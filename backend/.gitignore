@@ -1,0 +1,10 @@
+# Todo lo específico del backend
+node_modules/
+.env
+.env.local
+logs/
+*.log
+dist/
+coverage/
+*.db
+.DS_Store

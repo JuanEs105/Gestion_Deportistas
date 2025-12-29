@@ -1,0 +1,6 @@
+# Solo referencia a carpetas, NO archivos específicos
+backend/node_modules/
+frontend/node_modules/
+backend/.env
+frontend/.env
+.DS_Store
