@@ -1,14 +1,18 @@
+// frontend/src/services/api.js
 import axios from 'axios';
 
-// Configurar axios base
+const API_URL = 'http://localhost:5000/api';
+
+// Configuración base de axios
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: API_URL,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
   }
 });
 
-// Interceptor para agregar token automáticamente
+// Interceptor para agregar token a todas las peticiones
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -36,23 +40,171 @@ api.interceptors.response.use(
   }
 );
 
-export const deportistasAPI = {
-  getAll: () => api.get('/deportistas'),
-  getById: (id) => api.get(`/deportistas/${id}`),
-  create: (data) => api.post('/deportistas', data),
-  update: (id, data) => api.put(`/deportistas/${id}`, data),
-  delete: (id) => api.delete(`/deportistas/${id}`)
-};
-
-export const evaluacionesAPI = {
-  getAll: () => api.get('/evaluaciones'),
-  getByDeportista: (deportistaId) => api.get(`/evaluaciones/deportista/${deportistaId}`),
-  create: (data) => api.post('/evaluaciones', data)
-};
-
+// ==========================================
+// AUTH API
+// ==========================================
 export const authAPI = {
-  login: (credentials) => api.post('/auth/login', credentials),
-  profile: () => api.get('/auth/profile')
+  login: async (credentials) => {
+    const response = await axios.post(`${API_URL}/auth/login`, credentials);
+    return response.data;
+  },
+  
+  register: async (userData) => {
+    const response = await axios.post(`${API_URL}/auth/register`, userData);
+    return response.data;
+  },
+  
+  getProfile: async () => {
+    const response = await api.get('/auth/profile');
+    return response.data;
+  },
+  
+  logout: async () => {
+    const response = await api.post('/auth/logout');
+    return response.data;
+  }
+};
+
+// ==========================================
+// DEPORTISTAS API
+// ==========================================
+export const deportistasAPI = {
+  getAll: async () => {
+    try {
+      console.log('📡 Llamando a:', `${API_URL}/deportistas`);
+      const response = await api.get('/deportistas');
+      console.log('✅ Respuesta deportistas:', response.data);
+      return response;
+    } catch (error) {
+      console.error('❌ Error en getAll deportistas:', error);
+      throw error;
+    }
+  },
+  
+  getById: async (id) => {
+    const response = await api.get(`/deportistas/${id}`);
+    return response.data;
+  },
+  
+  create: async (deportistaData) => {
+    const response = await api.post('/deportistas', deportistaData);
+    return response.data;
+  },
+  
+  update: async (id, deportistaData) => {
+    const response = await api.put(`/deportistas/${id}`, deportistaData);
+    return response.data;
+  },
+  
+  delete: async (id) => {
+    const response = await api.delete(`/deportistas/${id}`);
+    return response.data;
+  },
+  
+  getStats: async (id) => {
+    const response = await api.get(`/deportistas/${id}/stats`);
+    return response.data;
+  }
+};
+
+// ==========================================
+// EVALUACIONES API
+// ==========================================
+export const evaluacionesAPI = {
+  create: async (evaluacionData) => {
+    const response = await api.post('/evaluaciones', evaluacionData);
+    return response.data;
+  },
+  
+  getByDeportista: async (deportistaId) => {
+    const response = await api.get(`/evaluaciones/deportista/${deportistaId}`);
+    return response.data;
+  },
+  
+  getProgreso: async (deportistaId) => {
+    const response = await api.get(`/evaluaciones/progreso/${deportistaId}`);
+    return response.data;
+  },
+  
+  getHistorial: async (deportistaId, habilidadId) => {
+    const response = await api.get(`/evaluaciones/historial/${deportistaId}/${habilidadId}`);
+    return response.data;
+  },
+  
+  aprobarCambioNivel: async (deportistaId, observaciones) => {
+    const response = await api.post(`/evaluaciones/aprobar-cambio/${deportistaId}`, {
+      observaciones
+    });
+    return response.data;
+  },
+  
+  getPendientes: async () => {
+    const response = await api.get('/evaluaciones/pendientes');
+    return response.data;
+  }
+};
+
+// ==========================================
+// HABILIDADES API
+// ==========================================
+export const habilidadesAPI = {
+  getAll: async (params = {}) => {
+    const response = await api.get('/habilidades', { params });
+    return response.data;
+  },
+  
+  getByNivel: async (nivel, deportistaId = null) => {
+    const params = deportistaId ? { deportista_id: deportistaId } : {};
+    const response = await api.get(`/habilidades/nivel/${nivel}`, { params });
+    return response.data;
+  },
+  
+  create: async (habilidadData) => {
+    const response = await api.post('/habilidades', habilidadData);
+    return response.data;
+  },
+  
+  getFaltantes: async (deportistaId, nivel = null) => {
+    const params = nivel ? { nivel } : {};
+    const response = await api.get(`/habilidades/faltantes/${deportistaId}`, { params });
+    return response.data;
+  }
+};
+
+// ==========================================
+// UPLOAD API
+// ==========================================
+export const uploadAPI = {
+  uploadDeportistaFoto: async (deportistaId, file) => {
+    const formData = new FormData();
+    formData.append('foto', file);
+    
+    const response = await api.post(`/upload/deportista/${deportistaId}/foto`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+  },
+  
+  deleteDeportistaFoto: async (deportistaId) => {
+    const response = await api.delete(`/upload/deportista/${deportistaId}/foto`);
+    return response.data;
+  },
+  
+  uploadMultiple: async (files) => {
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('fotos', file);
+    });
+    
+    const response = await api.post('/upload/galeria', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+  }
 };
 
 export default api;

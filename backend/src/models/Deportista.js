@@ -1,5 +1,6 @@
+// src/models/Deportista.js - VERSIÓN FINAL CORREGIDA
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database'); 
+const { sequelize } = require('../config/database');
 
 const Deportista = sequelize.define('Deportista', {
   id: {
@@ -21,35 +22,21 @@ const Deportista = sequelize.define('Deportista', {
   },
   altura: {
     type: DataTypes.FLOAT,
-    allowNull: true,
-    validate: {
-      min: 0.5,
-      max: 2.5
-    }
+    allowNull: true
   },
   peso: {
     type: DataTypes.FLOAT,
-    allowNull: true,
-    validate: {
-      min: 20,
-      max: 200
-    }
-  },
-  posicion: {
-    type: DataTypes.ENUM('delantero', 'defensa', 'portero', 'medio', 'basico', 'avanzado'),
     allowNull: true
   },
-  grupo: {
-    type: DataTypes.ENUM('élite', 'intermedio', 'principiante'),
-    defaultValue: 'principiante'
-  },
   nivel_actual: {
-    type: DataTypes.ENUM('básico', 'medio', 'avanzado'),
-    defaultValue: 'básico'
+    type: DataTypes.ENUM('1_basico', '1_medio', '1_avanzado', '2', '3', '4'),
+    defaultValue: '1_basico',
+    allowNull: false
   },
   estado: {
     type: DataTypes.ENUM('activo', 'lesionado', 'descanso', 'inactivo'),
-    defaultValue: 'activo'
+    defaultValue: 'activo',
+    allowNull: false
   },
   foto_perfil: {
     type: DataTypes.STRING,
@@ -69,13 +56,17 @@ const Deportista = sequelize.define('Deportista', {
   }
 }, {
   tableName: 'deportistas',
-  timestamps: true
+  timestamps: true,
+  underscored: true,        // ⚠️ CRÍTICO: Esto convierte createdAt -> created_at
+  createdAt: 'created_at',  // ⚠️ CRÍTICO: Mapeo explícito
+  updatedAt: 'updated_at'   // ⚠️ CRÍTICO: Mapeo explícito
 });
 
-// Asociaciones
+// Asociaciones - CORREGIDO
 Deportista.associate = function(models) {
   Deportista.belongsTo(models.User, {
-    foreignKey: 'user_id'
+    foreignKey: 'user_id',
+    as: 'User'  // ⚠️ CRÍTICO: Este alias debe usarse siempre
   });
   
   Deportista.hasMany(models.Evaluacion, {

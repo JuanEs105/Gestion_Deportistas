@@ -1,7 +1,7 @@
+// src/models/User.js - Verifica que use bcryptjs
 const { DataTypes } = require('sequelize');
-// CORREGIR: Importar sequelize desde config/database
 const { sequelize } = require('../config/database');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs'); // CAMBIADO: bcryptjs
 
 const User = sequelize.define('User', {
   id: {
@@ -13,45 +13,24 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
     validate: {
-      notEmpty: {
-        msg: 'El nombre es requerido'
-      }
+      notEmpty: true
     }
   },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: {
-      msg: 'El email ya está registrado'
-    },
+    unique: true,
     validate: {
-      isEmail: {
-        msg: 'Email inválido'
-      },
-      notEmpty: {
-        msg: 'El email es requerido'
-      }
+      isEmail: true
     }
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      len: {
-        args: [6, 100],
-        msg: 'La contraseña debe tener al menos 6 caracteres'
-      }
-    }
+    allowNull: false
   },
   role: {
     type: DataTypes.ENUM('entrenador', 'deportista', 'admin'),
-    defaultValue: 'deportista',
-    validate: {
-      isIn: {
-        args: [['entrenador', 'deportista', 'admin']],
-        msg: 'Rol inválido'
-      }
-    }
+    defaultValue: 'deportista'
   },
   telefono: {
     type: DataTypes.STRING,
@@ -64,6 +43,9 @@ const User = sequelize.define('User', {
 }, {
   tableName: 'users',
   timestamps: true,
+  underscored: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
   hooks: {
     beforeCreate: async (user) => {
       if (user.password) {
@@ -80,27 +62,11 @@ const User = sequelize.define('User', {
   }
 });
 
-// Método de instancia para comparar contraseñas
-User.prototype.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
-};
-
-// Método para obtener datos públicos (sin password)
-User.prototype.toJSON = function() {
-  const values = Object.assign({}, this.get());
-  delete values.password;
-  return values;
-};
 // Asociaciones
 User.associate = function(models) {
   User.hasOne(models.Deportista, {
     foreignKey: 'user_id',
-    onDelete: 'CASCADE'
-  });
-  
-  User.hasMany(models.Evaluacion, {
-    foreignKey: 'entrenador_id',
-    as: 'EvaluacionesRealizadas'
+    as: 'deportista'
   });
 };
 

@@ -9,7 +9,6 @@ const Sidebar = ({ tipoUsuario }) => {
     { path: '/entrenador/deportistas', label: 'Deportistas', icon: '👥' },
     { path: '/entrenador/evaluaciones', label: 'Evaluaciones', icon: '📋' },
     { path: '/entrenador/habilidades', label: 'Habilidades', icon: '🏅' },
-    { path: '/entrenador/grupos', label: 'Grupos', icon: '👨‍👩‍👧‍👦' },
   ];
   
   const menuItemsDeportista = [

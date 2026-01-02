@@ -5,7 +5,7 @@ dotenv.config();
 
 // Crear conexión a PostgreSQL
 const sequelize = new Sequelize(
-  process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/eval_deportistas',
+  process.env.DATABASE_URL || 'postgresql://postgres:Mini1052@localhost:5432/eval_deportistas',
   {
     dialect: 'postgres',
     logging: process.env.NODE_ENV === 'development' ? console.log : false,

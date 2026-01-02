@@ -1,60 +1,36 @@
-// src/models/index.js - VERSIÓN QUE NO FALLA
+// backend/src/models/index.js - ACTUALIZADO
 const { sequelize } = require('../config/database');
 
-// Intentar cargar modelos
-let User, Deportista, Habilidad, Evaluacion;
+// Cargar modelos
+const User = require('./User');
+const Deportista = require('./Deportista');
+const Habilidad = require('./Habilidad');
+const Evaluacion = require('./Evaluacion');
+const HistorialNivel = require('./HistorialNivel');
 
-try {
-  User = require('./User');
-  console.log('✅ User cargado');
-} catch (error) {
-  console.error('❌ Error cargando User:', error.message);
-  User = {};
-}
+console.log('✅ User cargado');
+console.log('✅ Deportista cargado');
+console.log('✅ Habilidad cargado');
+console.log('✅ Evaluacion cargado');
+console.log('✅ HistorialNivel cargado');
 
-try {
-  Deportista = require('./Deportista');
-  console.log('✅ Deportista cargado');
-} catch (error) {
-  console.error('❌ Error cargando Deportista:', error.message);
-  Deportista = {};
-}
+// Objeto con todos los modelos
+const models = {
+  User,
+  Deportista,
+  Habilidad,
+  Evaluacion,
+  HistorialNivel
+};
 
-try {
-  Habilidad = require('./Habilidad');
-  console.log('✅ Habilidad cargado');
-} catch (error) {
-  console.error('❌ Error cargando Habilidad:', error.message);
-  console.error('Creando Habilidad como dummy...');
-  // Crear un objeto dummy con métodos básicos
-  Habilidad = {
-    create: async () => ({ id: 'dummy-id', nombre: 'Dummy' }),
-    findAll: async () => [],
-    count: async () => 0,
-    findOne: async () => null,
-    findByPk: async () => null
-  };
-}
-
-try {
-  Evaluacion = require('./Evaluacion');
-  console.log('✅ Evaluacion cargado');
-} catch (error) {
-  console.error('❌ Error cargando Evaluacion:', error.message);
-  Evaluacion = {};
-}
-
-// Definir asociaciones solo si los modelos existen
-try {
-  if (User.associate && Deportista.associate) {
-    User.associate({ Deportista, Evaluacion });
-    Deportista.associate({ User, Evaluacion });
+// Ejecutar asociaciones
+Object.keys(models).forEach(modelName => {
+  if (models[modelName].associate) {
+    models[modelName].associate(models);
   }
-} catch (error) {
-  console.log('⚠️  Error en asociaciones:', error.message);
-}
+});
 
-console.log('📦 Modelos listos');
+console.log('📦 Modelos listos y asociados');
 
 // Exportar
 module.exports = {
@@ -62,5 +38,6 @@ module.exports = {
   User,
   Deportista,
   Habilidad,
-  Evaluacion
+  Evaluacion,
+  HistorialNivel
 };

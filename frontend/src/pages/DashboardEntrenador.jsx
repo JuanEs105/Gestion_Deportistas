@@ -5,7 +5,6 @@ const DashboardEntrenador = () => {
   const [stats, setStats] = useState({
     totalDeportistas: 0,
     evaluacionesPendientes: 0,
-    gruposActivos: 0,
     completadosEsteMes: 0
   });
   const [loading, setLoading] = useState(true);
@@ -31,7 +30,6 @@ const DashboardEntrenador = () => {
       setStats({
         totalDeportistas,
         evaluacionesPendientes,
-        gruposActivos: 3, // Por ahora fijo
         completadosEsteMes
       });
       
@@ -74,10 +72,6 @@ const DashboardEntrenador = () => {
           <p className="text-3xl font-bold text-yellow-600">{stats.evaluacionesPendientes}</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold text-gray-600">Grupos Activos</h3>
-          <p className="text-3xl font-bold text-green-600">{stats.gruposActivos}</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-lg font-semibold text-gray-600">Completados Este Mes</h3>
           <p className="text-3xl font-bold text-purple-600">{stats.completadosEsteMes}</p>
         </div>
@@ -91,9 +85,6 @@ const DashboardEntrenador = () => {
           </button>
           <button className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
             Agregar Deportista
-          </button>
-          <button className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700">
-            Crear Grupo
           </button>
         </div>
       </div>

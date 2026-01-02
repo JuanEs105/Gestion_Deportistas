@@ -1,3 +1,4 @@
+// backend/src/middleware/auth.js - VERSIÓN CORREGIDA
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
@@ -32,10 +33,10 @@ const authMiddleware = async (req, res, next) => {
       });
     }
     
-    // Agregar usuario a la request (con 'tipo' para frontend)
+    // Agregar usuario a la request
     req.user = {
       id: user.id,
-      name: user.name,
+      name: user.nombre,
       email: user.email,
       role: user.role,
       tipo: user.role,  // Para compatibilidad con frontend
@@ -65,6 +66,7 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
+// Middleware para verificar rol de entrenador
 const isEntrenador = (req, res, next) => {
   if (req.user.role !== 'entrenador' && req.user.role !== 'admin') {
     return res.status(403).json({
@@ -74,6 +76,7 @@ const isEntrenador = (req, res, next) => {
   next();
 };
 
+// Middleware para verificar rol de admin
 const isAdmin = (req, res, next) => {
   if (req.user.role !== 'admin') {
     return res.status(403).json({
@@ -83,6 +86,7 @@ const isAdmin = (req, res, next) => {
   next();
 };
 
+// Middleware para verificar rol de deportista
 const isDeportista = (req, res, next) => {
   if (req.user.role !== 'deportista') {
     return res.status(403).json({
@@ -92,7 +96,7 @@ const isDeportista = (req, res, next) => {
   next();
 };
 
-// EXPORTAR SOLO LOS MIDDLEWARES
+// EXPORTAR CORRECTAMENTE
 module.exports = { 
   authMiddleware, 
   isEntrenador, 

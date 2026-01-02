@@ -8,7 +8,7 @@ import Deportistas from './pages/Deportistas';
 import Evaluaciones from './pages/Evaluaciones';
 import Progreso from './pages/Progreso';
 import Habilidades from './pages/Habilidades';
-import Grupos from './pages/Grupos';
+import Estadisticas from './pages/Estadisticas';
 
 function App() {
   return (
@@ -22,7 +22,7 @@ function App() {
           <Route path="deportistas" element={<Deportistas />} />
           <Route path="evaluaciones" element={<Evaluaciones />} />
           <Route path="habilidades" element={<Habilidades />} />
-          <Route path="grupos" element={<Grupos />} />
+          <Route path="estadisticas" element={<Estadisticas />} />
         </Route>
         
         <Route path="/deportista" element={<Layout />}>
