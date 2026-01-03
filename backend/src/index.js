@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const { connectDB } = require('./config/database');
+const adminRoutes = require('./routes/adminRoutes');
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
 // Conectar a la base de datos
 connectDB().then(() => {
   // Importar rutas
@@ -43,6 +45,7 @@ connectDB().then(() => {
   app.use('/api/upload', uploadRoutes);
   app.use('/api/evaluaciones', evaluacionRoutes);
   app.use('/api/habilidades', habilidadRoutes);
+  app.use('/api/admin', adminRoutes);
 
   // Ruta de prueba
   app.get('/', (req, res) => {

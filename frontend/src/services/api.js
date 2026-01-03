@@ -207,4 +207,73 @@ export const uploadAPI = {
   }
 };
 
+// ==========================================
+// ADMIN API
+// ==========================================
+export const adminAPI = {
+  // Estadísticas
+  getStats: async () => {
+    const response = await api.get('/admin/stats');
+    return response.data;
+  },
+  
+  getDeportistasStats: async () => {
+    const response = await api.get('/admin/stats/deportistas');
+    return response.data;
+  },
+  
+  getEvaluacionesStats: async () => {
+    const response = await api.get('/admin/stats/evaluaciones');
+    return response.data;
+  },
+  
+  // Entrenadores
+  getAllEntrenadores: async () => {
+    const response = await api.get('/admin/entrenadores');
+    return response.data;
+  },
+  
+  getEntrenadorById: async (id) => {
+    const response = await api.get(`/admin/entrenadores/${id}`);
+    return response.data;
+  },
+  
+  createEntrenador: async (entrenadorData) => {
+    const response = await api.post('/admin/entrenadores', entrenadorData);
+    return response.data;
+  },
+  
+  updateEntrenador: async (id, entrenadorData) => {
+    const response = await api.put(`/admin/entrenadores/${id}`, entrenadorData);
+    return response.data;
+  },
+  
+  deleteEntrenador: async (id) => {
+    const response = await api.delete(`/admin/entrenadores/${id}`);
+    return response.data;
+  },
+  
+  toggleEntrenadorStatus: async (id) => {
+    const response = await api.patch(`/admin/entrenadores/${id}/toggle-status`);
+    return response.data;
+  },
+  
+  // Deportistas globales
+  getAllDeportistasGlobal: async () => {
+    const response = await api.get('/admin/deportistas/all');
+    return response.data;
+  },
+  
+  // Reportes
+  getReporteResumen: async () => {
+    const response = await api.get('/admin/reportes/resumen');
+    return response.data;
+  },
+  
+  getReporteActividad: async () => {
+    const response = await api.get('/admin/reportes/actividad');
+    return response.data;
+  }
+};
+
 export default api;

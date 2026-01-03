@@ -1,5 +1,5 @@
 // frontend/src/pages/Evaluaciones.jsx - CON GRÁFICAS
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { deportistasAPI, habilidadesAPI, evaluacionesAPI } from '../services/api';
 import {
   LineChart, Line, BarChart, Bar, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -22,6 +22,7 @@ const Evaluaciones = () => {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [refreshKey, setRefreshKey] = useState(0); // NUEVO: Para forzar refresh
 
   useEffect(() => {
     cargarDeportistas();
@@ -32,6 +33,13 @@ const Evaluaciones = () => {
       cargarDatosDeportista();
     }
   }, [deportistaSeleccionado, categoriaActual]);
+
+  // Efecto adicional para forzar actualización de gráficas
+  useEffect(() => {
+    if (deportistaSeleccionado && historialEvaluaciones.length > 0) {
+      console.log('🔄 Historial actualizado, recalculando gráficas...');
+    }
+  }, [historialEvaluaciones]);
 
   const cargarDeportistas = async () => {
     try {
@@ -47,25 +55,36 @@ const Evaluaciones = () => {
     try {
       setLoading(true);
       
+      console.log('🔄 Cargando datos del deportista:', deportistaSeleccionado.id);
+      
       // Cargar habilidades del nivel actual
+      console.log('📋 Cargando habilidades...');
       const habilidadesRes = await habilidadesAPI.getByNivel(
         deportistaSeleccionado.nivel_actual,
         deportistaSeleccionado.id
       );
       
       const habilidadesData = habilidadesRes.habilidades || [];
+      console.log('✅ Habilidades cargadas:', habilidadesData.length);
       setHabilidades(habilidadesData);
       
       // Cargar progreso
+      console.log('📊 Cargando progreso...');
       const progresoRes = await evaluacionesAPI.getProgreso(deportistaSeleccionado.id);
+      console.log('✅ Progreso cargado:', progresoRes);
       setProgreso(progresoRes);
       
       // Cargar historial de evaluaciones
+      console.log('📜 Cargando historial...');
       const historialRes = await evaluacionesAPI.getByDeportista(deportistaSeleccionado.id);
+      console.log('✅ Historial cargado:', historialRes.evaluaciones?.length || 0, 'evaluaciones');
       setHistorialEvaluaciones(historialRes.evaluaciones || []);
       
+      console.log('🎉 Todos los datos cargados correctamente');
+      
     } catch (error) {
-      console.error('Error cargando datos:', error);
+      console.error('❌ Error cargando datos:', error);
+      console.error('Detalles del error:', error.response?.data);
     } finally {
       setLoading(false);
     }
@@ -96,7 +115,9 @@ const Evaluaciones = () => {
     try {
       setLoading(true);
       
-      await evaluacionesAPI.create({
+      console.log('💾 Guardando evaluación...');
+      
+      const response = await evaluacionesAPI.create({
         deportista_id: deportistaSeleccionado.id,
         habilidad_id: evaluacionActual.habilidad_id,
         puntuacion: parseInt(evaluacionActual.puntuacion),
@@ -104,7 +125,9 @@ const Evaluaciones = () => {
         video_url: evaluacionActual.video_url || null
       });
       
-      alert('✅ Evaluación registrada exitosamente');
+      console.log('✅ Evaluación guardada:', response);
+      
+      // Cerrar modal INMEDIATAMENTE
       setMostrarFormulario(false);
       setEvaluacionActual({
         habilidad_id: '',
@@ -113,20 +136,91 @@ const Evaluaciones = () => {
         video_url: ''
       });
       
-      // Recargar datos
-      await cargarDatosDeportista();
+      // Mostrar mensaje
+      alert('✅ Evaluación registrada exitosamente');
+      
+      // FORZAR ACTUALIZACIÓN COMPLETA
+      console.log('🔄 FORZANDO ACTUALIZACIÓN COMPLETA...');
+      
+      // Esperar que el backend procese
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // RESETEAR TODO EL ESTADO
+      console.log('🔄 Limpiando estado anterior...');
+      setProgreso(null);
+      setHabilidades([]);
+      setHistorialEvaluaciones([]);
+      
+      // Esperar que React limpie el DOM
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // CARGAR DATOS FRESCOS
+      console.log('📥 Cargando datos frescos...');
+      
+      const [habilidadesRes, progresoRes, historialRes] = await Promise.all([
+        habilidadesAPI.getByNivel(deportistaSeleccionado.nivel_actual, deportistaSeleccionado.id),
+        evaluacionesAPI.getProgreso(deportistaSeleccionado.id),
+        evaluacionesAPI.getByDeportista(deportistaSeleccionado.id)
+      ]);
+      
+      console.log('📋 Habilidades recargadas:', habilidadesRes.habilidades?.length);
+      console.log('📊 Progreso recargado:', progresoRes);
+      console.log('📜 Historial recargado:', historialRes.evaluaciones?.length);
+      
+      // ACTUALIZAR ESTADO CON NUEVOS DATOS
+      setHabilidades([...habilidadesRes.habilidades || []]);
+      setProgreso({...progresoRes});
+      setHistorialEvaluaciones([...historialRes.evaluaciones || []]);
+      
+      // FORZAR RE-RENDER COMPLETO
+      setRefreshKey(prev => prev + 1);
+      
+      console.log('✅ ACTUALIZACIÓN COMPLETA EXITOSA');
       
     } catch (error) {
-      console.error('Error guardando evaluación:', error);
+      console.error('❌ Error guardando evaluación:', error);
+      console.error('Detalles:', error.response?.data);
       alert('❌ Error al guardar la evaluación: ' + (error.response?.data?.error || error.message));
     } finally {
       setLoading(false);
     }
   };
 
-  // Preparar datos para gráficas
+  const handleAprobarCambioNivel = async () => {
+    if (!window.confirm(`¿Estás seguro de promover a ${deportistaSeleccionado.User?.nombre} al siguiente nivel?`)) {
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      
+      await evaluacionesAPI.aprobarCambioNivel(deportistaSeleccionado.id, 
+        'Nivel completado al 100%, promovido automáticamente'
+      );
+      
+      alert('✅ ¡Deportista promovido exitosamente!');
+      
+      // Recargar deportista actualizado
+      await cargarDatosDeportista();
+      
+    } catch (error) {
+      console.error('Error aprobando cambio:', error);
+      alert('❌ Error al aprobar cambio: ' + (error.response?.data?.error || error.message));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Preparar datos para gráficas - SE RECALCULA AUTOMÁTICAMENTE
   const prepararDatosGraficas = () => {
-    if (!progreso) return null;
+    if (!progreso) {
+      console.log('⚠️ No hay datos de progreso');
+      return null;
+    }
+
+    console.log('📊 Preparando datos para gráficas...');
+    console.log('Progreso:', progreso);
+    console.log('Historial:', historialEvaluaciones.length, 'evaluaciones');
 
     // Datos para gráfica de barras (progreso por categoría)
     const datosBarras = Object.entries(progreso.progreso_por_categoria).map(([categoria, data]) => ({
@@ -137,27 +231,31 @@ const Evaluaciones = () => {
       porcentaje: data.porcentaje
     }));
 
+    console.log('📊 Datos barras:', datosBarras);
+
     // Datos para gráfica radar (últimas 6 evaluaciones)
     const ultimasEvaluaciones = historialEvaluaciones
       .slice(0, 6)
       .reverse()
-      .map(evalu => ({
-        habilidad: evalu.habilidad?.nombre?.substring(0, 20) || 'Sin nombre',
-        puntuacion: evalu.puntuacion,
-        minimo: evalu.habilidad?.puntuacion_minima || 7
+      .map(evaluacion => ({
+        habilidad: evaluacion.habilidad?.nombre?.substring(0, 20) || 'Sin nombre',
+        puntuacion: evaluacion.puntuacion,
+        minimo: evaluacion.habilidad?.puntuacion_minima || 7
       }));
+
+    console.log('🎯 Últimas evaluaciones:', ultimasEvaluaciones);
 
     // Datos para línea de tiempo (progreso histórico)
     const evaluacionesPorFecha = {};
-    historialEvaluaciones.forEach(evalu => {
-      const fecha = new Date(eval.fecha_evaluacion).toLocaleDateString('es-ES', { 
+    historialEvaluaciones.forEach(evaluacion => {
+      const fecha = new Date(evaluacion.fecha_evaluacion).toLocaleDateString('es-ES', { 
         month: 'short', 
         day: 'numeric' 
       });
       if (!evaluacionesPorFecha[fecha]) {
         evaluacionesPorFecha[fecha] = [];
       }
-      evaluacionesPorFecha[fecha].push(eval.puntuacion);
+      evaluacionesPorFecha[fecha].push(evaluacion.puntuacion);
     });
 
     const datosLinea = Object.entries(evaluacionesPorFecha)
@@ -167,6 +265,9 @@ const Evaluaciones = () => {
         promedio: (puntuaciones.reduce((a, b) => a + b, 0) / puntuaciones.length).toFixed(1),
         evaluaciones: puntuaciones.length
       }));
+
+    console.log('📈 Datos línea:', datosLinea);
+    console.log('✅ Datos preparados correctamente');
 
     return { datosBarras, ultimasEvaluaciones, datosLinea };
   };
@@ -223,7 +324,18 @@ const Evaluaciones = () => {
     return { estado: 'en progreso', color: 'bg-yellow-100 text-yellow-800', icon: '🔄' };
   };
 
-  const datosGraficas = deportistaSeleccionado && progreso ? prepararDatosGraficas() : null;
+  // USAR USEMEMO PARA RECALCULAR AUTOMÁTICAMENTE - AGREGAMOS refreshKey
+  const datosGraficas = useMemo(() => {
+    if (!deportistaSeleccionado || !progreso) {
+      return null;
+    }
+    
+    console.log('🔄 useMemo - Recalculando gráficas... [refreshKey:', refreshKey, ']');
+    console.log('   Progreso actual:', progreso.progreso_total);
+    console.log('   Historial:', historialEvaluaciones.length, 'evaluaciones');
+    
+    return prepararDatosGraficas();
+  }, [deportistaSeleccionado, progreso, historialEvaluaciones, refreshKey]); // AGREGAMOS refreshKey
 
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
@@ -352,68 +464,98 @@ const Evaluaciones = () => {
                 )}
               </div>
 
-              {/* GRÁFICAS DE PROGRESO */}
-              {datosGraficas && historialEvaluaciones.length > 0 && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              {/* GRÁFICAS DE PROGRESO - AGREGAMOS KEY PARA FORZAR RE-RENDER */}
+              {datosGraficas && historialEvaluaciones.length > 0 ? (
+                <div key={`graficas-${refreshKey}`} className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                   {/* GRÁFICA DE BARRAS - Progreso por Categoría */}
                   <div className="bg-white rounded-xl shadow-lg p-6">
                     <h3 className="text-lg font-bold text-gray-800 mb-4">📊 Progreso por Categoría</h3>
-                    <ResponsiveContainer width="100%" height={250}>
-                      <BarChart data={datosGraficas.datosBarras}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="categoria" />
-                        <YAxis />
-                        <Tooltip />
-                        <Bar dataKey="completadas" fill="#3b82f6" name="Completadas">
-                          {datosGraficas.datosBarras.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Bar>
-                        <Bar dataKey="total" fill="#e5e7eb" name="Total" />
-                      </BarChart>
-                    </ResponsiveContainer>
+                    {loading ? (
+                      <div className="flex justify-center items-center h-[250px]">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                      </div>
+                    ) : (
+                      <ResponsiveContainer width="100%" height={250} key={`barras-${refreshKey}`}>
+                        <BarChart data={datosGraficas.datosBarras}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="categoria" />
+                          <YAxis />
+                          <Tooltip />
+                          <Bar dataKey="completadas" fill="#3b82f6" name="Completadas">
+                            {datosGraficas.datosBarras.map((entry, index) => (
+                              <Cell key={`cell-${index}-${refreshKey}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Bar>
+                          <Bar dataKey="total" fill="#e5e7eb" name="Total" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    )}
                   </div>
 
                   {/* GRÁFICA RADAR - Últimas Evaluaciones */}
                   <div className="bg-white rounded-xl shadow-lg p-6">
                     <h3 className="text-lg font-bold text-gray-800 mb-4">🎯 Últimas 6 Evaluaciones</h3>
-                    <ResponsiveContainer width="100%" height={250}>
-                      <RadarChart data={datosGraficas.ultimasEvaluaciones}>
-                        <PolarGrid />
-                        <PolarAngleAxis dataKey="habilidad" />
-                        <PolarRadiusAxis domain={[0, 10]} />
-                        <Radar name="Puntuación" dataKey="puntuacion" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
-                        <Radar name="Mínimo" dataKey="minimo" stroke="#ef4444" fill="#ef4444" fillOpacity={0.2} />
-                        <Tooltip />
-                        <Legend />
-                      </RadarChart>
-                    </ResponsiveContainer>
+                    {loading ? (
+                      <div className="flex justify-center items-center h-[250px]">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                      </div>
+                    ) : (
+                      <ResponsiveContainer width="100%" height={250} key={`radar-${refreshKey}`}>
+                        <RadarChart data={datosGraficas.ultimasEvaluaciones}>
+                          <PolarGrid />
+                          <PolarAngleAxis dataKey="habilidad" />
+                          <PolarRadiusAxis domain={[0, 10]} />
+                          <Radar name="Puntuación" dataKey="puntuacion" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
+                          <Radar name="Mínimo" dataKey="minimo" stroke="#ef4444" fill="#ef4444" fillOpacity={0.2} />
+                          <Tooltip />
+                          <Legend />
+                        </RadarChart>
+                      </ResponsiveContainer>
+                    )}
                   </div>
 
                   {/* GRÁFICA DE LÍNEA - Evolución Temporal */}
                   {datosGraficas.datosLinea.length > 0 && (
                     <div className="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
                       <h3 className="text-lg font-bold text-gray-800 mb-4">📈 Evolución del Rendimiento</h3>
-                      <ResponsiveContainer width="100%" height={250}>
-                        <LineChart data={datosGraficas.datosLinea}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="fecha" />
-                          <YAxis domain={[0, 10]} />
-                          <Tooltip />
-                          <Legend />
-                          <Line type="monotone" dataKey="promedio" stroke="#3b82f6" strokeWidth={3} name="Promedio" />
-                        </LineChart>
-                      </ResponsiveContainer>
+                      {loading ? (
+                        <div className="flex justify-center items-center h-[250px]">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        </div>
+                      ) : (
+                        <ResponsiveContainer width="100%" height={250} key={`linea-${refreshKey}`}>
+                          <LineChart data={datosGraficas.datosLinea}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="fecha" />
+                            <YAxis domain={[0, 10]} />
+                            <Tooltip />
+                            <Legend />
+                            <Line type="monotone" dataKey="promedio" stroke="#3b82f6" strokeWidth={3} name="Promedio" />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      )}
                     </div>
                   )}
                 </div>
+              ) : (
+                historialEvaluaciones.length === 0 && (
+                  <div className="bg-white rounded-xl shadow-lg p-8 mb-6 text-center">
+                    <div className="text-6xl mb-4">📊</div>
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">
+                      Sin evaluaciones aún
+                    </h3>
+                    <p className="text-gray-600">
+                      Realiza la primera evaluación para ver las gráficas de progreso
+                    </p>
+                  </div>
+                )
               )}
 
-              {/* ESTADÍSTICAS POR CATEGORÍA */}
+              {/* ESTADÍSTICAS POR CATEGORÍA - AGREGAR KEY */}
               {progreso && (
-                <div className="grid grid-cols-3 gap-4 mb-6">
+                <div key={`stats-${refreshKey}`} className="grid grid-cols-3 gap-4 mb-6">
                   {Object.entries(progreso.progreso_por_categoria).map(([categoria, data]) => (
-                    <div key={categoria} className="bg-white rounded-xl shadow p-4">
+                    <div key={`${categoria}-${refreshKey}`} className="bg-white rounded-xl shadow p-4">
                       <div className="text-3xl mb-2">{getCategoriaIcon(categoria)}</div>
                       <h4 className="font-semibold text-gray-700 capitalize mb-2">
                         {categoria.replace('_', ' ')}
