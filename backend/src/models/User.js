@@ -1,7 +1,7 @@
-// src/models/User.js - Verifica que use bcryptjs
+// src/models/User.js - CON NIVELES ASIGNADOS
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
-const bcrypt = require('bcryptjs'); // CAMBIADO: bcryptjs
+const bcrypt = require('bcryptjs');
 
 const User = sequelize.define('User', {
   id: {
@@ -39,6 +39,12 @@ const User = sequelize.define('User', {
   activo: {
     type: DataTypes.BOOLEAN,
     defaultValue: true
+  },
+  niveles_asignados: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    allowNull: true,
+    defaultValue: [],
+    comment: 'Niveles que puede gestionar este entrenador (solo para role=entrenador)'
   }
 }, {
   tableName: 'users',

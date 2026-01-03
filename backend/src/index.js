@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const { connectDB } = require('./config/database');
-const adminRoutes = require('./routes/adminRoutes');
+
 
 dotenv.config();
 
@@ -37,6 +37,7 @@ connectDB().then(() => {
   const uploadRoutes = require('./routes/uploadRoutes');
   const evaluacionRoutes = require('./routes/evaluacionRoutes');
   const habilidadRoutes = require('./routes/habilidadRoutes');
+  const adminRoutes = require('./routes/adminRoutes');
   
 
   // Rutas de la API
@@ -45,6 +46,7 @@ connectDB().then(() => {
   app.use('/api/upload', uploadRoutes);
   app.use('/api/evaluaciones', evaluacionRoutes);
   app.use('/api/habilidades', habilidadRoutes);
+  app.use('/api/admin', adminRoutes);
   app.use('/api/admin', adminRoutes);
 
   // Ruta de prueba

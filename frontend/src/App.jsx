@@ -9,14 +9,24 @@ import Evaluaciones from './pages/Evaluaciones';
 import Progreso from './pages/Progreso';
 import Habilidades from './pages/Habilidades';
 import Estadisticas from './pages/Estadisticas';
+import DashboardAdmin from './pages/Admin/DashboardAdmin';
+import AdminEntrenadores from './pages/Admin/AdminEntrenadores';
+import AdminDeportistas from './pages/Admin/AdminDeportistas';
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
-        
+
         {/* RUTAS PROTEGIDAS CON LAYOUT */}
+
+        <Route path="/admin" element={<Layout />}>
+          <Route index element={<DashboardAdmin />} />
+          <Route path="entrenadores" element={<AdminEntrenadores />} />
+          <Route path="deportistas" element={<AdminDeportistas />} />
+        </Route>
+        
         <Route path="/entrenador" element={<Layout />}>
           <Route index element={<DashboardEntrenador />} />
           <Route path="deportistas" element={<Deportistas />} />
@@ -30,7 +40,7 @@ function App() {
           <Route path="progreso" element={<Progreso />} />
           <Route path="evaluaciones" element={<Evaluaciones />} />
         </Route>
-        
+
         <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
     </Router>

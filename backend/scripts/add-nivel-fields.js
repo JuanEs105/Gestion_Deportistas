@@ -1,38 +1,73 @@
-// backend/scripts/add-nivel-fields.js
 const { sequelize } = require('../src/config/database');
 
 const addNivelFields = async () => {
   try {
-    console.log('🔄 Agregando campos de cambio de nivel...');
+    console.log('🔄 Verificando y agregando campos de cambio de nivel...');
     
-    await sequelize.getQueryInterface().addColumn('deportistas', 'nivel_sugerido', {
-      type: sequelize.Sequelize.ENUM('1_basico', '1_medio', '1_avanzado', '2', '3', '4'),
-      allowNull: true,
-      comment: 'Siguiente nivel sugerido cuando completa el 100%'
-    });
+    // Verificar si la columna ya existe
+    const [result] = await sequelize.query(`
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name = 'deportistas' 
+      AND column_name = 'nivel_sugerido'
+    `);
     
-    await sequelize.getQueryInterface().addColumn('deportistas', 'cambio_nivel_pendiente', {
-      type: sequelize.Sequelize.BOOLEAN,
-      defaultValue: false,
-      comment: 'Indica si hay un cambio de nivel pendiente de aprobación'
-    });
+    if (result.length > 0) {
+      console.log('✅ La columna nivel_sugerido ya existe');
+    } else {
+      // Crear el tipo ENUM si no existe
+      await sequelize.query(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_deportistas_nivel_sugerido') THEN
+            CREATE TYPE "public"."enum_deportistas_nivel_sugerido" AS ENUM('1_basico', '1_medio', '1_avanzado', '2', '3', '4');
+          END IF;
+        END $$;
+      `);
+      
+      // Agregar la columna
+      await sequelize.query(`
+        ALTER TABLE deportistas 
+        ADD COLUMN nivel_sugerido "public"."enum_deportistas_nivel_sugerido"
+      `);
+      
+      console.log('✅ Columna nivel_sugerido agregada');
+    }
     
-    await sequelize.getQueryInterface().addColumn('deportistas', 'fecha_ultimo_cambio_nivel', {
-      type: sequelize.Sequelize.DATE,
-      allowNull: true,
-      comment: 'Fecha del último cambio de nivel aprobado'
-    });
+    // Verificar si la columna porcentaje_completado ya existe
+    const [result2] = await sequelize.query(`
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name = 'deportistas' 
+      AND column_name = 'porcentaje_completado'
+    `);
     
-    console.log('✅ Campos agregados exitosamente');
+    if (result2.length > 0) {
+      console.log('✅ La columna porcentaje_completado ya existe');
+    } else {
+      // Agregar columna porcentaje_completado
+      await sequelize.query(`
+        ALTER TABLE deportistas 
+        ADD COLUMN porcentaje_completado FLOAT DEFAULT 0.0
+      `);
+      
+      console.log('✅ Columna porcentaje_completado agregada');
+    }
+    
+    // Agregar comentarios a las columnas
+    await sequelize.query(`
+      COMMENT ON COLUMN deportistas.nivel_sugerido IS 'Siguiente nivel sugerido cuando completa el 100%';
+    `);
+    
+    await sequelize.query(`
+      COMMENT ON COLUMN deportistas.porcentaje_completado IS 'Porcentaje completado del nivel actual (0-100)';
+    `);
+    
+    console.log('🎉 Todos los campos de nivel han sido verificados/agregados correctamente');
     process.exit(0);
   } catch (error) {
-    if (error.message.includes('already exists')) {
-      console.log('⚠️  Los campos ya existen');
-      process.exit(0);
-    } else {
-      console.error('❌ Error:', error.message);
-      process.exit(1);
-    }
+    console.error('❌ Error:', error.message);
+    process.exit(1);
   }
 };
 

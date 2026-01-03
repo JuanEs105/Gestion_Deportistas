@@ -128,26 +128,30 @@ class AdminController {
     try {
       const entrenadores = await User.findAll({
         where: { role: 'entrenador' },
-        attributes: ['id', 'nombre', 'email', 'telefono', 'activo', 'created_at'],
+        attributes: ['id', 'nombre', 'email', 'telefono', 'activo', 'niveles_asignados', 'created_at'],
         order: [['created_at', 'DESC']]
       });
       
-      // Contar deportistas por entrenador (evaluaciones únicas)
+      // Contar deportistas por entrenador
       const entrenadoresConStats = await Promise.all(
         entrenadores.map(async (entrenador) => {
-          const deportistasUnicos = await Evaluacion.findAll({
-            where: { entrenador_id: entrenador.id },
-            attributes: [[sequelize.fn('DISTINCT', sequelize.col('deportista_id')), 'deportista_id']],
-            raw: true
+          const nivelesAsignados = entrenador.niveles_asignados || [];
+          
+          // Contar deportistas en sus niveles asignados
+          const deportistasAsignados = await Deportista.count({
+            where: {
+              nivel_actual: nivelesAsignados.length > 0 ? nivelesAsignados : null
+            }
           });
           
+          // Total de evaluaciones realizadas
           const totalEvaluaciones = await Evaluacion.count({
             where: { entrenador_id: entrenador.id }
           });
           
           return {
             ...entrenador.toJSON(),
-            deportistas_asignados: deportistasUnicos.length,
+            deportistas_asignados: deportistasAsignados,
             total_evaluaciones: totalEvaluaciones
           };
         })
@@ -189,7 +193,7 @@ class AdminController {
   
   static async createEntrenador(req, res) {
     try {
-      const { nombre, email, password, telefono } = req.body;
+      const { nombre, email, password, telefono, niveles_asignados } = req.body;
       
       if (!nombre || !email || !password) {
         return res.status(400).json({
@@ -205,6 +209,11 @@ class AdminController {
         });
       }
       
+      // Validar niveles asignados
+      const nivelesValidos = ['1_basico', '1_medio', '1_avanzado', '2', '3', '4'];
+      const nivelesArray = Array.isArray(niveles_asignados) ? niveles_asignados : [];
+      const nivelesFinales = nivelesArray.filter(n => nivelesValidos.includes(n));
+      
       // Crear entrenador
       const entrenador = await User.create({
         nombre,
@@ -212,10 +221,12 @@ class AdminController {
         password,
         telefono,
         role: 'entrenador',
-        activo: true
+        activo: true,
+        niveles_asignados: nivelesFinales.length > 0 ? nivelesFinales : nivelesValidos
       });
       
       console.log('✅ Entrenador creado por admin:', entrenador.email);
+      console.log('   Niveles asignados:', entrenador.niveles_asignados);
       
       res.status(201).json({
         success: true,
@@ -225,7 +236,8 @@ class AdminController {
           nombre: entrenador.nombre,
           email: entrenador.email,
           telefono: entrenador.telefono,
-          activo: entrenador.activo
+          activo: entrenador.activo,
+          niveles_asignados: entrenador.niveles_asignados
         }
       });
     } catch (error) {
@@ -237,7 +249,7 @@ class AdminController {
   static async updateEntrenador(req, res) {
     try {
       const { id } = req.params;
-      const { nombre, email, telefono, password } = req.body;
+      const { nombre, email, telefono, password, niveles_asignados } = req.body;
       
       const entrenador = await User.findOne({
         where: { id, role: 'entrenador' }
@@ -251,9 +263,18 @@ class AdminController {
       if (nombre) updateData.nombre = nombre;
       if (email) updateData.email = email;
       if (telefono !== undefined) updateData.telefono = telefono;
-      if (password) updateData.password = password; // Se hasheará automáticamente
+      if (password) updateData.password = password;
+      
+      // Actualizar niveles asignados
+      if (Array.isArray(niveles_asignados)) {
+        const nivelesValidos = ['1_basico', '1_medio', '1_avanzado', '2', '3', '4'];
+        updateData.niveles_asignados = niveles_asignados.filter(n => nivelesValidos.includes(n));
+      }
       
       await entrenador.update(updateData);
+      
+      console.log('✅ Entrenador actualizado:', entrenador.email);
+      console.log('   Nuevos niveles:', entrenador.niveles_asignados);
       
       res.json({
         success: true,
@@ -263,7 +284,8 @@ class AdminController {
           nombre: entrenador.nombre,
           email: entrenador.email,
           telefono: entrenador.telefono,
-          activo: entrenador.activo
+          activo: entrenador.activo,
+          niveles_asignados: entrenador.niveles_asignados
         }
       });
     } catch (error) {
