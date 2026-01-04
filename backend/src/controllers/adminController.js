@@ -504,6 +504,185 @@ class AdminController {
       total_evaluaciones: totalEvaluaciones
     };
   }
+  // ==========================================
+// GESTIÓN DE ADMINISTRADORES
+// ==========================================
+
+static async getAllAdministradores(req, res) {
+  try {
+    const administradores = await User.findAll({
+      where: { role: 'admin' },
+      attributes: ['id', 'nombre', 'email', 'telefono', 'activo', 'created_at'],
+      order: [['created_at', 'DESC']]
+    });
+    
+    res.json({
+      success: true,
+      total: administradores.length,
+      administradores
+    });
+  } catch (error) {
+    console.error('Error obteniendo administradores:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+}
+
+static async createAdministrador(req, res) {
+  try {
+    const { nombre, email, password, telefono } = req.body;
+    
+    if (!nombre || !email || !password) {
+      return res.status(400).json({
+        error: 'Nombre, email y contraseña son requeridos'
+      });
+    }
+    
+    // Verificar email único
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({
+        error: 'El email ya está registrado'
+      });
+    }
+    
+    // Crear administrador
+    const admin = await User.create({
+      nombre,
+      email,
+      password,
+      telefono,
+      role: 'admin',
+      activo: true
+    });
+    
+    console.log('✅ Administrador creado:', admin.email);
+    
+    res.status(201).json({
+      success: true,
+      message: 'Administrador creado exitosamente',
+      administrador: {
+        id: admin.id,
+        nombre: admin.nombre,
+        email: admin.email,
+        telefono: admin.telefono,
+        activo: admin.activo
+      }
+    });
+  } catch (error) {
+    console.error('Error creando administrador:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+}
+
+static async updateAdministrador(req, res) {
+  try {
+    const { id } = req.params;
+    const { nombre, email, telefono, password } = req.body;
+    
+    const admin = await User.findOne({
+      where: { id, role: 'admin' }
+    });
+    
+    if (!admin) {
+      return res.status(404).json({ error: 'Administrador no encontrado' });
+    }
+    
+    const updateData = {};
+    if (nombre) updateData.nombre = nombre;
+    if (email) updateData.email = email;
+    if (telefono !== undefined) updateData.telefono = telefono;
+    if (password) updateData.password = password;
+    
+    await admin.update(updateData);
+    
+    console.log('✅ Administrador actualizado:', admin.email);
+    
+    res.json({
+      success: true,
+      message: 'Administrador actualizado exitosamente',
+      administrador: {
+        id: admin.id,
+        nombre: admin.nombre,
+        email: admin.email,
+        telefono: admin.telefono,
+        activo: admin.activo
+      }
+    });
+  } catch (error) {
+    console.error('Error actualizando administrador:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+}
+
+static async deleteAdministrador(req, res) {
+  try {
+    const { id } = req.params;
+    
+    // No permitir auto-eliminación
+    if (id === req.user.id) {
+      return res.status(400).json({
+        error: 'No puedes eliminar tu propia cuenta de administrador'
+      });
+    }
+    
+    const admin = await User.findOne({
+      where: { id, role: 'admin' }
+    });
+    
+    if (!admin) {
+      return res.status(404).json({ error: 'Administrador no encontrado' });
+    }
+    
+    const nombreAdmin = admin.nombre;
+    await admin.destroy();
+    
+    console.log('✅ Administrador eliminado:', nombreAdmin);
+    
+    res.json({
+      success: true,
+      message: `Administrador ${nombreAdmin} eliminado exitosamente`
+    });
+  } catch (error) {
+    console.error('Error eliminando administrador:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+}
+
+static async toggleAdministradorStatus(req, res) {
+  try {
+    const { id } = req.params;
+    
+    // No permitir auto-desactivación
+    if (id === req.user.id) {
+      return res.status(400).json({
+        error: 'No puedes cambiar el estado de tu propia cuenta'
+      });
+    }
+    
+    const admin = await User.findOne({
+      where: { id, role: 'admin' }
+    });
+    
+    if (!admin) {
+      return res.status(404).json({ error: 'Administrador no encontrado' });
+    }
+    
+    await admin.update({ activo: !admin.activo });
+    
+    res.json({
+      success: true,
+      message: `Administrador ${admin.activo ? 'activado' : 'desactivado'}`,
+      administrador: {
+        id: admin.id,
+        nombre: admin.nombre,
+        activo: admin.activo
+      }
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+}
 }
 
 module.exports = AdminController;

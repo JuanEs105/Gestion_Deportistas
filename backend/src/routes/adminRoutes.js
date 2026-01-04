@@ -1,4 +1,4 @@
-// backend/src/routes/adminRoutes.js
+// backend/src/routes/adminRoutes.js - VERSIÓN COMPLETA
 const express = require('express');
 const router = express.Router();
 const AdminController = require('../controllers/adminController');
@@ -24,6 +24,15 @@ router.post('/entrenadores', AdminController.createEntrenador);
 router.put('/entrenadores/:id', AdminController.updateEntrenador);
 router.delete('/entrenadores/:id', AdminController.deleteEntrenador);
 router.patch('/entrenadores/:id/toggle-status', AdminController.toggleEntrenadorStatus);
+
+// ==========================================
+// GESTIÓN DE ADMINISTRADORES (NUEVO)
+// ==========================================
+router.get('/administradores', AdminController.getAllAdministradores);
+router.post('/administradores', AdminController.createAdministrador);
+router.put('/administradores/:id', AdminController.updateAdministrador);
+router.delete('/administradores/:id', AdminController.deleteAdministrador);
+router.patch('/administradores/:id/toggle-status', AdminController.toggleAdministradorStatus);
 
 // ==========================================
 // VISTA GLOBAL DE DEPORTISTAS

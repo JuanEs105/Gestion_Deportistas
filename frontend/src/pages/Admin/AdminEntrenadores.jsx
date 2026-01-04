@@ -1,4 +1,4 @@
-// frontend/src/pages/Admin/AdminEntrenadores.jsx
+// frontend/src/pages/Admin/AdminEntrenadores.jsx - MODAL CORREGIDO
 import React, { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
 
@@ -203,42 +203,25 @@ const AdminEntrenadores = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">
-                  Nombre
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">
-                  Email
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">
-                  Teléfono
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">
-                  Niveles Asignados
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">
-                  Deportistas
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">
-                  Evaluaciones
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">
-                  Estado
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">
-                  Acciones
-                </th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Nombre</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Email</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Teléfono</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Niveles Asignados</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Deportistas</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Estado</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Acciones</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan="8" className="px-6 py-12 text-center">
+                  <td colSpan="7" className="px-6 py-12 text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
                   </td>
                 </tr>
               ) : entrenadoresFiltrados.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="px-6 py-12 text-center text-gray-400">
+                  <td colSpan="7" className="px-6 py-12 text-center text-gray-400">
                     <div className="text-6xl mb-4">👨‍🏫</div>
                     <p>No hay entrenadores registrados</p>
                   </td>
@@ -256,12 +239,8 @@ const AdminEntrenadores = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {entrenador.email}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {entrenador.telefono || '-'}
-                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{entrenador.email}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{entrenador.telefono || '-'}</td>
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1">
                         {(entrenador.niveles_asignados || []).length > 0 ? (
@@ -287,15 +266,8 @@ const AdminEntrenadores = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold">
-                        {entrenador.total_evaluaciones || 0}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        entrenador.activo 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
+                        entrenador.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                       }`}>
                         {entrenador.activo ? '✅ Activo' : '❌ Inactivo'}
                       </span>
@@ -333,18 +305,18 @@ const AdminEntrenadores = () => {
         </div>
       </div>
 
-      {/* MODAL FORMULARIO */}
+      {/* MODAL FORMULARIO - CORREGIDO */}
       {mostrarFormulario && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full">
-            <div className="bg-gradient-to-r from-blue-500 to-blue-700 p-6 text-white rounded-t-2xl">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-gradient-to-r from-blue-500 to-blue-700 p-6 text-white rounded-t-2xl sticky top-0 z-10">
               <h3 className="text-2xl font-bold">
                 {modoEdicion ? '✏️ Editar Entrenador' : '➕ Nuevo Entrenador'}
               </h3>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6">
-              <div className="space-y-4">
+              <div className="space-y-4 mb-6">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
                     Nombre Completo *
@@ -354,15 +326,13 @@ const AdminEntrenadores = () => {
                     value={formData.nombre}
                     onChange={(e) => setFormData({...formData, nombre: e.target.value})}
                     required
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="Juan Pérez"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Email *
-                  </label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Email *</label>
                   <input
                     type="email"
                     value={formData.email}
@@ -370,42 +340,37 @@ const AdminEntrenadores = () => {
                     required
                     disabled={modoEdicion}
                     className={`w-full px-4 py-3 border-2 rounded-lg ${
-                      modoEdicion 
-                        ? 'bg-gray-100 cursor-not-allowed' 
-                        : 'border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                      modoEdicion ? 'bg-gray-100 cursor-not-allowed' : 'focus:ring-2 focus:ring-blue-500'
                     }`}
                     placeholder="correo@ejemplo.com"
                   />
                   {modoEdicion && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      ℹ️ El email no se puede modificar
-                    </p>
+                    <p className="text-xs text-gray-500 mt-1">ℹ️ El email no se puede modificar</p>
                   )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Contraseña {modoEdicion ? '' : '*'}
+                    Contraseña {modoEdicion ? '(dejar vacío para no cambiar)' : '*'}
                   </label>
                   <input
                     type="password"
                     value={formData.password}
                     onChange={(e) => setFormData({...formData, password: e.target.value})}
                     required={!modoEdicion}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder={modoEdicion ? 'Dejar en blanco para no cambiar' : 'Mínimo 6 caracteres'}
+                    minLength="6"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="Mínimo 6 caracteres"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Teléfono
-                  </label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Teléfono</label>
                   <input
                     type="tel"
                     value={formData.telefono}
                     onChange={(e) => setFormData({...formData, telefono: e.target.value})}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="+57 300 123 4567"
                   />
                 </div>
@@ -448,7 +413,8 @@ const AdminEntrenadores = () => {
                 </div>
               </div>
 
-              <div className="flex space-x-4 mt-6">
+              {/* BOTONES - CORREGIDOS Y SIEMPRE VISIBLES */}
+              <div className="flex space-x-4 pt-4 border-t sticky bottom-0 bg-white">
                 <button
                   type="button"
                   onClick={() => setMostrarFormulario(false)}

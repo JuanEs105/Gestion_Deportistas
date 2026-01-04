@@ -1,4 +1,4 @@
-// src/models/User.js - CON NIVELES ASIGNADOS
+// backend/src/models/User.js - AGREGAR ESTOS CAMPOS
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 const bcrypt = require('bcryptjs');
@@ -44,7 +44,18 @@ const User = sequelize.define('User', {
     type: DataTypes.ARRAY(DataTypes.STRING),
     allowNull: true,
     defaultValue: [],
-    comment: 'Niveles que puede gestionar este entrenador (solo para role=entrenador)'
+    comment: 'Niveles que puede gestionar este entrenador'
+  },
+  // NUEVOS CAMPOS PARA RECUPERACIÓN DE CONTRASEÑA
+  reset_password_code: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Código de 6 dígitos para recuperación'
+  },
+  reset_password_expires: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    comment: 'Fecha de expiración del código'
   }
 }, {
   tableName: 'users',

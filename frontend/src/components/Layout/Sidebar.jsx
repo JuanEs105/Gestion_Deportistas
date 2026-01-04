@@ -1,3 +1,4 @@
+// frontend/src/components/Layout/Sidebar.jsx - ACTUALIZADO
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -8,26 +9,30 @@ const Sidebar = ({ tipoUsuario }) => {
     { path: '/entrenador', label: 'Dashboard', icon: '🏠' },
     { path: '/entrenador/deportistas', label: 'Deportistas', icon: '👥' },
     { path: '/entrenador/evaluaciones', label: 'Evaluaciones', icon: '📋' },
-    { path: '/entrenador/habilidades', label: 'Habilidades', icon: '🏅' },
+    { path: '/entrenador/calendario', label: 'Calendario', icon: '📅' },
+    { path: '/entrenador/reportes', label: 'Reportes', icon: '📊' },
   ];
 
   const menuItemsDeportista = [
     { path: '/deportista', label: 'Dashboard', icon: '🏠' },
     { path: '/deportista/progreso', label: 'Mi Progreso', icon: '📈' },
     { path: '/deportista/evaluaciones', label: 'Mis Evaluaciones', icon: '📋' },
+    { path: '/deportista/calendario', label: 'Calendario', icon: '📅' },
   ];
 
   const menuItemsAdmin = [
     { path: '/admin', label: 'Dashboard', icon: '🏠' },
+    { path: '/admin/administradores', label: 'Administradores', icon: '👑' },
     { path: '/admin/entrenadores', label: 'Entrenadores', icon: '👨‍🏫' },
     { path: '/admin/deportistas', label: 'Deportistas', icon: '🏃' },
+    { path: '/admin/calendario', label: 'Calendario', icon: '📅' },
     { path: '/admin/reportes', label: 'Reportes', icon: '📊' },
   ];
 
   const menuItems = 
-  tipoUsuario === 'admin' ? menuItemsAdmin : 
-  tipoUsuario === 'entrenador' ? menuItemsEntrenador : 
-  menuItemsDeportista;
+    tipoUsuario === 'admin' ? menuItemsAdmin : 
+    tipoUsuario === 'entrenador' ? menuItemsEntrenador : 
+    menuItemsDeportista;
   
   return (
     <div className="bg-blue-800 text-white w-64 space-y-6 py-7 px-2">
@@ -41,10 +46,11 @@ const Sidebar = ({ tipoUsuario }) => {
           <Link
             key={item.path}
             to={item.path}
-            className={`block py-2.5 px-4 rounded transition duration-200 ${location.pathname === item.path
+            className={`block py-2.5 px-4 rounded transition duration-200 ${
+              location.pathname === item.path
                 ? 'bg-blue-700 text-white'
                 : 'hover:bg-blue-700 hover:text-white'
-              }`}
+            }`}
           >
             <span className="mr-3">{item.icon}</span>
             {item.label}

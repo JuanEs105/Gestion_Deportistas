@@ -1,4 +1,4 @@
-// frontend/src/pages/Admin/DashboardAdmin.jsx
+// frontend/src/pages/Admin/DashboardAdmin.jsx - VERSIÓN MEJORADA
 import React, { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
 import {
@@ -258,7 +258,14 @@ const DashboardAdmin = () => {
       {/* ACCIONES RÁPIDAS */}
       <div className="mt-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg p-8 text-white">
         <h3 className="text-2xl font-bold mb-6">⚡ Acciones Rápidas</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <a
+            href="/admin/administradores"
+            className="bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-lg rounded-lg p-6 text-center transition-all duration-200 transform hover:scale-105"
+          >
+            <div className="text-4xl mb-3">👑</div>
+            <p className="font-semibold">Gestionar Admins</p>
+          </a>
           <a
             href="/admin/entrenadores"
             className="bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-lg rounded-lg p-6 text-center transition-all duration-200 transform hover:scale-105"

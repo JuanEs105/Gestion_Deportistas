@@ -1,4 +1,6 @@
+// frontend/src/components/Layout/Header.jsx - VERSIÓN CORREGIDA
 import React from 'react';
+import Notificaciones from '../Notificaciones';
 
 const Header = ({ onLogout }) => {
   const getUserFromStorage = () => {
@@ -35,13 +37,18 @@ const Header = ({ onLogout }) => {
   const getPanelTitle = () => {
     const userType = user.tipo?.toLowerCase();
     
-    if (userType === 'entrenador' || userType === 'admin') {
+    // CORRECCIÓN: Título correcto según rol
+    if (userType === 'admin') {
+      return 'Panel de Administración';
+    } else if (userType === 'entrenador') {
       return 'Panel del Entrenador';
     } else if (userType === 'deportista') {
       return 'Panel del Deportista';
     }
     return 'Panel de Usuario';
   };
+  
+  const esEntrenadorOAdmin = user.tipo?.toLowerCase() === 'entrenador' || user.tipo?.toLowerCase() === 'admin';
   
   return (
     <header className="bg-white shadow">
@@ -56,6 +63,9 @@ const Header = ({ onLogout }) => {
         </div>
         
         <div className="flex items-center space-x-4">
+          {/* NOTIFICACIONES (solo para entrenadores/admins) */}
+          {esEntrenadorOAdmin && <Notificaciones />}
+          
           <span className="text-sm text-gray-600">{user.email}</span>
           <button
             onClick={onLogout}

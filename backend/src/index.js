@@ -1,16 +1,15 @@
-// backend/src/index.js - AGREGAR CORS COMPLETO
+// backend/src/index.js - ACTUALIZADO CON TODAS LAS RUTAS
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const { connectDB } = require('./config/database');
-
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Configurar CORS más permisivo
+// Configurar CORS
 app.use(cors({
   origin: ['http://localhost:3000', 'http://localhost:3001'],
   credentials: true,
@@ -18,7 +17,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
 
-// Middleware para logs de requests
+// Middleware para logs
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
   next();
@@ -27,7 +26,6 @@ app.use((req, res, next) => {
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 
 // Conectar a la base de datos
 connectDB().then(() => {
@@ -38,16 +36,20 @@ connectDB().then(() => {
   const evaluacionRoutes = require('./routes/evaluacionRoutes');
   const habilidadRoutes = require('./routes/habilidadRoutes');
   const adminRoutes = require('./routes/adminRoutes');
-  
+  const passwordRecoveryRoutes = require('./routes/passwordRecoveryRoutes');
+  const calendarioRoutes = require('./routes/calendarioRoutes');
+  const reportesRoutes = require('./routes/reportesRoutes');
 
   // Rutas de la API
-    app.use('/api/auth', authRoutes);
+  app.use('/api/auth', authRoutes);
   app.use('/api/deportistas', deportistaRoutes);
   app.use('/api/upload', uploadRoutes);
   app.use('/api/evaluaciones', evaluacionRoutes);
   app.use('/api/habilidades', habilidadRoutes);
   app.use('/api/admin', adminRoutes);
-  app.use('/api/admin', adminRoutes);
+  app.use('/api/password-recovery', passwordRecoveryRoutes);
+  app.use('/api/calendario', calendarioRoutes);
+  app.use('/api/reportes', reportesRoutes);
 
   // Ruta de prueba
   app.get('/', (req, res) => {
@@ -62,13 +64,15 @@ connectDB().then(() => {
         upload: '/api/upload',
         evaluaciones: '/api/evaluaciones',
         habilidades: '/api/habilidades',
-        health: '/health',
-        test: '/test-db'
+        calendario: '/api/calendario',
+        reportes: '/api/reportes',
+        admin: '/api/admin',
+        health: '/health'
       }
     });
   });
 
-  // Ruta de salud mejorada
+  // Ruta de salud
   app.get('/health', async (req, res) => {
     try {
       const { sequelize } = require('./config/database');
@@ -91,26 +95,20 @@ connectDB().then(() => {
     }
   });
 
-  // Ruta 404 mejorada
+  // Ruta 404
   app.use('*', (req, res) => {
     res.status(404).json({
       error: 'Ruta no encontrada',
       path: req.originalUrl,
       method: req.method,
-      timestamp: new Date().toISOString(),
-      suggestions: [
-        '/api/auth/login',
-        '/api/deportistas',
-        '/health'
-      ]
+      timestamp: new Date().toISOString()
     });
   });
 
-  // Error handling mejorado
+  // Error handling
   app.use((err, req, res, next) => {
     console.error('❌ Error del servidor:', err.stack);
     
-    // Si es error de multer (upload)
     if (err.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
         error: 'Archivo demasiado grande',
@@ -127,8 +125,7 @@ connectDB().then(() => {
     
     res.status(500).json({
       error: 'Error interno del servidor',
-      message: process.env.NODE_ENV === 'development' ? err.message : 'Contacte al administrador',
-      requestId: req.headers['x-request-id'] || Date.now()
+      message: process.env.NODE_ENV === 'development' ? err.message : 'Contacte al administrador'
     });
   });
 
@@ -139,19 +136,16 @@ connectDB().then(() => {
     console.log(`📍 URL: http://localhost:${PORT}`);
     console.log(`🌐 CORS: Permitido para http://localhost:3000`);
     console.log(`📊 Ambiente: ${process.env.NODE_ENV}`);
-    console.log(`🗄️  Base de datos: ${process.env.DB_TYPE}`);
-    console.log(`🔑 JWT: ${process.env.JWT_SECRET ? 'Configurado' : 'NO CONFIGURADO'}`);
-    console.log(`☁️  Cloudinary: ${process.env.CLOUDINARY_CLOUD_NAME ? 'Conectado' : 'NO CONFIGURADO'}`);
+    console.log(`🗄️  Base de datos: PostgreSQL`);
     console.log(`⏰ Iniciado: ${new Date().toLocaleString()}`);
     console.log('='.repeat(60));
     
-    // Mostrar endpoints disponibles
     console.log('\n📡 Endpoints disponibles:');
     console.log('  POST   /api/auth/login');
     console.log('  GET    /api/deportistas');
-    console.log('  POST   /api/deportistas');
-    console.log('  DELETE /api/deportistas/:id');
-    console.log('  POST   /api/upload/deportista/:id/foto');
+    console.log('  POST   /api/evaluaciones');
+    console.log('  GET    /api/calendario/nivel/:nivel');
+    console.log('  GET    /api/reportes/pdf/deportista/:id');
     console.log('  GET    /health');
   });
 

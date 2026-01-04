@@ -211,6 +211,31 @@ export const uploadAPI = {
 // ADMIN API
 // ==========================================
 export const adminAPI = {
+  getAllAdministradores: async () => {
+    const response = await api.get('/admin/administradores');
+    return response.data;
+  },
+  
+  createAdministrador: async (adminData) => {
+    const response = await api.post('/admin/administradores', adminData);
+    return response.data;
+  },
+  
+  updateAdministrador: async (id, adminData) => {
+    const response = await api.put(`/admin/administradores/${id}`, adminData);
+    return response.data;
+  },
+  
+  deleteAdministrador: async (id) => {
+    const response = await api.delete(`/admin/administradores/${id}`);
+    return response.data;
+  },
+  
+  toggleAdministradorStatus: async (id) => {
+    const response = await api.patch(`/admin/administradores/${id}/toggle-status`);
+    return response.data;
+  },
+  
   // Estadísticas
   getStats: async () => {
     const response = await api.get('/admin/stats');
