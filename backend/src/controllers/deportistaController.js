@@ -3,6 +3,40 @@ const { Deportista, User, Evaluacion, Habilidad } = require('../models');
 const { sequelize } = require('../config/database');
 
 class DeportistaController {
+  // AGREGAR ESTA RUTA AL INICIO:
+  static async getMe(req, res) {
+    try {
+      const userId = req.user.id;
+      
+      console.log('🔍 Buscando deportista para user_id:', userId);
+      
+      const deportista = await Deportista.findOne({
+        where: { user_id: userId },
+        include: [{
+          model: User,
+          as: 'User',
+          attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
+        }]
+      });
+      
+      if (!deportista) {
+        return res.status(404).json({
+          error: 'No se encontró tu perfil de deportista'
+        });
+      }
+      
+      console.log('✅ Deportista encontrado:', deportista.id);
+      
+      res.json({
+        success: true,
+        deportista
+      });
+    } catch (error) {
+      console.error('Error obteniendo perfil:', error);
+      res.status(500).json({ error: 'Error en el servidor' });
+    }
+  }
+
   // Obtener todos los deportistas
   static async getAll(req, res) {
     try {

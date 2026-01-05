@@ -1,6 +1,6 @@
-// frontend/src/components/Layout/Header.jsx - VERSIÓN CORREGIDA
+// frontend/src/components/Layout/Header.jsx - VERSIÓN ACTUALIZADA
 import React from 'react';
-import Notificaciones from '../Notificaciones';
+import NotificacionesMejoradas from '../NotificacionesMejoradas';
 
 const Header = ({ onLogout }) => {
   const getUserFromStorage = () => {
@@ -37,7 +37,6 @@ const Header = ({ onLogout }) => {
   const getPanelTitle = () => {
     const userType = user.tipo?.toLowerCase();
     
-    // CORRECCIÓN: Título correcto según rol
     if (userType === 'admin') {
       return 'Panel de Administración';
     } else if (userType === 'entrenador') {
@@ -51,27 +50,31 @@ const Header = ({ onLogout }) => {
   const esEntrenadorOAdmin = user.tipo?.toLowerCase() === 'entrenador' || user.tipo?.toLowerCase() === 'admin';
   
   return (
-    <header className="bg-white shadow">
+    <header className="bg-white shadow-md">
       <div className="flex justify-between items-center px-6 py-4">
         <div>
           <h2 className="text-xl font-semibold text-gray-800">
             {getPanelTitle()}
           </h2>
           <p className="text-sm text-gray-600">
-            Bienvenido, {user.nombre}
+            Bienvenido, <span className="font-semibold">{user.nombre}</span>
           </p>
         </div>
         
         <div className="flex items-center space-x-4">
-          {/* NOTIFICACIONES (solo para entrenadores/admins) */}
-          {esEntrenadorOAdmin && <Notificaciones />}
+          {/* NOTIFICACIONES MEJORADAS (solo para entrenadores/admins) */}
+          {esEntrenadorOAdmin && <NotificacionesMejoradas />}
           
-          <span className="text-sm text-gray-600">{user.email}</span>
+          <div className="text-right hidden md:block">
+            <p className="text-xs text-gray-500">Usuario</p>
+            <p className="text-sm text-gray-700 font-medium">{user.email}</p>
+          </div>
+          
           <button
             onClick={onLogout}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm transition"
+            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-md hover:shadow-lg"
           >
-            Cerrar Sesión
+            🚪 Cerrar Sesión
           </button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-// frontend/src/components/Layout/Sidebar.jsx - ACTUALIZADO
+// frontend/src/components/Layout/Sidebar.jsx
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -6,7 +6,7 @@ const Sidebar = ({ tipoUsuario }) => {
   const location = useLocation();
 
   const menuItemsEntrenador = [
-    { path: '/entrenador', label: 'Dashboard', icon: '🏠' },
+    { path: '/entrenador', label: 'Inicio', icon: '🏠' },
     { path: '/entrenador/deportistas', label: 'Deportistas', icon: '👥' },
     { path: '/entrenador/evaluaciones', label: 'Evaluaciones', icon: '📋' },
     { path: '/entrenador/calendario', label: 'Calendario', icon: '📅' },
@@ -14,14 +14,16 @@ const Sidebar = ({ tipoUsuario }) => {
   ];
 
   const menuItemsDeportista = [
-    { path: '/deportista', label: 'Dashboard', icon: '🏠' },
+    { path: '/deportista', label: 'Inicio', icon: '🏠' },
     { path: '/deportista/progreso', label: 'Mi Progreso', icon: '📈' },
     { path: '/deportista/evaluaciones', label: 'Mis Evaluaciones', icon: '📋' },
+    { path: '/deportista/habilidades', label: 'Mis Habilidades', icon: '🎯' },
     { path: '/deportista/calendario', label: 'Calendario', icon: '📅' },
+    { path: '/deportista/estadisticas', label: 'Estadísticas', icon: '📊' },
   ];
 
   const menuItemsAdmin = [
-    { path: '/admin', label: 'Dashboard', icon: '🏠' },
+    { path: '/admin', label: 'Inicio', icon: '🏠' },
     { path: '/admin/administradores', label: 'Administradores', icon: '👑' },
     { path: '/admin/entrenadores', label: 'Entrenadores', icon: '👨‍🏫' },
     { path: '/admin/deportistas', label: 'Deportistas', icon: '🏃' },
@@ -35,7 +37,7 @@ const Sidebar = ({ tipoUsuario }) => {
     menuItemsDeportista;
   
   return (
-    <div className="bg-blue-800 text-white w-64 space-y-6 py-7 px-2">
+    <div className="bg-blue-900 text-white w-64 space-y-6 py-7 px-2">
       <div className="text-white flex items-center space-x-2 px-4">
         <span className="text-2xl font-bold">🏆</span>
         <h1 className="text-xl font-bold">Sistema Deportivo</h1>

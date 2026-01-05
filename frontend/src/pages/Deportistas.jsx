@@ -1,39 +1,87 @@
-// frontend/src/pages/Deportistas.jsx - CON CREAR DEPORTISTA
+// frontend/src/pages/Deportistas.jsx - VERSIÓN COMPLETA Y FUNCIONAL
 import React, { useState, useEffect } from 'react';
-import { deportistasAPI, uploadAPI } from '../services/api';
+import { deportistasAPI } from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 const Deportistas = () => {
+  const navigate = useNavigate();
   const [deportistas, setDeportistas] = useState([]);
+  const [deportistasTodos, setDeportistasTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [filtroNivel, setFiltroNivel] = useState('todos');
   const [filtroEstado, setFiltroEstado] = useState('todos');
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [modoEdicion, setModoEdicion] = useState(false);
-  const [deportistaEditando, setDeportistaEditando] = useState(null);
-  const [mostrarModalFoto, setMostrarModalFoto] = useState(false);
-  const [deportistaFoto, setDeportistaFoto] = useState(null);
-  const [archivoFoto, setArchivoFoto] = useState(null);
-  const [previewFoto, setPreviewFoto] = useState(null);
+  const [nivelesAsignados, setNivelesAsignados] = useState([]);
+  const [userRole, setUserRole] = useState('admin');
   
-  // Estado del formulario
-  const [formData, setFormData] = useState({
-    nombre: '',
-    email: '',
-    password: '',
-    telefono: '',
-    fecha_nacimiento: '',
-    altura: '',
-    peso: '',
-    nivel_actual: '1_basico',
-    estado: 'activo',
-    contacto_emergencia_nombre: '',
-    contacto_emergencia_telefono: '',
-    contacto_emergencia_parentesco: ''
-  });
-
+  // FUNCIÓN QUE FALTABA - SOLUCIÓN AL ERROR
+  const handleNuevoDeportista = () => {
+    // Ajusta la ruta según tu configuración de rutas
+    if (userRole === 'entrenador') {
+      navigate('/entrenador/deportistas/nuevo');
+    } else {
+      navigate('/admin/deportistas/nuevo');
+    }
+  };
+  
+  // Funciones para manejar editar/eliminar
+  const handleEditar = (deportistaId) => {
+    console.log('Editar deportista:', deportistaId);
+    // Navegar a la página de edición
+    if (userRole === 'entrenador') {
+      navigate(`/entrenador/deportistas/editar/${deportistaId}`);
+    } else {
+      navigate(`/admin/deportistas/editar/${deportistaId}`);
+    }
+  };
+  
+  const handleEliminar = async (deportistaId, deportistaNombre) => {
+    if (!window.confirm(`¿Estás seguro de eliminar a ${deportistaNombre}?`)) {
+      return;
+    }
+    
+    try {
+      await deportistasAPI.delete(deportistaId);
+      // Actualizar lista
+      setDeportistas(deportistas.filter(d => d.id !== deportistaId));
+      setDeportistasTodos(deportistasTodos.filter(d => d.id !== deportistaId));
+      alert('Deportista eliminado correctamente');
+    } catch (err) {
+      console.error('Error eliminando deportista:', err);
+      alert('Error al eliminar deportista');
+    }
+  };
+  
+  const handleVerDetalles = (deportistaId) => {
+    console.log('Ver detalles deportista:', deportistaId);
+    // Navegar a la página de detalles
+    if (userRole === 'entrenador') {
+      navigate(`/entrenador/deportistas/${deportistaId}`);
+    } else {
+      navigate(`/admin/deportistas/${deportistaId}`);
+    }
+  };
+  
   useEffect(() => {
+    // Obtener niveles asignados del usuario
+    const userData = localStorage.getItem('user');
+    const user = userData ? JSON.parse(userData) : null;
+    
+    if (user) {
+      setUserRole(user.tipo || user.role);
+      
+      if (user.tipo === 'entrenador') {
+        const niveles = user.niveles_asignados || [];
+        setNivelesAsignados(niveles);
+        
+        // Establecer el primer nivel asignado como filtro por defecto
+        if (niveles.length > 0) {
+          setFiltroNivel(niveles[0]);
+        }
+      }
+    }
+    
     fetchDeportistas();
   }, []);
 
@@ -49,10 +97,25 @@ const Deportistas = () => {
         throw new Error('La respuesta no contiene un array de deportistas');
       }
       
-      setDeportistas(deportistasArray);
+      // Guardar todos los deportistas
+      setDeportistasTodos(deportistasArray);
+      
+      // FILTRAR POR NIVELES ASIGNADOS AUTOMÁTICAMENTE
+      const userData = localStorage.getItem('user');
+      const user = userData ? JSON.parse(userData) : null;
+      
+      if (user && user.tipo === 'entrenador' && user.niveles_asignados) {
+        const deportistasFiltrados = deportistasArray.filter(d => 
+          user.niveles_asignados.includes(d.nivel_actual)
+        );
+        setDeportistas(deportistasFiltrados);
+      } else {
+        // Admin ve todos
+        setDeportistas(deportistasArray);
+      }
       
     } catch (err) {
-      console.error('❌ Error cargando deportistas:', err);
+      console.error('Error cargando deportistas:', err);
       setError(err.response?.data?.error || err.message || 'Error al cargar deportistas');
       setDeportistas([]);
     } finally {
@@ -60,198 +123,96 @@ const Deportistas = () => {
     }
   };
 
-  const handleNuevoDeportista = () => {
-    setModoEdicion(false);
-    setDeportistaEditando(null);
-    setFormData({
-      nombre: '',
-      email: '',
-      password: '',
-      telefono: '',
-      fecha_nacimiento: '',
-      altura: '',
-      peso: '',
-      nivel_actual: '1_basico',
-      estado: 'activo',
-      contacto_emergencia_nombre: '',
-      contacto_emergencia_telefono: '',
-      contacto_emergencia_parentesco: ''
-    });
-    setMostrarFormulario(true);
-  };
-
-  const handleEditarDeportista = (deportista) => {
-    setModoEdicion(true);
-    setDeportistaEditando(deportista);
-    
-    // Formatear fecha si existe
-    let fechaNacimiento = '';
-    if (deportista.fecha_nacimiento) {
-      const fecha = new Date(deportista.fecha_nacimiento);
-      fechaNacimiento = fecha.toISOString().split('T')[0];
-    }
-    
-    setFormData({
-      nombre: deportista.User?.nombre || '',
-      email: deportista.User?.email || '',
-      password: '', // No pre-llenar contraseña
-      telefono: deportista.User?.telefono || '',
-      fecha_nacimiento: fechaNacimiento,
-      altura: deportista.altura || '',
-      peso: deportista.peso || '',
-      nivel_actual: deportista.nivel_actual || '1_basico',
-      estado: deportista.estado || 'activo',
-      contacto_emergencia_nombre: deportista.contacto_emergencia_nombre || '',
-      contacto_emergencia_telefono: deportista.contacto_emergencia_telefono || '',
-      contacto_emergencia_parentesco: deportista.contacto_emergencia_parentesco || ''
-    });
-    setMostrarFormulario(true);
-  };
-
-  const handleSubmitFormulario = async (e) => {
-    e.preventDefault();
-    
-    try {
-      setLoading(true);
-      
-      if (modoEdicion) {
-        // Actualizar deportista existente
-        await deportistasAPI.update(deportistaEditando.id, formData);
-        alert('✅ Deportista actualizado exitosamente');
-      } else {
-        // Crear nuevo deportista
-        await deportistasAPI.create(formData);
-        alert('✅ Deportista creado exitosamente');
-      }
-      
-      setMostrarFormulario(false);
-      await fetchDeportistas();
-      
-    } catch (err) {
-      console.error('Error guardando deportista:', err);
-      alert('❌ Error: ' + (err.response?.data?.error || err.message));
-    } finally {
-      setLoading(false);
+  // Obtener niveles disponibles para el selector
+  const getNivelesDisponibles = () => {
+    if (userRole === 'admin') {
+      return [
+        { value: 'todos', label: 'Todos los niveles' },
+        { value: '1_basico', label: '1 Básico' },
+        { value: '1_medio', label: '1 Medio' },
+        { value: '1_avanzado', label: '1 Avanzado' },
+        { value: '2', label: 'Nivel 2' },
+        { value: '3', label: 'Nivel 3' },
+        { value: '4', label: 'Nivel 4' }
+      ];
+    } else {
+      // Entrenador: SOLO sus niveles asignados
+      return [
+        { value: 'todos', label: 'Todos mis niveles' },
+        ...nivelesAsignados.map(nivel => ({
+          value: nivel,
+          label: getNivelNombre(nivel)
+        }))
+      ];
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este deportista? Esta acción no se puede deshacer.')) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      await deportistasAPI.delete(id);
-      alert('✅ Deportista eliminado exitosamente');
-      await fetchDeportistas();
-    } catch (err) {
-      console.error('Error eliminando deportista:', err);
-      alert('❌ Error al eliminar: ' + (err.response?.data?.error || err.message));
-    } finally {
-      setLoading(false);
-    }
+  const getNivelNombre = (nivel) => {
+    const nombres = {
+      '1_basico': '1 Básico',
+      '1_medio': '1 Medio',
+      '1_avanzado': '1 Avanzado',
+      '2': 'Nivel 2',
+      '3': 'Nivel 3',
+      '4': 'Nivel 4'
+    };
+    return nombres[nivel] || nivel;
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const getEstadoColor = (estado) => {
+    const colores = {
+      'activo': 'bg-green-100 text-green-800',
+      'lesionado': 'bg-yellow-100 text-yellow-800',
+      'descanso': 'bg-blue-100 text-blue-800',
+      'inactivo': 'bg-red-100 text-red-800'
+    };
+    return colores[estado] || 'bg-gray-100 text-gray-800';
   };
 
-  const handleAbrirModalFoto = (deportista) => {
-    setDeportistaFoto(deportista);
-    setArchivoFoto(null);
-    setPreviewFoto(deportista.foto_perfil || null);
-    setMostrarModalFoto(true);
+  const getEstadoTexto = (estado) => {
+    const textos = {
+      'activo': 'Activo',
+      'lesionado': 'Lesionado',
+      'descanso': 'Descanso',
+      'inactivo': 'Inactivo'
+    };
+    return textos[estado] || estado;
   };
 
-  const handleSeleccionarFoto = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Validar tipo de archivo
-      const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-      if (!tiposPermitidos.includes(file.type)) {
-        alert('❌ Tipo de archivo no permitido. Solo se aceptan imágenes (JPG, PNG, GIF, WEBP)');
-        return;
-      }
-      
-      // Validar tamaño (5MB max)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('❌ El archivo es demasiado grande. Tamaño máximo: 5MB');
-        return;
-      }
-      
-      setArchivoFoto(file);
-      
-      // Crear preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewFoto(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubirFoto = async () => {
-    if (!archivoFoto) {
-      alert('⚠️ Por favor selecciona una imagen');
-      return;
-    }
-    
-    try {
-      setLoading(true);
-      
-      await uploadAPI.uploadDeportistaFoto(deportistaFoto.id, archivoFoto);
-      
-      alert('✅ Foto actualizada exitosamente');
-      setMostrarModalFoto(false);
-      setArchivoFoto(null);
-      setPreviewFoto(null);
-      await fetchDeportistas();
-      
-    } catch (error) {
-      console.error('Error subiendo foto:', error);
-      alert('❌ Error al subir la foto: ' + (error.response?.data?.error || error.message));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleEliminarFoto = async () => {
-    if (!window.confirm('¿Estás seguro de eliminar la foto de perfil?')) {
-      return;
-    }
-    
-    try {
-      setLoading(true);
-      
-      await uploadAPI.deleteDeportistaFoto(deportistaFoto.id);
-      
-      alert('✅ Foto eliminada exitosamente');
-      setMostrarModalFoto(false);
-      await fetchDeportistas();
-      
-    } catch (error) {
-      console.error('Error eliminando foto:', error);
-      alert('❌ Error al eliminar la foto: ' + (error.response?.data?.error || error.message));
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // FILTRADO COMPLETO
   const deportistasFiltrados = deportistas.filter(deportista => {
-    const matchNombre = deportista.User?.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
-    const matchEmail = deportista.User?.email?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
+    // Filtro por búsqueda
+    const user = deportista.User || {};
+    const matchNombre = user.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
+    const matchEmail = user.email?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
     const matchBusqueda = searchTerm === '' || matchNombre || matchEmail;
     
-    const matchNivel = filtroNivel === 'todos' || deportista.nivel_actual === filtroNivel;
+    // Filtro por nivel (respeta niveles asignados)
+    let matchNivel = true;
+    if (filtroNivel !== 'todos') {
+      matchNivel = deportista.nivel_actual === filtroNivel;
+    } else if (userRole === 'entrenador' && nivelesAsignados.length > 0) {
+      // Si es "todos" pero es entrenador, solo mostrar de sus niveles
+      matchNivel = nivelesAsignados.includes(deportista.nivel_actual);
+    }
+    
+    // Filtro por estado
     const matchEstado = filtroEstado === 'todos' || deportista.estado === filtroEstado;
     
     return matchBusqueda && matchNivel && matchEstado;
   });
+
+  // Calcular estadísticas SOLO de deportistas filtrados por niveles
+  const getEstadisticas = () => {
+    return {
+      total: deportistas.length,
+      activos: deportistas.filter(d => d.estado === 'activo').length,
+      lesionados: deportistas.filter(d => d.estado === 'lesionado').length,
+      filtrados: deportistasFiltrados.length
+    };
+  };
+
+  const stats = getEstadisticas();
 
   if (loading && deportistas.length === 0) {
     return (
@@ -259,6 +220,7 @@ const Deportistas = () => {
         <h1 className="text-3xl font-bold mb-6">Gestión de Deportistas</h1>
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <span className="ml-3 text-gray-600">Cargando deportistas...</span>
         </div>
       </div>
     );
@@ -270,10 +232,25 @@ const Deportistas = () => {
       <div className="mb-8 flex justify-between items-start">
         <div>
           <h1 className="text-4xl font-bold text-gray-800 mb-2">👥 Gestión de Deportistas</h1>
-          <p className="text-gray-600">Administra la información de los deportistas</p>
+          <p className="text-gray-600">
+            {userRole === 'entrenador' 
+              ? 'Deportistas de tus niveles asignados' 
+              : 'Administra la información de los deportistas'}
+          </p>
+          
+          {/* Mostrar niveles asignados */}
+          {userRole === 'entrenador' && nivelesAsignados.length > 0 && (
+            <div className="mt-3 flex items-center space-x-2">
+              <span className="text-sm font-semibold text-gray-700">📚 Tus niveles:</span>
+              {nivelesAsignados.map(nivel => (
+                <span key={nivel} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
+                  {getNivelNombre(nivel)}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
         
-        {/* BOTÓN CREAR NUEVO */}
         <button
           onClick={handleNuevoDeportista}
           className="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center space-x-2"
@@ -314,13 +291,11 @@ const Deportistas = () => {
               onChange={(e) => setFiltroNivel(e.target.value)}
               className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
             >
-              <option value="todos">Todos los niveles</option>
-              <option value="1_basico">1 Básico</option>
-              <option value="1_medio">1 Medio</option>
-              <option value="1_avanzado">1 Avanzado</option>
-              <option value="2">Nivel 2</option>
-              <option value="3">Nivel 3</option>
-              <option value="4">Nivel 4</option>
+              {getNivelesDisponibles().map(nivel => (
+                <option key={nivel.value} value={nivel.value}>
+                  {nivel.label}
+                </option>
+              ))}
             </select>
           </div>
           
@@ -346,24 +321,22 @@ const Deportistas = () => {
       {/* ESTADÍSTICAS */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-xl shadow-lg text-white">
-          <h3 className="text-lg font-semibold mb-2">Total</h3>
-          <p className="text-4xl font-bold">{deportistas.length}</p>
+          <h3 className="text-lg font-semibold mb-2">
+            {userRole === 'entrenador' ? 'Mis Deportistas' : 'Total'}
+          </h3>
+          <p className="text-4xl font-bold">{stats.total}</p>
         </div>
         <div className="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-xl shadow-lg text-white">
           <h3 className="text-lg font-semibold mb-2">Activos</h3>
-          <p className="text-4xl font-bold">
-            {deportistas.filter(d => d.estado === 'activo').length}
-          </p>
+          <p className="text-4xl font-bold">{stats.activos}</p>
         </div>
         <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 p-6 rounded-xl shadow-lg text-white">
           <h3 className="text-lg font-semibold mb-2">Lesionados</h3>
-          <p className="text-4xl font-bold">
-            {deportistas.filter(d => d.estado === 'lesionado').length}
-          </p>
+          <p className="text-4xl font-bold">{stats.lesionados}</p>
         </div>
         <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-xl shadow-lg text-white">
           <h3 className="text-lg font-semibold mb-2">Filtrados</h3>
-          <p className="text-4xl font-bold">{deportistasFiltrados.length}</p>
+          <p className="text-4xl font-bold">{stats.filtrados}</p>
         </div>
       </div>
 
@@ -400,467 +373,105 @@ const Deportistas = () => {
                     <div className="text-gray-400">
                       <div className="text-6xl mb-4">🔍</div>
                       <p className="text-xl font-semibold mb-2">
-                        {searchTerm || filtroNivel !== 'todos' || filtroEstado !== 'todos'
-                          ? 'No se encontraron deportistas con los filtros aplicados'
-                          : 'No hay deportistas registrados'}
+                        {deportistas.length === 0
+                          ? userRole === 'entrenador'
+                            ? 'No tienes deportistas en tus niveles asignados'
+                            : 'No hay deportistas registrados'
+                          : 'No se encontraron deportistas con los filtros aplicados'}
                       </p>
-                      <p className="text-gray-500">
-                        {!searchTerm && filtroNivel === 'todos' && filtroEstado === 'todos' && 
-                          'Haz clic en "Nuevo Deportista" para comenzar'}
-                      </p>
+                      {userRole === 'entrenador' && nivelesAsignados.length > 0 && (
+                        <p className="text-gray-500">
+                          Niveles asignados: {nivelesAsignados.map(n => getNivelNombre(n)).join(', ')}
+                        </p>
+                      )}
                     </div>
                   </td>
                 </tr>
               ) : (
-                deportistasFiltrados.map((deportista) => (
-                  <tr key={deportista.id} className="hover:bg-gray-50 transition">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {deportista.foto_perfil ? (
-                        <img
-                          src={deportista.foto_perfil}
-                          alt={deportista.User?.nombre || 'Deportista'}
-                          className="h-12 w-12 rounded-full object-cover shadow"
-                        />
-                      ) : (
-                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow">
-                          <span className="text-white font-bold text-lg">
-                            {deportista.User?.nombre?.charAt(0)?.toUpperCase() || '?'}
-                          </span>
+                deportistasFiltrados.map((deportista) => {
+                  const user = deportista.User || {};
+                  return (
+                    <tr key={deportista.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          {user.foto_perfil ? (
+                            <img
+                              className="h-10 w-10 rounded-full object-cover"
+                              src={user.foto_perfil}
+                              alt={user.nombre}
+                            />
+                          ) : (
+                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                              <span className="text-blue-600 font-semibold">
+                                {user.nombre?.charAt(0)?.toUpperCase() || 'D'}
+                              </span>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold text-gray-900">
-                        {deportista.User?.nombre || 'Sin nombre'}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">
-                        {deportista.User?.email || 'Sin email'}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {deportista.nivel_actual}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        deportista.estado === 'activo' 
-                          ? 'bg-green-100 text-green-800'
-                          : deportista.estado === 'lesionado'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : deportista.estado === 'descanso'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {deportista.estado}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-3">
-                        <button
-                          onClick={() => handleAbrirModalFoto(deportista)}
-                          className="text-purple-600 hover:text-purple-900 font-semibold transition hover:scale-110"
-                          title="Cambiar foto"
-                        >
-                          📸 Foto
-                        </button>
-                        <button
-                          onClick={() => handleEditarDeportista(deportista)}
-                          className="text-blue-600 hover:text-blue-900 font-semibold transition hover:scale-110"
-                          title="Editar deportista"
-                        >
-                          ✏️ Editar
-                        </button>
-                        <button
-                          onClick={() => handleDelete(deportista.id)}
-                          className="text-red-600 hover:text-red-900 font-semibold transition hover:scale-110"
-                          title="Eliminar deportista"
-                        >
-                          🗑️ Eliminar
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {user.nombre || 'Sin nombre'}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          ID: {deportista.id}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{user.email || 'Sin email'}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                          {getNivelNombre(deportista.nivel_actual)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getEstadoColor(deportista.estado)}`}>
+                          {getEstadoTexto(deportista.estado)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleVerDetalles(deportista.id)}
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            👁️ Ver
+                          </button>
+                          <button
+                            onClick={() => handleEditar(deportista.id)}
+                            className="text-yellow-600 hover:text-yellow-900"
+                          >
+                            ✏️ Editar
+                          </button>
+                          <button
+                            onClick={() => handleEliminar(deportista.id, user.nombre || 'este deportista')}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            🗑️ Eliminar
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
+        
+        {/* PAGINACIÓN O INFO */}
+        <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+          <div className="flex justify-between items-center">
+            <div className="text-sm text-gray-700">
+              Mostrando <span className="font-semibold">{deportistasFiltrados.length}</span> de <span className="font-semibold">{deportistas.length}</span> deportistas
+            </div>
+            <div className="text-sm text-gray-500">
+              {userRole === 'entrenador' && 'Filtrado por tus niveles asignados'}
+            </div>
+          </div>
+        </div>
       </div>
-
-      {/* MODAL FORMULARIO */}
-      {mostrarFormulario && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            {/* Header del Modal */}
-            <div className="bg-gradient-to-r from-blue-500 to-blue-700 p-6 text-white rounded-t-2xl sticky top-0 z-10">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold">
-                    {modoEdicion ? '✏️ Editar Deportista' : '➕ Nuevo Deportista'}
-                  </h3>
-                  <p className="text-blue-100">
-                    {modoEdicion 
-                      ? `Actualizando información de ${deportistaEditando?.User?.nombre}` 
-                      : 'Completa el formulario para registrar un nuevo deportista'}
-                  </p>
-                </div>
-                {modoEdicion && (
-                  <div className="bg-white bg-opacity-20 px-4 py-2 rounded-lg">
-                    <p className="text-sm font-semibold">ID: {deportistaEditando?.id?.slice(0, 8)}...</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <form onSubmit={handleSubmitFormulario} className="p-6">
-              {/* INFORMACIÓN PERSONAL */}
-              <div className="mb-8">
-                <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                  <span className="text-2xl mr-2">👤</span>
-                  Información Personal
-                </h4>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Nombre Completo *
-                    </label>
-                    <input
-                      type="text"
-                      name="nombre"
-                      value={formData.nombre}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                      placeholder="Ej: Juan Pérez"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Email *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                      disabled={modoEdicion}
-                      className={`w-full px-4 py-3 border-2 rounded-lg transition ${
-                        modoEdicion 
-                          ? 'border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed' 
-                          : 'border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      }`}
-                      placeholder="correo@ejemplo.com"
-                    />
-                    {modoEdicion && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        ℹ️ El email no se puede modificar
-                      </p>
-                    )}
-                  </div>
-
-                  {!modoEdicion && (
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Contraseña *
-                      </label>
-                      <input
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        required={!modoEdicion}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                        placeholder="Mínimo 6 caracteres"
-                      />
-                    </div>
-                  )}
-
-                  {modoEdicion && (
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Estado
-                      </label>
-                      <select
-                        name="estado"
-                        value={formData.estado || deportistaEditando?.estado || 'activo'}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                      >
-                        <option value="activo">Activo</option>
-                        <option value="lesionado">Lesionado</option>
-                        <option value="descanso">Descanso</option>
-                        <option value="inactivo">Inactivo</option>
-                      </select>
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Teléfono
-                    </label>
-                    <input
-                      type="tel"
-                      name="telefono"
-                      value={formData.telefono}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                      placeholder="+57 300 123 4567"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Fecha de Nacimiento
-                    </label>
-                    <input
-                      type="date"
-                      name="fecha_nacimiento"
-                      value={formData.fecha_nacimiento}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* INFORMACIÓN DEPORTIVA */}
-              <div className="mb-8">
-                <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                  <span className="text-2xl mr-2">🏋️</span>
-                  Información Deportiva
-                </h4>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Altura (cm)
-                    </label>
-                    <input
-                      type="number"
-                      name="altura"
-                      value={formData.altura}
-                      onChange={handleInputChange}
-                      step="0.01"
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                      placeholder="175"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Peso (kg)
-                    </label>
-                    <input
-                      type="number"
-                      name="peso"
-                      value={formData.peso}
-                      onChange={handleInputChange}
-                      step="0.01"
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                      placeholder="70"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Nivel Inicial *
-                    </label>
-                    <select
-                      name="nivel_actual"
-                      value={formData.nivel_actual}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                    >
-                      <option value="1_basico">1 Básico</option>
-                      <option value="1_medio">1 Medio</option>
-                      <option value="1_avanzado">1 Avanzado</option>
-                      <option value="2">Nivel 2</option>
-                      <option value="3">Nivel 3</option>
-                      <option value="4">Nivel 4</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* CONTACTO DE EMERGENCIA */}
-              <div className="mb-8">
-                <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                  <span className="text-2xl mr-2">🚨</span>
-                  Contacto de Emergencia
-                </h4>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Nombre
-                    </label>
-                    <input
-                      type="text"
-                      name="contacto_emergencia_nombre"
-                      value={formData.contacto_emergencia_nombre}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                      placeholder="Ej: María Pérez"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Teléfono
-                    </label>
-                    <input
-                      type="tel"
-                      name="contacto_emergencia_telefono"
-                      value={formData.contacto_emergencia_telefono}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                      placeholder="+57 300 123 4567"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Parentesco
-                    </label>
-                    <input
-                      type="text"
-                      name="contacto_emergencia_parentesco"
-                      value={formData.contacto_emergencia_parentesco}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                      placeholder="Ej: Madre"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* BOTONES */}
-              <div className="flex space-x-4 pt-4 border-t">
-                <button
-                  type="button"
-                  onClick={() => setMostrarFormulario(false)}
-                  className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold transition"
-                  disabled={loading}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold transition shadow-lg disabled:opacity-50"
-                  disabled={loading}
-                >
-                  {loading ? '⏳ Guardando...' : modoEdicion ? '✅ Actualizar' : '✅ Crear Deportista'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL DE FOTO DE PERFIL */}
-      {mostrarModalFoto && deportistaFoto && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-purple-500 to-purple-700 p-6 text-white rounded-t-2xl">
-              <h3 className="text-2xl font-bold">📸 Foto de Perfil</h3>
-              <p className="text-purple-100">{deportistaFoto.User?.nombre}</p>
-            </div>
-
-            <div className="p-6">
-              {/* Preview de la foto */}
-              <div className="mb-6">
-                <div className="flex justify-center mb-4">
-                  {previewFoto ? (
-                    <img
-                      src={previewFoto}
-                      alt="Preview"
-                      className="w-48 h-48 rounded-full object-cover border-4 border-purple-500 shadow-lg"
-                    />
-                  ) : (
-                    <div className="w-48 h-48 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-6xl font-bold border-4 border-purple-500 shadow-lg">
-                      {deportistaFoto.User?.nombre?.charAt(0)?.toUpperCase()}
-                    </div>
-                  )}
-                </div>
-
-                {/* Input de archivo */}
-                <div className="flex justify-center">
-                  <label className="cursor-pointer bg-purple-100 hover:bg-purple-200 text-purple-700 font-semibold py-3 px-6 rounded-lg transition inline-flex items-center space-x-2">
-                    <span>📁 Seleccionar Imagen</span>
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                      onChange={handleSeleccionarFoto}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
-
-                {archivoFoto && (
-                  <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-center">
-                    <p className="text-sm text-green-700">
-                      ✅ Archivo seleccionado: <span className="font-semibold">{archivoFoto.name}</span>
-                    </p>
-                    <p className="text-xs text-green-600 mt-1">
-                      Tamaño: {(archivoFoto.size / 1024).toFixed(2)} KB
-                    </p>
-                  </div>
-                )}
-
-                {/* Información */}
-                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-xs text-blue-700 text-center">
-                    <strong>ℹ️ Formatos permitidos:</strong> JPG, PNG, GIF, WEBP<br />
-                    <strong>Tamaño máximo:</strong> 5MB
-                  </p>
-                </div>
-              </div>
-
-              {/* Botones */}
-              <div className="flex space-x-3">
-                {deportistaFoto.foto_perfil && (
-                  <button
-                    type="button"
-                    onClick={handleEliminarFoto}
-                    className="flex-1 px-4 py-3 border-2 border-red-300 text-red-700 rounded-lg hover:bg-red-50 font-semibold transition"
-                    disabled={loading}
-                  >
-                    🗑️ Eliminar Foto
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMostrarModalFoto(false);
-                    setArchivoFoto(null);
-                    setPreviewFoto(null);
-                  }}
-                  className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold transition"
-                  disabled={loading}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSubirFoto}
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 font-semibold transition shadow-lg disabled:opacity-50"
-                  disabled={loading || !archivoFoto}
-                >
-                  {loading ? '⏳ Subiendo...' : '✅ Subir Foto'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

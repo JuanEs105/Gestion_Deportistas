@@ -1,19 +1,20 @@
-// backend/src/controllers/reportesController.js
+// backend/src/controllers/reportesController.js - VERSIÓN COMPLETAMENTE RENOVADA
 const { User, Deportista, Evaluacion, Habilidad } = require('../models');
 const { sequelize } = require('../config/database');
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
+const path = require('path');
 
 class ReportesController {
   
   // ==========================================
-  // REPORTE INDIVIDUAL DE DEPORTISTA (PDF)
+  // REPORTE INDIVIDUAL PDF - DISEÑO MEJORADO
   // ==========================================
   static async generarPDFDeportista(req, res) {
     try {
       const { deportista_id } = req.params;
       
-      // Obtener datos del deportista
+      // Obtener datos completos
       const deportista = await Deportista.findByPk(deportista_id, {
         include: [{
           model: User,
@@ -26,7 +27,6 @@ class ReportesController {
         return res.status(404).json({ error: 'Deportista no encontrado' });
       }
       
-      // Obtener evaluaciones
       const evaluaciones = await Evaluacion.findAll({
         where: { deportista_id },
         include: [
@@ -51,100 +51,258 @@ class ReportesController {
         ? (evaluaciones.reduce((sum, e) => sum + e.puntuacion, 0) / evaluaciones.length).toFixed(2)
         : 0;
       
-      // Crear PDF
-      const doc = new PDFDocument({ margin: 50 });
+      // Progreso por categoría
+      const porCategoria = {};
+      evaluaciones.forEach(e => {
+        const cat = e.habilidad?.categoria || 'general';
+        if (!porCategoria[cat]) {
+          porCategoria[cat] = { total: 0, completadas: 0 };
+        }
+        porCategoria[cat].total++;
+        if (e.completado) porCategoria[cat].completadas++;
+      });
       
-      // Configurar headers para descarga
+      // Crear PDF con diseño moderno
+      const doc = new PDFDocument({ 
+        margin: 40,
+        size: 'LETTER',
+        bufferPages: true
+      });
+      
+      // Headers para descarga
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename=reporte_${deportista.User.nombre.replace(/\s/g, '_')}_${Date.now()}.pdf`);
+      res.setHeader('Content-Disposition', 
+        `attachment; filename=reporte_${deportista.User.nombre.replace(/\s/g, '_')}_${Date.now()}.pdf`
+      );
       
       doc.pipe(res);
       
-      // ENCABEZADO
-      doc.fontSize(24).fillColor('#3b82f6').text('🏆 REPORTE DE EVALUACIÓN', { align: 'center' });
-      doc.moveDown(0.5);
-      doc.fontSize(12).fillColor('#666').text('Sistema de Gestión Deportiva', { align: 'center' });
-      doc.moveDown(2);
+      // ====== PORTADA MODERNA ======
+      doc.rect(0, 0, doc.page.width, 200).fill('#3b82f6');
       
-      // INFORMACIÓN DEL DEPORTISTA
-      doc.fontSize(16).fillColor('#000').text('📋 Información del Deportista', { underline: true });
-      doc.moveDown(0.5);
+      doc.fontSize(32)
+         .fillColor('#ffffff')
+         .font('Helvetica-Bold')
+         .text('REPORTE DE EVALUACIÓN', 50, 60, { align: 'center' });
       
-      doc.fontSize(12).fillColor('#333');
-      doc.text(`Nombre: ${deportista.User.nombre}`);
-      doc.text(`Email: ${deportista.User.email}`);
-      doc.text(`Teléfono: ${deportista.User.telefono || 'No registrado'}`);
-      doc.text(`Nivel Actual: ${deportista.nivel_actual}`);
-      doc.text(`Estado: ${deportista.estado}`);
-      doc.text(`Fecha de Reporte: ${new Date().toLocaleDateString('es-ES')}`);
-      doc.moveDown(2);
+      doc.fontSize(16)
+         .fillColor('#e0f2fe')
+         .font('Helvetica')
+         .text('Sistema de Gestión Deportiva', 50, 110, { align: 'center' });
       
-      // ESTADÍSTICAS GENERALES
-      doc.fontSize(16).fillColor('#000').text('📊 Estadísticas Generales', { underline: true });
-      doc.moveDown(0.5);
+      doc.fontSize(14)
+         .fillColor('#bfdbfe')
+         .text(`Generado: ${new Date().toLocaleDateString('es-ES', {
+           year: 'numeric',
+           month: 'long',
+           day: 'numeric'
+         })}`, 50, 140, { align: 'center' });
       
-      doc.fontSize(12).fillColor('#333');
-      doc.text(`Total de Evaluaciones: ${totalEvaluaciones}`);
-      doc.text(`Habilidades Completadas: ${completadas}`);
-      doc.text(`Promedio General: ${promedio}/10`);
-      doc.text(`Porcentaje de Éxito: ${totalEvaluaciones > 0 ? ((completadas / totalEvaluaciones) * 100).toFixed(1) : 0}%`);
-      doc.moveDown(2);
+      // ====== INFORMACIÓN DEL DEPORTISTA ======
+      doc.moveDown(4);
+      const startY = 220;
       
-      // DETALLE DE EVALUACIONES
-      if (evaluaciones.length > 0) {
-        doc.fontSize(16).fillColor('#000').text('📝 Últimas 10 Evaluaciones', { underline: true });
-        doc.moveDown(0.5);
+      // Box con información
+      doc.rect(40, startY, doc.page.width - 80, 160)
+         .fillAndStroke('#f0f9ff', '#3b82f6');
+      
+      doc.fontSize(20)
+         .fillColor('#1e40af')
+         .font('Helvetica-Bold')
+         .text('👤 Información del Deportista', 60, startY + 20);
+      
+      doc.fontSize(12)
+         .fillColor('#1f2937')
+         .font('Helvetica');
+      
+      let infoY = startY + 55;
+      const infoItems = [
+        ['Nombre:', deportista.User.nombre],
+        ['Email:', deportista.User.email],
+        ['Teléfono:', deportista.User.telefono || 'No registrado'],
+        ['Nivel Actual:', deportista.nivel_actual],
+        ['Estado:', deportista.estado.toUpperCase()]
+      ];
+      
+      infoItems.forEach(([label, value]) => {
+        doc.font('Helvetica-Bold').text(label, 60, infoY, { continued: true, width: 150 });
+        doc.font('Helvetica').text(` ${value}`, { width: 350 });
+        infoY += 20;
+      });
+      
+      // ====== ESTADÍSTICAS VISUALES ======
+      doc.moveDown(3);
+      const statsY = infoY + 40;
+      
+      doc.fontSize(18)
+         .fillColor('#1e40af')
+         .font('Helvetica-Bold')
+         .text('📊 Estadísticas Generales', 60, statsY);
+      
+      // Tarjetas de estadísticas
+      const stats = [
+        { label: 'Total Evaluaciones', value: totalEvaluaciones, color: '#3b82f6', x: 60 },
+        { label: 'Completadas', value: completadas, color: '#10b981', x: 220 },
+        { label: 'Promedio', value: `${promedio}/10`, color: '#f59e0b', x: 380 }
+      ];
+      
+      const cardY = statsY + 40;
+      stats.forEach(stat => {
+        // Tarjeta con sombra
+        doc.rect(stat.x, cardY, 140, 80).fill('#ffffff');
+        doc.rect(stat.x, cardY, 140, 80).lineWidth(2).stroke(stat.color);
         
-        evaluaciones.slice(0, 10).forEach((evaluacion, index) => {
-          const fecha = new Date(evaluacion.fecha_evaluacion).toLocaleDateString('es-ES');
-          
-          doc.fontSize(11).fillColor('#000').text(`${index + 1}. ${evaluacion.habilidad.nombre}`, { continued: true });
-          doc.fillColor(evaluacion.completado ? '#10b981' : '#f59e0b').text(` - ${evaluacion.puntuacion}/10`);
-          
-          doc.fontSize(9).fillColor('#666');
-          doc.text(`   Fecha: ${fecha} | Evaluador: ${evaluacion.entrenador.nombre}`);
-          
-          if (evaluacion.observaciones) {
-            doc.text(`   Observaciones: ${evaluacion.observaciones.substring(0, 100)}...`);
-          }
-          
-          doc.moveDown(0.5);
-        });
-      } else {
-        doc.fontSize(12).fillColor('#999').text('No hay evaluaciones registradas aún.');
-      }
+        doc.fontSize(10)
+           .fillColor('#6b7280')
+           .font('Helvetica')
+           .text(stat.label, stat.x + 10, cardY + 15, { width: 120, align: 'center' });
+        
+        doc.fontSize(28)
+           .fillColor(stat.color)
+           .font('Helvetica-Bold')
+           .text(stat.value.toString(), stat.x + 10, cardY + 38, { width: 120, align: 'center' });
+      });
       
-      // PIE DE PÁGINA
-      doc.fontSize(8).fillColor('#999');
-      doc.text(
-        'Este documento es generado automáticamente por el Sistema de Gestión Deportiva',
-        50,
-        doc.page.height - 50,
-        { align: 'center' }
-      );
+      // ====== PROGRESO POR CATEGORÍA ======
+      doc.addPage();
+      doc.fontSize(18)
+         .fillColor('#1e40af')
+         .font('Helvetica-Bold')
+         .text('📈 Progreso por Categoría', 60, 60);
+      
+      let catY = 100;
+      const categorias = {
+        'habilidad': { label: 'Habilidades', icon: '🏆', color: '#3b82f6' },
+        'ejercicio_accesorio': { label: 'Ejercicios', icon: '💪', color: '#10b981' },
+        'postura': { label: 'Posturas', icon: '🧘', color: '#f59e0b' }
+      };
+      
+      Object.entries(categorias).forEach(([key, config]) => {
+        const data = porCategoria[key] || { total: 0, completadas: 0 };
+        const porcentaje = data.total > 0 ? (data.completadas / data.total * 100).toFixed(1) : 0;
+        
+        // Título de categoría
+        doc.fontSize(14)
+           .fillColor('#1f2937')
+           .font('Helvetica-Bold')
+           .text(`${config.icon} ${config.label}`, 60, catY);
+        
+        doc.fontSize(11)
+           .fillColor('#6b7280')
+           .font('Helvetica')
+           .text(`${data.completadas}/${data.total} (${porcentaje}%)`, 300, catY);
+        
+        // Barra de progreso
+        const barY = catY + 25;
+        const barWidth = 450;
+        const fillWidth = (parseFloat(porcentaje) / 100) * barWidth;
+        
+        // Barra background
+        doc.rect(60, barY, barWidth, 20).fill('#e5e7eb');
+        // Barra rellena
+        doc.rect(60, barY, fillWidth, 20).fill(config.color);
+        // Borde
+        doc.rect(60, barY, barWidth, 20).stroke('#d1d5db');
+        
+        catY += 65;
+      });
+      
+      // ====== ÚLTIMAS EVALUACIONES ======
+      doc.moveDown(2);
+      doc.fontSize(18)
+         .fillColor('#1e40af')
+         .font('Helvetica-Bold')
+         .text('📝 Últimas 10 Evaluaciones', 60, catY + 20);
+      
+      let evalY = catY + 60;
+      evaluaciones.slice(0, 10).forEach((evaluacion, index) => {
+        const fecha = new Date(evaluacion.fecha_evaluacion).toLocaleDateString('es-ES');
+        const estado = evaluacion.completado ? '✅' : '🔄';
+        
+        // Fondo alternado
+        if (index % 2 === 0) {
+          doc.rect(50, evalY - 5, doc.page.width - 100, 50).fill('#f9fafb');
+        }
+        
+        doc.fontSize(11)
+           .fillColor('#1f2937')
+           .font('Helvetica-Bold')
+           .text(`${estado} ${evaluacion.habilidad.nombre}`, 60, evalY);
+        
+        doc.fontSize(14)
+           .fillColor(evaluacion.completado ? '#10b981' : '#f59e0b')
+           .font('Helvetica-Bold')
+           .text(`${evaluacion.puntuacion}/10`, 450, evalY - 2);
+        
+        doc.fontSize(9)
+           .fillColor('#6b7280')
+           .font('Helvetica')
+           .text(`${fecha} • ${evaluacion.entrenador.nombre}`, 60, evalY + 18);
+        
+        if (evaluacion.observaciones) {
+          doc.fontSize(8)
+             .fillColor('#9ca3af')
+             .text(`"${evaluacion.observaciones.substring(0, 80)}..."`, 60, evalY + 32);
+        }
+        
+        evalY += 55;
+        
+        // Nueva página si es necesario
+        if (evalY > 700 && index < 9) {
+          doc.addPage();
+          evalY = 60;
+        }
+      });
+      
+      // ====== PIE DE PÁGINA EN TODAS LAS PÁGINAS ======
+      const pages = doc.bufferedPageRange();
+      for (let i = 0; i < pages.count; i++) {
+        doc.switchToPage(i);
+        
+        doc.fontSize(8)
+           .fillColor('#9ca3af')
+           .font('Helvetica')
+           .text(
+             'Sistema de Gestión Deportiva - Reporte Confidencial',
+             50,
+             doc.page.height - 50,
+             { align: 'center', width: doc.page.width - 100 }
+           );
+        
+        doc.text(
+          `Página ${i + 1} de ${pages.count}`,
+          50,
+          doc.page.height - 35,
+          { align: 'center', width: doc.page.width - 100 }
+        );
+      }
       
       doc.end();
       
     } catch (error) {
-      console.error('Error generando PDF:', error);
-      res.status(500).json({ error: 'Error generando el reporte PDF' });
+      console.error('❌ Error generando PDF:', error);
+      res.status(500).json({ 
+        error: 'Error generando reporte PDF',
+        details: error.message 
+      });
     }
   }
   
   // ==========================================
-  // REPORTE GRUPAL EN EXCEL
+  // EXCEL GRUPAL - CORREGIDO
   // ==========================================
   static async generarExcelGrupal(req, res) {
     try {
       const { nivel } = req.query;
       
-      // Construir query
+      console.log('📗 Generando Excel para nivel:', nivel || 'todos');
+      
+      // Construir filtro
       const whereClause = {};
-      if (nivel) {
+      if (nivel && nivel !== 'todos') {
         whereClause.nivel_actual = nivel;
       }
       
-      // Obtener deportistas
       const deportistas = await Deportista.findAll({
         where: whereClause,
         include: [{
@@ -154,13 +312,19 @@ class ReportesController {
         }]
       });
       
-      // Crear Excel
+      console.log(`✅ ${deportistas.length} deportistas encontrados`);
+      
+      // Crear workbook
       const workbook = new ExcelJS.Workbook();
+      workbook.creator = 'Sistema Deportivo';
+      workbook.created = new Date();
       
-      // HOJA 1: RESUMEN DE DEPORTISTAS
-      const sheetResumen = workbook.addWorksheet('Resumen Deportistas');
+      // ===== HOJA 1: RESUMEN =====
+      const sheetResumen = workbook.addWorksheet('Resumen Deportistas', {
+        properties: { tabColor: { argb: '3B82F6' } }
+      });
       
-      // Estilos
+      // Definir columnas
       sheetResumen.columns = [
         { header: 'Nombre', key: 'nombre', width: 30 },
         { header: 'Email', key: 'email', width: 30 },
@@ -173,12 +337,21 @@ class ReportesController {
       ];
       
       // Estilo del header
-      sheetResumen.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      sheetResumen.getRow(1).font = { 
+        bold: true, 
+        color: { argb: 'FFFFFFFF' },
+        size: 12
+      };
       sheetResumen.getRow(1).fill = {
         type: 'pattern',
         pattern: 'solid',
         fgColor: { argb: 'FF3B82F6' }
       };
+      sheetResumen.getRow(1).alignment = { 
+        vertical: 'middle', 
+        horizontal: 'center' 
+      };
+      sheetResumen.getRow(1).height = 25;
       
       // Llenar datos
       for (const deportista of deportistas) {
@@ -192,20 +365,43 @@ class ReportesController {
           ? (evaluaciones.reduce((sum, e) => sum + e.puntuacion, 0) / totalEvaluaciones).toFixed(2)
           : 0;
         
-        sheetResumen.addRow({
-          nombre: deportista.User.nombre,
-          email: deportista.User.email,
-          telefono: deportista.User.telefono || 'N/A',
+        const row = sheetResumen.addRow({
+          nombre: deportista.User?.nombre || 'Sin nombre',
+          email: deportista.User?.email || 'Sin email',
+          telefono: deportista.User?.telefono || 'N/A',
           nivel: deportista.nivel_actual,
           estado: deportista.estado,
           evaluaciones: totalEvaluaciones,
           completadas,
           promedio
         });
+        
+        // Color alternado
+        if (row.number % 2 === 0) {
+          row.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFF9FAFB' }
+          };
+        }
       }
       
-      // HOJA 2: EVALUACIONES DETALLADAS
-      const sheetEvaluaciones = workbook.addWorksheet('Evaluaciones Detalladas');
+      // Bordes
+      sheetResumen.eachRow((row, rowNumber) => {
+        row.eachCell((cell) => {
+          cell.border = {
+            top: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+            left: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+            bottom: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+            right: { style: 'thin', color: { argb: 'FFE5E7EB' } }
+          };
+        });
+      });
+      
+      // ===== HOJA 2: EVALUACIONES DETALLADAS =====
+      const sheetEvaluaciones = workbook.addWorksheet('Evaluaciones Detalladas', {
+        properties: { tabColor: { argb: '10B981' } }
+      });
       
       sheetEvaluaciones.columns = [
         { header: 'Deportista', key: 'deportista', width: 25 },
@@ -219,19 +415,30 @@ class ReportesController {
         { header: 'Entrenador', key: 'entrenador', width: 25 }
       ];
       
-      sheetEvaluaciones.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      // Estilo header
+      sheetEvaluaciones.getRow(1).font = { 
+        bold: true, 
+        color: { argb: 'FFFFFFFF' },
+        size: 12
+      };
       sheetEvaluaciones.getRow(1).fill = {
         type: 'pattern',
         pattern: 'solid',
         fgColor: { argb: 'FF10B981' }
       };
+      sheetEvaluaciones.getRow(1).alignment = { 
+        vertical: 'middle', 
+        horizontal: 'center' 
+      };
+      sheetEvaluaciones.getRow(1).height = 25;
       
-      // Obtener todas las evaluaciones
+      // Obtener evaluaciones
       const todasEvaluaciones = await Evaluacion.findAll({
         include: [
           {
             model: Deportista,
             as: 'deportista',
+            where: whereClause,
             include: [{
               model: User,
               as: 'User',
@@ -250,53 +457,80 @@ class ReportesController {
           }
         ],
         order: [['fecha_evaluacion', 'DESC']],
-        limit: 500 // Limitar a 500 para no sobrecargar
+        limit: 1000
       });
+      
+      console.log(`✅ ${todasEvaluaciones.length} evaluaciones encontradas`);
       
       todasEvaluaciones.forEach(evaluacion => {
         const row = sheetEvaluaciones.addRow({
-          deportista: evaluacion.deportista.User.nombre,
-          habilidad: evaluacion.habilidad.nombre,
-          categoria: evaluacion.habilidad.categoria,
-          nivel: evaluacion.habilidad.nivel,
+          deportista: evaluacion.deportista?.User?.nombre || 'Desconocido',
+          habilidad: evaluacion.habilidad?.nombre || 'Sin nombre',
+          categoria: evaluacion.habilidad?.categoria || 'N/A',
+          nivel: evaluacion.habilidad?.nivel || 'N/A',
           puntuacion: evaluacion.puntuacion,
-          minimo: evaluacion.habilidad.puntuacion_minima,
+          minimo: evaluacion.habilidad?.puntuacion_minima || 0,
           completado: evaluacion.completado ? 'SÍ' : 'NO',
           fecha: new Date(evaluacion.fecha_evaluacion).toLocaleDateString('es-ES'),
-          entrenador: evaluacion.entrenador.nombre
+          entrenador: evaluacion.entrenador?.nombre || 'Desconocido'
         });
         
-        // Colorear fila según si está completado
+        // Colorear según estado
         if (evaluacion.completado) {
           row.fill = {
             type: 'pattern',
             pattern: 'solid',
-            fgColor: { argb: 'FFD1FAE5' } // Verde claro
+            fgColor: { argb: 'FFD1FAE5' }
           };
         }
+        
+        // Bordes
+        row.eachCell((cell) => {
+          cell.border = {
+            top: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+            left: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+            bottom: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+            right: { style: 'thin', color: { argb: 'FFE5E7EB' } }
+          };
+        });
       });
       
-      // Configurar respuesta
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.setHeader('Content-Disposition', `attachment; filename=reporte_general_${Date.now()}.xlsx`);
+      // ===== CONFIGURAR RESPUESTA =====
+      const filename = `reporte_general_${nivel || 'todos'}_${Date.now()}.xlsx`;
+      
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      );
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${filename}"`
+      );
+      res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+      
+      console.log('📥 Enviando Excel al cliente...');
       
       await workbook.xlsx.write(res);
       res.end();
       
+      console.log('✅ Excel enviado correctamente');
+      
     } catch (error) {
-      console.error('Error generando Excel:', error);
-      res.status(500).json({ error: 'Error generando el reporte Excel' });
+      console.error('❌ Error generando Excel:', error);
+      res.status(500).json({ 
+        error: 'Error generando reporte Excel',
+        details: error.message 
+      });
     }
   }
   
   // ==========================================
-  // REPORTE DE PROGRESO POR NIVEL (PDF)
+  // PDF PROGRESO POR NIVEL
   // ==========================================
   static async generarPDFProgresoNivel(req, res) {
     try {
       const { nivel } = req.params;
       
-      // Obtener deportistas del nivel
       const deportistas = await Deportista.findAll({
         where: { nivel_actual: nivel },
         include: [{
@@ -306,29 +540,41 @@ class ReportesController {
         }]
       });
       
-      // Obtener habilidades del nivel
       const habilidades = await Habilidad.findAll({
         where: { nivel, activa: true },
         order: [['categoria', 'ASC'], ['orden', 'ASC']]
       });
       
-      // Crear PDF
-      const doc = new PDFDocument({ margin: 50, size: 'A4', layout: 'landscape' });
+      const doc = new PDFDocument({ 
+        margin: 40, 
+        size: 'LETTER',
+        layout: 'landscape' 
+      });
       
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename=progreso_nivel_${nivel}_${Date.now()}.pdf`);
+      res.setHeader('Content-Disposition', 
+        `attachment; filename=progreso_nivel_${nivel}_${Date.now()}.pdf`
+      );
       
       doc.pipe(res);
       
       // ENCABEZADO
-      doc.fontSize(20).fillColor('#3b82f6').text(`📊 REPORTE DE PROGRESO - NIVEL ${nivel.toUpperCase()}`, { align: 'center' });
-      doc.moveDown(0.5);
-      doc.fontSize(10).fillColor('#666').text(`Fecha: ${new Date().toLocaleDateString('es-ES')} | Total Deportistas: ${deportistas.length}`, { align: 'center' });
-      doc.moveDown(2);
+      doc.rect(0, 0, doc.page.width, 100).fill('#3b82f6');
       
-      // Por cada deportista
+      doc.fontSize(24)
+         .fillColor('#ffffff')
+         .font('Helvetica-Bold')
+         .text(`📊 PROGRESO - NIVEL ${nivel.toUpperCase()}`, 50, 30, { align: 'center' });
+      
+      doc.fontSize(12)
+         .fillColor('#e0f2fe')
+         .text(`Fecha: ${new Date().toLocaleDateString('es-ES')} | Deportistas: ${deportistas.length}`, 
+           50, 65, { align: 'center' });
+      
+      // CONTENIDO
+      let yPos = 130;
+      
       for (const deportista of deportistas) {
-        // Obtener evaluaciones
         const evaluaciones = await Evaluacion.findAll({
           where: { deportista_id: deportista.id },
           include: [{
@@ -337,34 +583,48 @@ class ReportesController {
           }]
         });
         
-        // Calcular progreso
         const completadas = habilidades.filter(h => {
           const evalu = evaluaciones.find(e => e.habilidad_id === h.id);
           return evalu && evalu.completado;
         }).length;
         
-        const porcentaje = (completadas / habilidades.length * 100).toFixed(1);
+        const porcentaje = ((completadas / habilidades.length) * 100).toFixed(1);
         
-        doc.fontSize(14).fillColor('#000').text(`${deportista.User.nombre}`, { underline: true });
-        doc.fontSize(10).fillColor('#666').text(`Progreso: ${completadas}/${habilidades.length} (${porcentaje}%)`);
-        doc.moveDown(0.5);
+        // Nombre
+        doc.fontSize(14)
+           .fillColor('#1f2937')
+           .font('Helvetica-Bold')
+           .text(deportista.User.nombre, 50, yPos);
         
-        // Barra de progreso visual
-        const barWidth = 400;
-        const barHeight = 15;
+        // Progreso texto
+        doc.fontSize(10)
+           .fillColor('#6b7280')
+           .font('Helvetica')
+           .text(`${completadas}/${habilidades.length} (${porcentaje}%)`, 300, yPos + 2);
+        
+        // Barra de progreso
+        const barY = yPos + 25;
+        const barWidth = 600;
         const fillWidth = (completadas / habilidades.length) * barWidth;
         
-        doc.rect(100, doc.y, barWidth, barHeight).fillAndStroke('#e5e7eb', '#d1d5db');
-        doc.rect(100, doc.y - barHeight, fillWidth, barHeight).fill('#10b981');
+        doc.rect(50, barY, barWidth, 15).fill('#e5e7eb');
+        doc.rect(50, barY, fillWidth, 15).fill('#10b981');
+        doc.rect(50, barY, barWidth, 15).stroke('#d1d5db');
         
-        doc.moveDown(2);
+        yPos += 60;
+        
+        // Nueva página si es necesario
+        if (yPos > 500) {
+          doc.addPage();
+          yPos = 50;
+        }
       }
       
       doc.end();
       
     } catch (error) {
-      console.error('Error generando PDF de progreso:', error);
-      res.status(500).json({ error: 'Error generando el reporte' });
+      console.error('❌ Error generando PDF de nivel:', error);
+      res.status(500).json({ error: 'Error generando reporte' });
     }
   }
 }

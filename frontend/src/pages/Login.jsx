@@ -1,4 +1,4 @@
-// frontend/src/pages/Login.jsx - CON BOTÓN DE RECUPERACIÓN
+// frontend/src/pages/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -23,21 +23,26 @@ const Login = () => {
 
       const { token, user } = response.data;
       
+      // CORRECCIÓN: Usar 'role' en lugar de 'tipo'
       const normalizedUser = {
         id: user.id,
         nombre: user.nombre || user.name,
         email: user.email,
-        tipo: user.tipo || user.role,
+        tipo: user.role || user.tipo,  // ← ¡FIX!
         telefono: user.telefono,
-        activo: user.activo
+        activo: user.activo,
+        // Añadir deportistaProfile si existe
+        deportistaProfile: user.deportista || null
       };
       
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(normalizedUser));
       
-      const userType = normalizedUser.tipo.toLowerCase();
+      // CORRECCIÓN: Usar user.role para determinar redirección
+      const userRole = normalizedUser.tipo.toLowerCase();
       
-      if (userType === 'entrenador' || userType === 'admin') {
+      // Redirigir según tipo de usuario
+      if (userRole === 'admin' || userRole === 'entrenador') {
         navigate('/entrenador');
       } else {
         navigate('/deportista');
@@ -78,6 +83,7 @@ const Login = () => {
               className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="correo@ejemplo.com"
               disabled={loading}
+              autoComplete="username"
             />
           </div>
 
@@ -93,10 +99,10 @@ const Login = () => {
               className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="••••••••"
               disabled={loading}
+              autoComplete="current-password"
             />
           </div>
 
-          {/* BOTÓN DE RECUPERACIÓN */}
           <div className="text-right">
             <Link
               to="/forgot-password"
@@ -121,7 +127,7 @@ const Login = () => {
           </button>
         </form>
 
-        {/* CREDENCIALES DE PRUEBA */}
+        {/* CREDENCIALES DE PRUEBA - ACTUALIZADAS */}
         <div className="mt-6">
           <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
             <p className="text-sm font-semibold text-blue-900 mb-2">
@@ -129,9 +135,14 @@ const Login = () => {
             </p>
             <div className="text-xs text-blue-800 space-y-2">
               <div className="bg-white rounded p-2">
-                <p className="font-medium">Entrenador:</p>
-                <p className="font-mono">entrenador@deportes.com</p>
-                <p className="font-mono">password123</p>
+                <p className="font-medium">Entrenador (usa estas):</p>
+                <p className="font-mono">entrenadors@deporters.com</p>
+                <p className="font-mono">pasavant323</p>
+              </div>
+              <div className="bg-white rounded p-2">
+                <p className="font-medium">O prueba con:</p>
+                <p className="font-mono">pipe@gmail.com</p>
+                <p className="font-mono">(tu contraseña)</p>
               </div>
             </div>
           </div>

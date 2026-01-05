@@ -1,15 +1,25 @@
-// frontend/src/App.js - RUTAS ACTUALIZADAS
+// frontend/src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import Layout from './components/Layout/Layout';
+
+// Páginas Entrenador
 import DashboardEntrenador from './pages/DashboardEntrenador';
-import DashboardDeportista from './pages/DashboardDeportista';
 import Deportistas from './pages/Deportistas';
 import Evaluaciones from './pages/Evaluaciones';
 import Calendario from './pages/Calendario';
 import Reportes from './pages/Reportes';
+
+// Páginas Deportista
+import DashboardDeportista from './pages/DashboardDeportista';
+import CalendarioDeportista from './pages/CalendarioDeportista';
+import Progreso from './pages/Progreso';
+import MisEvaluaciones from './pages/MisEvaluaciones';
+import Habilidades from './pages/Habilidades';
+
+// Páginas Admin
 import DashboardAdmin from './pages/Admin/DashboardAdmin';
 import AdminAdministradores from './pages/Admin/AdminAdministradores';
 import AdminEntrenadores from './pages/Admin/AdminEntrenadores';
@@ -19,6 +29,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* RUTAS PÚBLICAS */}
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
@@ -44,10 +55,15 @@ function App() {
         {/* RUTAS DEPORTISTA */}
         <Route path="/deportista" element={<Layout />}>
           <Route index element={<DashboardDeportista />} />
-          <Route path="calendario" element={<Calendario />} />
+          <Route path="calendario" element={<CalendarioDeportista />} />
+          <Route path="progreso" element={<Progreso />} />
+          <Route path="evaluaciones" element={<MisEvaluaciones />} />
+          <Route path="habilidades" element={<Habilidades />} />
         </Route>
 
+        {/* RUTA POR DEFECTO */}
         <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </Router>
   );
