@@ -1,4 +1,3 @@
-// frontend/src/pages/Deportistas.jsx - VERSIÓN COMPLETA Y FUNCIONAL
 import React, { useState, useEffect } from 'react';
 import { deportistasAPI } from '../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -15,20 +14,50 @@ const Deportistas = () => {
   const [nivelesAsignados, setNivelesAsignados] = useState([]);
   const [userRole, setUserRole] = useState('admin');
   
-  // FUNCIÓN QUE FALTABA - SOLUCIÓN AL ERROR
+  // Estados para el modal - CORREGIDO: Usar JSON como el Admin
+  const [showModal, setShowModal] = useState(false);
+  const [creando, setCreando] = useState(false);
+  const [formData, setFormData] = useState({
+    nombre: '',
+    email: '',
+    password: '',
+    telefono: '',
+    fecha_nacimiento: '',
+    altura: '',
+    peso: '',
+    nivel_actual: '1_basico',
+    contacto_emergencia_nombre: '',
+    contacto_emergencia_telefono: '',
+    contacto_emergencia_parentesco: ''
+  });
+  
+  // FUNCIÓN CORREGIDA: Abre modal para nuevo deportista
   const handleNuevoDeportista = () => {
-    // Ajusta la ruta según tu configuración de rutas
-    if (userRole === 'entrenador') {
-      navigate('/entrenador/deportistas/nuevo');
-    } else {
-      navigate('/admin/deportistas/nuevo');
-    }
+    console.log('🟡 Abriendo modal para nuevo deportista...');
+    
+    // Resetear formulario con nivel por defecto
+    const nivelPorDefecto = nivelesAsignados.length > 0 ? nivelesAsignados[0] : '1_basico';
+    
+    setFormData({
+      nombre: '',
+      email: '',
+      password: '',
+      telefono: '',
+      fecha_nacimiento: '',
+      altura: '',
+      peso: '',
+      nivel_actual: nivelPorDefecto,
+      contacto_emergencia_nombre: '',
+      contacto_emergencia_telefono: '',
+      contacto_emergencia_parentesco: ''
+    });
+    
+    setShowModal(true);
   };
   
   // Funciones para manejar editar/eliminar
   const handleEditar = (deportistaId) => {
     console.log('Editar deportista:', deportistaId);
-    // Navegar a la página de edición
     if (userRole === 'entrenador') {
       navigate(`/entrenador/deportistas/editar/${deportistaId}`);
     } else {
@@ -43,7 +72,6 @@ const Deportistas = () => {
     
     try {
       await deportistasAPI.delete(deportistaId);
-      // Actualizar lista
       setDeportistas(deportistas.filter(d => d.id !== deportistaId));
       setDeportistasTodos(deportistasTodos.filter(d => d.id !== deportistaId));
       alert('Deportista eliminado correctamente');
@@ -55,7 +83,6 @@ const Deportistas = () => {
   
   const handleVerDetalles = (deportistaId) => {
     console.log('Ver detalles deportista:', deportistaId);
-    // Navegar a la página de detalles
     if (userRole === 'entrenador') {
       navigate(`/entrenador/deportistas/${deportistaId}`);
     } else {
@@ -64,7 +91,6 @@ const Deportistas = () => {
   };
   
   useEffect(() => {
-    // Obtener niveles asignados del usuario
     const userData = localStorage.getItem('user');
     const user = userData ? JSON.parse(userData) : null;
     
@@ -75,7 +101,6 @@ const Deportistas = () => {
         const niveles = user.niveles_asignados || [];
         setNivelesAsignados(niveles);
         
-        // Establecer el primer nivel asignado como filtro por defecto
         if (niveles.length > 0) {
           setFiltroNivel(niveles[0]);
         }
@@ -90,28 +115,42 @@ const Deportistas = () => {
       setLoading(true);
       setError('');
       
-      const response = await deportistasAPI.getAll();
-      const deportistasArray = response.data?.deportistas || response.data || [];
-      
-      if (!Array.isArray(deportistasArray)) {
-        throw new Error('La respuesta no contiene un array de deportistas');
-      }
-      
-      // Guardar todos los deportistas
-      setDeportistasTodos(deportistasArray);
-      
-      // FILTRAR POR NIVELES ASIGNADOS AUTOMÁTICAMENTE
       const userData = localStorage.getItem('user');
       const user = userData ? JSON.parse(userData) : null;
       
-      if (user && user.tipo === 'entrenador' && user.niveles_asignados) {
-        const deportistasFiltrados = deportistasArray.filter(d => 
-          user.niveles_asignados.includes(d.nivel_actual)
-        );
+      console.log('👤 Usuario:', user);
+      
+      const response = await deportistasAPI.getAll();
+      const todosDeportistas = response.data?.deportistas || response.data || [];
+      
+      if (!Array.isArray(todosDeportistas)) {
+        throw new Error('La respuesta no contiene un array de deportistas');
+      }
+      
+      setDeportistasTodos(todosDeportistas);
+      
+      if (user && user.tipo === 'entrenador') {
+        const nivelesEntrenador = user.niveles_asignados || [];
+        
+        console.log('📚 Niveles del entrenador:', nivelesEntrenador);
+        
+        if (nivelesEntrenador.length === 0) {
+          console.log('⚠️ ENTRENADOR SIN NIVELES');
+          setError('No tienes niveles asignados. Contacta al administrador.');
+          setDeportistas([]);
+          setLoading(false);
+          return;
+        }
+        
+        const deportistasFiltrados = todosDeportistas.filter(d => {
+          const match = nivelesEntrenador.includes(d.nivel_actual);
+          return match;
+        });
+        
+        console.log('✅ Deportistas filtrados:', deportistasFiltrados.length);
         setDeportistas(deportistasFiltrados);
       } else {
-        // Admin ve todos
-        setDeportistas(deportistasArray);
+        setDeportistas(todosDeportistas);
       }
       
     } catch (err) {
@@ -120,6 +159,83 @@ const Deportistas = () => {
       setDeportistas([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // FUNCIONES PARA EL MODAL DE CREACIÓN - CORREGIDAS
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      setCreando(true);
+      console.log('📤 Intentando crear deportista...', formData);
+      
+      // Verificar campos requeridos
+      if (!formData.nombre || !formData.email || !formData.password) {
+        alert('Nombre, email y contraseña son requeridos');
+        setCreando(false);
+        return;
+      }
+      
+      console.log('📦 Enviando datos como JSON (igual que el Admin)...');
+      
+      // IMPORTANTE: Enviar como JSON normal, NO como FormData
+      const response = await deportistasAPI.create(formData);
+      console.log('✅ Deportista creado:', response);
+      
+      alert('Deportista creado exitosamente');
+      setShowModal(false);
+      
+      // Limpiar formulario
+      const nivelPorDefecto = nivelesAsignados.length > 0 ? nivelesAsignados[0] : '1_basico';
+      setFormData({
+        nombre: '',
+        email: '',
+        password: '',
+        telefono: '',
+        fecha_nacimiento: '',
+        altura: '',
+        peso: '',
+        nivel_actual: nivelPorDefecto,
+        contacto_emergencia_nombre: '',
+        contacto_emergencia_telefono: '',
+        contacto_emergencia_parentesco: ''
+      });
+      
+      // Recargar lista
+      fetchDeportistas();
+      
+    } catch (err) {
+      console.error('❌ Error creando deportista:', err);
+      console.error('Detalles del error:', {
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message
+      });
+      
+      let errorMsg = 'Error al crear deportista';
+      
+      if (err.response?.status === 401) {
+        errorMsg = 'No autenticado. Por favor inicia sesión nuevamente.';
+        // Verificar token
+        console.log('🔑 Token actual:', localStorage.getItem('token'));
+      } else if (err.response?.data?.error) {
+        errorMsg = err.response.data.error;
+      } else if (err.message) {
+        errorMsg = err.message;
+      }
+      
+      alert(`Error: ${errorMsg}`);
+    } finally {
+      setCreando(false);
     }
   };
 
@@ -181,28 +297,23 @@ const Deportistas = () => {
 
   // FILTRADO COMPLETO
   const deportistasFiltrados = deportistas.filter(deportista => {
-    // Filtro por búsqueda
     const user = deportista.User || {};
     const matchNombre = user.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
     const matchEmail = user.email?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
     const matchBusqueda = searchTerm === '' || matchNombre || matchEmail;
     
-    // Filtro por nivel (respeta niveles asignados)
     let matchNivel = true;
     if (filtroNivel !== 'todos') {
       matchNivel = deportista.nivel_actual === filtroNivel;
     } else if (userRole === 'entrenador' && nivelesAsignados.length > 0) {
-      // Si es "todos" pero es entrenador, solo mostrar de sus niveles
       matchNivel = nivelesAsignados.includes(deportista.nivel_actual);
     }
     
-    // Filtro por estado
     const matchEstado = filtroEstado === 'todos' || deportista.estado === filtroEstado;
     
     return matchBusqueda && matchNivel && matchEstado;
   });
 
-  // Calcular estadísticas SOLO de deportistas filtrados por niveles
   const getEstadisticas = () => {
     return {
       total: deportistas.length,
@@ -238,7 +349,6 @@ const Deportistas = () => {
               : 'Administra la información de los deportistas'}
           </p>
           
-          {/* Mostrar niveles asignados */}
           {userRole === 'entrenador' && nivelesAsignados.length > 0 && (
             <div className="mt-3 flex items-center space-x-2">
               <span className="text-sm font-semibold text-gray-700">📚 Tus niveles:</span>
@@ -472,6 +582,199 @@ const Deportistas = () => {
           </div>
         </div>
       </div>
+
+      {/* MODAL PARA NUEVO DEPORTISTA - SIMILAR AL DEL ADMIN */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full my-8">
+            <div className="bg-gradient-to-r from-green-500 to-green-700 p-6 text-white rounded-t-2xl">
+              <h3 className="text-2xl font-bold">➕ Nuevo Deportista</h3>
+              {userRole === 'entrenador' && (
+                <p className="text-green-100 text-sm mt-1">
+                  Puedes crear deportistas en tus niveles asignados: {nivelesAsignados.map(n => getNivelNombre(n)).join(', ')}
+                </p>
+              )}
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-6 max-h-[70vh] overflow-y-auto">
+              {/* Información Personal */}
+              <div className="mb-6">
+                <h4 className="text-lg font-bold text-gray-800 mb-4">👤 Información Personal</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Nombre *</label>
+                    <input
+                      type="text"
+                      name="nombre"
+                      value={formData.nombre}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      placeholder="Juan Pérez"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Email *</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      placeholder="correo@ejemplo.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Contraseña *</label>
+                    <input
+                      type="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                      minLength="6"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      placeholder="Mínimo 6 caracteres"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Teléfono</label>
+                    <input
+                      type="tel"
+                      name="telefono"
+                      value={formData.telefono}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      placeholder="+57 300 123 4567"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Fecha de Nacimiento</label>
+                    <input
+                      type="date"
+                      name="fecha_nacimiento"
+                      value={formData.fecha_nacimiento}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Información Deportiva */}
+              <div className="mb-6">
+                <h4 className="text-lg font-bold text-gray-800 mb-4">🏋️ Información Deportiva</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Altura (cm)</label>
+                    <input
+                      type="number"
+                      name="altura"
+                      value={formData.altura}
+                      onChange={handleChange}
+                      step="0.01"
+                      min="0"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      placeholder="175"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Peso (kg)</label>
+                    <input
+                      type="number"
+                      name="peso"
+                      value={formData.peso}
+                      onChange={handleChange}
+                      step="0.01"
+                      min="0"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      placeholder="70"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Nivel *</label>
+                    <select
+                      name="nivel_actual"
+                      value={formData.nivel_actual}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    >
+                      {nivelesAsignados.map(nivel => (
+                        <option key={nivel} value={nivel}>
+                          {getNivelNombre(nivel)}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Solo puedes crear en tus niveles asignados
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contacto de Emergencia */}
+              <div className="mb-6">
+                <h4 className="text-lg font-bold text-gray-800 mb-4">🚨 Contacto de Emergencia</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Nombre</label>
+                    <input
+                      type="text"
+                      name="contacto_emergencia_nombre"
+                      value={formData.contacto_emergencia_nombre}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      placeholder="María Pérez"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Teléfono</label>
+                    <input
+                      type="tel"
+                      name="contacto_emergencia_telefono"
+                      value={formData.contacto_emergencia_telefono}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      placeholder="+57 300 123 4567"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Parentesco</label>
+                    <input
+                      type="text"
+                      name="contacto_emergencia_parentesco"
+                      value={formData.contacto_emergencia_parentesco}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      placeholder="Madre"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex space-x-4 pt-4 border-t">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold transition"
+                  disabled={creando}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 font-semibold transition shadow-lg disabled:opacity-50"
+                  disabled={creando}
+                >
+                  {creando ? '⏳ Creando...' : '✅ Crear Deportista'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

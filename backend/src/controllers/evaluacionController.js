@@ -49,7 +49,13 @@ class EvaluacionController {
 
       // Verificar deportista
       console.log('\n🔍 Buscando deportista ID:', deportista_id);
-      const deportista = await Deportista.findByPk(deportista_id);
+      const deportista = await Deportista.findByPk(deportista_id, {
+        include: [{
+          model: User,
+          as: 'User',  // ← AÑADIDO EL 'as'
+          attributes: ['id', 'nombre']
+        }]
+      });
       
       if (!deportista) {
         console.log('❌ Deportista no encontrado');
@@ -59,6 +65,7 @@ class EvaluacionController {
       }
       
       console.log('✅ Deportista encontrado:');
+      console.log('   - Nombre:', deportista.User?.nombre || 'N/A');
       console.log('   - Nivel actual:', deportista.nivel_actual);
       console.log('   - Estado:', deportista.estado);
 
@@ -90,7 +97,7 @@ class EvaluacionController {
       console.log('   ID:', evaluacion.id);
       console.log('   Fecha:', evaluacion.fecha_evaluacion);
 
-      // Verificar progreso (CORREGIDO: usar EvaluacionController en lugar de this)
+      // Verificar progreso
       console.log('\n📊 Verificando progreso del deportista...');
       await EvaluacionController.verificarProgresoYSugerirCambio(deportista_id, deportista.nivel_actual);
 
@@ -159,7 +166,6 @@ class EvaluacionController {
     }
   }
 
-  // CORREGIDO: usar EvaluacionController en lugar de this
   static async verificarProgresoYSugerirCambio(deportista_id, nivel_actual) {
     try {
       const progreso = await EvaluacionController.calcularProgresoInterno(deportista_id, nivel_actual);
@@ -239,12 +245,18 @@ class EvaluacionController {
     };
   }
 
-  // CORREGIDO: usar EvaluacionController en lugar de this
   static async getProgreso(req, res) {
     try {
       const { deportista_id } = req.params;
 
-      const deportista = await Deportista.findByPk(deportista_id);
+      const deportista = await Deportista.findByPk(deportista_id, {
+        include: [{
+          model: User,
+          as: 'User',  // ← AÑADIDO EL 'as'
+          attributes: ['id', 'nombre']
+        }]
+      });
+      
       if (!deportista) {
         return res.status(404).json({
           error: 'Deportista no encontrado'
@@ -304,16 +316,16 @@ class EvaluacionController {
         };
       }
 
-      // CORREGIDO: usar EvaluacionController en lugar de this
       const progresoTotal = await EvaluacionController.calcularProgresoInterno(deportista_id, nivel);
 
       res.json({
         deportista_id,
+        deportista_nombre: deportista.User?.nombre || 'Sin nombre',
         nivel_actual: nivel,
         progreso_total: progresoTotal,
         progreso_por_categoria: progresoPorCategoria,
-        cambio_nivel_pendiente: deportista.cambio_nivel_pendiente,
-        nivel_sugerido: deportista.nivel_sugerido
+        cambio_nivel_pendiente: deportista.cambio_nivel_pendiente || false,
+        nivel_sugerido: deportista.nivel_sugerido || null
       });
 
     } catch (error) {
@@ -347,6 +359,7 @@ class EvaluacionController {
       });
 
       res.json({
+        success: true,
         total: evaluaciones.length,
         evaluaciones
       });
@@ -395,6 +408,7 @@ class EvaluacionController {
       const mejoria = ultimaPuntuacion - primeraPuntuacion;
 
       res.json({
+        success: true,
         habilidad: evaluaciones[0].habilidad,
         historial: evaluaciones,
         estadisticas: {
@@ -424,6 +438,7 @@ class EvaluacionController {
       const deportista = await Deportista.findByPk(deportista_id, {
         include: [{
           model: User,
+          as: 'User',  // ← AÑADIDO EL 'as'
           attributes: ['nombre', 'email']
         }]
       });
@@ -459,14 +474,14 @@ class EvaluacionController {
         fecha_cambio: new Date()
       });
 
-      console.log(`✅ Cambio de nivel aprobado: ${deportista.User.nombre} de ${nivel_anterior} a ${nivel_nuevo}`);
+      console.log(`✅ Cambio de nivel aprobado: ${deportista.User?.nombre} de ${nivel_anterior} a ${nivel_nuevo}`);
 
       res.json({
         success: true,
         message: `Deportista promovido de ${nivel_anterior} a ${nivel_nuevo}`,
         deportista: {
           id: deportista.id,
-          nombre: deportista.User.nombre,
+          nombre: deportista.User?.nombre,
           nivel_anterior,
           nivel_nuevo
         }
@@ -483,25 +498,165 @@ class EvaluacionController {
 
   static async getDeportistasConCambioPendiente(req, res) {
     try {
+      console.log('🔍 Buscando deportistas con cambio de nivel pendiente...');
+      
       const deportistas = await Deportista.findAll({
         where: {
           cambio_nivel_pendiente: true
         },
         include: [{
           model: User,
+          as: 'User',  // ← AÑADIDO EL 'as' (ESTA ES LA CORRECCIÓN)
           attributes: ['id', 'nombre', 'email']
         }]
       });
 
+      console.log(`✅ ${deportistas.length} deportistas con cambio pendiente encontrados`);
+      
       res.json({
+        success: true,
         total: deportistas.length,
-        deportistas
+        deportistas: deportistas.map(d => ({
+          id: d.id,
+          nombre: d.User?.nombre || 'Sin nombre',
+          email: d.User?.email,
+          nivel_actual: d.nivel_actual,
+          nivel_sugerido: d.nivel_sugerido,
+          fecha_ultimo_cambio_nivel: d.fecha_ultimo_cambio_nivel,
+          created_at: d.created_at
+        }))
       });
 
     } catch (error) {
-      console.error('❌ Error:', error);
+      console.error('❌ Error obteniendo deportistas con cambio pendiente:', error);
+      console.error('Detalles del error:', error.message);
+      
       res.status(500).json({
-        error: 'Error en el servidor'
+        error: 'Error en el servidor',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+
+  // NUEVO MÉTODO: Obtener evaluaciones pendientes para un entrenador
+  static async getEvaluacionesPendientes(req, res) {
+    try {
+      const entrenador_id = req.user.id;
+      
+      console.log('🔍 Buscando evaluaciones pendientes para entrenador:', entrenador_id);
+      
+      // Obtener deportistas asignados a este entrenador
+      // Asumiendo que hay una relación entre entrenador y deportistas
+      // Si no hay, ajusta esta consulta
+      const evaluaciones = await Evaluacion.findAll({
+        where: {
+          entrenador_id,
+          completado: false  // Evaluaciones no completadas
+        },
+        include: [
+          {
+            model: Deportista,
+            as: 'deportista',
+            include: [{
+              model: User,
+              as: 'User',
+              attributes: ['id', 'nombre', 'email']
+            }]
+          },
+          {
+            model: Habilidad,
+            as: 'habilidad',
+            attributes: ['id', 'nombre', 'nivel', 'puntuacion_minima']
+          }
+        ],
+        order: [['fecha_evaluacion', 'DESC']],
+        limit: 10  // Limitar resultados
+      });
+
+      console.log(`✅ ${evaluaciones.length} evaluaciones pendientes encontradas`);
+      
+      res.json({
+        success: true,
+        total: evaluaciones.length,
+        evaluaciones: evaluaciones.map(e => ({
+          id: e.id,
+          deportista_nombre: e.deportista?.User?.nombre || 'Sin nombre',
+          habilidad_nombre: e.habilidad?.nombre || 'Sin habilidad',
+          nivel: e.habilidad?.nivel,
+          puntuacion: e.puntuacion,
+          puntuacion_minima: e.habilidad?.puntuacion_minima,
+          completado: e.completado,
+          fecha_evaluacion: e.fecha_evaluacion,
+          observaciones: e.observaciones
+        }))
+      });
+
+    } catch (error) {
+      console.error('❌ Error obteniendo evaluaciones pendientes:', error);
+      res.status(500).json({
+        error: 'Error en el servidor',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+
+  // NUEVO MÉTODO: Obtener estadísticas de evaluaciones
+  static async getStats(req, res) {
+    try {
+      const { deportista_id } = req.params;
+
+      // Total evaluaciones
+      const totalEvaluaciones = await Evaluacion.count({
+        where: { deportista_id }
+      });
+
+      // Evaluaciones completadas
+      const evaluacionesCompletadas = await Evaluacion.count({
+        where: {
+          deportista_id,
+          completado: true
+        }
+      });
+
+      // Promedio de puntuación
+      const promedioResult = await Evaluacion.findOne({
+        where: { deportista_id },
+        attributes: [
+          [sequelize.fn('AVG', sequelize.col('puntuacion')), 'promedio']
+        ],
+        raw: true
+      });
+
+      // Última evaluación
+      const ultimaEvaluacion = await Evaluacion.findOne({
+        where: { deportista_id },
+        include: [{
+          model: Habilidad,
+          as: 'habilidad',
+          attributes: ['nombre', 'nivel']
+        }],
+        order: [['fecha_evaluacion', 'DESC']]
+      });
+
+      res.json({
+        success: true,
+        stats: {
+          total_evaluaciones: totalEvaluaciones,
+          evaluaciones_completadas: evaluacionesCompletadas,
+          evaluaciones_pendientes: totalEvaluaciones - evaluacionesCompletadas,
+          porcentaje_completado: totalEvaluaciones > 0 ? 
+            Math.round((evaluacionesCompletadas / totalEvaluaciones) * 100) : 0,
+          promedio_puntuacion: promedioResult?.promedio ? 
+            parseFloat(promedioResult.promedio).toFixed(2) : '0.00',
+          ultima_evaluacion: ultimaEvaluacion
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Error obteniendo estadísticas:', error);
+      res.status(500).json({
+        error: 'Error en el servidor',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   }

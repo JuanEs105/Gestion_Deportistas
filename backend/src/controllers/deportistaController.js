@@ -3,6 +3,7 @@ const { Deportista, User, Evaluacion, Habilidad } = require('../models');
 const { sequelize } = require('../config/database');
 
 class DeportistaController {
+  
   // AGREGAR ESTA RUTA AL INICIO:
   static async getMe(req, res) {
     try {
@@ -100,11 +101,35 @@ class DeportistaController {
     }
   }
 
-  // Crear nuevo deportista
+  // Crear nuevo deportista - VERSIÓN CORREGIDA
   static async create(req, res) {
+    const transaction = await sequelize.transaction();
+    
     try {
-      console.log('📥 Crear deportista - Body:', req.body);
-      console.log('📎 Archivo:', req.file);
+      console.log('📥 CREAR DEPORTISTA - Usuario autenticado:', req.user);
+      
+      // VERIFICAR PERMISOS
+      if (!req.user || !req.user.id) {
+        console.log('❌ Sin usuario autenticado');
+        await transaction.rollback();
+        return res.status(401).json({
+          error: 'No autenticado. Por favor inicia sesión.'
+        });
+      }
+      
+      if (req.user.role !== 'entrenador' && req.user.role !== 'admin') {
+        console.log('❌ Sin permisos:', req.user.role);
+        await transaction.rollback();
+        return res.status(403).json({
+          error: 'No tienes permisos para crear deportistas'
+        });
+      }
+
+      console.log('\n========================================');
+      console.log('📥 CREAR DEPORTISTA - Inicio');
+      console.log('========================================');
+      console.log('Body recibido:', JSON.stringify(req.body, null, 2));
+      console.log('Archivo recibido:', req.file ? req.file.filename : 'Sin archivo');
 
       const {
         nombre,
@@ -120,34 +145,55 @@ class DeportistaController {
         contacto_emergencia_parentesco
       } = req.body;
 
-      // Validaciones
+      // ============================================
+      // PASO 1: VALIDACIONES BÁSICAS
+      // ============================================
       if (!nombre || !email || !password) {
+        console.log('❌ Validación fallida: Faltan campos requeridos');
+        await transaction.rollback();
         return res.status(400).json({
           error: 'Nombre, email y contraseña son requeridos'
         });
       }
 
-      // Verificar si el email ya existe
-      const existingUser = await User.findOne({ where: { email } });
+      // ============================================
+      // PASO 2: VERIFICAR EMAIL ÚNICO
+      // ============================================
+      console.log('🔍 Verificando si el email existe...');
+      const existingUser = await User.findOne({ 
+        where: { email },
+        transaction 
+      });
+      
       if (existingUser) {
+        console.log('❌ El email ya está registrado:', email);
+        await transaction.rollback();
         return res.status(400).json({
           error: 'El email ya está registrado'
         });
       }
+      console.log('✅ Email disponible');
 
-      // Crear usuario
+      // ============================================
+      // PASO 3: CREAR USUARIO
+      // ============================================
+      console.log('👤 Creando usuario...');
       const user = await User.create({
         nombre,
         email,
-        password,
-        telefono,
+        password, // Se hashea automáticamente por el hook
+        telefono: telefono || null,
         role: 'deportista',
         activo: true
-      });
+      }, { transaction });
 
-      console.log('✅ Usuario creado:', user.id);
+      console.log('✅ Usuario creado con ID:', user.id);
 
-      // Crear deportista
+      // ============================================
+      // PASO 4: CREAR PERFIL DEPORTISTA
+      // ============================================
+      console.log('🏃 Creando perfil deportista...');
+      
       const deportistaData = {
         user_id: user.id,
         fecha_nacimiento: fecha_nacimiento || null,
@@ -160,11 +206,21 @@ class DeportistaController {
         contacto_emergencia_parentesco: contacto_emergencia_parentesco || null,
         foto_perfil: req.file ? req.file.path : null
       };
+      
+      console.log('Datos del deportista:', deportistaData);
 
-      const deportista = await Deportista.create(deportistaData);
-      console.log('✅ Deportista creado:', deportista.id);
+      const deportista = await Deportista.create(deportistaData, { transaction });
+      console.log('✅ Deportista creado con ID:', deportista.id);
 
-      // Obtener deportista completo con usuario
+      // ============================================
+      // PASO 5: CONFIRMAR TRANSACCIÓN
+      // ============================================
+      await transaction.commit();
+      console.log('✅ Transacción confirmada exitosamente');
+
+      // ============================================
+      // PASO 6: OBTENER DEPORTISTA COMPLETO
+      // ============================================
       const deportistaCompleto = await Deportista.findByPk(deportista.id, {
         include: [{
           model: User,
@@ -173,6 +229,13 @@ class DeportistaController {
         }]
       });
 
+      console.log('========================================');
+      console.log('✅ DEPORTISTA CREADO EXITOSAMENTE');
+      console.log('========================================\n');
+
+      // ============================================
+      // RESPUESTA EXITOSA
+      // ============================================
       res.status(201).json({
         success: true,
         message: 'Deportista creado exitosamente',
@@ -180,7 +243,48 @@ class DeportistaController {
       });
 
     } catch (error) {
-      console.error('❌ Error creando deportista:', error);
+      // ============================================
+      // MANEJO DE ERRORES
+      // ============================================
+      console.log('\n========================================');
+      console.error('❌❌❌ ERROR CREANDO DEPORTISTA ❌❌❌');
+      console.log('========================================');
+      
+      await transaction.rollback();
+      console.log('🔄 Transacción revertida');
+      
+      console.error('Tipo de error:', error.name);
+      console.error('Mensaje:', error.message);
+      console.error('Stack:', error.stack);
+      
+      if (error.name === 'SequelizeValidationError') {
+        console.error('\n📋 Errores de validación:');
+        error.errors.forEach(e => {
+          console.error(`  - Campo: ${e.path}`);
+          console.error(`    Mensaje: ${e.message}`);
+          console.error(`    Valor: ${e.value}`);
+        });
+        
+        return res.status(400).json({
+          error: 'Error de validación',
+          detalles: error.errors.map(e => ({
+            campo: e.path,
+            mensaje: e.message
+          }))
+        });
+      }
+      
+      if (error.name === 'SequelizeUniqueConstraintError') {
+        console.error('\n🔗 Error de unicidad:');
+        console.error('  Campo:', error.fields);
+        
+        return res.status(400).json({
+          error: 'El email ya está registrado'
+        });
+      }
+      
+      console.log('========================================\n');
+      
       res.status(500).json({
         error: 'Error creando deportista',
         details: process.env.NODE_ENV === 'development' ? error.message : undefined

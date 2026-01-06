@@ -4,7 +4,6 @@ const { User } = require('../models');
 
 const authMiddleware = async (req, res, next) => {
   try {
-    // Obtener token del header
     const authHeader = req.header('Authorization');
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -14,33 +13,31 @@ const authMiddleware = async (req, res, next) => {
     }
     
     const token = authHeader.replace('Bearer ', '');
-    
-    // Verificar token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret-key-desarrollo');
     
-    // Buscar usuario
-    const user = await User.findByPk(decoded.id);
+    // Buscar usuario CON niveles asignados
+    const user = await User.findByPk(decoded.id, {
+      attributes: ['id', 'nombre', 'email', 'role', 'activo', 'niveles_asignados'] // ← CRÍTICO
+    });
     
     if (!user) {
-      return res.status(401).json({
-        error: 'Usuario no encontrado'
-      });
+      return res.status(401).json({ error: 'Usuario no encontrado' });
     }
     
     if (!user.activo) {
-      return res.status(401).json({
-        error: 'Usuario inactivo'
-      });
+      return res.status(401).json({ error: 'Usuario inactivo' });
     }
     
-    // Agregar usuario a la request
+    // INCLUIR niveles_asignados en req.user
     req.user = {
       id: user.id,
       name: user.nombre,
+      nombre: user.nombre,
       email: user.email,
       role: user.role,
-      tipo: user.role,  // Para compatibilidad con frontend
-      activo: user.activo
+      tipo: user.role,
+      activo: user.activo,
+      niveles_asignados: user.niveles_asignados || [] // ← CRÍTICO
     };
     req.token = token;
     
@@ -49,20 +46,14 @@ const authMiddleware = async (req, res, next) => {
     console.error('Error en authMiddleware:', error.message);
     
     if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({
-        error: 'Token inválido'
-      });
+      return res.status(401).json({ error: 'Token inválido' });
     }
     
     if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({
-        error: 'Token expirado'
-      });
+      return res.status(401).json({ error: 'Token expirado' });
     }
     
-    res.status(401).json({
-      error: 'Por favor autentícate'
-    });
+    res.status(401).json({ error: 'Por favor autentícate' });
   }
 };
 

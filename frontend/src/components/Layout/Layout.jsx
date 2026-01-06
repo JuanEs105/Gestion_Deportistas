@@ -1,12 +1,14 @@
-// frontend/src/components/Layout/Layout.jsx
+// frontend/src/components/Layout/Layout.jsx - VERSIÓN CORREGIDA
 import React, { useEffect, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import Header from './Header';
 import Sidebar from './Sidebar';
 
 const Layout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
+  const [userType, setUserType] = useState(null);
   
   useEffect(() => {
     const checkAuth = () => {
@@ -14,14 +16,42 @@ const Layout = () => {
         const userData = localStorage.getItem('user');
         const token = localStorage.getItem('token');
         
-        // Si no hay usuario o token, redirigir al login
         if (!userData || !token) {
           console.log('🔐 No autenticado, redirigiendo...');
           navigate('/login', { replace: true });
           return;
         }
         
-        // Si hay usuario, continuar
+        const user = JSON.parse(userData);
+        const tipo = (user.tipo || user.role || '').toLowerCase();
+        setUserType(tipo);
+        
+        // CORRECCIÓN: Redirigir al dashboard correcto según el rol
+        const currentPath = location.pathname;
+        
+        if (tipo === 'admin') {
+          // Si es admin y está en ruta de entrenador, redirigir a admin
+          if (currentPath.startsWith('/entrenador') && currentPath !== '/entrenador') {
+            navigate('/admin', { replace: true });
+          } else if (currentPath === '/' || currentPath === '/entrenador') {
+            navigate('/admin', { replace: true });
+          }
+        } else if (tipo === 'entrenador') {
+          // Si es entrenador y está en ruta de admin, redirigir a entrenador
+          if (currentPath.startsWith('/admin')) {
+            navigate('/entrenador', { replace: true });
+          } else if (currentPath === '/') {
+            navigate('/entrenador', { replace: true });
+          }
+        } else if (tipo === 'deportista') {
+          // Si es deportista y está en otra ruta, redirigir a deportista
+          if (currentPath.startsWith('/admin') || currentPath.startsWith('/entrenador')) {
+            navigate('/deportista', { replace: true });
+          } else if (currentPath === '/') {
+            navigate('/deportista', { replace: true });
+          }
+        }
+        
         setIsLoading(false);
       } catch (error) {
         console.error('Error verificando autenticación:', error);
@@ -29,24 +59,8 @@ const Layout = () => {
       }
     };
     
-    // Pequeño delay para asegurar que React Router esté listo
-    setTimeout(checkAuth, 100);
-  }, [navigate]);
-  
-  // Obtener tipo de usuario del localStorage
-  const getUserType = () => {
-    try {
-      const userData = localStorage.getItem('user');
-      if (!userData) return 'entrenador';
-      
-      const user = JSON.parse(userData);
-      return user.tipo || user.role || 'entrenador';
-    } catch (error) {
-      return 'entrenador';
-    }
-  };
-  
-  const userType = getUserType();
+    checkAuth();
+  }, [navigate, location.pathname]);
   
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -54,7 +68,6 @@ const Layout = () => {
     navigate('/login');
   };
 
-  // Mostrar loader mientras verifica autenticación
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen bg-gray-100">

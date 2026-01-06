@@ -22,19 +22,23 @@ const Login = () => {
       });
 
       const { token, user } = response.data;
-      
-      // CORRECCIÓN: Usar 'role' en lugar de 'tipo'
+
+      // NORMALIZAR usuario con TODOS los campos
       const normalizedUser = {
         id: user.id,
         nombre: user.nombre || user.name,
+        name: user.nombre || user.name,
         email: user.email,
-        tipo: user.role || user.tipo,  // ← ¡FIX!
+        tipo: user.role || user.tipo,
+        role: user.role || user.tipo,
         telefono: user.telefono,
         activo: user.activo,
-        // Añadir deportistaProfile si existe
+        niveles_asignados: user.niveles_asignados || [], // ← CRÍTICO
         deportistaProfile: user.deportista || null
       };
-      
+
+      console.log('✅ Usuario normalizado:', normalizedUser);
+
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(normalizedUser));
       
