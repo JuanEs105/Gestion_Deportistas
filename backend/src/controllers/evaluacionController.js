@@ -1,4 +1,3 @@
-// backend/src/controllers/evaluacionController.js - VERSIÓN FINAL CORREGIDA
 const { Evaluacion, Deportista, User, Habilidad, HistorialNivel } = require('../models');
 const { sequelize } = require('../config/database');
 
@@ -52,7 +51,7 @@ class EvaluacionController {
       const deportista = await Deportista.findByPk(deportista_id, {
         include: [{
           model: User,
-          as: 'User',  // ← AÑADIDO EL 'as'
+          as: 'user',  // 🔥 CORREGIDO: 'User' → 'user' (minúscula)
           attributes: ['id', 'nombre']
         }]
       });
@@ -65,7 +64,7 @@ class EvaluacionController {
       }
       
       console.log('✅ Deportista encontrado:');
-      console.log('   - Nombre:', deportista.User?.nombre || 'N/A');
+      console.log('   - Nombre:', deportista.user?.nombre || 'N/A'); // 🔥 CORREGIDO: User → user
       console.log('   - Nivel actual:', deportista.nivel_actual);
       console.log('   - Estado:', deportista.estado);
 
@@ -252,7 +251,7 @@ class EvaluacionController {
       const deportista = await Deportista.findByPk(deportista_id, {
         include: [{
           model: User,
-          as: 'User',  // ← AÑADIDO EL 'as'
+          as: 'user',  // 🔥 CORREGIDO: 'User' → 'user' (minúscula)
           attributes: ['id', 'nombre']
         }]
       });
@@ -320,7 +319,7 @@ class EvaluacionController {
 
       res.json({
         deportista_id,
-        deportista_nombre: deportista.User?.nombre || 'Sin nombre',
+        deportista_nombre: deportista.user?.nombre || 'Sin nombre', // 🔥 CORREGIDO: User → user
         nivel_actual: nivel,
         progreso_total: progresoTotal,
         progreso_por_categoria: progresoPorCategoria,
@@ -438,7 +437,7 @@ class EvaluacionController {
       const deportista = await Deportista.findByPk(deportista_id, {
         include: [{
           model: User,
-          as: 'User',  // ← AÑADIDO EL 'as'
+          as: 'user',  // 🔥 CORREGIDO: 'User' → 'user' (minúscula)
           attributes: ['nombre', 'email']
         }]
       });
@@ -474,14 +473,14 @@ class EvaluacionController {
         fecha_cambio: new Date()
       });
 
-      console.log(`✅ Cambio de nivel aprobado: ${deportista.User?.nombre} de ${nivel_anterior} a ${nivel_nuevo}`);
+      console.log(`✅ Cambio de nivel aprobado: ${deportista.user?.nombre} de ${nivel_anterior} a ${nivel_nuevo}`);
 
       res.json({
         success: true,
         message: `Deportista promovido de ${nivel_anterior} a ${nivel_nuevo}`,
         deportista: {
           id: deportista.id,
-          nombre: deportista.User?.nombre,
+          nombre: deportista.user?.nombre, // 🔥 CORREGIDO: User → user
           nivel_anterior,
           nivel_nuevo
         }
@@ -506,7 +505,7 @@ class EvaluacionController {
         },
         include: [{
           model: User,
-          as: 'User',  // ← AÑADIDO EL 'as' (ESTA ES LA CORRECCIÓN)
+          as: 'user',  // 🔥 CORREGIDO: 'User' → 'user' (minúscula)
           attributes: ['id', 'nombre', 'email']
         }]
       });
@@ -518,8 +517,8 @@ class EvaluacionController {
         total: deportistas.length,
         deportistas: deportistas.map(d => ({
           id: d.id,
-          nombre: d.User?.nombre || 'Sin nombre',
-          email: d.User?.email,
+          nombre: d.user?.nombre || 'Sin nombre', 
+          email: d.user?.email, 
           nivel_actual: d.nivel_actual,
           nivel_sugerido: d.nivel_sugerido,
           fecha_ultimo_cambio_nivel: d.fecha_ultimo_cambio_nivel,
@@ -559,7 +558,7 @@ class EvaluacionController {
             as: 'deportista',
             include: [{
               model: User,
-              as: 'User',
+              as: 'user',  // 🔥 CORREGIDO: 'User' → 'user' (minúscula)
               attributes: ['id', 'nombre', 'email']
             }]
           },
@@ -580,7 +579,7 @@ class EvaluacionController {
         total: evaluaciones.length,
         evaluaciones: evaluaciones.map(e => ({
           id: e.id,
-          deportista_nombre: e.deportista?.User?.nombre || 'Sin nombre',
+          deportista_nombre: e.deportista?.user?.nombre || 'Sin nombre', // 🔥 CORREGIDO: User → user
           habilidad_nombre: e.habilidad?.nombre || 'Sin habilidad',
           nivel: e.habilidad?.nivel,
           puntuacion: e.puntuacion,

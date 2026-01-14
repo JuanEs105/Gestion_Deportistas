@@ -1,36 +1,37 @@
-// backend/src/routes/calendarioRoutes.js - VERSIÓN ACTUALIZADA
+// backend/src/routes/calendarioRoutes.js - VERSIÓN CORREGIDA
 const express = require('express');
 const router = express.Router();
-const CalendarioController = require('../controllers/calendarioController');
-const { authMiddleware, isEntrenador, isAdmin } = require('../middleware/auth');
+const calendarioController = require('../controllers/calendarioController');
+const { authMiddleware, isEntrenador } = require('../middleware/auth');
 
 // ============================================
-// RUTAS PÚBLICAS (NO requieren autenticación)
+// RUTAS PÚBLICAS (SIN AUTENTICACIÓN)
 // ============================================
 
-// Obtener eventos por nivel (PÚBLICO - puede ver cualquier persona)
-router.get('/nivel/:nivel', CalendarioController.getEventosPorNivel);
+// ✅ Ruta principal con filtros - SIN AUTH
+router.get('/filtros', calendarioController.getEventosConFiltros);
 
-// Obtener eventos públicos (alternativa)
-router.get('/publicos', CalendarioController.getEventosPublicos);
-
-// Obtener niveles disponibles según usuario (público pero con info personalizada)
-router.get('/niveles-disponibles', CalendarioController.getNivelesDisponibles);
+// ✅ Obtener grupos competitivos disponibles - SIN AUTH
+router.get('/grupos-competitivos', calendarioController.getGruposCompetitivos);
 
 // ============================================
-// RUTAS PROTEGIDAS (requieren autenticación)
+// RUTAS PROTEGIDAS (CON AUTENTICACIÓN)
 // ============================================
 
-// Crear evento (solo entrenadores y admins)
-router.post('/', authMiddleware, isEntrenador, CalendarioController.crearEvento);
+// ✅ Obtener un evento específico
+router.get('/:id', calendarioController.getEventoById);
 
-// Actualizar evento (solo el creador o admin)
-router.put('/:id', authMiddleware, CalendarioController.actualizarEvento);
+// ============================================
+// RUTAS CRUD (ENTRENADORES Y ADMIN)
+// ============================================
 
-// Eliminar evento (solo el creador o admin)
-router.delete('/:id', authMiddleware, CalendarioController.eliminarEvento);
+// ✅ Crear evento
+router.post('/', authMiddleware, isEntrenador, calendarioController.crearEvento);
 
-// Ver todos los eventos (solo admin)
-router.get('/admin/todos', authMiddleware, isAdmin, CalendarioController.getTodosEventos);
+// ✅ Actualizar evento
+router.put('/:id', authMiddleware, calendarioController.actualizarEvento);
+
+// ✅ Eliminar evento
+router.delete('/:id', authMiddleware, calendarioController.eliminarEvento);
 
 module.exports = router;

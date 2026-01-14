@@ -1,4 +1,4 @@
-// src/models/Deportista.js - VERSIÓN CORREGIDA CON CAMPOS DE CAMBIO DE NIVEL
+// backend/src/models/Deportista.js - CON EQUIPOS DE COMPETENCIA
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
@@ -22,22 +22,69 @@ const Deportista = sequelize.define('Deportista', {
   },
   altura: {
     type: DataTypes.FLOAT,
-    allowNull: true
+    allowNull: true,
+    comment: 'Altura en metros (ej: 1.65)'
   },
   peso: {
     type: DataTypes.FLOAT,
-    allowNull: true
+    allowNull: true,
+    comment: 'Peso en kilogramos (ej: 55.5)'
   },
+  nivel_deportivo: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Nivel deportivo general (ej: Intermedio)'
+  },
+  
+  // ==========================================
+  // NIVELES (SISTEMA ORIGINAL + BABY TITANS)
+  // ==========================================
   nivel_actual: {
-    type: DataTypes.ENUM('1_basico', '1_medio', '1_avanzado', '2', '3', '4'),
-    defaultValue: '1_basico',
-    allowNull: false
+    type: DataTypes.ENUM(
+      'pendiente', 
+      'baby_titans',     // ✅ NUEVO NIVEL
+      '1_basico', 
+      '1_medio', 
+      '1_avanzado', 
+      '2', 
+      '3', 
+      '4'
+    ),
+    defaultValue: 'pendiente',
+    allowNull: false,
+    comment: 'Nivel actual del deportista'
   },
   nivel_sugerido: {
-    type: DataTypes.ENUM('1_basico', '1_medio', '1_avanzado', '2', '3', '4'),
+    type: DataTypes.ENUM(
+      'baby_titans',     // ✅ NUEVO NIVEL
+      '1_basico', 
+      '1_medio', 
+      '1_avanzado', 
+      '2', 
+      '3', 
+      '4'
+    ),
     allowNull: true,
     comment: 'Siguiente nivel sugerido cuando completa el 100%'
   },
+  
+  // ==========================================
+  // EQUIPOS DE COMPETENCIA (NUEVO SISTEMA)
+  // ==========================================
+  equipo_competitivo: {
+    type: DataTypes.ENUM(
+      'sin_equipo',           // Por defecto
+      'rocks_titans',
+      'lightning_titans',
+      'storm_titans',
+      'fire_titans',
+      'electric_titans'
+    ),
+    defaultValue: 'sin_equipo',
+    allowNull: false,
+    comment: 'Equipo de competencia asignado (independiente del nivel)'
+  },
+  
   cambio_nivel_pendiente: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
@@ -49,13 +96,18 @@ const Deportista = sequelize.define('Deportista', {
     comment: 'Fecha del último cambio de nivel aprobado'
   },
   estado: {
-    type: DataTypes.ENUM('activo', 'lesionado', 'descanso', 'inactivo'),
+    type: DataTypes.ENUM('activo', 'lesionado', 'descanso', 'inactivo', 'falta de pago'),
     defaultValue: 'activo',
     allowNull: false
   },
   foto_perfil: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  documento_identidad: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'URL del documento de identidad en PDF (Cloudinary)'
   },
   contacto_emergencia_nombre: {
     type: DataTypes.STRING,
@@ -68,6 +120,11 @@ const Deportista = sequelize.define('Deportista', {
   contacto_emergencia_parentesco: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  acepta_terminos: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    comment: 'Indica si aceptó términos y condiciones (sincronizado con User)'
   }
 }, {
   tableName: 'deportistas',
@@ -77,13 +134,12 @@ const Deportista = sequelize.define('Deportista', {
   updatedAt: 'updated_at'
 });
 
-// Asociaciones
-Deportista.associate = function(models) {
+Deportista.associate = function (models) {
   Deportista.belongsTo(models.User, {
     foreignKey: 'user_id',
-    as: 'User'
+    as: 'user'
   });
-  
+
   Deportista.hasMany(models.Evaluacion, {
     foreignKey: 'deportista_id',
     as: 'evaluaciones'

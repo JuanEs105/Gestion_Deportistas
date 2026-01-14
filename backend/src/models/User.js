@@ -1,4 +1,3 @@
-// backend/src/models/User.js - AGREGAR ESTOS CAMPOS
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 const bcrypt = require('bcryptjs');
@@ -40,13 +39,17 @@ const User = sequelize.define('User', {
     type: DataTypes.BOOLEAN,
     defaultValue: true
   },
+  acepta_terminos: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+    comment: 'Indica si aceptó términos y condiciones'
+  },
   niveles_asignados: {
     type: DataTypes.ARRAY(DataTypes.STRING),
     allowNull: true,
     defaultValue: [],
     comment: 'Niveles que puede gestionar este entrenador'
   },
-  // NUEVOS CAMPOS PARA RECUPERACIÓN DE CONTRASEÑA
   reset_password_code: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -72,19 +75,38 @@ const User = sequelize.define('User', {
     },
     beforeUpdate: async (user) => {
       if (user.changed('password')) {
+        console.log('🔐 Hook beforeUpdate: Hasheando nueva contraseña...');
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(user.password, salt);
+        console.log('✅ Contraseña hasheada en el hook');
       }
     }
   }
 });
 
-// Asociaciones
-User.associate = function(models) {
+// ✅ CORREGIDO: Asociaciones completas según instrucciones
+User.associate = function (models) {
+  // Relación con Deportista
   User.hasOne(models.Deportista, {
     foreignKey: 'user_id',
-    as: 'deportista'
+    as: 'deportista',
+    onDelete: 'CASCADE'
   });
+  
+  // ⚠️ Comentado porque no hay modelos separados para Entrenador/Admin
+  // Pero si en algún momento los creas, descomenta estas líneas:
+  
+  // User.hasOne(models.Entrenador, {
+  //   foreignKey: 'user_id',
+  //   as: 'entrenador',
+  //   onDelete: 'CASCADE'
+  // });
+  
+  // User.hasOne(models.Administrador, {
+  //   foreignKey: 'user_id',
+  //   as: 'administrador',
+  //   onDelete: 'CASCADE'
+  // });
 };
 
 module.exports = User;

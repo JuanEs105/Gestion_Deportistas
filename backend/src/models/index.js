@@ -1,32 +1,40 @@
-// backend/src/models/index.js - VERSIÓN FINAL Y COMPLETA
+// backend/src/models/index.js - ACTUALIZADO
 const { sequelize } = require('../config/database');
 const { Sequelize } = require('sequelize');
 
 console.log('🔗 Inicializando modelos...');
 
-// Cargar modelos
+// Cargar modelos base (obligatorios)
 const User = require('./User');
 const Deportista = require('./Deportista');
 const Habilidad = require('./Habilidad');
 const Evaluacion = require('./Evaluacion');
 const HistorialNivel = require('./HistorialNivel');
 
-// Intentar cargar CalendarioEvento (puede no existir todavía)
-let CalendarioEvento;
-try {
-  CalendarioEvento = require('./CalendarioEvento');
-  console.log('✅ CalendarioEvento cargado');
-} catch (error) {
-  console.log('⚠️  CalendarioEvento no encontrado, continuando sin él');
-  console.log('   Para usar el calendario, crea el archivo: backend/src/models/CalendarioEvento.js');
-  CalendarioEvento = null;
-}
-
 console.log('✅ User cargado');
 console.log('✅ Deportista cargado');
 console.log('✅ Habilidad cargado');
 console.log('✅ Evaluacion cargado');
 console.log('✅ HistorialNivel cargado');
+
+// Intentar cargar modelos opcionales
+let CalendarioEvento, Notificacion;
+
+try {
+  CalendarioEvento = require('./CalendarioEvento');
+  console.log('✅ CalendarioEvento cargado');
+} catch (error) {
+  console.log('⚠️  CalendarioEvento no encontrado, continuando sin él');
+  CalendarioEvento = null;
+}
+
+try {
+  Notificacion = require('./Notificacion');
+  console.log('✅ Notificacion cargado');
+} catch (error) {
+  console.log('⚠️  Notificacion no encontrado, continuando sin él');
+  Notificacion = null;
+}
 
 // Objeto con todos los modelos
 const models = {
@@ -37,9 +45,13 @@ const models = {
   HistorialNivel
 };
 
-// Agregar CalendarioEvento si existe
+// Agregar modelos opcionales si existen
 if (CalendarioEvento) {
   models.CalendarioEvento = CalendarioEvento;
+}
+
+if (Notificacion) {
+  models.Notificacion = Notificacion;
 }
 
 // Ejecutar asociaciones
@@ -56,7 +68,7 @@ Object.keys(models).forEach(modelName => {
 
 console.log('📦 Modelos listos y asociados');
 
-// Crear objeto db para compatibilidad con código existente
+// Crear objeto db para compatibilidad
 const db = {
   sequelize,
   Sequelize,
@@ -67,10 +79,13 @@ const db = {
   HistorialNivel
 };
 
-// Agregar CalendarioEvento si existe
+// Agregar modelos opcionales si existen
 if (CalendarioEvento) {
   db.CalendarioEvento = CalendarioEvento;
 }
 
-// Exportar de ambas formas para compatibilidad
+if (Notificacion) {
+  db.Notificacion = Notificacion;
+}
+
 module.exports = db;

@@ -1,4 +1,4 @@
-// backend/src/routes/adminRoutes.js - VERSIÓN COMPLETA
+// backend/src/routes/adminRoutes.js - VERSIÓN COMPLETA (YA CORRECTA)
 const express = require('express');
 const router = express.Router();
 const AdminController = require('../controllers/adminController');

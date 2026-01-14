@@ -1,4 +1,4 @@
-// backend/src/models/CalendarioEvento.js
+// backend/src/models/CalendarioEvento.js - VERSIÓN ACTUALIZADA CON NORMALIZACIÓN
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
@@ -14,6 +14,10 @@ const CalendarioEvento = sequelize.define('CalendarioEvento', {
     validate: {
       notEmpty: {
         msg: 'El título es requerido'
+      },
+      len: {
+        args: [3, 200],
+        msg: 'El título debe tener entre 3 y 200 caracteres'
       }
     }
   },
@@ -36,7 +40,7 @@ const CalendarioEvento = sequelize.define('CalendarioEvento', {
   nivel: {
     type: DataTypes.ENUM('1_basico', '1_medio', '1_avanzado', '2', '3', '4', 'todos'),
     allowNull: false,
-    defaultValue: '1_basico', // ← VALOR POR DEFECTO
+    defaultValue: 'todos',
     validate: {
       notNull: {
         msg: 'El nivel es requerido'
@@ -47,6 +51,31 @@ const CalendarioEvento = sequelize.define('CalendarioEvento', {
       }
     },
     comment: 'Nivel al que aplica el evento'
+  },
+  grupo_competitivo: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: null,
+    comment: 'Grupo competitivo específico (ej: ROCKS TITANS). Null = para todos los grupos',
+    set(value) {
+      // ✅ Normalizar antes de guardar
+      if (value) {
+        // Convertir a minúsculas y reemplazar espacios con guiones bajos
+        const normalized = value.toLowerCase().replace(/\s+/g, '_');
+        this.setDataValue('grupo_competitivo', normalized);
+      } else {
+        this.setDataValue('grupo_competitivo', null);
+      }
+    },
+    get() {
+      const rawValue = this.getDataValue('grupo_competitivo');
+      if (!rawValue) return null;
+      
+      // Convertir de nuevo a formato legible al obtener
+      return rawValue.split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    }
   },
   tipo: {
     type: DataTypes.ENUM('competencia', 'entrenamiento', 'evaluacion', 'festivo', 'general'),
@@ -61,8 +90,16 @@ const CalendarioEvento = sequelize.define('CalendarioEvento', {
       model: 'users',
       key: 'id'
     },
-    onDelete: 'CASCADE', // ← Si se elimina el entrenador, eliminar sus eventos
+    onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   }
 }, {
   tableName: 'calendario_eventos',
@@ -76,9 +113,20 @@ const CalendarioEvento = sequelize.define('CalendarioEvento', {
       fields: ['nivel']
     },
     {
+      fields: ['grupo_competitivo']
+    },
+    {
+      fields: ['tipo']
+    },
+    {
       fields: ['entrenador_id']
     }
-  ]
+  ],
+  hooks: {
+    beforeUpdate: (evento) => {
+      evento.updatedAt = new Date();
+    }
+  }
 });
 
 // Asociaciones

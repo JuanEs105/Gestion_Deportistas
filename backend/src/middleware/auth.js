@@ -1,96 +1,205 @@
-// backend/src/middleware/auth.js - VERSIÓN CORREGIDA
+// backend/src/middleware/auth.js - MIDDLEWARE COMPLETO
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
+// ============================================
+// 1. MIDDLEWARE DE AUTENTICACIÓN BÁSICO
+// ============================================
 const authMiddleware = async (req, res, next) => {
   try {
-    const authHeader = req.header('Authorization');
+    // Obtener token del header
+    const token = req.header('Authorization')?.replace('Bearer ', '');
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
       return res.status(401).json({
-        error: 'Token no proporcionado. Por favor autentícate.'
+        success: false,
+        error: 'No se proporcionó token de autenticación'
       });
     }
     
-    const token = authHeader.replace('Bearer ', '');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret-key-desarrollo');
+    // Verificar token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'tu_clave_secreta_super_segura_aqui_12345_2024');
     
-    // Buscar usuario CON niveles asignados
+    // Buscar usuario
     const user = await User.findByPk(decoded.id, {
-      attributes: ['id', 'nombre', 'email', 'role', 'activo', 'niveles_asignados'] // ← CRÍTICO
+      attributes: { exclude: ['password'] }
     });
     
     if (!user) {
-      return res.status(401).json({ error: 'Usuario no encontrado' });
+      return res.status(401).json({
+        success: false,
+        error: 'Usuario no encontrado'
+      });
     }
     
     if (!user.activo) {
-      return res.status(401).json({ error: 'Usuario inactivo' });
+      return res.status(401).json({
+        success: false,
+        error: 'Usuario inactivo'
+      });
     }
     
-    // INCLUIR niveles_asignados en req.user
+    // Agregar usuario a la request
     req.user = {
       id: user.id,
-      name: user.nombre,
-      nombre: user.nombre,
       email: user.email,
+      nombre: user.nombre,
       role: user.role,
-      tipo: user.role,
-      activo: user.activo,
-      niveles_asignados: user.niveles_asignados || [] // ← CRÍTICO
+      tipo: user.role // Alias para compatibilidad
     };
-    req.token = token;
     
     next();
+    
   } catch (error) {
-    console.error('Error en authMiddleware:', error.message);
+    console.error('❌ Error en authMiddleware:', error.message);
     
     if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({ error: 'Token inválido' });
+      return res.status(401).json({
+        success: false,
+        error: 'Token inválido'
+      });
     }
     
     if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token expirado' });
+      return res.status(401).json({
+        success: false,
+        error: 'Token expirado'
+      });
     }
     
-    res.status(401).json({ error: 'Por favor autentícate' });
-  }
-};
-
-// Middleware para verificar rol de entrenador
-const isEntrenador = (req, res, next) => {
-  if (req.user.role !== 'entrenador' && req.user.role !== 'admin') {
-    return res.status(403).json({
-      error: 'Acceso denegado. Se requiere rol de entrenador'
+    return res.status(500).json({
+      success: false,
+      error: 'Error en la autenticación'
     });
   }
-  next();
 };
 
-// Middleware para verificar rol de admin
+// ============================================
+// 2. MIDDLEWARE PARA VERIFICAR ROL ADMIN
+// ============================================
 const isAdmin = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'No autenticado'
+    });
+  }
+  
   if (req.user.role !== 'admin') {
     return res.status(403).json({
+      success: false,
       error: 'Acceso denegado. Se requiere rol de administrador'
     });
   }
+  
   next();
 };
 
-// Middleware para verificar rol de deportista
+// ============================================
+// 3. MIDDLEWARE PARA VERIFICAR ROL ENTRENADOR
+// ============================================
+const isEntrenador = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'No autenticado'
+    });
+  }
+  
+  // Permitir tanto a entrenadores como a admins
+  if (req.user.role !== 'entrenador' && req.user.role !== 'admin') {
+    return res.status(403).json({
+      success: false,
+      error: 'Acceso denegado. Se requiere rol de entrenador o administrador'
+    });
+  }
+  
+  next();
+};
+
+// ============================================
+// 4. MIDDLEWARE PARA VERIFICAR ROL DEPORTISTA
+// ============================================
 const isDeportista = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'No autenticado'
+    });
+  }
+  
   if (req.user.role !== 'deportista') {
     return res.status(403).json({
+      success: false,
       error: 'Acceso denegado. Se requiere rol de deportista'
     });
   }
+  
   next();
 };
 
-// EXPORTAR CORRECTAMENTE
-module.exports = { 
-  authMiddleware, 
-  isEntrenador, 
-  isAdmin, 
-  isDeportista 
+// ============================================
+// 5. MIDDLEWARE PARA VERIFICAR ADMIN O ENTRENADOR
+// ============================================
+const isAdminOrEntrenador = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'No autenticado'
+    });
+  }
+  
+  if (req.user.role !== 'admin' && req.user.role !== 'entrenador') {
+    return res.status(403).json({
+      success: false,
+      error: 'Acceso denegado. Se requiere rol de administrador o entrenador'
+    });
+  }
+  
+  next();
+};
+
+// ============================================
+// 6. MIDDLEWARE OPCIONAL (NO REQUIERE AUTH)
+// ============================================
+const optionalAuth = async (req, res, next) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'tu_clave_secreta_super_segura_aqui_12345_2024');
+      
+      const user = await User.findByPk(decoded.id, {
+        attributes: { exclude: ['password'] }
+      });
+      
+      if (user && user.activo) {
+        req.user = {
+          id: user.id,
+          email: user.email,
+          nombre: user.nombre,
+          role: user.role,
+          tipo: user.role
+        };
+      }
+    }
+    
+    next();
+    
+  } catch (error) {
+    // Si hay error en el token opcional, simplemente continuar sin usuario
+    next();
+  }
+};
+
+// ============================================
+// EXPORTAR MIDDLEWARE
+// ============================================
+module.exports = {
+  authMiddleware,
+  isAdmin,
+  isEntrenador,
+  isDeportista,
+  isAdminOrEntrenador,
+  optionalAuth
 };

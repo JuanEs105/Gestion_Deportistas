@@ -4,7 +4,7 @@ const { sequelize } = require('../config/database');
 
 class DeportistaController {
   
-  // AGREGAR ESTA RUTA AL INICIO:
+  // Obtener perfil del deportista autenticado
   static async getMe(req, res) {
     try {
       const userId = req.user.id;
@@ -15,7 +15,7 @@ class DeportistaController {
         where: { user_id: userId },
         include: [{
           model: User,
-          as: 'User',
+          as: 'user',
           attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
         }]
       });
@@ -40,34 +40,61 @@ class DeportistaController {
 
   // Obtener todos los deportistas
   static async getAll(req, res) {
-    try {
-      console.log('📥 Petición getAll deportistas recibida');
+  try {
+    console.log('📥 Petición getAll deportistas recibida');
+    console.log('👤 Usuario:', req.user?.role);
+    
+    const deportistas = await Deportista.findAll({
+      include: [{
+        model: User,
+        as: 'user',  // ✅ Esto es LO QUE DEBES USAR según tu modelo Deportista
+        attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
+      }],
+      order: [['created_at', 'DESC']]
+    });
+
+    console.log(`✅ ${deportistas.length} deportistas encontrados`);
+
+    const deportistasFormateados = deportistas.map(d => {
+      const deportistaObj = d.toJSON();
+      const user = deportistaObj.user || {};
       
-      const deportistas = await Deportista.findAll({
-        include: [{
-          model: User,
-          as: 'User',
-          attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
-        }],
-        order: [['created_at', 'DESC']]
-      });
+      return {
+        id: deportistaObj.id,
+        user_id: deportistaObj.user_id,
+        nombre: user.nombre || 'Sin nombre',
+        email: user.email || 'Sin email',
+        telefono: user.telefono || null,
+        activo: user.activo ?? true,
+        nivel_actual: deportistaObj.nivel_actual,
+        estado: deportistaObj.estado,
+        altura: deportistaObj.altura,
+        peso: deportistaObj.peso,
+        foto_perfil: deportistaObj.foto_perfil,
+        equipo_competitivo: deportistaObj.equipo_competitivo || 'sin_equipo',
+        contacto_emergencia_nombre: deportistaObj.contacto_emergencia_nombre,
+        contacto_emergencia_telefono: deportistaObj.contacto_emergencia_telefono,
+        contacto_emergencia_parentesco: deportistaObj.contacto_emergencia_parentesco,
+        fecha_nacimiento: deportistaObj.fecha_nacimiento,
+        created_at: deportistaObj.created_at,
+        updated_at: deportistaObj.updated_at,
+        User: user,
+        user: user
+      };
+    });
 
-      console.log(`✅ ${deportistas.length} deportistas encontrados`);
+    return res.status(200).json(deportistasFormateados);
 
-      res.json({
-        success: true,
-        total: deportistas.length,
-        deportistas
-      });
-
-    } catch (error) {
-      console.error('❌ Error en getAll deportistas:', error);
-      res.status(500).json({
-        error: 'Error obteniendo deportistas',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      });
-    }
+  } catch (error) {
+    console.error('❌ Error en getAll deportistas:', error);
+    console.error('Stack:', error.stack);
+    
+    return res.status(500).json({
+      error: 'Error obteniendo deportistas',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
+}
 
   // Obtener un deportista por ID
   static async getById(req, res) {
@@ -77,7 +104,7 @@ class DeportistaController {
       const deportista = await Deportista.findByPk(id, {
         include: [{
           model: User,
-          as: 'User',
+          as: 'user',
           attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
         }]
       });
@@ -101,14 +128,14 @@ class DeportistaController {
     }
   }
 
-  // Crear nuevo deportista - VERSIÓN CORREGIDA
+  // Crear nuevo deportista
   static async create(req, res) {
     const transaction = await sequelize.transaction();
     
     try {
       console.log('📥 CREAR DEPORTISTA - Usuario autenticado:', req.user);
       
-      // VERIFICAR PERMISOS
+      // Verificar permisos
       if (!req.user || !req.user.id) {
         console.log('❌ Sin usuario autenticado');
         await transaction.rollback();
@@ -125,11 +152,8 @@ class DeportistaController {
         });
       }
 
-      console.log('\n========================================');
       console.log('📥 CREAR DEPORTISTA - Inicio');
-      console.log('========================================');
       console.log('Body recibido:', JSON.stringify(req.body, null, 2));
-      console.log('Archivo recibido:', req.file ? req.file.filename : 'Sin archivo');
 
       const {
         nombre,
@@ -145,9 +169,7 @@ class DeportistaController {
         contacto_emergencia_parentesco
       } = req.body;
 
-      // ============================================
-      // PASO 1: VALIDACIONES BÁSICAS
-      // ============================================
+      // Paso 1: Validaciones básicas
       if (!nombre || !email || !password) {
         console.log('❌ Validación fallida: Faltan campos requeridos');
         await transaction.rollback();
@@ -156,9 +178,7 @@ class DeportistaController {
         });
       }
 
-      // ============================================
-      // PASO 2: VERIFICAR EMAIL ÚNICO
-      // ============================================
+      // Paso 2: Verificar email único
       console.log('🔍 Verificando si el email existe...');
       const existingUser = await User.findOne({ 
         where: { email },
@@ -174,14 +194,12 @@ class DeportistaController {
       }
       console.log('✅ Email disponible');
 
-      // ============================================
-      // PASO 3: CREAR USUARIO
-      // ============================================
+      // Paso 3: Crear usuario
       console.log('👤 Creando usuario...');
       const user = await User.create({
         nombre,
         email,
-        password, // Se hashea automáticamente por el hook
+        password,
         telefono: telefono || null,
         role: 'deportista',
         activo: true
@@ -189,9 +207,7 @@ class DeportistaController {
 
       console.log('✅ Usuario creado con ID:', user.id);
 
-      // ============================================
-      // PASO 4: CREAR PERFIL DEPORTISTA
-      // ============================================
+      // Paso 4: Crear perfil deportista
       console.log('🏃 Creando perfil deportista...');
       
       const deportistaData = {
@@ -199,8 +215,9 @@ class DeportistaController {
         fecha_nacimiento: fecha_nacimiento || null,
         altura: altura ? parseFloat(altura) : null,
         peso: peso ? parseFloat(peso) : null,
-        nivel_actual: nivel_actual || '1_basico',
+        nivel_actual: nivel_actual || 'pendiente',
         estado: 'activo',
+        equipo_competitivo: 'sin_equipo',
         contacto_emergencia_nombre: contacto_emergencia_nombre || null,
         contacto_emergencia_telefono: contacto_emergencia_telefono || null,
         contacto_emergencia_parentesco: contacto_emergencia_parentesco || null,
@@ -212,30 +229,22 @@ class DeportistaController {
       const deportista = await Deportista.create(deportistaData, { transaction });
       console.log('✅ Deportista creado con ID:', deportista.id);
 
-      // ============================================
-      // PASO 5: CONFIRMAR TRANSACCIÓN
-      // ============================================
+      // Paso 5: Confirmar transacción
       await transaction.commit();
       console.log('✅ Transacción confirmada exitosamente');
 
-      // ============================================
-      // PASO 6: OBTENER DEPORTISTA COMPLETO
-      // ============================================
+      // Paso 6: Obtener deportista completo
       const deportistaCompleto = await Deportista.findByPk(deportista.id, {
         include: [{
           model: User,
-          as: 'User',
+          as: 'user',
           attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
         }]
       });
 
-      console.log('========================================');
       console.log('✅ DEPORTISTA CREADO EXITOSAMENTE');
-      console.log('========================================\n');
 
-      // ============================================
-      // RESPUESTA EXITOSA
-      // ============================================
+      // Respuesta exitosa
       res.status(201).json({
         success: true,
         message: 'Deportista creado exitosamente',
@@ -243,28 +252,10 @@ class DeportistaController {
       });
 
     } catch (error) {
-      // ============================================
-      // MANEJO DE ERRORES
-      // ============================================
-      console.log('\n========================================');
-      console.error('❌❌❌ ERROR CREANDO DEPORTISTA ❌❌❌');
-      console.log('========================================');
-      
       await transaction.rollback();
-      console.log('🔄 Transacción revertida');
-      
-      console.error('Tipo de error:', error.name);
-      console.error('Mensaje:', error.message);
-      console.error('Stack:', error.stack);
+      console.error('❌ ERROR CREANDO DEPORTISTA:', error.message);
       
       if (error.name === 'SequelizeValidationError') {
-        console.error('\n📋 Errores de validación:');
-        error.errors.forEach(e => {
-          console.error(`  - Campo: ${e.path}`);
-          console.error(`    Mensaje: ${e.message}`);
-          console.error(`    Valor: ${e.value}`);
-        });
-        
         return res.status(400).json({
           error: 'Error de validación',
           detalles: error.errors.map(e => ({
@@ -275,15 +266,10 @@ class DeportistaController {
       }
       
       if (error.name === 'SequelizeUniqueConstraintError') {
-        console.error('\n🔗 Error de unicidad:');
-        console.error('  Campo:', error.fields);
-        
         return res.status(400).json({
           error: 'El email ya está registrado'
         });
       }
-      
-      console.log('========================================\n');
       
       res.status(500).json({
         error: 'Error creando deportista',
@@ -294,83 +280,94 @@ class DeportistaController {
 
   // Actualizar deportista
   static async update(req, res) {
-    try {
-      const { id } = req.params;
-      const {
-        nombre,
-        email,
-        telefono,
-        fecha_nacimiento,
-        altura,
-        peso,
-        nivel_actual,
-        estado,
-        contacto_emergencia_nombre,
-        contacto_emergencia_telefono,
-        contacto_emergencia_parentesco
-      } = req.body;
+  const transaction = await sequelize.transaction();
+  
+  try {
+    const { id } = req.params;
+    const { 
+      estado,
+      peso,
+      altura,
+      telefono
+      // Solo estos campos son editables por el entrenador
+    } = req.body;
 
-      const deportista = await Deportista.findByPk(id, {
-        include: [{
-          model: User,
-          as: 'User'
-        }]
-      });
+    console.log('📝 UPDATE deportista - ID:', id);
+    console.log('📦 Datos recibidos para actualizar:', req.body);
 
-      if (!deportista) {
-        return res.status(404).json({
-          error: 'Deportista no encontrado'
-        });
-      }
+    const deportista = await Deportista.findByPk(id, {
+      include: [{
+        model: User,
+        as: 'user'
+      }],
+      transaction
+    });
 
-      // Actualizar datos del usuario si se proporcionaron
-      if (deportista.User) {
-        const userUpdateData = {};
-        if (nombre) userUpdateData.nombre = nombre;
-        if (email) userUpdateData.email = email;
-        if (telefono !== undefined) userUpdateData.telefono = telefono;
-        
-        await deportista.User.update(userUpdateData);
-      }
-
-      // Actualizar datos del deportista
-      const deportistaUpdateData = {};
-      if (fecha_nacimiento !== undefined) deportistaUpdateData.fecha_nacimiento = fecha_nacimiento || null;
-      if (altura !== undefined) deportistaUpdateData.altura = altura ? parseFloat(altura) : null;
-      if (peso !== undefined) deportistaUpdateData.peso = peso ? parseFloat(peso) : null;
-      if (nivel_actual !== undefined) deportistaUpdateData.nivel_actual = nivel_actual;
-      if (estado !== undefined) deportistaUpdateData.estado = estado;
-      if (contacto_emergencia_nombre !== undefined) deportistaUpdateData.contacto_emergencia_nombre = contacto_emergencia_nombre || null;
-      if (contacto_emergencia_telefono !== undefined) deportistaUpdateData.contacto_emergencia_telefono = contacto_emergencia_telefono || null;
-      if (contacto_emergencia_parentesco !== undefined) deportistaUpdateData.contacto_emergencia_parentesco = contacto_emergencia_parentesco || null;
-
-      await deportista.update(deportistaUpdateData);
-
-      console.log('✅ Deportista actualizado:', id);
-
-      // Obtener deportista actualizado con usuario
-      const deportistaActualizado = await Deportista.findByPk(id, {
-        include: [{
-          model: User,
-          as: 'User',
-          attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
-        }]
-      });
-
-      res.json({
-        success: true,
-        message: 'Deportista actualizado exitosamente',
-        deportista: deportistaActualizado
-      });
-
-    } catch (error) {
-      console.error('❌ Error actualizando deportista:', error);
-      res.status(500).json({
-        error: 'Error actualizando deportista',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    if (!deportista) {
+      await transaction.rollback();
+      return res.status(404).json({
+        error: 'Deportista no encontrado'
       });
     }
+
+    // ✅ ACTUALIZAR ESTADO (incluyendo pendiente_de_pago)
+    if (estado !== undefined) {
+      const estadosValidos = ['activo', 'lesionado', 'descanso', 'inactivo', 'pendiente', 'pendiente_de_pago'];
+      
+      if (!estadosValidos.includes(estado)) {
+        await transaction.rollback();
+        return res.status(400).json({
+          error: `Estado inválido. Debe ser uno de: ${estadosValidos.join(', ')}`
+        });
+      }
+      
+      deportista.estado = estado;
+      console.log(`✅ Estado actualizado a: ${estado}`);
+    }
+
+    // ✅ ACTUALIZAR CAMPOS EDITABLES
+    if (peso !== undefined) deportista.peso = peso;
+    if (altura !== undefined) deportista.altura = altura;
+
+    // Actualizar teléfono del usuario si se proporciona
+    if (telefono !== undefined && deportista.user) {
+      deportista.user.telefono = telefono;
+      await deportista.user.save({ transaction });
+    }
+
+    // Guardar cambios del deportista
+    await deportista.save({ transaction });
+
+    // Confirmar transacción
+    await transaction.commit();
+
+    // Obtener deportista actualizado
+    const deportistaActualizado = await Deportista.findByPk(id, {
+      include: [{
+        model: User,
+        as: 'user',
+        attributes: ['id', 'nombre', 'email', 'telefono']
+      }]
+    });
+
+    console.log(`✅ Deportista ${deportistaActualizado.user?.nombre} actualizado correctamente`);
+
+    return res.json({
+      success: true,
+      message: 'Deportista actualizado exitosamente',
+      deportista: deportistaActualizado
+    });
+
+  } catch (error) {
+    await transaction.rollback();
+    console.error('❌ Error actualizando deportista:', error);
+    
+    return res.status(500).json({
+      error: 'Error actualizando deportista',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
+}
 
   // Eliminar deportista
   static async delete(req, res) {
@@ -382,7 +379,7 @@ class DeportistaController {
       const deportista = await Deportista.findByPk(id, {
         include: [{
           model: User,
-          as: 'User'
+          as: 'user'
         }]
       });
 
@@ -392,7 +389,7 @@ class DeportistaController {
         });
       }
 
-      const nombreDeportista = deportista.User?.nombre;
+      const nombreDeportista = deportista.user?.nombre;
       const userId = deportista.user_id;
 
       // Eliminar evaluaciones primero
@@ -487,6 +484,65 @@ class DeportistaController {
       console.error('❌ Error obteniendo estadísticas:', error);
       res.status(500).json({
         error: 'Error obteniendo estadísticas'
+      });
+    }
+  }
+
+  // Asignar Equipo de Competencia
+  static async asignarEquipo(req, res) {
+    try {
+      const { id } = req.params;
+      const { equipo_competitivo } = req.body;
+      
+      const equiposValidos = [
+        'sin_equipo',
+        'rocks_titans',
+        'lightning_titans',
+        'storm_titans',
+        'fire_titans',
+        'electric_titans'
+      ];
+      
+      if (!equiposValidos.includes(equipo_competitivo)) {
+        return res.status(400).json({
+          error: `Equipo inválido. Debe ser uno de: ${equiposValidos.join(', ')}`
+        });
+      }
+      
+      const deportista = await Deportista.findByPk(id, {
+        include: [{
+          model: User,
+          as: 'user',
+          attributes: ['nombre', 'email']
+        }]
+      });
+      
+      if (!deportista) {
+        return res.status(404).json({ error: 'Deportista no encontrado' });
+      }
+      
+      const equipoAnterior = deportista.equipo_competitivo;
+      
+      await deportista.update({ equipo_competitivo });
+      
+      console.log(`✅ Equipo asignado: ${deportista.user?.nombre} cambió de "${equipoAnterior}" a "${equipo_competitivo}"`);
+      
+      res.json({
+        success: true,
+        message: `Equipo "${equipo_competitivo}" asignado exitosamente a ${deportista.user?.nombre}`,
+        deportista: {
+          id: deportista.id,
+          nombre: deportista.user?.nombre,
+          equipo_anterior: equipoAnterior,
+          equipo_actual: deportista.equipo_competitivo
+        }
+      });
+      
+    } catch (error) {
+      console.error('❌ Error asignando equipo:', error);
+      res.status(500).json({ 
+        error: 'Error asignando equipo de competencia',
+        details: error.message 
       });
     }
   }

@@ -1,20 +1,25 @@
 // backend/src/routes/reportesRoutes.js
 const express = require('express');
 const router = express.Router();
-const ReportesController = require('../controllers/reportesController');
-const { authMiddleware, isEntrenador } = require('../middleware/auth');
+const ReportesController = require('../controllers/reportesController'); // ← CORREGIDO
+const { authMiddleware, isAdminOrEntrenador } = require('../middleware/auth');
 
-// Todas las rutas requieren autenticación de entrenador/admin
+// ====================
+// RUTAS PROTEGIDAS
+// ====================
 router.use(authMiddleware);
-router.use(isEntrenador);
+router.use(isAdminOrEntrenador);
 
-// PDF individual de deportista
-router.get('/pdf/deportista/:deportista_id', ReportesController.generarPDFDeportista);
-
-// Excel grupal (todos o por nivel)
+// GET /api/reportes/excel/grupal - Generar Excel con filtros completos
 router.get('/excel/grupal', ReportesController.generarExcelGrupal);
 
-// PDF de progreso por nivel
-router.get('/pdf/nivel/:nivel', ReportesController.generarPDFProgresoNivel);
+// GET /api/reportes/documento/:deportista_id - Descargar documento individual
+router.get('/documento/:deportista_id', ReportesController.descargarDocumentoPDF);
+
+// GET /api/reportes/documentos/masivos - Descargar documentos masivos con filtros
+router.get('/documentos/masivos', ReportesController.descargarDocumentosMasivos);
+
+// GET /api/reportes/opciones-filtros - Obtener opciones dinámicas
+router.get('/opciones-filtros', ReportesController.obtenerOpcionesFiltros);
 
 module.exports = router;

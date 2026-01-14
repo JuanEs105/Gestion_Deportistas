@@ -1,4 +1,3 @@
-// frontend/src/components/Layout/Sidebar.jsx
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -13,13 +12,14 @@ const Sidebar = ({ tipoUsuario }) => {
     { path: '/entrenador/reportes', label: 'Reportes', icon: '📊' },
   ];
 
+
   const menuItemsDeportista = [
     { path: '/deportista', label: 'Inicio', icon: '🏠' },
     { path: '/deportista/progreso', label: 'Mi Progreso', icon: '📈' },
     { path: '/deportista/evaluaciones', label: 'Mis Evaluaciones', icon: '📋' },
     { path: '/deportista/habilidades', label: 'Mis Habilidades', icon: '🎯' },
-    { path: '/deportista/calendario', label: 'Calendario', icon: '📅' },
-    { path: '/deportista/estadisticas', label: 'Estadísticas', icon: '📊' },
+    { path: '/deportista/calendario', label: 'Calendario', icon: '📅' }
+   
   ];
 
   const menuItemsAdmin = [

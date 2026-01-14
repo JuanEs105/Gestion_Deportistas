@@ -9,36 +9,101 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET || 'demo'
 });
 
-// Configurar almacenamiento de Cloudinary
-const storage = new CloudinaryStorage({
+// ===================================
+// STORAGE PARA FOTOS DE PERFIL
+// ===================================
+const fotoStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'deportistas', // Carpeta en Cloudinary
+    folder: 'deportistas/fotos',
     allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
     transformation: [
-      { width: 500, height: 500, crop: 'limit' }, // Redimensionar
-      { quality: 'auto' } // Optimizar calidad
+      { width: 500, height: 500, crop: 'limit' },
+      { quality: 'auto' }
     ]
   }
 });
 
-// Configurar multer
-const upload = multer({
-  storage: storage,
+// ===================================
+// STORAGE PARA DOCUMENTOS PDF
+// ===================================
+const documentoStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'deportistas/documentos',
+    allowed_formats: ['pdf'],
+    resource_type: 'raw' // Importante para PDFs
+  }
+});
+
+// ===================================
+// MULTER PARA FOTOS
+// ===================================
+const uploadFoto = multer({
+  storage: fotoStorage,
   limits: {
-    fileSize: 5 * 1024 * 1024 // Límite de 5MB
+    fileSize: 5 * 1024 * 1024 // 5MB
   },
   fileFilter: (req, file, cb) => {
-    // Validar tipo de archivo
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Tipo de archivo no permitido. Solo se aceptan imágenes (JPG, PNG, GIF, WEBP)'), false);
+      cb(new Error('Solo se aceptan imágenes (JPG, PNG, GIF, WEBP)'), false);
     }
   }
 });
+
+// ===================================
+// MULTER PARA DOCUMENTOS PDF
+// ===================================
+const uploadDocumento = multer({
+  storage: documentoStorage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Solo se aceptan archivos PDF'), false);
+    }
+  }
+});
+
+// ===================================
+// MULTER PARA REGISTRO (FOTO + PDF)
+// ===================================
+const uploadRegistro = multer({
+  storage: multer.memoryStorage(), // Usamos memoria para procesarlos manualmente
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB máximo por archivo
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = [
+      'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
+      'application/pdf'
+    ];
+    
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Solo se aceptan imágenes (JPG, PNG, GIF, WEBP) y PDF'), false);
+    }
+  }
+});
+
+// Función para subir a Cloudinary manualmente
+const uploadToCloudinary = (buffer, options) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(options, (error, result) => {
+      if (error) reject(error);
+      else resolve(result);
+    });
+    uploadStream.end(buffer);
+  });
+};
 
 // Función para eliminar imagen de Cloudinary
 const deleteImage = async (publicId) => {
@@ -51,15 +116,25 @@ const deleteImage = async (publicId) => {
   }
 };
 
+// Función para eliminar documento PDF de Cloudinary
+const deleteDocument = async (publicId) => {
+  try {
+    const result = await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' });
+    return result;
+  } catch (error) {
+    console.error('Error eliminando documento de Cloudinary:', error);
+    throw error;
+  }
+};
+
 // Extraer public_id de URL de Cloudinary
 const getPublicIdFromUrl = (url) => {
   if (!url) return null;
   
   try {
-    // URL ejemplo: https://res.cloudinary.com/demo/image/upload/v1234567/deportistas/abc123.jpg
     const parts = url.split('/');
-    const filename = parts[parts.length - 1].split('.')[0]; // abc123
-    const folder = parts[parts.length - 2]; // deportistas
+    const filename = parts[parts.length - 1].split('.')[0];
+    const folder = parts.slice(-3, -1).join('/'); // deportistas/fotos o deportistas/documentos
     return `${folder}/${filename}`;
   } catch (error) {
     return null;
@@ -68,7 +143,12 @@ const getPublicIdFromUrl = (url) => {
 
 module.exports = {
   cloudinary,
-  upload,
+  upload: uploadFoto, // Backward compatibility
+  uploadFoto,
+  uploadDocumento,
+  uploadRegistro,
+  uploadToCloudinary,
   deleteImage,
+  deleteDocument,
   getPublicIdFromUrl
 };

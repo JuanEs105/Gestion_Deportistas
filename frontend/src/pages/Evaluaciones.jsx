@@ -1,4 +1,4 @@
-// frontend/src/pages/Evaluaciones.jsx - CON GRÁFICAS
+// frontend/src/pages/Evaluaciones.jsx - VERSIÓN CORREGIDA COMPLETA
 import React, { useState, useEffect, useMemo } from 'react';
 import { deportistasAPI, habilidadesAPI, evaluacionesAPI } from '../services/api';
 import {
@@ -22,7 +22,7 @@ const Evaluaciones = () => {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [refreshKey, setRefreshKey] = useState(0); // NUEVO: Para forzar refresh
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     cargarDeportistas();
@@ -34,20 +34,66 @@ const Evaluaciones = () => {
     }
   }, [deportistaSeleccionado, categoriaActual]);
 
-  // Efecto adicional para forzar actualización de gráficas
   useEffect(() => {
     if (deportistaSeleccionado && historialEvaluaciones.length > 0) {
       console.log('🔄 Historial actualizado, recalculando gráficas...');
     }
   }, [historialEvaluaciones]);
 
+  // ✅ CORREGIDO: Cargar deportistas con filtro por entrenador
   const cargarDeportistas = async () => {
     try {
+      console.log('📥 Cargando deportistas...');
+      
       const response = await deportistasAPI.getAll();
       const deportistasArray = response.data?.deportistas || response.data || [];
-      setDeportistas(deportistasArray.filter(d => d.estado !== 'inactivo'));
+      
+      console.log('📊 Total deportistas recibidos:', deportistasArray.length);
+      
+      // ✅ OBTENER USUARIO ACTUAL
+      const userData = localStorage.getItem('user');
+      const user = userData ? JSON.parse(userData) : null;
+      
+      console.log('👤 Usuario actual:', user);
+      
+      // ✅ Filtrar solo activos (no inactivos)
+      let deportistasFiltrados = deportistasArray.filter(d => d.estado !== 'inactivo');
+      
+      console.log('📊 Deportistas activos:', deportistasFiltrados.length);
+      
+      // ✅ Si es ENTRENADOR, aplicar filtro por niveles (incluir pendientes)
+      if (user && user.tipo === 'entrenador') {
+        const nivelesEntrenador = user.niveles_asignados || [];
+        console.log('📚 Niveles del entrenador:', nivelesEntrenador);
+        
+        if (nivelesEntrenador.length > 0) {
+          deportistasFiltrados = deportistasFiltrados.filter(d => {
+            // ✅ SIEMPRE incluir deportistas con nivel pendiente
+            if (d.nivel_actual === 'pendiente') {
+              console.log('  ✅ Incluyendo pendiente:', d.User?.nombre || d.nombre);
+              return true;
+            }
+            // Para otros niveles, verificar si está en los niveles del entrenador
+            const incluir = nivelesEntrenador.includes(d.nivel_actual);
+            if (incluir) {
+              console.log('  ✅ Incluyendo por nivel', d.nivel_actual, ':', d.User?.nombre || d.nombre);
+            }
+            return incluir;
+          });
+        }
+        
+        console.log('✅ Deportistas filtrados para entrenador:', deportistasFiltrados.length);
+        console.log('   - Con nivel pendiente:', deportistasFiltrados.filter(d => d.nivel_actual === 'pendiente').length);
+        console.log('   - Con nivel asignado:', deportistasFiltrados.filter(d => d.nivel_actual !== 'pendiente').length);
+      }
+      
+      setDeportistas(deportistasFiltrados);
+      
+      console.log('✅ Deportistas cargados en el estado:', deportistasFiltrados.length);
+      
     } catch (error) {
-      console.error('Error cargando deportistas:', error);
+      console.error('❌ Error cargando deportistas:', error);
+      alert('Error al cargar deportistas: ' + (error.response?.data?.error || error.message));
     }
   };
 
@@ -91,6 +137,7 @@ const Evaluaciones = () => {
   };
 
   const handleSeleccionarDeportista = (deportista) => {
+    console.log('👤 Deportista seleccionado:', deportista.User?.nombre || deportista.nombre);
     setDeportistaSeleccionado(deportista);
     setMostrarFormulario(false);
     setEvaluacionActual({
@@ -187,7 +234,7 @@ const Evaluaciones = () => {
   };
 
   const handleAprobarCambioNivel = async () => {
-    if (!window.confirm(`¿Estás seguro de promover a ${deportistaSeleccionado.User?.nombre} al siguiente nivel?`)) {
+    if (!window.confirm(`¿Estás seguro de promover a ${deportistaSeleccionado.User?.nombre || deportistaSeleccionado.nombre} al siguiente nivel?`)) {
       return;
     }
     
@@ -211,69 +258,9 @@ const Evaluaciones = () => {
     }
   };
 
-  // Preparar datos para gráficas - SE RECALCULA AUTOMÁTICAMENTE
-  const prepararDatosGraficas = () => {
-    if (!progreso) {
-      console.log('⚠️ No hay datos de progreso');
-      return null;
-    }
-
-    console.log('📊 Preparando datos para gráficas...');
-    console.log('Progreso:', progreso);
-    console.log('Historial:', historialEvaluaciones.length, 'evaluaciones');
-
-    // Datos para gráfica de barras (progreso por categoría)
-    const datosBarras = Object.entries(progreso.progreso_por_categoria).map(([categoria, data]) => ({
-      categoria: categoria === 'habilidad' ? 'Habilidades' : 
-                 categoria === 'ejercicio_accesorio' ? 'Ejercicios' : 'Posturas',
-      completadas: data.completadas,
-      total: data.total,
-      porcentaje: data.porcentaje
-    }));
-
-    console.log('📊 Datos barras:', datosBarras);
-
-    // Datos para gráfica radar (últimas 6 evaluaciones)
-    const ultimasEvaluaciones = historialEvaluaciones
-      .slice(0, 6)
-      .reverse()
-      .map(evaluacion => ({
-        habilidad: evaluacion.habilidad?.nombre?.substring(0, 20) || 'Sin nombre',
-        puntuacion: evaluacion.puntuacion,
-        minimo: evaluacion.habilidad?.puntuacion_minima || 7
-      }));
-
-    console.log('🎯 Últimas evaluaciones:', ultimasEvaluaciones);
-
-    // Datos para línea de tiempo (progreso histórico)
-    const evaluacionesPorFecha = {};
-    historialEvaluaciones.forEach(evaluacion => {
-      const fecha = new Date(evaluacion.fecha_evaluacion).toLocaleDateString('es-ES', { 
-        month: 'short', 
-        day: 'numeric' 
-      });
-      if (!evaluacionesPorFecha[fecha]) {
-        evaluacionesPorFecha[fecha] = [];
-      }
-      evaluacionesPorFecha[fecha].push(evaluacion.puntuacion);
-    });
-
-    const datosLinea = Object.entries(evaluacionesPorFecha)
-      .slice(-10) // Últimas 10 fechas
-      .map(([fecha, puntuaciones]) => ({
-        fecha,
-        promedio: (puntuaciones.reduce((a, b) => a + b, 0) / puntuaciones.length).toFixed(1),
-        evaluaciones: puntuaciones.length
-      }));
-
-    console.log('📈 Datos línea:', datosLinea);
-    console.log('✅ Datos preparados correctamente');
-
-    return { datosBarras, ultimasEvaluaciones, datosLinea };
-  };
-
   const getNivelColor = (nivel) => {
     const colores = {
+      'pendiente': 'bg-gray-500',
       '1_basico': 'bg-green-500',
       '1_medio': 'bg-blue-500',
       '1_avanzado': 'bg-purple-500',
@@ -286,6 +273,7 @@ const Evaluaciones = () => {
 
   const getNivelNombre = (nivel) => {
     const nombres = {
+      'pendiente': 'Pendiente',
       '1_basico': '1 Básico',
       '1_medio': '1 Medio',
       '1_avanzado': '1 Avanzado',
@@ -305,10 +293,14 @@ const Evaluaciones = () => {
     return iconos[categoria] || '📋';
   };
 
-  const deportistasFiltrados = deportistas.filter(d => 
-    d.User?.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    d.User?.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // ✅ CORREGIDO: Búsqueda funcional
+  const deportistasFiltrados = deportistas.filter(d => {
+    const nombre = d.User?.nombre || d.nombre || '';
+    const email = d.User?.email || d.email || '';
+    
+    return nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           email.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   const habilidadesFiltradas = habilidades.filter(h => h.categoria === categoriaActual);
 
@@ -324,18 +316,67 @@ const Evaluaciones = () => {
     return { estado: 'en progreso', color: 'bg-yellow-100 text-yellow-800', icon: '🔄' };
   };
 
-  // USAR USEMEMO PARA RECALCULAR AUTOMÁTICAMENTE - AGREGAMOS refreshKey
+  // Preparar datos para gráficas
+  const prepararDatosGraficas = () => {
+    if (!progreso) {
+      console.log('⚠️ No hay datos de progreso');
+      return null;
+    }
+
+    console.log('📊 Preparando datos para gráficas...');
+
+    // Datos para gráfica de barras
+    const datosBarras = Object.entries(progreso.progreso_por_categoria).map(([categoria, data]) => ({
+      categoria: categoria === 'habilidad' ? 'Habilidades' : 
+                 categoria === 'ejercicio_accesorio' ? 'Ejercicios' : 'Posturas',
+      completadas: data.completadas,
+      total: data.total,
+      porcentaje: data.porcentaje
+    }));
+
+    // Datos para gráfica radar
+    const ultimasEvaluaciones = historialEvaluaciones
+      .slice(0, 6)
+      .reverse()
+      .map(evaluacion => ({
+        habilidad: evaluacion.habilidad?.nombre?.substring(0, 20) || 'Sin nombre',
+        puntuacion: evaluacion.puntuacion,
+        minimo: evaluacion.habilidad?.puntuacion_minima || 7
+      }));
+
+    // Datos para línea de tiempo
+    const evaluacionesPorFecha = {};
+    historialEvaluaciones.forEach(evaluacion => {
+      const fecha = new Date(evaluacion.fecha_evaluacion).toLocaleDateString('es-ES', { 
+        month: 'short', 
+        day: 'numeric' 
+      });
+      if (!evaluacionesPorFecha[fecha]) {
+        evaluacionesPorFecha[fecha] = [];
+      }
+      evaluacionesPorFecha[fecha].push(evaluacion.puntuacion);
+    });
+
+    const datosLinea = Object.entries(evaluacionesPorFecha)
+      .slice(-10)
+      .map(([fecha, puntuaciones]) => ({
+        fecha,
+        promedio: (puntuaciones.reduce((a, b) => a + b, 0) / puntuaciones.length).toFixed(1),
+        evaluaciones: puntuaciones.length
+      }));
+
+    return { datosBarras, ultimasEvaluaciones, datosLinea };
+  };
+
   const datosGraficas = useMemo(() => {
     if (!deportistaSeleccionado || !progreso) {
       return null;
     }
     
     console.log('🔄 useMemo - Recalculando gráficas... [refreshKey:', refreshKey, ']');
-    console.log('   Progreso actual:', progreso.progreso_total);
-    console.log('   Historial:', historialEvaluaciones.length, 'evaluaciones');
     
     return prepararDatosGraficas();
-  }, [deportistaSeleccionado, progreso, historialEvaluaciones, refreshKey]); // AGREGAMOS refreshKey
+  }, [deportistaSeleccionado, progreso, historialEvaluaciones, refreshKey]);
 
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
@@ -352,7 +393,7 @@ const Evaluaciones = () => {
         <div className="lg:col-span-1">
           <div className="bg-white rounded-xl shadow-lg p-6 sticky top-6">
             <h2 className="text-2xl font-bold mb-4 text-gray-800">
-              👥 Deportistas
+              👥 Deportistas ({deportistas.length})
             </h2>
             
             {/* Búsqueda */}
@@ -366,39 +407,52 @@ const Evaluaciones = () => {
 
             {/* Lista de deportistas */}
             <div className="space-y-2 max-h-[600px] overflow-y-auto">
-              {deportistasFiltrados.map((deportista) => (
-                <button
-                  key={deportista.id}
-                  onClick={() => handleSeleccionarDeportista(deportista)}
-                  className={`w-full text-left p-4 rounded-lg transition-all duration-200 ${
-                    deportistaSeleccionado?.id === deportista.id
-                      ? 'bg-blue-500 text-white shadow-lg scale-105'
-                      : 'bg-gray-50 hover:bg-gray-100 hover:shadow-md'
-                  }`}
-                >
-                  <div className="flex items-center space-x-3">
-                    {deportista.foto_perfil ? (
-                      <img
-                        src={deportista.foto_perfil}
-                        alt={deportista.User?.nombre}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-lg">
-                        {deportista.User?.nombre?.charAt(0)?.toUpperCase()}
+              {deportistasFiltrados.length === 0 ? (
+                <div className="text-center py-8 text-gray-400">
+                  <div className="text-4xl mb-2">🔍</div>
+                  <p className="text-sm">No se encontraron deportistas</p>
+                </div>
+              ) : (
+                deportistasFiltrados.map((deportista) => {
+                  const nombre = deportista.User?.nombre || deportista.nombre || 'Sin nombre';
+                  const email = deportista.User?.email || deportista.email || '';
+                  const foto = deportista.foto_perfil || deportista.User?.foto_perfil;
+                  
+                  return (
+                    <button
+                      key={deportista.id}
+                      onClick={() => handleSeleccionarDeportista(deportista)}
+                      className={`w-full text-left p-4 rounded-lg transition-all duration-200 ${
+                        deportistaSeleccionado?.id === deportista.id
+                          ? 'bg-blue-500 text-white shadow-lg scale-105'
+                          : 'bg-gray-50 hover:bg-gray-100 hover:shadow-md'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        {foto ? (
+                          <img
+                            src={foto}
+                            alt={nombre}
+                            className="w-12 h-12 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-lg">
+                            {nombre?.charAt(0)?.toUpperCase() || '?'}
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <p className="font-semibold">{nombre}</p>
+                          <div className="flex items-center space-x-2 mt-1">
+                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getNivelColor(deportista.nivel_actual)} text-white`}>
+                              {getNivelNombre(deportista.nivel_actual)}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    )}
-                    <div className="flex-1">
-                      <p className="font-semibold">{deportista.User?.nombre}</p>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getNivelColor(deportista.nivel_actual)} text-white`}>
-                          {getNivelNombre(deportista.nivel_actual)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </button>
-              ))}
+                    </button>
+                  );
+                })
+              )}
             </div>
           </div>
         </div>
@@ -424,22 +478,33 @@ const Evaluaciones = () => {
                     {deportistaSeleccionado.foto_perfil ? (
                       <img
                         src={deportistaSeleccionado.foto_perfil}
-                        alt={deportistaSeleccionado.User?.nombre}
+                        alt={deportistaSeleccionado.User?.nombre || deportistaSeleccionado.nombre}
                         className="w-20 h-20 rounded-full border-4 border-white object-cover"
                       />
                     ) : (
                       <div className="w-20 h-20 rounded-full border-4 border-white bg-white text-blue-600 flex items-center justify-center text-3xl font-bold">
-                        {deportistaSeleccionado.User?.nombre?.charAt(0)?.toUpperCase()}
+                        {(deportistaSeleccionado.User?.nombre?.charAt(0) || deportistaSeleccionado.nombre?.charAt(0) || '?').toUpperCase()}
                       </div>
                     )}
                     <div>
-                      <h2 className="text-3xl font-bold">{deportistaSeleccionado.User?.nombre}</h2>
-                      <p className="text-blue-100">{deportistaSeleccionado.User?.email}</p>
+                      <h2 className="text-3xl font-bold">{deportistaSeleccionado.User?.nombre || deportistaSeleccionado.nombre || 'Sin nombre'}</h2>
+                      <p className="text-blue-100">{deportistaSeleccionado.User?.email || deportistaSeleccionado.email || ''}</p>
                       <span className="inline-block mt-2 px-3 py-1 bg-white bg-opacity-20 rounded-full text-sm font-semibold">
                         {getNivelNombre(deportistaSeleccionado.nivel_actual)}
                       </span>
                     </div>
                   </div>
+                  
+                  {/* BOTÓN PROMOVER SI ESTÁ AL 100% */}
+                  {progreso && progreso.progreso_total.porcentaje === 100 && deportistaSeleccionado.nivel_actual !== '4' && (
+                    <button
+                      onClick={handleAprobarCambioNivel}
+                      className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-lg font-bold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
+                    >
+                      <span>🚀</span>
+                      <span>Promover al siguiente nivel</span>
+                    </button>
+                  )}
                 </div>
 
                 {/* BARRA DE PROGRESO TOTAL */}
@@ -464,76 +529,58 @@ const Evaluaciones = () => {
                 )}
               </div>
 
-              {/* GRÁFICAS DE PROGRESO - AGREGAMOS KEY PARA FORZAR RE-RENDER */}
+              {/* GRÁFICAS DE PROGRESO */}
               {datosGraficas && historialEvaluaciones.length > 0 ? (
                 <div key={`graficas-${refreshKey}`} className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                  {/* GRÁFICA DE BARRAS - Progreso por Categoría */}
+                  {/* GRÁFICA DE BARRAS */}
                   <div className="bg-white rounded-xl shadow-lg p-6">
                     <h3 className="text-lg font-bold text-gray-800 mb-4">📊 Progreso por Categoría</h3>
-                    {loading ? (
-                      <div className="flex justify-center items-center h-[250px]">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                      </div>
-                    ) : (
-                      <ResponsiveContainer width="100%" height={250} key={`barras-${refreshKey}`}>
-                        <BarChart data={datosGraficas.datosBarras}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="categoria" />
-                          <YAxis />
-                          <Tooltip />
-                          <Bar dataKey="completadas" fill="#3b82f6" name="Completadas">
-                            {datosGraficas.datosBarras.map((entry, index) => (
-                              <Cell key={`cell-${index}-${refreshKey}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                          </Bar>
-                          <Bar dataKey="total" fill="#e5e7eb" name="Total" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    )}
+                    <ResponsiveContainer width="100%" height={250}>
+                      <BarChart data={datosGraficas.datosBarras}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="categoria" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="completadas" fill="#3b82f6" name="Completadas">
+                          {datosGraficas.datosBarras.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Bar>
+                        <Bar dataKey="total" fill="#e5e7eb" name="Total" />
+                      </BarChart>
+                    </ResponsiveContainer>
                   </div>
 
-                  {/* GRÁFICA RADAR - Últimas Evaluaciones */}
+                  {/* GRÁFICA RADAR */}
                   <div className="bg-white rounded-xl shadow-lg p-6">
                     <h3 className="text-lg font-bold text-gray-800 mb-4">🎯 Últimas 6 Evaluaciones</h3>
-                    {loading ? (
-                      <div className="flex justify-center items-center h-[250px]">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                      </div>
-                    ) : (
-                      <ResponsiveContainer width="100%" height={250} key={`radar-${refreshKey}`}>
-                        <RadarChart data={datosGraficas.ultimasEvaluaciones}>
-                          <PolarGrid />
-                          <PolarAngleAxis dataKey="habilidad" />
-                          <PolarRadiusAxis domain={[0, 10]} />
-                          <Radar name="Puntuación" dataKey="puntuacion" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
-                          <Radar name="Mínimo" dataKey="minimo" stroke="#ef4444" fill="#ef4444" fillOpacity={0.2} />
-                          <Tooltip />
-                          <Legend />
-                        </RadarChart>
-                      </ResponsiveContainer>
-                    )}
+                    <ResponsiveContainer width="100%" height={250}>
+                      <RadarChart data={datosGraficas.ultimasEvaluaciones}>
+                        <PolarGrid />
+                        <PolarAngleAxis dataKey="habilidad" />
+                        <PolarRadiusAxis domain={[0, 10]} />
+                        <Radar name="Puntuación" dataKey="puntuacion" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
+                        <Radar name="Mínimo" dataKey="minimo" stroke="#ef4444" fill="#ef4444" fillOpacity={0.2} />
+                        <Tooltip />
+                        <Legend />
+                      </RadarChart>
+                    </ResponsiveContainer>
                   </div>
 
-                  {/* GRÁFICA DE LÍNEA - Evolución Temporal */}
+                  {/* GRÁFICA DE LÍNEA */}
                   {datosGraficas.datosLinea.length > 0 && (
                     <div className="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
                       <h3 className="text-lg font-bold text-gray-800 mb-4">📈 Evolución del Rendimiento</h3>
-                      {loading ? (
-                        <div className="flex justify-center items-center h-[250px]">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                        </div>
-                      ) : (
-                        <ResponsiveContainer width="100%" height={250} key={`linea-${refreshKey}`}>
-                          <LineChart data={datosGraficas.datosLinea}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="fecha" />
-                            <YAxis domain={[0, 10]} />
-                            <Tooltip />
-                            <Legend />
-                            <Line type="monotone" dataKey="promedio" stroke="#3b82f6" strokeWidth={3} name="Promedio" />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      )}
+                      <ResponsiveContainer width="100%" height={250}>
+                        <LineChart data={datosGraficas.datosLinea}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="fecha" />
+                          <YAxis domain={[0, 10]} />
+                          <Tooltip />
+                          <Legend />
+                          <Line type="monotone" dataKey="promedio" stroke="#3b82f6" strokeWidth={3} name="Promedio" />
+                        </LineChart>
+                      </ResponsiveContainer>
                     </div>
                   )}
                 </div>
@@ -551,11 +598,11 @@ const Evaluaciones = () => {
                 )
               )}
 
-              {/* ESTADÍSTICAS POR CATEGORÍA - AGREGAR KEY */}
+              {/* ESTADÍSTICAS POR CATEGORÍA */}
               {progreso && (
                 <div key={`stats-${refreshKey}`} className="grid grid-cols-3 gap-4 mb-6">
                   {Object.entries(progreso.progreso_por_categoria).map(([categoria, data]) => (
-                    <div key={`${categoria}-${refreshKey}`} className="bg-white rounded-xl shadow p-4">
+                    <div key={categoria} className="bg-white rounded-xl shadow p-4">
                       <div className="text-3xl mb-2">{getCategoriaIcon(categoria)}</div>
                       <h4 className="font-semibold text-gray-700 capitalize mb-2">
                         {categoria.replace('_', ' ')}

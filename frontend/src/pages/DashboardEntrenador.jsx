@@ -38,8 +38,11 @@ const DashboardEntrenador = () => {
       
       // Filtrar por niveles asignados
       const deportistasFiltrados = niveles.length > 0
-        ? todosDeportistas.filter(d => niveles.includes(d.nivel_actual))
-        : todosDeportistas;
+  ? todosDeportistas.filter(d => {
+      if (d.nivel_actual === 'pendiente') return true;
+      return niveles.includes(d.nivel_actual);
+    })
+  : todosDeportistas;
       
       const deportistasActivos = deportistasFiltrados.filter(d => d.estado === 'activo');
       

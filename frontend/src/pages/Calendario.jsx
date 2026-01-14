@@ -1,162 +1,347 @@
-// frontend/src/pages/Calendario.jsx - VERSIÓN 100% FUNCIONAL Y CORREGIDA
-import React, { useState, useEffect } from 'react';
+// frontend/src/pages/Calendario.jsx - VERSIÓN FINAL MEJORADA
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const Calendario = () => {
   const [eventos, setEventos] = useState([]);
+  const [eventosSinFiltrar, setEventosSinFiltrar] = useState([]); // ✅ NUEVO: Guardamos todos los eventos
   const [mesActual, setMesActual] = useState(new Date());
   const [mostrarModal, setMostrarModal] = useState(false);
   const [diaSeleccionado, setDiaSeleccionado] = useState(null);
-  const [nivelSeleccionado, setNivelSeleccionado] = useState('');
-  const [eventoEditando, setEventoEditando] = useState(null);
+  const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [nivelesDisponibles, setNivelesDisponibles] = useState([]);
-  const [nivelesAsignados, setNivelesAsignados] = useState([]);
   const [userRole, setUserRole] = useState('');
-  const [userName, setUserName] = useState('');
-  const [filtroNivel, setFiltroNivel] = useState('todos'); // NUEVO: Para filtrar vista
+  const [userId, setUserId] = useState('');
+  const [gruposDisponibles, setGruposDisponibles] = useState([]);
+  const [error, setError] = useState('');
+  const [modoVista, setModoVista] = useState('ver');
+  const [ultimaActualizacion, setUltimaActualizacion] = useState(null);
   
+  // Estados para filtros
+  const [filtroNivel, setFiltroNivel] = useState('todos');
+  const [filtroGrupo, setFiltroGrupo] = useState('todos');
+
+  // Estados para formulario
   const [formData, setFormData] = useState({
     titulo: '',
     descripcion: '',
     fecha: '',
-    nivel: '',
+    niveles: [],
+    grupos_competitivos: [],
     tipo: 'general'
   });
 
+  const nivelesDisponibles = [
+    { value: 'todos', label: 'Todos los niveles', emoji: '🌟' },
+    { value: 'baby_titans', label: 'Baby Titans', emoji: '👶' },
+    { value: '1_basico', label: '1 Básico', emoji: '🥉' },
+    { value: '1_medio', label: '1 Medio', emoji: '🥈' },
+    { value: '1_avanzado', label: '1 Avanzado', emoji: '🥇' },
+    { value: '2', label: 'Nivel 2', emoji: '⭐' },
+    { value: '3', label: 'Nivel 3', emoji: '⭐⭐' },
+    { value: '4', label: 'Nivel 4', emoji: '⭐⭐⭐' }
+  ];
+
+  const tiposEvento = [
+    { value: 'general', label: 'General', emoji: '📌', color: 'bg-gray-500' },
+    { value: 'competencia', label: 'Competencia', emoji: '🏆', color: 'bg-red-500' },
+    { value: 'entrenamiento', label: 'Entrenamiento', emoji: '💪', color: 'bg-blue-500' },
+    { value: 'evaluacion', label: 'Evaluación', emoji: '📋', color: 'bg-purple-500' },
+    { value: 'festivo', label: 'Festivo', emoji: '🎉', color: 'bg-green-500' }
+  ];
+
+  // ============================================
+  // NOTIFICACIÓN DE CAMBIOS
+  // ============================================
+  const mostrarNotificacionToast = (mensaje, tipo = 'info') => {
+    // Crear el elemento de notificación
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 animate-bounce ${
+      tipo === 'success' ? 'bg-green-500 text-white' : 
+      tipo === 'error' ? 'bg-red-500 text-white' : 
+      'bg-blue-500 text-white'
+    }`;
+    toast.innerHTML = mensaje;
+    
+    // Añadir al DOM
+    document.body.appendChild(toast);
+    
+    // Remover después de 3 segundos
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
+  };
+
   useEffect(() => {
-    cargarDatosUsuario();
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        setUserRole(user.role || user.tipo || '');
+        setUserId(user.id || '');
+        console.log('👤 Usuario:', { role: user.role, id: user.id });
+      } catch (error) {
+        console.error('Error parseando usuario:', error);
+      }
+    }
+    
+    cargarGruposCompetitivos();
   }, []);
 
-  useEffect(() => {
-    cargarEventos();
-  }, [mesActual, filtroNivel]); // CAMBIADO: Ahora usa filtroNivel
-
-  const cargarDatosUsuario = () => {
-  const userData = localStorage.getItem('user');
-  const user = userData ? JSON.parse(userData) : null;
-  
-  console.log('👤 Usuario cargado:', user);
-  
-  if (user) {
-    const role = user.tipo || user.role || 'deportista';
-    setUserRole(role);
-    setUserName(user.nombre || user.name || 'Usuario');
+  // ============================================
+  // ✅ APLICAR FILTROS (NUEVA FUNCIÓN)
+  // ============================================
+  const aplicarFiltros = useCallback((eventosOriginales) => {
+    console.log('🔍 Aplicando filtros:', { filtroNivel, filtroGrupo });
+    console.log('📊 Eventos originales:', eventosOriginales.length);
     
-    if (role === 'entrenador') {
-      const niveles = user.niveles_asignados || [];
-      console.log('📚 Niveles asignados:', niveles);
-      
-      setNivelesAsignados(niveles);
-      
-      // VERIFICAR SI NO TIENE NIVELES
-      if (niveles.length === 0) {
-        console.log('⚠️ ENTRENADOR SIN NIVELES ASIGNADOS');
-        alert('⚠️ No tienes niveles asignados. Contacta al administrador para que te asigne niveles.');
-        setFormData(prev => ({ ...prev, nivel: '1_basico' }));
-      } else {
-        // Seleccionar el primer nivel
-        setNivelSeleccionado(niveles[0]);
-        setFormData(prev => ({ ...prev, nivel: niveles[0] }));
-        console.log('✅ Nivel seleccionado:', niveles[0]);
-      }
-    } else if (role === 'deportista') {
-      const nivelDeportista = user.deportistaProfile?.nivel_actual || '1_basico';
-      setNivelSeleccionado(nivelDeportista);
-      setFormData(prev => ({ ...prev, nivel: nivelDeportista }));
-    } else if (role === 'admin') {
-      setFormData(prev => ({ ...prev, nivel: '1_basico' }));
+    let eventosFiltrados = [...eventosOriginales];
+    
+    // Filtrar por nivel
+    if (filtroNivel !== 'todos') {
+      eventosFiltrados = eventosFiltrados.filter(evento => {
+        const cumple = evento.nivel === filtroNivel || evento.nivel === 'todos';
+        if (!cumple) {
+          console.log(`❌ "${evento.titulo}" filtrado por nivel (tiene: ${evento.nivel}, buscando: ${filtroNivel})`);
+        }
+        return cumple;
+      });
     }
-  } else {
-    setUserRole('');
-    setFormData(prev => ({ ...prev, nivel: 'todos' }));
-  }
-};
+    
+    // Filtrar por grupo
+    if (filtroGrupo !== 'todos') {
+      eventosFiltrados = eventosFiltrados.filter(evento => {
+        // Normalizar grupos para comparación
+        const grupoEvento = evento.grupo_competitivo?.toLowerCase().replace(/\s+/g, '_');
+        const grupoFiltro = filtroGrupo.toLowerCase().replace(/\s+/g, '_');
+        
+        // Incluir eventos sin grupo específico (para todos)
+        const cumple = !evento.grupo_competitivo || grupoEvento === grupoFiltro;
+        
+        if (!cumple) {
+          console.log(`❌ "${evento.titulo}" filtrado por grupo (tiene: ${evento.grupo_competitivo}, buscando: ${filtroGrupo})`);
+        }
+        return cumple;
+      });
+    }
+    
+    console.log('✅ Eventos después de filtrar:', eventosFiltrados.length);
+    return eventosFiltrados;
+  }, [filtroNivel, filtroGrupo]);
 
-  const cargarEventos = async () => {
+  // ============================================
+  // CARGAR EVENTOS (MEJORADO)
+  // ============================================
+  const cargarEventos = useCallback(async (silencioso = false) => {
     try {
-      setLoading(true);
-      const token = localStorage.getItem('token');
+      if (!silencioso) setLoading(true);
+      setError('');
+      
       const mes = mesActual.getMonth() + 1;
       const año = mesActual.getFullYear();
       
-      // CORRECCIÓN: Usar filtroNivel para la vista
-      const nivel = filtroNivel || 'todos';
+      const url = `http://localhost:5000/api/calendario/filtros?mes=${mes}&año=${año}`;
       
-      console.log('📥 Cargando eventos:', { nivel, mes, año, userRole });
-      
-      const headers = {};
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
+      if (!silencioso) {
+        console.log('📡 Cargando eventos:', url);
       }
       
-      const response = await axios.get(
-        `http://localhost:5000/api/calendario/nivel/${nivel}?mes=${mes}&año=${año}`,
-        { headers }
-      );
+      const response = await axios.get(url);
       
-      console.log('✅ Eventos cargados:', response.data.eventos?.length);
-      setEventos(response.data.eventos || []);
+      if (response.data.success) {
+        const todosEventos = response.data.eventos || [];
+        const conteoAnterior = eventosSinFiltrar.length;
+        const conteoNuevo = todosEventos.length;
+        
+        // Guardar eventos sin filtrar
+        setEventosSinFiltrar(todosEventos);
+        
+        // Aplicar filtros
+        const eventosFiltrados = aplicarFiltros(todosEventos);
+        setEventos(eventosFiltrados);
+        setUltimaActualizacion(new Date());
+        
+        if (!silencioso) {
+          console.log(`✅ ${todosEventos.length} eventos cargados, ${eventosFiltrados.length} filtrados`);
+        } else {
+          console.log(`🔄 Calendario actualizado automáticamente: ${conteoAnterior} → ${conteoNuevo} eventos`);
+          
+          // Si hay nuevos eventos en actualización silenciosa
+          if (conteoNuevo > conteoAnterior) {
+            const diferencia = conteoNuevo - conteoAnterior;
+            mostrarNotificacionToast(`🔔 ¡Nuevo${diferencia > 1 ? 's' : ''} evento${diferencia > 1 ? 's' : ''} agregado${diferencia > 1 ? 's' : ''}!`, 'success');
+          }
+        }
+      } else {
+        setError(response.data.error || 'Error al cargar eventos');
+      }
       
     } catch (error) {
-      console.error('❌ Error cargando eventos:', error);
-      
-      // Fallback a eventos públicos
-      if (error.response?.status === 401 || error.response?.status === 500) {
-        try {
-          const mes = mesActual.getMonth() + 1;
-          const año = mesActual.getFullYear();
-          
-          const response = await axios.get(
-            `http://localhost:5000/api/calendario/publicos?mes=${mes}&año=${año}`
-          );
-          
-          setEventos(response.data.eventos || []);
-        } catch (fallbackError) {
-          console.error('❌ Error cargando eventos públicos:', fallbackError);
-          setEventos([]);
-        }
+      console.error('❌ Error:', error);
+      if (!silencioso) {
+        setError('No se pudieron cargar los eventos');
+        setEventos([]);
+        setEventosSinFiltrar([]);
       }
     } finally {
-      setLoading(false);
+      if (!silencioso) setLoading(false);
+    }
+  }, [mesActual, aplicarFiltros, eventosSinFiltrar.length]);
+
+  // ============================================
+  // ✅ APLICAR FILTROS CUANDO CAMBIAN
+  // ============================================
+  useEffect(() => {
+    if (eventosSinFiltrar.length > 0) {
+      console.log('🔄 Filtros cambiaron, reaplicando...');
+      const eventosFiltrados = aplicarFiltros(eventosSinFiltrar);
+      setEventos(eventosFiltrados);
+    }
+  }, [filtroNivel, filtroGrupo, eventosSinFiltrar, aplicarFiltros]);
+
+  // ============================================
+  // AUTO-REFRESH: Actualizar cada 30 segundos
+  // ============================================
+  useEffect(() => {
+    // Cargar eventos inmediatamente
+    cargarEventos(false);
+    
+    // Configurar auto-refresh cada 30 segundos
+    const intervalo = setInterval(() => {
+      console.log('🔄 Auto-refresh: verificando cambios...');
+      cargarEventos(true); // Silencioso
+    }, 30000); // 30 segundos
+    
+    return () => {
+      clearInterval(intervalo);
+      console.log('⏹️ Auto-refresh detenido');
+    };
+  }, [cargarEventos]);
+
+  const cargarGruposCompetitivos = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/calendario/grupos-competitivos');
+      if (response.data.success) {
+        setGruposDisponibles(response.data.grupos || []);
+        console.log('✅ Grupos cargados:', response.data.grupos);
+      }
+    } catch (error) {
+      console.error('❌ Error cargando grupos:', error);
+      setGruposDisponibles([
+        'ROCKS TITANS',
+        'LIGHTNING TITANS', 
+        'STORM TITANS',
+        'FIRE TITANS',
+        'ELECTRIC TITANS',
+        'STARS EVOLUTION'
+      ]);
     }
   };
 
-  const handleClickDia = (dia) => {
-    if (userRole === 'deportista' || !userRole) {
-      // Solo ver eventos
-      const eventosDelDia = getEventosPorDia(dia);
-      if (eventosDelDia.length > 0) {
-        setDiaSeleccionado(dia);
-        setMostrarModal(true);
-      }
+  const toggleNivel = (nivel) => {
+    if (modoVista === 'editar') {
+      setFormData(prev => ({ ...prev, niveles: [nivel] }));
     } else {
-      // Admin y entrenadores pueden crear/editar
-      setDiaSeleccionado(dia);
-      setEventoEditando(null);
-      
-      // CORRECCIÓN CRÍTICA: Determinar nivel por defecto correctamente
-      let nivelDefault = '1_basico';
-      
-      if (userRole === 'entrenador') {
-        if (nivelesAsignados.length > 0) {
-          nivelDefault = nivelesAsignados[0];
-        } else {
-          alert('⚠️ No tienes niveles asignados. Contacta al administrador.');
-          return;
-        }
-      }
-      
-      setFormData({
-        titulo: '',
-        descripcion: '',
-        fecha: formatearFecha(dia),
-        nivel: nivelDefault, // NIVEL POR DEFECTO CORRECTO
-        tipo: 'general'
+      setFormData(prev => {
+        const niveles = prev.niveles.includes(nivel)
+          ? prev.niveles.filter(n => n !== nivel)
+          : [...prev.niveles, nivel];
+        return { ...prev, niveles };
       });
-      
-      setMostrarModal(true);
     }
+  };
+
+  const toggleGrupo = (grupo) => {
+    if (modoVista === 'editar') {
+      setFormData(prev => ({ 
+        ...prev, 
+        grupos_competitivos: prev.grupos_competitivos.includes(grupo) ? [] : [grupo]
+      }));
+    } else {
+      setFormData(prev => {
+        const grupos = prev.grupos_competitivos.includes(grupo)
+          ? prev.grupos_competitivos.filter(g => g !== grupo)
+          : [...prev.grupos_competitivos, grupo];
+        return { ...prev, grupos_competitivos: grupos };
+      });
+    }
+  };
+
+  const seleccionarTodosNiveles = () => {
+    if (modoVista !== 'editar') {
+      const todosLosNiveles = nivelesDisponibles
+        .filter(n => n.value !== 'todos')
+        .map(n => n.value);
+      setFormData(prev => ({ ...prev, niveles: todosLosNiveles }));
+    }
+  };
+
+  const limpiarNiveles = () => {
+    setFormData(prev => ({ ...prev, niveles: [] }));
+  };
+
+  const seleccionarTodosGrupos = () => {
+    if (modoVista !== 'editar') {
+      setFormData(prev => ({ ...prev, grupos_competitivos: [...gruposDisponibles] }));
+    }
+  };
+
+  const limpiarGrupos = () => {
+    setFormData(prev => ({ ...prev, grupos_competitivos: [] }));
+  };
+
+  const abrirModalCrear = (dia) => {
+    console.log('➕ Abrir modal crear');
+    setModoVista('crear');
+    setEventoSeleccionado(null);
+    setDiaSeleccionado(dia);
+    setFormData({
+      titulo: '',
+      descripcion: '',
+      fecha: formatearFecha(dia),
+      niveles: [],
+      grupos_competitivos: [],
+      tipo: 'general'
+    });
+    setMostrarModal(true);
+  };
+
+  const abrirModalEditar = (evento) => {
+    console.log('✏️ Abrir modal editar:', evento.id);
+    setModoVista('editar');
+    setEventoSeleccionado(evento);
+    setDiaSeleccionado(null);
+    setFormData({
+      titulo: evento.titulo,
+      descripcion: evento.descripcion || '',
+      fecha: evento.fecha.split('T')[0],
+      niveles: [evento.nivel],
+      grupos_competitivos: evento.grupo_competitivo ? [evento.grupo_competitivo] : [],
+      tipo: evento.tipo
+    });
+    setMostrarModal(true);
+  };
+
+  const abrirModalVer = (dia) => {
+    console.log('👁️ Abrir modal ver eventos del día');
+    setModoVista('ver');
+    setEventoSeleccionado(null);
+    setDiaSeleccionado(dia);
+    setMostrarModal(true);
+  };
+
+  const handleClickDia = (dia) => {
+    const eventosDelDia = getEventosPorDia(dia);
+    console.log(`📅 Click en día ${dia.numero}:`, eventosDelDia.length, 'eventos');
+    
+    if (eventosDelDia.length > 0) {
+      // Hay eventos: mostrar en modo ver
+      abrirModalVer(dia);
+    } else if (puedeEditar) {
+      // No hay eventos y puede editar: modo crear
+      abrirModalCrear(dia);
+    }
+    // Si no hay eventos y no puede editar: no hacer nada
   };
 
   const handleSubmit = async (e) => {
@@ -164,127 +349,116 @@ const Calendario = () => {
     
     const token = localStorage.getItem('token');
     if (!token) {
-      alert('⚠️ Debes iniciar sesión para crear o editar eventos');
+      alert('Debes iniciar sesión');
       return;
     }
     
-    // VALIDACIONES MEJORADAS
-    if (!formData.titulo.trim()) {
-      alert('❌ El título es requerido');
+    if (formData.niveles.length === 0) {
+      alert('⚠️ Debes seleccionar al menos un nivel');
       return;
     }
-    
-    if (!formData.fecha) {
-      alert('❌ La fecha es requerida');
-      return;
-    }
-    
-    if (!formData.nivel) {
-      alert('❌ El nivel es requerido');
-      return;
-    }
-    
-    // VALIDAR PERMISOS DE NIVEL
-    if (userRole === 'entrenador') {
-      if (!nivelesAsignados.includes(formData.nivel) && formData.nivel !== 'todos') {
-        alert(`❌ No tienes permiso para crear eventos en el nivel ${formData.nivel}`);
-        return;
-      }
-    }
-    
-    console.log('💾 Guardando evento:', formData);
     
     try {
       setLoading(true);
       
-      const datosEvento = {
-        titulo: formData.titulo.trim(),
-        descripcion: formData.descripcion?.trim() || '',
-        fecha: formData.fecha,
-        nivel: formData.nivel,
-        tipo: formData.tipo || 'general'
-      };
-      
-      console.log('📤 Enviando:', datosEvento);
-      
-      if (eventoEditando) {
+      if (modoVista === 'editar' && eventoSeleccionado) {
+        const datosEvento = {
+          titulo: formData.titulo.trim(),
+          descripcion: formData.descripcion?.trim() || '',
+          fecha: formData.fecha,
+          nivel: formData.niveles[0],
+          grupo_competitivo: formData.grupos_competitivos[0] || null,
+          tipo: formData.tipo
+        };
+        
+        console.log('📤 Actualizando evento:', eventoSeleccionado.id, datosEvento);
+        
         await axios.put(
-          `http://localhost:5000/api/calendario/${eventoEditando.id}`,
+          `http://localhost:5000/api/calendario/${eventoSeleccionado.id}`,
           datosEvento,
           { headers: { Authorization: `Bearer ${token}` } }
         );
+        
         alert('✅ Evento actualizado');
       } else {
+        const datosEvento = {
+          titulo: formData.titulo.trim(),
+          descripcion: formData.descripcion?.trim() || '',
+          fecha: formData.fecha,
+          niveles: formData.niveles,
+          grupos_competitivos: formData.grupos_competitivos.length > 0 
+            ? formData.grupos_competitivos 
+            : null,
+          tipo: formData.tipo
+        };
+        
+        console.log('📤 Creando eventos:', datosEvento);
+        
         const response = await axios.post(
           'http://localhost:5000/api/calendario',
           datosEvento,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        console.log('✅ Respuesta del servidor:', response.data);
-        alert('✅ Evento creado exitosamente');
+        
+        if (response.data.success) {
+          alert(`✅ ${response.data.mensaje}`);
+        }
       }
       
       setMostrarModal(false);
-      setDiaSeleccionado(null);
-      await cargarEventos();
+      // Recargar eventos inmediatamente después de crear/editar
+      await cargarEventos(false);
       
     } catch (error) {
-      console.error('❌ Error guardando evento:', error);
-      console.error('Detalles:', error.response?.data);
-      alert('❌ Error: ' + (error.response?.data?.error || error.message));
+      console.error('❌ Error:', error);
+      alert(error.response?.data?.error || 'Error al guardar');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEditarEvento = (evento) => {
-    if (userRole !== 'admin' && userRole !== 'entrenador') {
-      alert('⚠️ No tienes permisos para editar eventos');
+  const handleEliminar = async (eventoId) => {
+    if (!window.confirm('¿Estás seguro de eliminar este evento?')) {
       return;
     }
     
-    setEventoEditando(evento);
-    setFormData({
-      titulo: evento.titulo,
-      descripcion: evento.descripcion || '',
-      fecha: evento.fecha.split('T')[0],
-      nivel: evento.nivel || '1_basico',
-      tipo: evento.tipo || 'general'
-    });
-    setMostrarModal(true);
-  };
-
-  const handleEliminar = async (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      alert('⚠️ Debes iniciar sesión para eliminar eventos');
+      alert('Debes iniciar sesión');
       return;
     }
-    
-    if (!window.confirm('¿Eliminar este evento?')) return;
     
     try {
       setLoading(true);
-      await axios.delete(`http://localhost:5000/api/calendario/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      
+      console.log('🗑️ Eliminando evento:', eventoId);
+      
+      await axios.delete(
+        `http://localhost:5000/api/calendario/${eventoId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
       alert('✅ Evento eliminado');
       setMostrarModal(false);
-      await cargarEventos();
+      await cargarEventos(false);
+      
     } catch (error) {
-      alert('❌ Error al eliminar');
+      console.error('❌ Error:', error);
+      alert(error.response?.data?.error || 'Error al eliminar');
     } finally {
       setLoading(false);
     }
   };
-  
-  const mesAnterior = () => {
-    setMesActual(new Date(mesActual.getFullYear(), mesActual.getMonth() - 1));
+
+  const puedeEditarEvento = (evento) => {
+    const puede = userRole === 'admin' || (userRole === 'entrenador' && evento.entrenador_id === userId);
+    console.log('🔐 Puede editar evento?', puede, { userRole, userId, entrenador_id: evento.entrenador_id });
+    return puede;
   };
 
-  const mesSiguiente = () => {
-    setMesActual(new Date(mesActual.getFullYear(), mesActual.getMonth() + 1));
-  };
+  const mesAnterior = () => setMesActual(new Date(mesActual.getFullYear(), mesActual.getMonth() - 1, 1));
+  const mesSiguiente = () => setMesActual(new Date(mesActual.getFullYear(), mesActual.getMonth() + 1, 1));
+  const irAHoy = () => setMesActual(new Date());
 
   const meses = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -296,16 +470,13 @@ const Calendario = () => {
   const getDiasDelMes = () => {
     const año = mesActual.getFullYear();
     const mes = mesActual.getMonth();
-    
     const primerDia = new Date(año, mes, 1);
     const ultimoDia = new Date(año, mes + 1, 0);
-    
     const diasAnteriores = primerDia.getDay();
     const diasMes = ultimoDia.getDate();
-    
     const dias = [];
-    
     const ultimoDiaMesAnterior = new Date(año, mes, 0).getDate();
+    
     for (let i = diasAnteriores - 1; i >= 0; i--) {
       dias.push({
         numero: ultimoDiaMesAnterior - i,
@@ -353,131 +524,135 @@ const Calendario = () => {
     return diaObj.fecha.toDateString() === hoy.toDateString();
   };
 
-  const getTipoColor = (tipo) => {
-    const colores = {
-      competencia: 'bg-red-500',
-      entrenamiento: 'bg-blue-500',
-      evaluacion: 'bg-purple-500',
-      festivo: 'bg-green-500',
-      general: 'bg-gray-500'
-    };
-    return colores[tipo] || 'bg-gray-500';
+  const getTipoEvento = (tipo) => {
+    return tiposEvento.find(t => t.value === tipo) || tiposEvento[0];
   };
 
-  const getTipoIcon = (tipo) => {
-    const iconos = {
-      competencia: '🏆',
-      entrenamiento: '💪',
-      evaluacion: '📋',
-      festivo: '🎉',
-      general: '📌'
-    };
-    return iconos[tipo] || '📌';
+  const getNivelNombre = (nivel) => {
+    const n = nivelesDisponibles.find(niv => niv.value === nivel);
+    return n ? `${n.emoji} ${n.label}` : nivel;
   };
 
-  const formatearNombreNivel = (nivel) => {
-    const nombres = {
-      '1_basico': '1 Básico',
-      '1_medio': '1 Medio',
-      '1_avanzado': '1 Avanzado',
-      '2': 'Nivel 2',
-      '3': 'Nivel 3',
-      '4': 'Nivel 4',
-      'todos': 'Todos'
-    };
-    return nombres[nivel] || nivel;
-  };
-
-  const puedeEditar = userRole === 'admin' || userRole === 'entrenador';
   const dias = getDiasDelMes();
+  const puedeEditar = userRole === 'admin' || userRole === 'entrenador';
 
   return (
-    <div className="p-6 bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+    <div className="p-4 min-h-screen bg-gray-50">
       <div className="mb-6">
-        <h1 className="text-4xl font-bold text-gray-800 mb-2">📅 Calendario de Eventos</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">📅 Calendario de Eventos</h1>
         <p className="text-gray-600">
-          {userRole === 'deportista' || !userRole
-            ? 'Visualiza los eventos programados'
-            : 'Haz clic en un día para crear o editar eventos'}
+          {puedeEditar ? 'Crea y gestiona eventos • Se actualiza automáticamente' : 'Consulta los eventos programados'}
         </p>
-        {userRole === 'entrenador' && nivelesAsignados.length > 0 && (
-          <div className="mt-2 flex items-center space-x-2">
-            <span className="text-sm font-semibold text-gray-700">📚 Tus niveles:</span>
-            {nivelesAsignados.map(nivel => (
-              <span key={nivel} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
-                {formatearNombreNivel(nivel)}
-              </span>
-            ))}
+        {error && (
+          <div className="mt-2 p-3 bg-red-100 text-red-700 rounded-lg">
+            ⚠️ {error}
           </div>
         )}
       </div>
 
-      {/* CONTROLES Y FILTROS */}
-      <div className="bg-white rounded-xl shadow-lg p-4 mb-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <button onClick={mesAnterior} className="p-2 hover:bg-gray-100 rounded-lg transition">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            
-            <h2 className="text-2xl font-bold text-gray-800">
-              {meses[mesActual.getMonth()]} {mesActual.getFullYear()}
-            </h2>
-            
-            <button onClick={mesSiguiente} className="p-2 hover:bg-gray-100 rounded-lg transition">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-          
-          {/* FILTRO DE NIVEL PARA LA VISTA */}
-          <div className="flex items-center space-x-4">
-            <label className="text-sm font-semibold text-gray-700">Filtrar eventos:</label>
-            <select
-              value={filtroNivel}
-              onChange={(e) => setFiltroNivel(e.target.value)}
-              className="px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
-            >
-              {nivelesDisponibles.map(nivel => (
-                <option key={nivel.value} value={nivel.value}>
-                  {nivel.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-lg p-4 mb-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <span className="text-sm font-semibold text-gray-700">Tipos:</span>
-            {['competencia', 'entrenamiento', 'evaluacion', 'festivo', 'general'].map(tipo => (
-              <div key={tipo} className="flex items-center space-x-1">
-                <span className="text-lg">{getTipoIcon(tipo)}</span>
-                <span className="text-xs text-gray-600 capitalize">{tipo}</span>
+      {/* FILTROS Y CONTROLES */}
+      <div className="bg-white rounded-lg shadow p-4 mb-4">
+        <div className="flex flex-col space-y-4">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center space-x-4">
+              <button onClick={mesAnterior} className="p-2 hover:bg-gray-100 rounded">◀</button>
+              <h2 className="text-xl font-bold min-w-[200px] text-center">
+                {meses[mesActual.getMonth()]} {mesActual.getFullYear()}
+              </h2>
+              <button onClick={mesSiguiente} className="p-2 hover:bg-gray-100 rounded">▶</button>
+              <button onClick={irAHoy} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                Hoy
+              </button>
+              <button
+                onClick={() => cargarEventos(false)}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 flex items-center"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <span className="animate-spin mr-2">⏳</span>
+                    Cargando...
+                  </>
+                ) : (
+                  <>
+                    <span className="mr-2">🔄</span>
+                    Actualizar
+                  </>
+                )}
+              </button>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="text-sm">
+                {loading ? '🔄 Cargando...' : `✅ ${eventos.length} de ${eventosSinFiltrar.length} eventos`}
               </div>
-            ))}
+              {ultimaActualizacion && (
+                <div className="text-xs text-gray-500">
+                  Actualizado: {ultimaActualizacion.toLocaleTimeString('es-ES')}
+                </div>
+              )}
+            </div>
           </div>
-          {puedeEditar && (
-            <span className="text-sm text-blue-600">💡 Haz clic en un día para agregar eventos</span>
-          )}
+
+          <div className="flex flex-wrap gap-4">
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-medium mb-2">🎯 Filtrar por Nivel</label>
+              <select
+                value={filtroNivel}
+                onChange={(e) => {
+                  console.log('🎯 Cambiando filtro nivel a:', e.target.value);
+                  setFiltroNivel(e.target.value);
+                }}
+                className="w-full px-4 py-2 border rounded"
+              >
+                {nivelesDisponibles.map(nivel => (
+                  <option key={nivel.value} value={nivel.value}>
+                    {nivel.emoji} {nivel.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-medium mb-2">🏆 Filtrar por Grupo</label>
+              <select
+                value={filtroGrupo}
+                onChange={(e) => {
+                  console.log('🏆 Cambiando filtro grupo a:', e.target.value);
+                  setFiltroGrupo(e.target.value);
+                }}
+                className="w-full px-4 py-2 border rounded"
+              >
+                <option value="todos">Todos los grupos</option>
+                {gruposDisponibles.map(grupo => (
+                  <option key={grupo} value={grupo}>{grupo}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded flex items-center justify-between">
+            <div>
+              📊 Mostrando eventos para: <strong>{getNivelNombre(filtroNivel)}</strong>
+              {filtroGrupo !== 'todos' && <> - <strong>{filtroGrupo}</strong></>}
+            </div>
+            <div className="text-xs text-blue-600">
+              🔄 Auto-actualización cada 30 segundos
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="grid grid-cols-7 bg-gradient-to-r from-blue-500 to-blue-600">
+      {/* CALENDARIO */}
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="grid grid-cols-7 bg-blue-600">
           {diasSemana.map(dia => (
-            <div key={dia} className="p-4 text-center">
+            <div key={dia} className="p-3 text-center">
               <span className="text-sm font-bold text-white">{dia}</span>
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-7 divide-x divide-y divide-gray-200">
+        <div className="grid grid-cols-7">
           {dias.map((dia, index) => {
             const eventosDelDia = getEventosPorDia(dia);
             const tieneEventos = eventosDelDia.length > 0;
@@ -487,16 +662,16 @@ const Calendario = () => {
               <div
                 key={index}
                 onClick={() => handleClickDia(dia)}
-                className={`min-h-[120px] p-2 transition-all duration-200 ${
+                className={`min-h-[100px] p-2 border cursor-pointer ${
                   !dia.mesActual 
                     ? 'bg-gray-50 text-gray-400' 
                     : esHoyFlag 
-                    ? 'bg-blue-50 border-2 border-blue-500' 
-                    : 'bg-white hover:bg-blue-50'
-                } ${puedeEditar || tieneEventos ? 'cursor-pointer' : ''}`}
+                    ? 'bg-blue-50 border-blue-300' 
+                    : 'bg-white hover:bg-gray-50'
+                }`}
               >
-                <div className="flex justify-between items-start mb-1">
-                  <span className={`text-sm font-semibold ${
+                <div className="flex justify-between">
+                  <span className={`font-semibold ${
                     esHoyFlag ? 'text-blue-600' : dia.mesActual ? 'text-gray-800' : 'text-gray-400'
                   }`}>
                     {dia.numero}
@@ -508,17 +683,20 @@ const Calendario = () => {
                   )}
                 </div>
                 
-                <div className="space-y-1">
-                  {eventosDelDia.slice(0, 2).map((evento, idx) => (
-                    <div
-                      key={idx}
-                      className={`text-xs p-1 rounded ${getTipoColor(evento.tipo)} text-white truncate`}
-                      title={evento.titulo}
-                    >
-                      <span className="mr-1">{getTipoIcon(evento.tipo)}</span>
-                      {evento.titulo}
-                    </div>
-                  ))}
+                <div className="mt-1 space-y-1">
+                  {eventosDelDia.slice(0, 2).map((evento, idx) => {
+                    const tipoEvento = getTipoEvento(evento.tipo);
+                    return (
+                      <div
+                        key={idx}
+                        className={`text-xs p-1 rounded ${tipoEvento.color} text-white truncate`}
+                        title={evento.titulo}
+                      >
+                        <span className="mr-1">{tipoEvento.emoji}</span>
+                        {evento.titulo}
+                      </div>
+                    );
+                  })}
                   {eventosDelDia.length > 2 && (
                     <div className="text-xs text-blue-600 font-semibold">
                       +{eventosDelDia.length - 2} más
@@ -531,214 +709,307 @@ const Calendario = () => {
         </div>
       </div>
 
-      {/* MODAL */}
+      {/* MODAL - Mantener el mismo código del modal de la segunda versión */}
       {mostrarModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="bg-gradient-to-r from-blue-500 to-blue-700 p-6 text-white rounded-t-2xl">
-              <h3 className="text-2xl font-bold">
-                {userRole === 'deportista' || !userRole
-                  ? `📅 Eventos del ${diaSeleccionado?.numero}` 
-                  : eventoEditando 
-                  ? '✏️ Editar Evento' 
-                  : `➕ Nuevo Evento - ${diaSeleccionado?.numero}`}
-              </h3>
-            </div>
-
-            {userRole === 'deportista' || !userRole ? (
-              <div className="p-6">
-                {getEventosPorDia(diaSeleccionado).length === 0 ? (
-                  <div className="text-center py-8 text-gray-400">
-                    <div className="text-6xl mb-4">📅</div>
-                    <p>No hay eventos este día</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {getEventosPorDia(diaSeleccionado).map(evento => (
-                      <div key={evento.id} className="border-2 border-gray-200 rounded-lg p-4">
-                        <div className="flex items-center space-x-3 mb-3">
-                          <span className="text-3xl">{getTipoIcon(evento.tipo)}</span>
-                          <div className="flex-1">
-                            <h4 className="text-lg font-bold text-gray-800">{evento.titulo}</h4>
-                            <div className="flex items-center space-x-2 mt-1">
-                              <span className={`px-2 py-1 ${getTipoColor(evento.tipo)} text-white rounded-full text-xs font-semibold`}>
-                                {evento.tipo}
-                              </span>
-                              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
-                                {formatearNombreNivel(evento.nivel)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        {evento.descripcion && (
-                          <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                            {evento.descripcion}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+          <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-blue-600 p-4 text-white rounded-t-lg sticky top-0 z-10">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold">
+                  {modoVista === 'editar' ? '✏️ Editar Evento' : modoVista === 'crear' ? '➕ Crear Evento' : '📅 Eventos del Día'}
+                </h3>
                 <button
-                  onClick={() => {
-                    setMostrarModal(false);
-                    setDiaSeleccionado(null);
-                  }}
-                  className="w-full mt-6 px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-semibold transition"
+                  onClick={() => setMostrarModal(false)}
+                  className="text-white hover:text-gray-200 text-2xl"
                 >
-                  Cerrar
+                  ✕
                 </button>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="p-6">
-                {!eventoEditando && getEventosPorDia(diaSeleccionado).length > 0 && (
-                  <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                    <p className="text-sm font-semibold text-blue-800 mb-2">
-                      Eventos existentes este día:
-                    </p>
-                    <div className="space-y-2">
-                      {getEventosPorDia(diaSeleccionado).map(evento => (
-                        <div key={evento.id} className="flex items-center justify-between bg-white p-2 rounded">
-                          <span className="text-sm">{getTipoIcon(evento.tipo)} {evento.titulo}</span>
-                          <div className="flex space-x-2">
-                            <button
-                              type="button"
-                              onClick={() => handleEditarEvento(evento)}
-                              className="text-blue-600 hover:text-blue-800"
-                            >
-                              ✏️
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleEliminar(evento.id)}
-                              className="text-red-600 hover:text-red-800"
-                            >
-                              🗑️
-                            </button>
-                          </div>
-                        </div>
-                      ))}
+            </div>
+
+            <div className="p-6">
+              {modoVista === 'ver' && diaSeleccionado ? (
+                <div>
+                  {getEventosPorDia(diaSeleccionado).length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500 mb-4">📭 No hay eventos programados para este día</p>
+                      {puedeEditar && (
+                        <button
+                          onClick={() => abrirModalCrear(diaSeleccionado)}
+                          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        >
+                          ➕ Crear Evento
+                        </button>
+                      )}
                     </div>
-                  </div>
-                )}
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">Título *</label>
-                    <input
-                      type="text"
-                      value={formData.titulo}
-                      onChange={(e) => setFormData({...formData, titulo: e.target.value})}
-                      required
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      placeholder="Ej: Competencia Regional"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">Descripción</label>
-                    <textarea
-                      value={formData.descripcion}
-                      onChange={(e) => setFormData({...formData, descripcion: e.target.value})}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      rows="3"
-                      placeholder="Detalles del evento..."
-                    />
+                  ) : (
+                    <div>
+                      <div className="space-y-4 mb-4">
+                        {getEventosPorDia(diaSeleccionado).map(evento => {
+                          const tipoEvento = getTipoEvento(evento.tipo);
+                          const puedeEditarEste = puedeEditarEvento(evento);
+                          
+                          return (
+                            <div key={evento.id} className="border-2 rounded-lg p-4 hover:shadow-md transition">
+                              <div className="flex items-start gap-3">
+                                <span className="text-4xl">{tipoEvento.emoji}</span>
+                                <div className="flex-1">
+                                  <h4 className="font-bold text-lg mb-2">{evento.titulo}</h4>
+                                  <div className="flex flex-wrap gap-2 mb-3">
+                                    <span className={`px-3 py-1 ${tipoEvento.color} text-white rounded-full text-xs font-semibold`}>
+                                      {tipoEvento.label}
+                                    </span>
+                                    <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
+                                      {getNivelNombre(evento.nivel)}
+                                    </span>
+                                    {evento.grupo_competitivo && (
+                                      <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold">
+                                        🏆 {evento.grupo_competitivo}
+                                      </span>
+                                    )}
+                                  </div>
+                                  {evento.descripcion && (
+                                    <p className="mt-2 text-gray-700 text-sm bg-gray-50 p-3 rounded">{evento.descripcion}</p>
+                                  )}
+                                  {puedeEditarEste && (
+                                    <div className="mt-4 flex gap-2">
+                                      <button
+                                        onClick={() => abrirModalEditar(evento)}
+                                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium"
+                                      >
+                                        ✏️ Editar
+                                      </button>
+                                      <button
+                                        onClick={() => handleEliminar(evento.id)}
+                                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm font-medium"
+                                      >
+                                        🗑️ Eliminar
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      
+                      {puedeEditar && (
+                        <button
+                          onClick={() => abrirModalCrear(diaSeleccionado)}
+                          className="w-full p-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium mb-3"
+                        >
+                          ➕ Crear Nuevo Evento
+                        </button>
+                      )}
+                      
+                      <button
+                        onClick={() => setMostrarModal(false)}
+                        className="w-full p-3 bg-gray-200 rounded-lg hover:bg-gray-300 font-medium"
+                      >
+                        Cerrar
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">📝 Título *</label>
+                      <input
+                        type="text"
+                        value={formData.titulo}
+                        onChange={(e) => setFormData({...formData, titulo: e.target.value})}
+                        required
+                        className="w-full p-3 border rounded-lg"
+                        placeholder="Ej: Competencia Regional"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-2">📄 Descripción</label>
+                      <textarea
+                        value={formData.descripcion}
+                        onChange={(e) => setFormData({...formData, descripcion: e.target.value})}
+                        className="w-full p-3 border rounded-lg"
+                        rows="3"
+                        placeholder="Detalles del evento..."
+                      />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Fecha *</label>
+                      <label className="block text-sm font-medium mb-2">📅 Fecha *</label>
                       <input
                         type="date"
                         value={formData.fecha}
                         onChange={(e) => setFormData({...formData, fecha: e.target.value})}
                         required
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full p-3 border rounded-lg"
                       />
                     </div>
-
+                    
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Nivel *</label>
-                      <select
-                        value={formData.nivel}
-                        onChange={(e) => setFormData({...formData, nivel: e.target.value})}
-                        required
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
-                      >
-                        <option value="">Selecciona un nivel</option>
-                        {userRole === 'admin' ? (
-                          <>
-                            <option value="todos">Todos (Público)</option>
-                            <option value="1_basico">1 Básico</option>
-                            <option value="1_medio">1 Medio</option>
-                            <option value="1_avanzado">1 Avanzado</option>
-                            <option value="2">Nivel 2</option>
-                            <option value="3">Nivel 3</option>
-                            <option value="4">Nivel 4</option>
-                          </>
-                        ) : (
-                          nivelesAsignados.map(nivel => (
-                            <option key={nivel} value={nivel}>
-                              {formatearNombreNivel(nivel)}
-                            </option>
-                          ))
-                        )}
-                      </select>
-                    </div>
-
-                    <div className="col-span-2">
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Tipo *</label>
+                      <label className="block text-sm font-medium mb-2">🎯 Tipo de Evento *</label>
                       <select
                         value={formData.tipo}
                         onChange={(e) => setFormData({...formData, tipo: e.target.value})}
-                        required
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full p-3 border rounded-lg"
                       >
-                        <option value="general">General</option>
-                        <option value="competencia">Competencia</option>
-                        <option value="entrenamiento">Entrenamiento</option>
-                        <option value="evaluacion">Evaluación</option>
-                        <option value="festivo">Festivo</option>
+                        {tiposEvento.map(tipo => (
+                          <option key={tipo.value} value={tipo.value}>
+                            {tipo.emoji} {tipo.label}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
 
-                  <div className="bg-blue-50 p-3 rounded-lg">
-                    <p className="text-xs text-blue-800">
-                      <strong>Usuario:</strong> {userName} ({userRole || 'Visitante'})
-                    </p>
-                    {formData.nivel && (
-                      <p className="text-xs text-blue-800 mt-1">
-                        <strong>Nivel seleccionado:</strong> {formatearNombreNivel(formData.nivel)}
-                      </p>
+                  <div className="border-2 border-blue-200 rounded-lg p-4 bg-blue-50">
+                    <div className="flex justify-between items-center mb-3">
+                      <label className="block text-sm font-bold text-blue-900">
+                        🎓 {modoVista === 'editar' ? 'Nivel' : 'Niveles'} * ({formData.niveles.length} seleccionados)
+                      </label>
+                      {modoVista !== 'editar' && (
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={seleccionarTodosNiveles}
+                            className="text-xs px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                          >
+                            ✓ Todos
+                          </button>
+                          <button
+                            type="button"
+                            onClick={limpiarNiveles}
+                            className="text-xs px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                          >
+                            ✕ Limpiar
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    {modoVista === 'editar' && (
+                      <div className="text-xs text-blue-700 mb-2 bg-blue-100 p-2 rounded">
+                        ℹ️ En modo edición solo puedes seleccionar un nivel
+                      </div>
                     )}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                      {nivelesDisponibles.filter(n => n.value !== 'todos').map(nivel => (
+                        <button
+                          key={nivel.value}
+                          type="button"
+                          onClick={() => toggleNivel(nivel.value)}
+                          className={`p-3 rounded-lg border-2 transition-all ${
+                            formData.niveles.includes(nivel.value)
+                              ? 'border-blue-600 bg-blue-100 text-blue-900 shadow-md transform scale-105'
+                              : 'border-gray-300 bg-white hover:border-blue-400 hover:bg-blue-50'
+                          }`}
+                        >
+                          <div className="text-2xl mb-1">{nivel.emoji}</div>
+                          <div className="text-xs font-medium">{nivel.label}</div>
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex space-x-4 mt-6">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMostrarModal(false);
-                      setDiaSeleccionado(null);
-                      setEventoEditando(null);
-                    }}
-                    className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold"
-                    disabled={loading}
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold shadow-lg"
-                    disabled={loading}
-                  >
-                    {loading ? '⏳ Guardando...' : eventoEditando ? '✅ Actualizar' : '✅ Crear'}
-                  </button>
-                </div>
-              </form>
-            )}
+                  <div className="border-2 border-purple-200 rounded-lg p-4 bg-purple-50">
+                    <div className="flex justify-between items-center mb-3">
+                      <label className="block text-sm font-bold text-purple-900">
+                        🏆 Grupos Competitivos ({formData.grupos_competitivos.length} seleccionados)
+                      </label>
+                      {modoVista !== 'editar' && (
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={seleccionarTodosGrupos}
+                            className="text-xs px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
+                          >
+                            ✓ Todos
+                          </button>
+                          <button
+                            type="button"
+                            onClick={limpiarGrupos}
+                            className="text-xs px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                          >
+                            ✕ Limpiar
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-xs text-purple-700 mb-3 bg-purple-100 p-2 rounded">
+                      💡 Si no seleccionas ningún grupo, el evento será visible para TODOS los grupos
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {gruposDisponibles.map(grupo => (
+                        <button
+                          key={grupo}
+                          type="button"
+                          onClick={() => toggleGrupo(grupo)}
+                          className={`p-3 rounded-lg border-2 transition-all ${
+                            formData.grupos_competitivos.includes(grupo)
+                              ? 'border-purple-600 bg-purple-100 text-purple-900 shadow-md transform scale-105'
+                              : 'border-gray-300 bg-white hover:border-purple-400 hover:bg-purple-50'
+                          }`}
+                        >
+                          <div className="font-bold text-sm">{grupo}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {modoVista !== 'editar' && (
+                    <div className="bg-gray-50 p-4 rounded-lg border">
+                      <h4 className="font-bold mb-2">📋 Resumen del evento:</h4>
+                      <ul className="text-sm space-y-1">
+                        <li>• Se crearán <strong>{formData.niveles.length || 0}</strong> evento(s) para los niveles seleccionados</li>
+                        <li>• Visible para <strong>
+                          {formData.grupos_competitivos.length === 0 
+                            ? 'TODOS los grupos' 
+                            : `${formData.grupos_competitivos.length} grupo(s) específico(s)`
+                          }
+                        </strong></li>
+                        <li>• Total de eventos a crear: <strong>
+                          {formData.grupos_competitivos.length === 0 
+                            ? formData.niveles.length 
+                            : formData.niveles.length * formData.grupos_competitivos.length
+                          }
+                        </strong></li>
+                      </ul>
+                    </div>
+                  )}
+                  
+                  <div className="flex space-x-4 sticky bottom-0 bg-white pt-4">
+                    {modoVista === 'editar' && (
+                      <button
+                        type="button"
+                        onClick={() => handleEliminar(eventoSeleccionado.id)}
+                        className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-bold"
+                        disabled={loading}
+                      >
+                        🗑️ Eliminar
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setMostrarModal(false)}
+                      className="flex-1 p-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 font-medium"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold disabled:bg-gray-400"
+                      disabled={loading || formData.niveles.length === 0}
+                    >
+                      {loading ? '⏳ Guardando...' : modoVista === 'editar' ? '✅ Actualizar' : '✅ Crear'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
         </div>
       )}

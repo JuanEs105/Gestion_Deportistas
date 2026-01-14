@@ -1,7 +1,5 @@
 const { Sequelize } = require('sequelize');
-const dotenv = require('dotenv');
-
-dotenv.config();
+require('dotenv').config();
 
 // Crear conexión a PostgreSQL
 const sequelize = new Sequelize(
@@ -18,6 +16,8 @@ const sequelize = new Sequelize(
     define: {
       timestamps: true,
       underscored: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at'
     }
   }
 );
@@ -27,23 +27,40 @@ const connectDB = async () => {
     await sequelize.authenticate();
     console.log('✅ PostgreSQL conectado exitosamente');
     
-    // Sincronizar solo si no existe
-    await sequelize.sync({ force: false, alter: false });
+    // Sincronizar modelos con opciones seguras
+    await sequelize.sync({ 
+      force: false,  // NO elimina tablas existentes
+      alter: true    // Modifica tablas existentes para coincidir con modelos
+    });
     
-    console.log('📊 Base de datos lista');
+    console.log('📊 Base de datos sincronizada y lista');
     return sequelize;
   } catch (error) {
     console.error('❌ Error conectando a PostgreSQL:', error.message);
     
-    // Si es error de foreign key, continuar igual
-    if (error.message.includes('foreign key') || error.message.includes('habilidades')) {
-      console.log('⚠️  Error de foreign key - continuando sin evaluaciones por ahora');
+    // Errores específicos que podemos manejar
+    if (error.message.includes('foreign key constraint')) {
+      console.log('⚠️  Error de foreign key - continuando sin sincronización completa');
       return sequelize;
     }
     
-    process.exit(1);
+    if (error.message.includes('relation') && error.message.includes('already exists')) {
+      console.log('ℹ️  Tablas ya existen - continuando normalmente');
+      return sequelize;
+    }
+    
+    // Si es un error de conexión fatal
+    if (error.message.includes('connect') || error.message.includes('authentication')) {
+      console.error('🚨 Error fatal de conexión. Verifica:');
+      console.error('  1. PostgreSQL está corriendo en el puerto 5432');
+      console.error('  2. La base de datos "eval_deportistas" existe');
+      console.error('  3. Usuario/contraseña correctos');
+      process.exit(1);
+    }
+    
+    console.error('❌ Error no manejado:', error);
+    return sequelize;
   }
 };
 
-// Asegúrate de exportar BOTH sequelize y connectDB
 module.exports = { sequelize, connectDB };
