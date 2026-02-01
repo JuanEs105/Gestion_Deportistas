@@ -1,0 +1,381 @@
+/* ===================================
+   MIS EVALUACIONES - TITANES EVOLUTION
+   Estilo Elite / Neon
+   =================================== */
+
+:root {
+    --primary-red: #E21B23;
+    --neon-glow: 0 0 15px rgba(226, 27, 35, 0.6);
+    --neon-glow-strong: 0 0 25px rgba(226, 27, 35, 0.8);
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ===================================
+   FONDO CARBON
+   =================================== */
+.bg-carbon {
+    background-color: #0a0a0a;
+    background-image: 
+        linear-gradient(45deg, #111 25%, transparent 25%), 
+        linear-gradient(-45deg, #111 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #111 75%), 
+        linear-gradient(-45deg, transparent 75%, #111 75%);
+    background-size: 8px 8px;
+}
+
+/* ===================================
+   EFECTOS NEON
+   =================================== */
+.neon-border {
+    border: 1px solid var(--primary-red);
+    box-shadow: var(--neon-glow);
+}
+
+.neon-text {
+    text-shadow: 0 0 10px rgba(226, 27, 35, 0.8);
+}
+
+.progress-glow {
+    box-shadow: 0 0 12px var(--primary-red);
+}
+
+/* ===================================
+   SCROLLBAR
+   =================================== */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #0a0a0a;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--primary-red);
+    border-radius: 10px;
+}
+
+/* ===================================
+   RADAR CHART
+   =================================== */
+.radar-grid {
+    stroke: rgba(255,255,255,0.1);
+    stroke-width: 1;
+}
+
+.area-chart-glow {
+    filter: drop-shadow(0 0 8px rgba(226, 27, 35, 0.8));
+}
+
+/* ===================================
+   ANIMACIONES
+   =================================== */
+.interactive-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.interactive-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 40px -10px rgba(226, 27, 35, 0.4);
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(226, 27, 35, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 20px 10px rgba(226, 27, 35, 0);
+    }
+}
+
+.pulse-animation {
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.slide-in-up {
+    animation: slideInUp 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* ===================================
+   BADGE DESTACADO
+   =================================== */
+.top-performance-badge {
+    background: linear-gradient(135deg, #FFD700 0%, #E21B23 100%);
+    box-shadow: 0 0 20px rgba(226, 27, 35, 0.5);
+}
+
+/* ===================================
+   CHAT BUBBLE
+   =================================== */
+.chat-bubble-tail {
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+/* ===================================
+   CATEGORY LEGEND
+   =================================== */
+.category-legend-line {
+    height: 3px;
+    width: 20px;
+    border-radius: 2px;
+}
+
+/* ===================================
+   CARD DE EVALUACIÓN
+   =================================== */
+.evaluation-card {
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.evaluation-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px -10px rgba(226, 27, 35, 0.3);
+}
+
+.evaluation-card-completed {
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.evaluation-card-pending {
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+/* ===================================
+   PUNTUACIÓN VISUAL
+   =================================== */
+.score-circle {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+    background: conic-gradient(
+        var(--primary-red) 0deg,
+        var(--primary-red) calc(var(--score, 0) * 3.6deg),
+        rgba(255, 255, 255, 0.1) calc(var(--score, 0) * 3.6deg),
+        rgba(255, 255, 255, 0.1) 360deg
+    );
+}
+
+.score-circle::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: #1A1A1A;
+}
+
+.score-circle span {
+    position: relative;
+    z-index: 1;
+}
+
+/* ===================================
+   PROGRESS BARS
+   =================================== */
+.progress-bar-animated {
+    background: linear-gradient(
+        90deg,
+        var(--primary-red) 0%,
+        #FF3131 50%,
+        var(--primary-red) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ===================================
+   VIDEO MODAL
+   =================================== */
+.video-modal-overlay {
+    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    height: 0;
+    overflow: hidden;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* ===================================
+   FEEDBACK EXPANDIBLE
+   =================================== */
+.feedback-expanded {
+    max-height: 1000px;
+    transition: max-height 0.5s ease-in-out;
+}
+
+.feedback-collapsed {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+
+/* ===================================
+   FILTROS
+   =================================== */
+select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--primary-red);
+}
+
+/* ===================================
+   SKELETON LOADING
+   =================================== */
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.05) 25%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0.05) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ===================================
+   ESTADO VACÍO
+   =================================== */
+.empty-state {
+    opacity: 0.6;
+    filter: grayscale(100%);
+}
+
+/* ===================================
+   TOOLTIPS
+   =================================== */
+.tooltip {
+    position: relative;
+}
+
+.tooltip::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.95);
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    margin-bottom: 8px;
+    border: 1px solid var(--primary-red);
+}
+
+.tooltip:hover::before {
+    opacity: 1;
+}
+
+/* ===================================
+   CATEGORÍA BADGES
+   =================================== */
+.category-badge-habilidad {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: #000;
+}
+
+.category-badge-ejercicio {
+    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+    color: #FFF;
+}
+
+.category-badge-postura {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: #FFF;
+}
+
+/* ===================================
+   RESPONSIVE
+   =================================== */
+@media (max-width: 768px) {
+    .score-circle {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .evaluation-card {
+        padding: 1rem;
+    }
+    
+    .radar-chart-container {
+        max-width: 250px;
+        margin: 0 auto;
+    }
+}
+
+/* ===================================
+   PRINT STYLES
+   =================================== */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .bg-zinc-900 {
+        background: white !important;
+        border: 1px solid #ccc !important;
+    }
+}

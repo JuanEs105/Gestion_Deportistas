@@ -1,4 +1,4 @@
-// backend/src/controllers/calendarioController.js - VERSIÓN CORREGIDA
+// backend/src/controllers/calendarioController.js - VERSIÓN CORREGIDA FINAL
 const { CalendarioEvento, User } = require('../models');
 const { Op } = require('sequelize');
 
@@ -8,15 +8,26 @@ const calendarioController = {
   // ============================================
   crearEvento: async (req, res) => {
     try {
-      const { 
-        titulo, 
-        descripcion, 
-        fecha, 
-        niveles, 
-        grupos_competitivos, 
-        tipo 
+      const {
+        titulo,
+        descripcion,
+        fecha,
+        hora,
+        ubicacion,
+        niveles,
+        grupos_competitivos,
+        tipo,
+        tipo_personalizado
       } = req.body;
 
+      console.log('📝 Datos recibidos para crear evento:', {
+        titulo,
+        niveles,
+        grupos_competitivos,
+        tipo
+      });
+
+      // Validaciones
       if (!titulo || !fecha) {
         return res.status(400).json({
           success: false,
@@ -31,6 +42,14 @@ const calendarioController = {
         });
       }
 
+      // Validar tipo personalizado
+      if (tipo === 'otro' && (!tipo_personalizado || tipo_personalizado.trim() === '')) {
+        return res.status(400).json({
+          success: false,
+          error: 'Debes especificar el tipo de evento personalizado'
+        });
+      }
+
       if (req.user.role !== 'admin' && req.user.role !== 'entrenador') {
         return res.status(403).json({
           success: false,
@@ -40,96 +59,104 @@ const calendarioController = {
 
       const eventosCreados = [];
 
+      // Si NO se seleccionaron grupos → crear para TODOS (grupo_competitivo = NULL)
       if (!grupos_competitivos || grupos_competitivos.length === 0) {
-        console.log('📝 Creando evento para TODOS los grupos');
-        
+        console.log('📝 Creando eventos para TODOS los grupos (NULL)');
+
         for (const nivel of niveles) {
+          console.log(`  → Nivel: ${nivel}, Grupo: NULL`);
+
           const evento = await CalendarioEvento.create({
             titulo: titulo.trim(),
             descripcion: descripcion ? descripcion.trim() : null,
             fecha: new Date(fecha),
+            hora: hora || null,
+            ubicacion: ubicacion ? ubicacion.trim() : null,
             nivel: nivel,
-            grupo_competitivo: null,
+            grupo_competitivo: null, // ← NULL para todos
             tipo: tipo || 'general',
+            tipo_personalizado: tipo === 'otro' ? tipo_personalizado.trim() : null,
             entrenador_id: req.user.id
           });
 
-          eventosCreados.push({
-            id: evento.id,
-            titulo: evento.titulo,
-            nivel: evento.nivel,
-            grupo: evento.grupo_competitivo,
-            fecha: evento.fecha,
-            tipo: evento.tipo
-          });
+          eventosCreados.push(evento);
         }
       } else {
-        console.log('📝 Creando eventos para grupos específicos');
-        
+        // Si se seleccionaron grupos específicos
+        console.log('📝 Creando eventos para grupos específicos:', grupos_competitivos);
+
         for (const grupo of grupos_competitivos) {
-          const grupoNormalizado = grupo.toLowerCase().replace(/\s+/g, '_');
-          
+          // ⚠️ NO NORMALICES AQUÍ - el modelo lo hace automáticamente
+          console.log(`  → Grupo recibido: "${grupo}"`);
+
           for (const nivel of niveles) {
+            console.log(`    → Nivel: ${nivel}, Grupo: ${grupo}`);
+
             const evento = await CalendarioEvento.create({
               titulo: titulo.trim(),
               descripcion: descripcion ? descripcion.trim() : null,
               fecha: new Date(fecha),
+              hora: hora || null,
+              ubicacion: ubicacion ? ubicacion.trim() : null,
               nivel: nivel,
-              grupo_competitivo: grupoNormalizado,
+              grupo_competitivo: grupo, // ← Enviar TAL CUAL (el modelo lo normaliza)
               tipo: tipo || 'general',
+              tipo_personalizado: tipo === 'otro' ? tipo_personalizado.trim() : null,
               entrenador_id: req.user.id
             });
 
-            eventosCreados.push({
-              id: evento.id,
-              titulo: evento.titulo,
-              nivel: evento.nivel,
-              grupo: evento.grupo_competitivo,
-              fecha: evento.fecha,
-              tipo: evento.tipo
-            });
+            eventosCreados.push(evento);
           }
         }
       }
 
-      console.log(`✅ ${eventosCreados.length} evento(s) creado(s) exitosamente`);
+      console.log(`✅ ${eventosCreados.length} evento(s) creado(s)`);
 
       res.status(201).json({
         success: true,
         mensaje: `${eventosCreados.length} evento(s) creado(s) exitosamente`,
-        eventos: eventosCreados
+        eventos: eventosCreados.map(e => ({
+          id: e.id,
+          titulo: e.titulo,
+          nivel: e.nivel,
+          grupo_competitivo: e.grupo_competitivo, // El getter devuelve formato legible
+          fecha: e.fecha,
+          tipo: e.tipo
+        }))
       });
 
     } catch (error) {
       console.error('❌ Error creando evento:', error);
+      console.error('   Mensaje:', error.message);
+      console.error('   Stack:', error.stack);
+
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor'
+        error: 'Error interno del servidor',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   },
 
   // ============================================
-  // OBTENER EVENTOS CON FILTROS (SOLO FECHA)
+  // OBTENER EVENTOS CON FILTROS
   // ============================================
   getEventosConFiltros: async (req, res) => {
     try {
       const { mes, año } = req.query;
 
-      console.log('🔍 GET /api/calendario/filtros recibido:', { mes, año });
+      console.log('🔍 GET /api/calendario/filtros:', { mes, año });
 
       let whereClause = {};
 
       if (mes && año) {
         const inicioMes = new Date(año, mes - 1, 1);
         const finMes = new Date(año, mes, 0, 23, 59, 59);
-        
+
         whereClause.fecha = {
           [Op.between]: [inicioMes, finMes]
         };
       }
-
-      console.log('🔍 Buscando eventos con filtros:', { mes, año });
 
       const eventos = await CalendarioEvento.findAll({
         where: whereClause,
@@ -151,7 +178,7 @@ const calendarioController = {
 
     } catch (error) {
       console.error('❌ Error obteniendo eventos:', error);
-      res.status(500).json({ 
+      res.status(500).json({
         success: false,
         error: 'Error en el servidor'
       });
@@ -159,41 +186,25 @@ const calendarioController = {
   },
 
   // ============================================
-  // OBTENER GRUPOS COMPETITIVOS DISPONIBLES
+  // OBTENER GRUPOS COMPETITIVOS
   // ============================================
   getGruposCompetitivos: async (req, res) => {
     try {
-      const eventos = await CalendarioEvento.findAll({
-        attributes: ['grupo_competitivo'],
-        where: {
-          grupo_competitivo: {
-            [Op.not]: null
-          }
-        },
-        group: ['grupo_competitivo']
-      });
+      console.log('🏆 GET /api/calendario/grupos-competitivos');
 
-      let grupos = eventos
-        .map(e => e.grupo_competitivo)
-        .filter(g => g !== null)
-        .sort();
-
-      if (grupos.length === 0) {
-        grupos = [
-          'ROCKS TITANS',
-          'LIGHTNING TITANS',
-          'STORM TITANS',
-          'FIRE TITANS',
-          'ELECTRIC TITANS',
-          'STARS EVOLUTION'
-        ];
-      }
-
-      console.log('🏆 Grupos competitivos disponibles:', grupos);
+      // Grupos por defecto (siempre disponibles)
+      const gruposPorDefecto = [
+        'ROCKS TITANS',
+        'LIGHTNING TITANS',
+        'STORM TITANS',
+        'FIRE TITANS',
+        'ELECTRIC TITANS',
+        'STARS EVOLUTION'
+      ];
 
       res.json({
         success: true,
-        grupos: grupos
+        grupos: gruposPorDefecto
       });
 
     } catch (error) {
@@ -211,10 +222,20 @@ const calendarioController = {
   actualizarEvento: async (req, res) => {
     try {
       const { id } = req.params;
-      const { titulo, descripcion, fecha, nivel, grupo_competitivo, tipo } = req.body;
+      const {
+        titulo,
+        descripcion,
+        fecha,
+        hora,
+        ubicacion,
+        nivel,
+        grupo_competitivo,
+        tipo,
+        tipo_personalizado
+      } = req.body;
 
       const evento = await CalendarioEvento.findByPk(id);
-      
+
       if (!evento) {
         return res.status(404).json({
           success: false,
@@ -222,25 +243,25 @@ const calendarioController = {
         });
       }
 
-      if (req.user.role !== 'admin' && evento.entrenador_id !== req.user.id) {
+      // 🔥 CORRECCIÓN: Permitir a cualquier entrenador (no solo admin)
+      if (req.user.role !== 'entrenador' && req.user.role !== 'admin') {
         return res.status(403).json({
           success: false,
-          error: 'No tienes permisos para editar este evento'
+          error: 'No tienes permisos para editar eventos'
         });
       }
 
-      let grupoNormalizado = null;
-      if (grupo_competitivo && grupo_competitivo.trim() !== '') {
-        grupoNormalizado = grupo_competitivo.toLowerCase().replace(/\s+/g, '_');
-      }
-
+      // ⚠️ NO normalices aquí - el modelo lo hace
       await evento.update({
         titulo: titulo ? titulo.trim() : evento.titulo,
         descripcion: descripcion !== undefined ? (descripcion ? descripcion.trim() : null) : evento.descripcion,
         fecha: fecha ? new Date(fecha) : evento.fecha,
+        hora: hora !== undefined ? hora : evento.hora,
+        ubicacion: ubicacion !== undefined ? (ubicacion ? ubicacion.trim() : null) : evento.ubicacion,
         nivel: nivel || evento.nivel,
-        grupo_competitivo: grupo_competitivo !== undefined ? grupoNormalizado : evento.grupo_competitivo,
-        tipo: tipo || evento.tipo
+        grupo_competitivo: grupo_competitivo !== undefined ? grupo_competitivo : evento.grupo_competitivo,
+        tipo: tipo || evento.tipo,
+        tipo_personalizado: tipo_personalizado !== undefined ? tipo_personalizado : evento.tipo_personalizado
       });
 
       console.log(`✅ Evento actualizado: ${evento.id}`);
@@ -268,7 +289,7 @@ const calendarioController = {
       const { id } = req.params;
 
       const evento = await CalendarioEvento.findByPk(id);
-      
+
       if (!evento) {
         return res.status(404).json({
           success: false,
@@ -276,10 +297,11 @@ const calendarioController = {
         });
       }
 
-      if (req.user.role !== 'admin' && evento.entrenador_id !== req.user.id) {
+      // 🔥 CORRECCIÓN: Permitir a cualquier entrenador (no solo admin)
+      if (req.user.role !== 'entrenador' && req.user.role !== 'admin') {
         return res.status(403).json({
           success: false,
-          error: 'No tienes permisos para eliminar este evento'
+          error: 'No tienes permisos para eliminar eventos'
         });
       }
 
@@ -302,7 +324,7 @@ const calendarioController = {
   },
 
   // ============================================
-  // ✅ OBTENER EVENTO POR ID (FALTABA ESTA FUNCIÓN)
+  // OBTENER EVENTO POR ID
   // ============================================
   getEventoById: async (req, res) => {
     try {

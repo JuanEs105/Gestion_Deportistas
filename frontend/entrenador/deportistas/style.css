@@ -1,0 +1,531 @@
+/* =========================================
+   DEPORTISTAS - ESTILOS ESPECÍFICOS
+   Titanes Evolution - Sistema Entrenador
+========================================= */
+
+/* Variables adicionales específicas para deportistas */
+:root {
+    --stat-primary-bg: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+    --stat-secondary-bg: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+    --stat-warning-bg: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    --stat-danger-bg: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+}
+
+/* =========================================
+   ANIMACIONES
+========================================= */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* =========================================
+   BOTONES - CORRECCIÓN ESPECÍFICA
+========================================= */
+
+/* ESTILOS PARA BOTONES DE GUARDAR (MUY IMPORTANTE) */
+button[type="submit"],
+.btn-guardar {
+    background-color: #E21B23 !important;
+    color: white !important;
+    border: none !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+}
+
+button[type="submit"]:hover,
+.btn-guardar:hover {
+    background-color: #C41820 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(226, 27, 35, 0.3) !important;
+}
+
+button[type="submit"]:disabled,
+.btn-guardar:disabled {
+    background-color: #9CA3AF !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Botones en modales específicamente */
+#modalEditarDeportista button[type="submit"],
+#formEditarDeportista button[type="submit"] {
+    background-color: #E21B23 !important;
+    color: white !important;
+    padding: 12px 24px !important;
+    border-radius: 8px !important;
+    font-size: 16px !important;
+    width: 100% !important;
+    margin: 0 !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* =========================================
+   STAT CARDS - Tarjetas de Estadísticas
+========================================= */
+
+.stat-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 1px solid #E5E7EB;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--primary);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card:hover::before {
+    opacity: 1;
+}
+
+.stat-card.stat-primary {
+    background: var(--stat-primary-bg);
+    border-color: #BFDBFE;
+}
+
+.stat-card.stat-secondary {
+    background: var(--stat-secondary-bg);
+    border-color: #BBF7D0;
+}
+
+.stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stat-value {
+    font-family: 'Oswald', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+    color: #111827;
+}
+
+.stat-subtitle {
+    font-size: 0.75rem;
+    color: #9CA3AF;
+    font-weight: 500;
+}
+
+/* Dark mode para stat cards */
+.dark .stat-card {
+    background: #18181B;
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark .stat-card.stat-primary {
+    background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.dark .stat-card.stat-secondary {
+    background: linear-gradient(135deg, #14532D 0%, #052E16 100%);
+    border-color: rgba(34, 197, 94, 0.2);
+}
+
+.dark .stat-value {
+    color: #F9FAFB;
+}
+
+/* =========================================
+   TABLA DE DEPORTISTAS
+========================================= */
+
+/* Header de tabla */
+.table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.dark .table-header {
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Botones de la tabla */
+.table-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* =========================================
+   DROPDOWN MENUS MEJORADOS
+========================================= */
+
+#dropdownMenu {
+    z-index: 9999 !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    animation: fadeIn 0.2s ease-out;
+    will-change: transform, opacity;
+}
+
+#dropdownMenu::-webkit-scrollbar {
+    width: 6px;
+}
+
+#dropdownMenu::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.dark #dropdownMenu::-webkit-scrollbar-track {
+    background: #2d3748;
+}
+
+#dropdownMenu::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+
+.dark #dropdownMenu::-webkit-scrollbar-thumb {
+    background: #4a5568;
+}
+
+#dropdownMenu::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+.dark #dropdownMenu::-webkit-scrollbar-thumb:hover {
+    background: #718096;
+}
+
+#dropdownOverlay {
+    z-index: 9998;
+    background: transparent;
+}
+
+/* Botones dropdown */
+.dropdown-btn {
+    transition: all 0.2s ease;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.dropdown-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* =========================================
+   NOTIFICACIONES DE PAGO PENDIENTE
+========================================= */
+
+.fixed.top-4.right-4.z-50.bg-yellow-500 {
+    animation: slideIn 0.3s ease-out;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.fixed.top-4.right-4.z-50.bg-yellow-500 button {
+    transition: color 0.2s ease;
+}
+
+.fixed.top-4.right-4.z-50.bg-yellow-500 button:hover {
+    color: #fef3c7;
+}
+
+/* =========================================
+   BADGES DE NIVEL, EQUIPO Y ESTADO
+========================================= */
+
+.badge-nivel {
+    background: #DBEAFE;
+    color: #1E40AF;
+}
+
+.badge-nivel-pendiente {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.badge-equipo {
+    background: #F3E8FF;
+    color: #7C3AED;
+}
+
+.badge-equipo-sin {
+    background: #F3F4F6;
+    color: #6B7280;
+}
+
+.badge-estado-activo {
+    background: #DCFCE7;
+    color: #166534;
+}
+
+.badge-estado-lesionado {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.badge-estado-inactivo {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.badge-estado-pago {
+    background: #FFEDD5;
+    color: #9A3412;
+}
+
+/* =========================================
+   MODALES
+========================================= */
+
+.modal-content {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* =========================================
+   FORMULARIOS
+========================================= */
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    box-shadow: 0 0 0 3px rgba(226, 27, 35, 0.1);
+}
+
+/* =========================================
+   BOTONES PRINCIPALES
+========================================= */
+
+.btn-primary-large {
+    transition: all 0.2s ease;
+}
+
+.btn-primary-large:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(226, 27, 35, 0.3);
+}
+
+/* =========================================
+   ESTADOS DE BLOQUEO
+========================================= */
+
+.opacity-50 {
+    opacity: 0.5;
+}
+
+.cursor-not-allowed {
+    cursor: not-allowed;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+    .stat-value {
+        font-size: 2rem;
+    }
+    
+    .modal-content {
+        max-height: 95vh;
+    }
+    
+    .floating-help-btn {
+        width: 3rem;
+        height: 3rem;
+        bottom: 1rem;
+        right: 1rem;
+    }
+    
+    #dropdownMenu {
+        width: 280px !important;
+        max-width: 90vw;
+    }
+}
+
+@media (max-width: 640px) {
+    .table-actions {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .table-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* =========================================
+   UTILIDADES ADICIONALES
+========================================= */
+
+.text-primary {
+    color: var(--primary) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary) !important;
+}
+
+.border-primary {
+    border-color: var(--primary) !important;
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s;
+}
+
+/* =========================================
+   LOADING OVERLAY
+========================================= */
+
+#loadingOverlay {
+    backdrop-filter: blur(4px);
+}
+
+/* =========================================
+   ESTADOS VACÍOS
+========================================= */
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+}
+
+.empty-state .material-symbols-outlined {
+    font-size: 4rem;
+    color: #D1D5DB;
+    margin-bottom: 1rem;
+}
+
+.dark .empty-state .material-symbols-outlined {
+    color: #52525B;
+}
+
+/* =========================================
+   SCROLLBAR PERSONALIZADO
+========================================= */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F3F4F6;
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-track {
+    background: #27272A;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #D1D5DB;
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #52525B;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #9CA3AF;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #71717A;
+}
+
+/* =========================================
+   BOTÓN FLOTANTE DE AYUDA
+========================================= */
+
+.floating-help-btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-help-btn:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 20px 25px -5px rgba(226, 27, 35, 0.3), 0 10px 10px -5px rgba(226, 27, 35, 0.2);
+}
+
+/* =========================================
+   ANIMACIONES PARA NOTIFICACIONES
+========================================= */
+
+@keyframes successPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.success-pulse {
+    animation: successPulse 0.5s ease-in-out;
+}

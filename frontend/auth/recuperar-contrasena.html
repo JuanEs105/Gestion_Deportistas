@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña | Titanes Evolution</title>
+    
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="../shared/css/main.css">
+    <link rel="stylesheet" href="recuperar-contrasena.css">
+</head>
+<body class="recuperar-body">
+    <!-- Background Pattern -->
+    <div class="bg-pattern"></div>
+    
+    <!-- Botón Volver -->
+    <a href="login.html" class="btn-back-recuperar">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Volver al Login
+    </a>
+    
+    <!-- Container Principal -->
+    <div class="recuperar-container">
+        <!-- Logo -->
+        <div class="logo-header">
+            <div class="logo-circle">
+                <img src="../assets/images/logo titanes.jpg" 
+                     alt="Logo Titanes Evolution" class="logo-img">
+            </div>
+        </div>
+
+        <!-- Tarjeta de Recuperación -->
+        <div class="recuperar-card">
+            <!-- Header -->
+            <div class="recuperar-header">
+                <h1 class="recuperar-title">
+                    RECUPERAR <span class="text-primary">CONTRASEÑA</span>
+                </h1>
+                <p class="recuperar-subtitle">
+                    Ingresa tu correo electrónico y te enviaremos un código de verificación para restablecer tu contraseña.
+                </p>
+            </div>
+
+            <!-- Formulario -->
+            <form id="recuperarForm" class="recuperar-form">
+                <!-- Campo Email -->
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        <span class="material-symbols-outlined">mail</span>
+                        Correo Electrónico
+                    </label>
+                    <input type="email" id="email" name="email" 
+                           placeholder="ejemplo@email.com" required 
+                           class="form-input">
+                    <div class="error-message" id="errorEmail"></div>
+                    <div class="success-message" id="successEmail"></div>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="info-box">
+                    <p>
+                        <span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">info</span>
+                        Asegúrate de ingresar el email asociado a tu cuenta. Revisa tu bandeja de entrada y la carpeta de spam.
+                    </p>
+                </div>
+
+                <!-- Botón de Enviar -->
+                <button type="submit" class="btn-recuperar" id="btnRecuperar">
+                    <span>ENVIAR CÓDIGO</span>
+                    <span class="material-symbols-outlined">send</span>
+                    <div class="loading-spinner hidden" id="loadingSpinner"></div>
+                </button>
+            </form>
+
+            <!-- Enlace para Login -->
+            <div class="login-link">
+                <p>
+                    ¿Recordaste tu contraseña? 
+                    <a href="login.html">
+                        <strong>Inicia sesión aquí</strong>
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="recuperar-footer">
+            <div class="footer-content">
+                <span class="copyright">TITANES EVOLUTION © 2024</span>
+                <div class="divider"></div>
+                <span class="tagline">SPORTS EXCELLENCE PROGRAM</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../shared/js/utils.js"></script>
+    <script src="recuperar-contrasena.js"></script>
+</body>
+</html>

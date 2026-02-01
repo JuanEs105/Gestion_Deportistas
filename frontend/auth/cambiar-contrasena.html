@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cambiar Contraseña | Titanes Evolution</title>
+    
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="cambiar-contrasena.css">
+</head>
+<body class="cambiar-body">
+    <!-- Background Pattern -->
+    <div class="bg-pattern"></div>
+    
+    <!-- Botón Volver -->
+    <a href="javascript:history.back()" class="btn-back-cambiar">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Volver
+    </a>
+    
+    <!-- Container Principal -->
+    <div class="cambiar-container">
+        <!-- Logo -->
+        <div class="logo-header">
+            <div class="logo-circle">
+                <img src="../assets/images/logo titanes.jpg" 
+                     alt="Logo Titanes Evolution" class="logo-img">
+            </div>
+        </div>
+
+        <!-- Tarjeta de Cambio -->
+        <div class="cambiar-card">
+            <!-- Header con paso -->
+            <div class="step-header">
+                <div class="step-indicator">
+                    <span class="step-number">3</span>
+                    <span class="step-text">ESTABLECE TU NUEVA CONTRASEÑA</span>
+                </div>
+                
+                <div class="email-display" id="emailDisplay">
+                    <span class="material-symbols-outlined">mail</span>
+                    <span id="emailText">Cargando email...</span>
+                </div>
+            </div>
+
+            <!-- Formulario -->
+            <form id="cambiarForm" class="cambiar-form">
+                <!-- Nueva Contraseña -->
+                <div class="form-group">
+                    <label for="newPassword" class="form-label">
+                        <span class="material-symbols-outlined">lock</span>
+                        CONTRASEÑA
+                    </label>
+                    <div class="password-container">
+                        <input type="password" id="newPassword" name="newPassword" 
+                               placeholder="Ingresa tu nueva contraseña" required 
+                               class="form-input" minlength="8">
+                        <button type="button" class="toggle-password" data-target="newPassword">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                    <div class="error-message" id="errorPassword"></div>
+                </div>
+
+                <!-- Confirmar Contraseña -->
+                <div class="form-group">
+                    <label for="confirmPassword" class="form-label">
+                        <span class="material-symbols-outlined">lock_reset</span>
+                        CONFIRMAR CONTRASEÑA
+                    </label>
+                    <div class="password-container">
+                        <input type="password" id="confirmPassword" name="confirmPassword" 
+                               placeholder="Repite tu contraseña" required 
+                               class="form-input" minlength="8">
+                        <button type="button" class="toggle-password" data-target="confirmPassword">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                    <div class="error-message" id="errorConfirm"></div>
+                </div>
+
+                <!-- Requisitos de contraseña -->
+                <div class="password-requirements">
+                    <p class="requirements-title">LA CONTRASEÑA DEBE INCLUIR:</p>
+                    <ul class="requirements-list" id="requirementsList">
+                        <li class="requirement invalid" data-req="length">Al menos 8 caracteres</li>
+                        <li class="requirement invalid" data-req="uppercase">Una letra mayúscula</li>
+                        <li class="requirement invalid" data-req="lowercase">Una letra minúscula</li>
+                        <li class="requirement invalid" data-req="number">Un número</li>
+                        <li class="requirement invalid" data-req="special">Un carácter especial (!@#$%^&*)</li>
+                    </ul>
+                </div>
+
+                <!-- Botón Cambiar -->
+                <button type="submit" class="btn-cambiar" id="btnCambiar">
+                    <span>RESTABLECER CONTRASEÑA</span>
+                    <span class="material-symbols-outlined">check_circle</span>
+                    <div class="loading-spinner hidden" id="loadingSpinner"></div>
+                </button>
+
+                <!-- Mensaje de éxito -->
+                <div id="successMessage" class="success-message"></div>
+            </form>
+
+            <!-- Redirección info -->
+            <div class="redirect-info">
+                <p class="redirect-text">
+                    Una vez finalizado, serás redirigido automáticamente a tu panel de acceso según tu rol.
+                </p>
+            </div>
+
+            <!-- Volver al login -->
+            <div class="login-link">
+                <a href="login.html" class="login-back">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Volver al inicio de sesión
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="cambiar-footer">
+            <div class="footer-content">
+                <span class="copyright">Titanes Evolution © 2024</span>
+                <div class="divider"></div>
+                <span class="tagline">Sports Excellence Program</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="cambiar-contrasena.js"></script>
+</body>
+</html>

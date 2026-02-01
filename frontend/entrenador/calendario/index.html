@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Calendario | Titanes Evolution - Entrenador</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../dashboard.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-content">
+            <!-- Logo -->
+            <div class="sidebar-logo">
+                <div class="logo-container">
+                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcw5Zw_VZ5QoFPk9QYIT89zW1mZesKOh5HIHLL41Mtd6HKuExl984TKKSHxE2FqiuFkaUeaMHfO-dutvPmOFiuT4xa0bJGzfv5ohyPe9Vgl7BroW_NqKwKJ-OCWoB0jQxk8nvXMo_BVwY1WqezyMIKcth1GPpIosmGURpSBe3Eac8HR9iSTJdTqRgnz3CTJCIFlrnxyl7afGX8iitVgkEYrseFRx9EIjWZuQGeoIL71DWubp-u6atx_t8w79rEnwBRufn6xLryzNq8" alt="Logo">
+                </div>
+                <span class="logo-text">TITANES<span class="text-primary">EVOLUTION</span></span>
+            </div>
+
+            <!-- Perfil del Entrenador -->
+            <div class="coach-profile" id="coachProfile" onclick="window.location.href='../perfil/index.html'">
+                <div class="profile-avatar">
+                    <img id="sidebarAvatar" src="https://via.placeholder.com/100" alt="Foto de perfil">
+                </div>
+                <div class="profile-info">
+                    <p class="profile-name" id="sidebarName">Cargando...</p>
+                    <p class="profile-role">ENTRENADOR</p>
+                </div>
+                <span class="material-symbols-outlined profile-icon">check_circle</span>
+            </div>
+
+            <!-- Navegación -->
+            <nav class="sidebar-nav">
+                <a href="../dashboard.html" class="nav-item">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="../deportistas/index.html" class="nav-item">
+                    <span class="material-symbols-outlined">groups</span>
+                    <span class="nav-text">Deportistas</span>
+                </a>
+                <a href="../evaluaciones/index.html" class="nav-item">
+                    <span class="material-symbols-outlined">assignment</span>
+                    <span class="nav-text">Evaluaciones</span>
+                </a>
+                <a href="index.html" class="nav-item active">
+                    <span class="material-symbols-outlined">calendar_month</span>
+                    <span class="nav-text">Calendario</span>
+                </a>
+            </nav>
+
+            <!-- Footer del Sidebar -->
+            <div class="sidebar-footer">
+                <button class="nav-item" id="toggleTheme">
+                    <span class="material-symbols-outlined">dark_mode</span>
+                    <span class="nav-text">Modo Oscuro</span>
+                </button>
+                <button class="nav-item logout-btn" id="logoutBtn">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="nav-text">Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="page-header">
+            <div>
+                <h1 class="page-title">
+                    CALENDARIO DE <span class="text-primary">EVENTOS</span>
+                </h1>
+                <p class="page-subtitle">Programación de entrenamientos, competencias y sesiones especiales.</p>
+                <div class="title-divider"></div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-primary" id="crearEventoBtn">
+                    <span class="material-symbols-outlined">add</span>
+                    Crear Evento
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid-calendario">
+            <!-- Total Eventos -->
+            <div class="stat-card stat-primary">
+                <div class="stat-header">
+                    <span class="stat-label">Total</span>
+                    <span class="material-symbols-outlined text-primary">event</span>
+                </div>
+                <div id="totalEventos" class="stat-value">0</div>
+                <div class="stat-subtitle">Eventos</div>
+            </div>
+
+            <!-- Competencias -->
+            <div class="stat-card stat-secondary">
+                <div class="stat-header">
+                    <span class="stat-label">Competencias</span>
+                    <span class="material-symbols-outlined text-primary">trophy</span>
+                </div>
+                <div id="competenciasEventos" class="stat-value">0</div>
+                <div class="stat-subtitle">Programadas</div>
+            </div>
+
+            <!-- Entrenamientos -->
+            <div class="stat-card stat-primary">
+                <div class="stat-header">
+                    <span class="stat-label">Entrenamientos</span>
+                    <span class="material-symbols-outlined text-primary">fitness_center</span>
+                </div>
+                <div id="entrenamientosEventos" class="stat-value">0</div>
+                <div class="stat-subtitle">Programados</div>
+            </div>
+
+            <!-- Evaluaciones -->
+            <div class="stat-card stat-secondary">
+                <div class="stat-header">
+                    <span class="stat-label">Evaluaciones</span>
+                    <span class="material-symbols-outlined text-primary">assignment</span>
+                </div>
+                <div id="evaluacionesEventos" class="stat-value">0</div>
+                <div class="stat-subtitle">Programadas</div>
+            </div>
+
+            <!-- Próximos 7 días -->
+            <div class="stat-card stat-primary">
+                <div class="stat-header">
+                    <span class="stat-label">Próximos 7 días</span>
+                    <span class="material-symbols-outlined text-primary">today</span>
+                </div>
+                <div id="proximos7dias" class="stat-value">0</div>
+                <div class="stat-subtitle">Por venir</div>
+            </div>
+
+            <!-- Filtrados -->
+            <div class="stat-card stat-secondary">
+                <div class="stat-header">
+                    <span class="stat-label">Filtrados</span>
+                    <span class="material-symbols-outlined text-primary">filter_list</span>
+                </div>
+                <div id="filtradosEventos" class="stat-value">0</div>
+                <div class="stat-subtitle">Mostrando</div>
+            </div>
+        </div>
+
+        <!-- Filtros y Calendario -->
+        <div class="calendario-layout">
+            <!-- Panel de Filtros -->
+            <div class="filtros-panel">
+                <div class="card">
+                    <!-- FILTRO POR NIVELES -->
+                    <h3 class="filtro-titulo">
+                        <span class="material-symbols-outlined text-primary">filter_alt</span> 
+                        FILTRO POR NIVELES
+                    </h3>
+                    <div class="filtros-container" id="nivelesCheckboxes">
+                        <!-- Los checkboxes se generarán dinámicamente -->
+                    </div>
+                    
+                    <div class="filtro-divider"></div>
+                    
+                    <!-- FILTRO POR GRUPOS -->
+                    <h3 class="filtro-titulo">
+                        <span class="material-symbols-outlined text-primary">layers</span> 
+                        FILTRO POR GRUPOS
+                    </h3>
+                    <div class="filtros-container" id="gruposCheckboxes">
+                        <!-- Los checkboxes se generarán dinámicamente -->
+                    </div>
+                </div>
+                
+                <!-- Próximos Eventos -->
+                <div class="card proximos-card">
+                    <h3 class="filtro-titulo">
+                        <span class="material-symbols-outlined text-primary">schedule</span>
+                        PRÓXIMOS EVENTOS
+                    </h3>
+                    <div class="proximos-container" id="proximosEventos">
+                        <div class="text-center py-4 text-muted">
+                            <span class="material-symbols-outlined">schedule</span>
+                            <p class="text-small mt-2">Cargando eventos...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendario Principal -->
+            <div class="calendario-principal">
+                <div class="card calendario-card">
+                    <!-- Controles del Calendario -->
+                    <div class="calendario-controles">
+                        <div class="controles-left">
+                            <h2 class="mes-titulo" id="currentMonth">
+                                Enero <span class="text-primary">2026</span>
+                            </h2>
+                            <div class="nav-buttons">
+                                <button class="nav-btn" id="prevMonthBtn">
+                                    <span class="material-symbols-outlined">chevron_left</span>
+                                </button>
+                                <button class="nav-btn" id="nextMonthBtn">
+                                    <span class="material-symbols-outlined">chevron_right</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="controles-right">
+                            <button class="btn-secondary-small" id="todayBtn">Hoy</button>
+                            <button class="btn-success-small" id="refreshBtn">
+                                <span class="material-symbols-outlined">refresh</span>
+                                Actualizar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- CABECERA DE DÍAS DE LA SEMANA -->
+                    <div class="calendario-header">
+                        <div class="dia-header">Dom</div>
+                        <div class="dia-header">Lun</div>
+                        <div class="dia-header">Mar</div>
+                        <div class="dia-header">Mié</div>
+                        <div class="dia-header">Jue</div>
+                        <div class="dia-header">Vie</div>
+                        <div class="dia-header">Sáb</div>
+                    </div>
+                    
+                    <!-- GRID DEL CALENDARIO -->
+                    <div class="calendario-grid" id="calendarGrid">
+                        <!-- Los días se generarán dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Información de Estado -->
+                <div class="calendario-footer">
+                    <span id="loadingStatus">Calendario cargado • Enero 2026</span>
+                    <span id="updateTime">Actualizado: --:--</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para Eventos -->
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-panel" id="eventModal">
+        <div class="modal-panel-header">
+            <div>
+                <h3 class="modal-panel-title">
+                    GESTIONAR <span class="text-primary">EVENTO</span>
+                </h3>
+                <p class="modal-panel-subtitle">Panel de Entrenador</p>
+            </div>
+            <button class="modal-close-btn" id="closeModalBtn">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div class="modal-panel-body" id="modalContent">
+            <!-- Contenido dinámico -->
+        </div>
+    </div>
+
+    <!-- Botón de Ayuda -->
+    <button class="floating-help-btn" id="ayudaBtn">
+        <span class="material-symbols-outlined">help</span>
+    </button>
+
+    <!-- Scripts -->
+    <script src="../api.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

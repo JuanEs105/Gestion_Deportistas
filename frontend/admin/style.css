@@ -1,0 +1,907 @@
+/* ==========================================
+   VARIABLES Y CONFIGURACIÓN
+   ========================================== */
+:root {
+    --primary: #E21B23;
+    --primary-light: rgba(226, 27, 35, 0.1);
+    --secondary: #1A1A1A;
+    --dark-grey: #333333;
+    --light-grey: #F8F9FA;
+    --dark-bg: #0A0A0A;
+    --white: #FFFFFF;
+    --grey-100: #F3F4F6;
+    --grey-200: #E5E7EB;
+    --grey-300: #D1D5DB;
+    --grey-400: #9CA3AF;
+    --grey-500: #6B7280;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --info: #3B82F6;
+}
+
+.dark {
+    --light-grey: #0A0A0A;
+    --white: #1A1A1A;
+    --grey-100: #111111;
+    --grey-200: #222222;
+    --grey-300: #333333;
+    --grey-400: #666666;
+    --grey-500: #888888;
+}
+
+/* ==========================================
+   RESET Y BASE
+   ========================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--light-grey);
+    color: var(--secondary);
+    transition: background-color 0.3s, color 0.3s;
+    min-height: 100vh;
+}
+
+.dark body {
+    color: var(--white);
+}
+
+/* ==========================================
+   TIPOGRAFÍA
+   ========================================== */
+.font-display {
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    font-style: italic;
+    letter-spacing: -0.025em;
+}
+
+.sports-heading {
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    font-style: italic;
+    letter-spacing: -0.025em;
+}
+
+/* ==========================================
+   CORRECCIÓN COMPLETA DEL SIDEBAR - TEXTO VISIBLE
+   ========================================== */
+
+/* Asegurar que el sidebar muestre el texto en pantallas grandes */
+@media (min-width: 1024px) {
+    /* Forzar que el texto sea visible en pantallas grandes */
+    .sidebar .font-semibold,
+    .sidebar .logo-text,
+    .sidebar .user-role,
+    .sidebar .user-email,
+    .sidebar .nav-text {
+        opacity: 1 !important;
+        display: inline !important;
+        visibility: visible !important;
+    }
+    
+    /* El sidebar debe tener ancho completo en desktop */
+    .sidebar {
+        width: 16rem !important; /* 256px */
+    }
+    
+    /* El contenido principal debe tener margen completo */
+    .main-content,
+    footer {
+        margin-left: 16rem !important; /* 256px */
+    }
+    
+    /* Mostrar siempre el texto del logo */
+    .logo-text {
+        display: inline !important;
+        opacity: 1 !important;
+    }
+}
+
+/* Sidebar base - siempre visible pero con texto oculto en móvil */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 5rem; /* 80px en móvil */
+    background-color: var(--secondary);
+    color: white;
+    z-index: 40;
+    transition: width 0.3s ease;
+    overflow: hidden;
+}
+
+/* Cuando se hace hover en móvil/tablet, mostrar texto */
+.sidebar:hover {
+    width: 16rem; /* 256px */
+}
+
+.sidebar:hover .font-semibold,
+.sidebar:hover .nav-text,
+.sidebar:hover .logo-text,
+.sidebar:hover .user-details {
+    opacity: 1;
+    display: inline;
+}
+
+/* Texto oculto por defecto (solo en móvil/tablet) */
+.sidebar .font-semibold,
+.sidebar .nav-text,
+.sidebar .logo-text:not(:first-child) {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+}
+
+/* En desktop siempre visible */
+@media (min-width: 1024px) {
+    .sidebar {
+        width: 16rem !important;
+    }
+    
+    .sidebar .font-semibold,
+    .sidebar .nav-text,
+    .sidebar .logo-text,
+    .sidebar .user-details {
+        opacity: 1 !important;
+        display: block !important;
+    }
+}
+
+/* Estilos específicos para elementos del sidebar */
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.5rem 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0 1.5rem;
+    margin-bottom: 2rem;
+    min-height: 3rem;
+}
+
+.logo-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: var(--primary);
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.logo-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.logo-text {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.25rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-style: italic;
+    letter-spacing: -0.025em;
+    white-space: nowrap;
+}
+
+/* Navegación */
+.nav {
+    flex: 1;
+    padding: 0 0.75rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    color: var(--grey-400);
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    white-space: nowrap;
+    margin-bottom: 0.25rem;
+}
+
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.nav-item.active {
+    background-color: var(--primary);
+    color: white;
+}
+
+.nav-text {
+    font-weight: 600;
+    transition: opacity 0.3s;
+}
+
+/* Footer del sidebar */
+.sidebar-footer {
+    margin-top: auto;
+    padding: 1rem 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.user-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.user-details {
+    overflow: hidden;
+    flex: 1;
+}
+
+.user-role {
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-family: 'Oswald', sans-serif;
+    font-style: italic;
+    letter-spacing: -0.025em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: white;
+}
+
+.user-email {
+    font-size: 0.625rem;
+    color: var(--grey-400);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Botones del sidebar */
+.sidebar-btn {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    padding: 0.75rem;
+    background: none;
+    border: none;
+    color: var(--grey-400);
+    cursor: pointer;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.sidebar-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+/* Clase específica para mostrar texto en desktop */
+.lg-show {
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    .lg-show {
+        display: inline !important;
+    }
+}
+
+/* Clase para forzar visibilidad */
+.force-show {
+    display: inline !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* ==========================================
+   AJUSTES PARA EL HTML ACTUAL
+   ========================================== */
+
+/* Corregir clases específicas de tu HTML */
+.hidden.lg\:inline {
+    display: none !important;
+}
+
+@media (min-width: 1024px) {
+    .hidden.lg\:inline {
+        display: inline !important;
+    }
+}
+
+/* Asegurar que todos los textos sean visibles en desktop */
+@media (min-width: 1024px) {
+    /* Mostrar texto del sidebar */
+    .sidebar span.font-semibold,
+    .sidebar .nav-text,
+    .sidebar .logo-text,
+    .sidebar .user-details div {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    
+    /* Mostrar texto de botones */
+    .sidebar button span.font-semibold {
+        display: inline !important;
+    }
+    
+    /* Ajustar padding para que quede bien */
+    .sidebar .p-6 {
+        padding: 1.5rem !important;
+    }
+    
+    .sidebar .px-4 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+}
+
+/* ==========================================
+   SOLUCIÓN DEFINITIVA - SIDEBAR SIMPLIFICADO
+   ========================================== */
+
+/* Sidebar básico que siempre muestra texto en desktop */
+.sidebar-fixed {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    background-color: var(--secondary);
+    color: white;
+    z-index: 40;
+    overflow-y: auto;
+}
+
+/* En móvil: sidebar colapsado */
+@media (max-width: 1023px) {
+    .sidebar-fixed {
+        width: 5rem;
+    }
+    
+    .sidebar-fixed .sidebar-text {
+        display: none;
+    }
+    
+    .sidebar-fixed:hover {
+        width: 16rem;
+    }
+    
+    .sidebar-fixed:hover .sidebar-text {
+        display: inline;
+    }
+}
+
+/* En desktop: sidebar expandido siempre */
+@media (min-width: 1024px) {
+    .sidebar-fixed {
+        width: 16rem;
+    }
+    
+    .sidebar-fixed .sidebar-text {
+        display: inline !important;
+    }
+}
+
+/* ==========================================
+   LOADING OVERLAY
+   ========================================== */
+#loadingOverlay {
+    animation: fadeIn 0.2s ease-out;
+    backdrop-filter: blur(4px);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* ==========================================
+   STATS CARDS
+   ========================================== */
+.stat-card {
+    background-color: var(--white);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.dark .stat-card {
+    background-color: var(--dark-grey);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.dark .stat-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.stat-primary {
+    border-bottom: 4px solid var(--primary);
+}
+
+.stat-secondary {
+    border-bottom: 4px solid var(--secondary);
+}
+
+.dark .stat-secondary {
+    border-bottom-color: var(--white);
+}
+
+.stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.stat-label {
+    color: var(--grey-500);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.dark .stat-label {
+    color: var(--grey-400);
+}
+
+.stat-value {
+    font-family: 'Oswald', sans-serif;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: var(--secondary);
+}
+
+.dark .stat-value {
+    color: var(--white);
+}
+
+.stat-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.positive {
+    color: var(--success);
+}
+
+.stat-description {
+    font-size: 0.75rem;
+    color: var(--grey-400);
+    font-style: italic;
+}
+
+/* ==========================================
+   BOTONES
+   ========================================== */
+.btn-refresh {
+    transition: all 0.2s ease;
+}
+
+.btn-refresh:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(226, 27, 35, 0.3);
+}
+
+.btn-refresh:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* ==========================================
+   CARDS
+   ========================================== */
+.card {
+    background-color: var(--white);
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.dark .card {
+    background-color: var(--dark-grey);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card-featured {
+    border-left: 4px solid var(--primary);
+}
+
+.card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--grey-200);
+}
+
+.dark .card-header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.bg-dark {
+    background-color: var(--secondary);
+    color: var(--white);
+    border-bottom: none;
+}
+
+.card-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.25rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-style: italic;
+    letter-spacing: -0.025em;
+    margin-bottom: 0.25rem;
+}
+
+.dark .card-title {
+    color: var(--white);
+}
+
+.card-subtitle {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--grey-500);
+}
+
+.dark .card-subtitle {
+    color: var(--grey-400);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* ==========================================
+   CHART
+   ========================================== */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+.chart-buttons {
+    transition: all 0.2s ease;
+}
+
+.chart-button {
+    transition: all 0.2s ease;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.chart-button.active {
+    background-color: var(--primary);
+    color: white;
+}
+
+.chart-button:not(.active):hover {
+    background-color: rgba(226, 27, 35, 0.1);
+}
+
+.dark .chart-button:not(.active):hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================
+   ACTIVITY LIST
+   ========================================== */
+.activity-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.activity-empty {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: var(--grey-400);
+}
+
+.activity-item {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    transition: all 0.2s ease;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary), #ff6b6b);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-family: 'Oswald', sans-serif;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(226, 27, 35, 0.3);
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-title {
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+}
+
+.activity-description {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.25rem;
+}
+
+.activity-time {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+}
+
+/* ==========================================
+   QUICK ACTIONS
+   ========================================== */
+.quick-action {
+    background-color: var(--grey-100);
+    border: 1px solid var(--grey-200);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    display: block;
+}
+
+.dark .quick-action {
+    background-color: var(--grey-300);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.quick-action:hover {
+    background-color: var(--grey-200);
+    transform: translateY(-5px);
+    border-color: var(--primary);
+}
+
+.dark .quick-action:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.quick-action-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.quick-action-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--secondary);
+}
+
+.dark .quick-action-title {
+    color: var(--white);
+}
+
+.quick-action-desc {
+    font-size: 0.875rem;
+    color: var(--grey-500);
+}
+
+.dark .quick-action-desc {
+    color: var(--grey-400);
+}
+
+/* ==========================================
+   FOOTER
+   ========================================== */
+footer {
+    transition: margin-left 0.3s ease;
+}
+
+/* ==========================================
+   FLOATING HELP BUTTON
+   ========================================== */
+.floating-help-btn {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* ==========================================
+   NOTIFICATIONS
+   ========================================== */
+#notificationContainer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+}
+
+.notification {
+    background: var(--white);
+    color: var(--secondary);
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideIn 0.3s ease-out;
+    font-weight: 500;
+    min-width: 300px;
+}
+
+.dark .notification {
+    background: var(--dark-grey);
+    color: var(--white);
+}
+
+.notification.success {
+    border-left: 4px solid var(--success);
+}
+
+.notification.error {
+    border-left: 4px solid var(--danger);
+}
+
+.notification.warning {
+    border-left: 4px solid var(--warning);
+}
+
+.notification.info {
+    border-left: 4px solid var(--info);
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+/* ==========================================
+   UTILITY CLASSES
+   ========================================== */
+.transition-all {
+    transition: all 0.3s ease-in-out;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================
+   SCROLLBAR
+   ========================================== */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--grey-300);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--grey-400);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: var(--grey-500);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: var(--grey-400);
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+@media (max-width: 768px) {
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 1.75rem;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+    
+    .quick-action {
+        padding: 1rem;
+    }
+    
+    .quick-action-icon {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .quick-action-title {
+        font-size: 1rem;
+    }
+}

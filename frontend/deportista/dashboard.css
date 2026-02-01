@@ -1,0 +1,268 @@
+/* ===================================
+   DASHBOARD DEPORTISTA - CSS
+   =================================== */
+
+:root {
+    --primary-red: #E21B23;
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.text-sport-stroke {
+    -webkit-text-stroke: 1px currentColor;
+}
+
+/* ===================================
+   ANIMACIONES
+   =================================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+.loading-skeleton {
+    background: linear-gradient(
+        90deg,
+        #f0f0f0 25%,
+        #e0e0e0 50%,
+        #f0f0f0 75%
+    );
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ===================================
+   CARDS DE EVALUACIONES
+   =================================== */
+
+.evaluacion-card {
+    transition: all 0.3s ease;
+}
+
+.evaluacion-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.evaluacion-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.evaluacion-badge.completada {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.evaluacion-badge.pendiente {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.puntuacion-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #E21B23 0%, #C4161D 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(226, 27, 35, 0.3);
+}
+
+/* ===================================
+   BADGES DE ESTADO
+   =================================== */
+
+.badge-estado {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.badge-estado.activo {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.badge-estado.lesionado {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.badge-estado.descanso {
+    background: #DBEAFE;
+    color: #1E40AF;
+}
+
+.badge-estado.pendiente {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.badge-estado.pendiente_de_pago {
+    background: #FED7AA;
+    color: #C2410C;
+}
+
+/* ===================================
+   NIVELES
+   =================================== */
+
+.nivel-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+}
+
+.nivel-baby_titans {
+    background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+    color: #991B1B;
+}
+
+.nivel-1_basico {
+    background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+    color: #1E40AF;
+}
+
+.nivel-1_medio {
+    background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+    color: #065F46;
+}
+
+.nivel-1_avanzado {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    color: #92400E;
+}
+
+.nivel-2, .nivel-3, .nivel-4 {
+    background: linear-gradient(135deg, #E0E7FF 0%, #C7D2FE 100%);
+    color: #3730A3;
+}
+
+/* ===================================
+   RESPONSIVE
+   =================================== */
+
+@media (max-width: 768px) {
+    .puntuacion-circle {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+}
+
+/* ===================================
+   DARK MODE
+   =================================== */
+
+.dark .loading-skeleton {
+    background: linear-gradient(
+        90deg,
+        #2D3748 25%,
+        #1A202C 50%,
+        #2D3748 75%
+    );
+    background-size: 200% 100%;
+}
+
+.dark .evaluacion-card:hover {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ===================================
+   UTILIDADES
+   =================================== */
+
+.truncate-2-lines {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}

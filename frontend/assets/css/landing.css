@@ -1,0 +1,650 @@
+/* Variables CSS */
+:root {
+    --primary: #FF0000;
+    --primary-dark: #CC0000;
+    --deepBlack: #050505;
+    --cardBlack: #0F0F0F;
+    --white: #FFFFFF;
+    --gray-light: #E5E5E5;
+    --gray: #9CA3AF;
+    --gray-dark: #6B7280;
+}
+
+/* Reset y Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Clases de utilidad */
+.font-sport {
+    font-family: 'Oswald', sans-serif;
+    font-style: italic;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+}
+
+.neon-red {
+    color: var(--primary);
+    text-shadow: 
+        0 0 10px rgba(255, 0, 0, 0.7),
+        0 0 20px rgba(255, 0, 0, 0.5),
+        0 0 30px rgba(255, 0, 0, 0.3);
+}
+
+.angular-clip {
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+}
+
+.angular-clip-left {
+    clip-path: polygon(0 0, 90% 0, 100% 100%, 10% 100%);
+}
+
+.btn-shine {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-shine::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 20%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: rotate(30deg);
+    transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.btn-shine:hover::after {
+    left: 120%;
+}
+
+.grid-overlay {
+    background-image: 
+        linear-gradient(rgba(255, 0, 0, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+/* Navbar */
+.navbar {
+    transition: all 0.3s ease;
+}
+
+.navbar.scrolled {
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(20px);
+}
+
+.nav-link {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: white;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: var(--primary);
+}
+
+.nav-btn {
+    position: relative;
+    overflow: hidden;
+    background: white;
+    color: black;
+    padding: 0.75rem 1.5rem;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+    transition: transform 0.3s ease;
+}
+
+.nav-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Hero Section */
+.hero-section {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section img,
+.hero-section video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Botones */
+.btn-primary {
+    position: relative;
+    overflow: hidden;
+    background: var(--primary);
+    color: white;
+    padding: 1rem 2rem;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.125rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(255, 0, 0, 0.3);
+}
+
+.btn-secondary {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 1rem 2rem;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.125rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+    transition: all 0.3s ease;
+    background: transparent;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: white;
+    color: black;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2);
+}
+
+/* Secciones */
+.section-padding {
+    padding: 5rem 0;
+}
+
+@media (min-width: 1024px) {
+    .section-padding {
+        padding: 8rem 0;
+    }
+}
+
+/* Info Icon */
+.info-icon {
+    width: 4rem;
+    height: 4rem;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.info-icon:hover {
+    background: var(--primary);
+}
+
+/* CTA Section */
+.cta-section {
+    position: relative;
+    background-color: var(--primary);
+    overflow: hidden;
+}
+
+.btn-cta-primary {
+    position: relative;
+    overflow: hidden;
+    background: black;
+    color: white;
+    padding: 1.25rem 3rem;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-cta-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.btn-cta-secondary {
+    border: 4px solid black;
+    color: black;
+    padding: 1.25rem 3rem;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+    transition: all 0.3s ease;
+    background: transparent;
+    cursor: pointer;
+}
+
+.btn-cta-secondary:hover {
+    background: black;
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Footer */
+.footer {
+    background-color: var(--deepBlack);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-link {
+    color: var(--gray);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+    color: var(--primary);
+}
+
+.footer-legal-link {
+    color: var(--gray-dark);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+}
+
+.footer-legal-link:hover {
+    color: white;
+}
+
+.social-link {
+    width: 3rem;
+    height: 3rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.25rem;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.social-link:hover {
+    background: var(--primary);
+    transform: translateY(-2px);
+    border-color: var(--primary);
+}
+
+.footer-bottom {
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    color: var(--gray-dark);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@media (min-width: 768px) {
+    .footer-bottom {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+/* WhatsApp Button */
+.whatsapp-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 4rem;
+    height: 4rem;
+    background: #25D366;
+    color: white;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.3);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    text-decoration: none;
+}
+
+.whatsapp-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(37, 211, 102, 0.4);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 1s ease-out;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(10px);
+    }
+}
+
+.animate-bounce {
+    animation: bounce 2s infinite;
+}
+
+@keyframes ping {
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+.animate-ping {
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-ping-slow {
+    animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Imágenes responsive */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Mejoras para imágenes grandes */
+.object-center {
+    object-position: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 3.5rem !important;
+        line-height: 1 !important;
+    }
+    
+    .hero-section h2 {
+        font-size: 2.5rem !important;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .section-padding {
+        padding: 3rem 0;
+    }
+    
+    .whatsapp-btn {
+        width: 3.5rem;
+        height: 3.5rem;
+        bottom: 1.5rem;
+        right: 1.5rem;
+    }
+}
+
+/* Material Icons Fix */
+.material-symbols-outlined {
+    font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+/* Contador */
+.counter {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Efectos hover */
+.group:hover .group-hover\:translate-x-2 {
+    transform: translateX(0.5rem);
+}
+
+/* Performance */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+.w-6.h-10 {
+    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.2);
+}
+/* Ajustes para el nuevo hero */
+.hero-section {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+}
+
+/* Para que el video mantenga relación de aspecto */
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Media queries para responsive */
+@media (max-width: 1024px) {
+    .hero-section .grid {
+        gap: 3rem !important;
+    }
+    
+    .skewed-image-frame {
+        transform: skewX(-10deg) !important;
+    }
+    
+    video {
+        transform: skewX(10deg) scale(1.05) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        min-height: auto;
+        padding-top: 6rem;
+        padding-bottom: 4rem;
+    }
+    
+    .hero-section .grid {
+        grid-template-columns: 1fr !important;
+        gap: 2rem !important;
+    }
+    
+    .skewed-image-frame {
+        transform: skewX(-8deg) !important;
+    }
+    
+    video {
+        transform: skewX(8deg) scale(1.03) !important;
+    }
+}
+/* Timeline Styles */
+.timeline-line {
+    background: linear-gradient(to bottom, #FF0000 0%, #FF0000 50%, #1a1a1a 100%);
+}
+
+/* Masonry Gallery */
+.masonry {
+    column-count: 3;
+    column-gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+    .masonry {
+        column-count: 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .masonry {
+        column-count: 1;
+    }
+}
+
+.masonry-item {
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 1.5rem;
+    break-inside: avoid;
+}
+
+/* Historia specific */
+.mt-24 {
+    margin-top: 6rem;
+}
+
+/* Gradient overlay for images */
+.gradient-overlay {
+    background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%);
+}
+
+/* Shadow for timeline dots */
+.shadow-glow {
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+}
+
+/* Responsive timeline */
+@media (max-width: 768px) {
+    .timeline-line {
+        left: 2rem !important;
+    }
+    
+    .md\:w-1\/2 {
+        width: 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        text-align: left !important;
+    }
+    
+    .md\:pr-12, .md\:pl-12 {
+        padding-right: 0 !important;
+        padding-left: 0 !important;
+    }
+    
+    .flex-col.md\:flex-row-reverse {
+        flex-direction: column !important;
+    }
+    
+    .flex-col.md\:flex-row {
+        flex-direction: column !important;
+    }
+}
+/* ==========================================
+   CORRECCIONES ESPECÍFICAS PARA HISTORIA
+   ========================================== */
+
+/* Quitar movimientos problemáticos */
+* {
+    transform-style: flat !important;
+}
+
+/* Navbar fijo */
+.navbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+    will-change: auto !important;
+}
+
+/* Ajustar body para navbar fijo */
+body {
+    padding-top: 96px !important;
+}
+
+/* Quitar parallax problemático */
+.hero-section,
+.section-padding,
+.masonry,
+.masonry-item {
+    transform: none !important;
+    position: static !important;
+}
+
+/* Timeline fijo */
+.timeline-line {
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    will-change: auto !important;
+}
+
+/* Timeline responsive */
+@media (max-width: 768px) {
+    .timeline-line {
+        left: 2rem !important;
+        transform: none !important;
+    }
+    
+    body {
+        padding-top: 88px !important;
+    }
+}
+
+/* Ajustes para hero de historia */
+header.relative.h-\[70vh\] {
+    margin-top: 0 !important;
+}
+
+/* Mejorar rendimiento de animaciones */
+.hover\:scale-105 {
+    transition: transform 0.3s ease !important;
+}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selección de Rol | Titanes Evolution</title>
+    
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="../shared/css/main.css">
+    <link rel="stylesheet" href="../shared/css/acceso.css">
+</head>
+<body class="acceso-body">
+    <!-- Botón Volver (superior derecha) -->
+    <a href="../index.html" class="btn-volver-inicio">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Volver al Inicio
+    </a>
+    
+    <div class="acceso-hero">
+        <!-- Background -->
+        <div class="acceso-hero-bg"></div>
+        
+        <!-- Header -->
+        <header class="acceso-header">
+            <div class="acceso-logo-container">
+                <div class="acceso-logo-circle">
+                    <img src="../assets/images/logo titanes.jpg" 
+                         alt="Titanes Evolution" class="acceso-logo-img">
+                </div>
+                <div class="acceso-logo-text-container">
+                    <h1 class="acceso-logo-text">
+                        Titanes<span class="acceso-logo-red">Evolution</span>
+                    </h1>
+                    <p class="acceso-subtitle">Sistema de Alto Rendimiento</p>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="acceso-main">
+            <div class="acceso-title-container">
+                <h2 class="acceso-title">
+                    Bienvenido al Portal de <span class="acceso-title-accent">Acceso</span>
+                </h2>
+                <div class="acceso-divider"></div>
+                <p class="acceso-description">
+                    Selecciona tu perfil para ingresar al sistema de gestión y seguimiento.
+                </p>
+            </div>
+            
+            <div class="acceso-roles-grid">
+                <!-- Administrador -->
+                <a href="login-admin.html" class="acceso-role-card">
+                    <div class="acceso-role-icon">
+                        <span class="material-symbols-outlined">admin_panel_settings</span>
+                    </div>
+                    <h3 class="acceso-role-title">Administrador</h3>
+                    <p class="acceso-role-description">
+                        Gestión Global, Finanzas y Configuración del Sistema
+                    </p>
+                    <span class="acceso-role-link">
+                        Entrar <span class="material-symbols-outlined">arrow_forward</span>
+                    </span>
+                </a>
+                
+                <!-- Entrenador -->
+                <a href="acceso-entrenador.html" class="acceso-role-card acceso-role-card-active">
+                    <div class="acceso-role-icon">
+                        <span class="material-symbols-outlined">fitness_center</span>
+                    </div>
+                    <h3 class="acceso-role-title">Entrenador</h3>
+                    <p class="acceso-role-description">
+                        Evaluaciones, Seguimiento de Skills y Planificación
+                    </p>
+                    <span class="acceso-role-link">
+                        Entrar <span class="material-symbols-outlined">arrow_forward</span>
+                    </span>
+                </a>
+                
+                <!-- Deportista -->
+                <a href="acceso-deportista.html" class="acceso-role-card">
+                    <div class="acceso-role-icon">
+                        <span class="material-symbols-outlined">person</span>
+                    </div>
+                    <h3 class="acceso-role-title">Deportista</h3>
+                    <p class="acceso-role-description">
+                        Progreso Personal, Metas y Calendario de Entrenos
+                    </p>
+                    <span class="acceso-role-link">
+                        Entrar <span class="material-symbols-outlined">arrow_forward</span>
+                    </span>
+                </a>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="acceso-footer">
+            <div class="acceso-footer-content">
+                <span class="acceso-copyright">© 2024 Titanes Evolution</span>
+                <div class="acceso-footer-links">
+                    <a href="#" class="acceso-footer-link">Términos de Uso</a>
+                    <a href="#" class="acceso-footer-link">Privacidad</a>
+                    <a href="#" class="acceso-footer-link">Soporte</a>
+                </div>
+            </div>
+        </footer>
+        
+        <!-- Help Button -->
+        <button class="acceso-help-button">
+            <span class="material-symbols-outlined">help</span>
+        </button>
+    </div>
+    
+    <!-- Script -->
+    <script src="acceso.js"></script>
+</body>
+</html>

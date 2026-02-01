@@ -24,9 +24,14 @@ const User = sequelize.define('User', {
     }
   },
   password: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
+  type: DataTypes.STRING,
+  allowNull: true,          // ✅ Esto ya está
+  defaultValue: null,       // ✅ Esto también
+  validate: {
+    // Quitar la validación de longitud mínima para permitir NULL
+    len: [0, 100]  // Cambiar de [6, 100] a [0, 100]
+  }
+},
   role: {
     type: DataTypes.ENUM('entrenador', 'deportista', 'admin'),
     defaultValue: 'deportista'
@@ -45,10 +50,30 @@ const User = sequelize.define('User', {
     comment: 'Indica si aceptó términos y condiciones'
   },
   niveles_asignados: {
-    type: DataTypes.ARRAY(DataTypes.STRING),
-    allowNull: true,
+    type: DataTypes.JSON,
+    allowNull: false,
     defaultValue: [],
-    comment: 'Niveles que puede gestionar este entrenador'
+    comment: 'Niveles que puede gestionar este entrenador',
+    get() {
+      const rawValue = this.getDataValue('niveles_asignados');
+      return Array.isArray(rawValue) ? rawValue : [];
+    }
+  },
+  grupos_competitivos: {
+    type: DataTypes.JSON,
+    allowNull: false,
+    defaultValue: [],
+    comment: 'Equipos competitivos asignados',
+    get() {
+      const rawValue = this.getDataValue('grupos_competitivos');
+      return Array.isArray(rawValue) ? rawValue : [];
+    }
+  },
+  foto_perfil: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: null,
+    comment: 'URL de la foto de perfil del usuario'
   },
   reset_password_code: {
     type: DataTypes.STRING,
@@ -59,7 +84,27 @@ const User = sequelize.define('User', {
     type: DataTypes.DATE,
     allowNull: true,
     comment: 'Fecha de expiración del código'
-  }
+  },
+  verification_token: {
+  type: DataTypes.STRING,
+  allowNull: true,
+  comment: 'Token para verificación de registro'
+},
+verification_token_expires: {
+  type: DataTypes.DATE,
+  allowNull: true,
+  comment: 'Fecha de expiración del token de verificación'
+},
+requiere_registro: {
+  type: DataTypes.BOOLEAN,
+  defaultValue: false,
+  comment: 'Indica si el entrenador debe completar su registro'
+},
+token_registro: {
+  type: DataTypes.STRING,
+  allowNull: true,
+  comment: 'Token temporal para el enlace de registro'
+}
 }, {
   tableName: 'users',
   timestamps: true,
@@ -67,46 +112,103 @@ const User = sequelize.define('User', {
   createdAt: 'created_at',
   updatedAt: 'updated_at',
   hooks: {
+    // ✅ CORRECCIÓN: Solo hashear si NO está ya hasheado
     beforeCreate: async (user) => {
-      if (user.password) {
+      if (user.password && !user.password.startsWith('$2a$') && !user.password.startsWith('$2b$')) {
+        console.log('🔐 Hook beforeCreate: Hasheando contraseña...');
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(user.password, salt);
+        console.log('✅ Contraseña hasheada en beforeCreate');
+      } else if (user.password && user.password.startsWith('$2')) {
+        console.log('⚠️  Contraseña ya está hasheada, saltando hash en beforeCreate');
       }
     },
+    
+    // ✅ CORRECCIÓN: Solo hashear si NO está ya hasheado
     beforeUpdate: async (user) => {
-      if (user.changed('password')) {
-        console.log('🔐 Hook beforeUpdate: Hasheando nueva contraseña...');
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(user.password, salt);
-        console.log('✅ Contraseña hasheada en el hook');
+      if (user.changed('password') && user.password) {
+        // 🔥 CRÍTICO: Verificar si ya está hasheado
+        if (!user.password.startsWith('$2a$') && !user.password.startsWith('$2b$')) {
+          console.log('🔐 Hook beforeUpdate: Hasheando nueva contraseña...');
+          const salt = await bcrypt.genSalt(10);
+          user.password = await bcrypt.hash(user.password, salt);
+          console.log('✅ Contraseña hasheada en beforeUpdate');
+        } else {
+          console.log('⚠️  Contraseña ya está hasheada, saltando hash en beforeUpdate');
+        }
       }
     }
   }
 });
 
-// ✅ CORREGIDO: Asociaciones completas según instrucciones
+// Asociaciones y métodos
 User.associate = function (models) {
-  // Relación con Deportista
   User.hasOne(models.Deportista, {
     foreignKey: 'user_id',
     as: 'deportista',
     onDelete: 'CASCADE'
   });
-  
-  // ⚠️ Comentado porque no hay modelos separados para Entrenador/Admin
-  // Pero si en algún momento los creas, descomenta estas líneas:
-  
-  // User.hasOne(models.Entrenador, {
-  //   foreignKey: 'user_id',
-  //   as: 'entrenador',
-  //   onDelete: 'CASCADE'
-  // });
-  
-  // User.hasOne(models.Administrador, {
-  //   foreignKey: 'user_id',
-  //   as: 'administrador',
-  //   onDelete: 'CASCADE'
-  // });
+
+  // ✅ MÉTODO DE VALIDACIÓN
+  User.prototype.validarPassword = async function (password) {
+    try {
+      if (!this.password) {
+        console.warn('⚠️  El usuario no tiene contraseña configurada');
+        return false;
+      }
+
+      if (!password || password.trim() === '') {
+        console.warn('⚠️  Contraseña proporcionada vacía');
+        return false;
+      }
+
+      const esValida = await bcrypt.compare(password, this.password);
+      return esValida;
+
+    } catch (error) {
+      console.error('❌ Error en validarPassword:', error);
+      return false;
+    }
+  };
+
+  // ✅ MÉTODO PARA CAMBIAR CONTRASEÑA
+  User.prototype.cambiarPassword = async function (passwordActual, passwordNueva) {
+    try {
+      const esValida = await this.validarPassword(passwordActual);
+      if (!esValida) {
+        throw new Error('Contraseña actual incorrecta');
+      }
+
+      const mismaContraseña = await bcrypt.compare(passwordNueva, this.password);
+      if (mismaContraseña) {
+        throw new Error('La nueva contraseña debe ser diferente a la actual');
+      }
+
+      if (passwordNueva.length < 6) {
+        throw new Error('La nueva contraseña debe tener al menos 6 caracteres');
+      }
+
+      // El hook beforeUpdate se encargará del hash
+      this.password = passwordNueva;
+      await this.save();
+
+      console.log('✅ Contraseña cambiada exitosamente');
+      return true;
+
+    } catch (error) {
+      console.error('❌ Error en cambiarPassword:', error);
+      throw error;
+    }
+  };
+
+  // ✅ MÉTODO toJSON (ocultar campos sensibles)
+  User.prototype.toJSON = function () {
+    const values = Object.assign({}, this.get());
+    delete values.password;
+    delete values.reset_password_code;
+    delete values.reset_password_expires;
+    return values;
+  };
 };
 
 module.exports = User;

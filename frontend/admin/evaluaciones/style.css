@@ -1,0 +1,318 @@
+/* ===== ESTILOS ESPECÍFICOS PARA EVALUACIONES ===== */
+
+/* Efectos hover para filas */
+.skill-row {
+    transition: background-color 0.2s ease;
+}
+
+.skill-row:hover {
+    background-color: rgba(226, 27, 35, 0.03);
+}
+
+/* Barras de progreso */
+.progreso-bar {
+    transition: width 0.5s ease-in-out;
+}
+
+/* Estrellas de calificación */
+.star-filled {
+    color: #fbbf24;
+    font-variation-settings: 'FILL' 1;
+}
+
+.star-empty {
+    color: #d1d5db;
+}
+
+/* Estados */
+.estado-dominado {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #10b981;
+}
+
+.estado-proceso {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #f59e0b;
+}
+
+.estado-iniciado {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #3b82f6;
+}
+
+.estado-pendiente {
+    background-color: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+/* Tabs activas */
+.categoria-activa {
+    border-bottom: 4px solid #E21B23 !important;
+    color: #E21B23 !important;
+    font-weight: 600;
+}
+
+/* Tarjetas de estadísticas */
+.stats-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.dark .stats-card:hover {
+    box-shadow: 0 10px 25px rgba(255, 255, 255, 0.05);
+}
+
+/* Información del deportista */
+#deportistaInfo {
+    background: linear-gradient(135deg, #E21B23 0%, #C4161D 100%);
+    box-shadow: 0 10px 30px rgba(226, 27, 35, 0.2);
+}
+
+/* ESTILOS PARA BUSCADOR DE DEPORTISTAS */
+#buscadorDeportista {
+    padding-right: 40px; /* Espacio para el icono */
+}
+
+#buscadorDeportista:focus {
+    outline: none;
+    border-color: #E21B23;
+    box-shadow: 0 0 0 3px rgba(226, 27, 35, 0.1);
+}
+
+#resultadosBusqueda {
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+#resultadosBusqueda::-webkit-scrollbar {
+    width: 6px;
+}
+
+#resultadosBusqueda::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#resultadosBusqueda::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.dark #resultadosBusqueda::-webkit-scrollbar-track {
+    background: #374151;
+}
+
+.dark #resultadosBusqueda::-webkit-scrollbar-thumb {
+    background: #4b5563;
+}
+
+/* Hover en resultados de búsqueda */
+#resultadosBusqueda > div:hover {
+    background-color: rgba(226, 27, 35, 0.05);
+}
+
+/* Scroll personalizado para lista de evaluaciones */
+#listaEvaluaciones {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+#listaEvaluaciones::-webkit-scrollbar {
+    width: 6px;
+}
+
+#listaEvaluaciones::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#listaEvaluaciones::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.dark #listaEvaluaciones::-webkit-scrollbar-track {
+    background: #374151;
+}
+
+.dark #listaEvaluaciones::-webkit-scrollbar-thumb {
+    background: #4b5563;
+}
+
+/* Animaciones de carga */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.skill-row {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { 
+        opacity: 0; 
+        transform: translateY(-10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+#resultadosBusqueda:not(.hidden) {
+    animation: slideDown 0.2s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stats-card {
+        text-align: center;
+    }
+    
+    #deportistaInfo {
+        padding: 1rem;
+    }
+    
+    #deportistaInfo .flex {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .categoria-activa {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    #resultadosBusqueda {
+        max-height: 200px;
+    }
+}
+
+/* Modal */
+#modalDetalle {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Botón flotante de ayuda */
+.floating-help-btn {
+    transition: all 0.3s ease;
+}
+
+.floating-help-btn:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 8px 25px rgba(226, 27, 35, 0.3);
+}
+
+/* Loading overlay */
+#loadingOverlay {
+    backdrop-filter: blur(4px);
+}
+
+/* Mejoras visuales para modo oscuro */
+.dark #buscadorDeportista {
+    background-color: #18181b;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.dark #buscadorDeportista:focus {
+    border-color: #E21B23;
+    box-shadow: 0 0 0 3px rgba(226, 27, 35, 0.2);
+}
+
+.dark #resultadosBusqueda {
+    background-color: #18181b;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.dark #resultadosBusqueda > div:hover {
+    background-color: rgba(226, 27, 35, 0.1);
+}
+
+/* Efectos de enfoque mejorados */
+select:focus,
+input:focus {
+    outline: none;
+    border-color: #E21B23;
+    box-shadow: 0 0 0 3px rgba(226, 27, 35, 0.1);
+}
+
+.dark select:focus,
+.dark input:focus {
+    box-shadow: 0 0 0 3px rgba(226, 27, 35, 0.2);
+}
+
+/* Transiciones suaves */
+* {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Evitar transiciones en animaciones de carga */
+.progreso-bar {
+    transition-property: width;
+    transition-duration: 500ms;
+}
+
+/* Mejoras de accesibilidad */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 2px solid #E21B23;
+    outline-offset: 2px;
+}
+
+/* Tooltips (si se implementan) */
+[data-tooltip] {
+    position: relative;
+    cursor: help;
+}
+
+[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.5rem 1rem;
+    background-color: #1f2937;
+    color: white;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-bottom: 0.5rem;
+}
+
+/* Estados de carga */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.dark .skeleton {
+    background: linear-gradient(90deg, #27272a 25%, #3f3f46 50%, #27272a 75%);
+    background-size: 200% 100%;
+}

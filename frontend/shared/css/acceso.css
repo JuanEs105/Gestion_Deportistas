@@ -1,0 +1,432 @@
+/* ==========================================
+   ESTILOS SELECCIÓN DE ROL - TITANES EVOLUTION
+   ========================================== */
+
+/* Variables específicas */
+:root {
+    --primary-red: #E21B23;
+    --secondary-black: #1A1A1A;
+    --background-dark: #0A0A0A;
+    --gray-400: #9CA3AF;
+    --gray-500: #6B7280;
+}
+
+/* Estilos del body */
+.acceso-body {
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: var(--background-dark);
+}
+
+/* Hero Container */
+.acceso-hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.acceso-hero-bg {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), 
+                url('https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&q=80&w=1920');
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+}
+
+/* Header */
+.acceso-header {
+    padding: 2rem 3rem;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 10;
+}
+
+@media (max-width: 768px) {
+    .acceso-header {
+        padding: 1.5rem;
+    }
+}
+
+.acceso-logo-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.acceso-logo-circle {
+    width: 4rem;
+    height: 4rem;
+    background: var(--primary-red);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .acceso-logo-circle {
+        width: 3rem;
+        height: 3rem;
+    }
+}
+
+.acceso-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.1);
+}
+
+.acceso-logo-text-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.acceso-logo-text {
+    font-family: 'Oswald', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    line-height: 1;
+}
+
+@media (max-width: 768px) {
+    .acceso-logo-text {
+        font-size: 1.75rem;
+    }
+}
+
+.acceso-logo-red {
+    color: var(--primary-red);
+}
+
+.acceso-subtitle {
+    font-size: 0.75rem;
+    font-weight: bold;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-top: 0.25rem;
+    padding-left: 0.25rem;
+}
+
+/* Main Content */
+.acceso-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1.5rem 3rem;
+    position: relative;
+    z-index: 10;
+}
+
+.acceso-title-container {
+    margin-bottom: 3rem;
+    text-align: center;
+    max-width: 32rem;
+}
+
+.acceso-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.875rem;
+    font-weight: 700;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: -0.025em;
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+    .acceso-title {
+        font-size: 2.25rem;
+    }
+}
+
+.acceso-title-accent {
+    color: var(--primary-red);
+}
+
+.acceso-divider {
+    height: 0.25rem;
+    width: 5rem;
+    background: var(--primary-red);
+    margin: 0 auto 1.5rem;
+}
+
+.acceso-description {
+    color: var(--gray-400);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+}
+
+@media (min-width: 768px) {
+    .acceso-description {
+        font-size: 1rem;
+    }
+}
+
+/* Roles Grid */
+.acceso-roles-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    width: 100%;
+    max-width: 72rem;
+}
+
+@media (min-width: 768px) {
+    .acceso-roles-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Role Cards */
+.acceso-role-card {
+    background: rgba(26, 26, 26, 0.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5rem solid transparent;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    color: white;
+    text-decoration: none;
+    position: relative;
+}
+
+/* ESTO ES LO IMPORTANTE: Eliminar o comentar la clase .acceso-role-card-active 
+   para que no tenga estilos permanentes */
+/*
+.acceso-role-card-active {
+    border-color: var(--primary-red);
+}
+*/
+
+.acceso-role-card:hover {
+    transform: translateY(-0.5rem);
+    border-color: var(--primary-red);
+    box-shadow: 0 0 30px rgba(226, 27, 35, 0.2);
+}
+
+.acceso-role-icon {
+    width: 6rem;
+    height: 6rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.acceso-role-card:hover .acceso-role-icon {
+    color: var(--primary-red);
+    transform: scale(1.1);
+}
+
+/* Eliminar también este selector si quieres que el icono solo cambie al hover */
+/*
+.acceso-role-card-active .acceso-role-icon {
+    background: rgba(226, 27, 35, 0.1);
+    color: var(--primary-red);
+}
+*/
+
+.acceso-role-icon .material-symbols-outlined {
+    font-size: 3rem;
+    font-variation-settings: 'wght' 300;
+}
+
+.acceso-role-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: -0.05em;
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+    .acceso-role-title {
+        font-size: 1.875rem;
+    }
+}
+
+.acceso-role-description {
+    color: var(--gray-400);
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    flex: 1;
+}
+
+.acceso-role-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary-red);
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 900;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.acceso-role-card:hover .acceso-role-link {
+    opacity: 1;
+}
+
+/* Eliminar esto para que el enlace solo se vea al hover */
+/*
+.acceso-role-card-active .acceso-role-link {
+    opacity: 1;
+}
+*/
+
+.acceso-role-link .material-symbols-outlined {
+    font-size: 0.875rem;
+}
+
+/* Footer */
+.acceso-footer {
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+}
+
+.acceso-footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .acceso-footer-content {
+        flex-direction: row;
+        justify-content: center;
+        gap: 3rem;
+    }
+}
+
+.acceso-copyright {
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--gray-500);
+}
+
+.acceso-footer-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.acceso-footer-link {
+    color: var(--gray-500);
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.acceso-footer-link:hover {
+    color: var(--primary-red);
+}
+
+/* Help Button */
+.acceso-help-button {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    background: var(--primary-red);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(226, 27, 35, 0.4);
+    transition: all 0.3s ease;
+    z-index: 50;
+}
+
+.acceso-help-button:hover {
+    transform: scale(1.1) rotate(12deg);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .acceso-role-card {
+        padding: 1.5rem;
+    }
+    
+    .acceso-role-icon {
+        width: 4.5rem;
+        height: 4.5rem;
+    }
+    
+    .acceso-role-title {
+        font-size: 1.25rem;
+    }
+    
+    .acceso-role-description {
+        font-size: 0.7rem;
+    }
+    
+    .acceso-help-button {
+        width: 3rem;
+        height: 3rem;
+        bottom: 1rem;
+        right: 1rem;
+    }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.acceso-role-card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.acceso-role-card:nth-child(1) { animation-delay: 0.1s; }
+.acceso-role-card:nth-child(2) { animation-delay: 0.2s; }
+.acceso-role-card:nth-child(3) { animation-delay: 0.3s; }

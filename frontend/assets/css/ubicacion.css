@@ -1,0 +1,395 @@
+/* ==========================================
+   ESTILOS ESPECÍFICOS PARA UBICACIÓN
+   ========================================== */
+
+/* Hero de ubicación */
+.ubicacion-hero {
+    position: relative;
+    overflow: hidden;
+}
+
+.ubicacion-hero-img {
+    filter: grayscale(40%) contrast(1.1);
+    opacity: 0.85;
+}
+
+.ubicacion-gradient {
+    background: linear-gradient(to bottom, 
+        rgba(5, 5, 5, 0.2) 0%, 
+        rgba(5, 5, 5, 0.6) 50%, 
+        rgba(5, 5, 5, 0.9) 100%);
+}
+
+/* Tarjetas de información */
+.ubicacion-info-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.ubicacion-info-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(255, 0, 0, 0.1);
+}
+
+.ubicacion-info-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--primary);
+}
+
+.ubicacion-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 0, 0, 0.1);
+    border: 2px solid var(--primary);
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ubicacion-icon .material-symbols-outlined {
+    color: var(--primary);
+    font-size: 1.5rem;
+}
+
+.ubicacion-info-text {
+    color: var(--gray-light);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.ubicacion-card-line {
+    height: 1px;
+    background: linear-gradient(to right, 
+        transparent 0%, 
+        rgba(255, 0, 0, 0.3) 50%, 
+        transparent 100%);
+    margin-top: 1rem;
+}
+
+/* Enlaces sociales */
+.ubicacion-social-link {
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.ubicacion-social-link:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+/* Botón WhatsApp */
+.ubicacion-whatsapp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+    color: white;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem 2rem;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.ubicacion-whatsapp-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 20%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(30deg);
+    transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.ubicacion-whatsapp-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(37, 211, 102, 0.3);
+}
+
+.ubicacion-whatsapp-btn:hover::before {
+    left: 120%;
+}
+
+/* Mapa */
+.ubicacion-map-overlay {
+    position: absolute;
+    inset: -2rem;
+    background: rgba(255, 0, 0, 0.05);
+    filter: blur(40px);
+    border-radius: 50%;
+    z-index: 0;
+    opacity: 0.5;
+}
+
+.ubicacion-map-container {
+    position: relative;
+    z-index: 10;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: var(--cardBlack);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.ubicacion-map-frame {
+    width: 100%;
+    height: 400px;
+    position: relative;
+}
+
+.ubicacion-map-iframe {
+    width: 100%;
+    height: 100%;
+    filter: invert(90%) hue-rotate(180deg) contrast(85%) brightness(95%);
+    transition: filter 0.3s ease;
+}
+
+.ubicacion-map-iframe:hover {
+    filter: invert(95%) hue-rotate(180deg) contrast(90%) brightness(100%);
+}
+
+.ubicacion-map-corner {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--primary);
+    z-index: 20;
+}
+
+.ubicacion-map-corner-tr {
+    top: -10px;
+    right: -10px;
+    border-left: none;
+    border-bottom: none;
+}
+
+.ubicacion-map-corner-bl {
+    bottom: -10px;
+    left: -10px;
+    border-right: none;
+    border-top: none;
+}
+
+/* Tarjetas de instalaciones */
+.instalacion-card {
+    background: var(--cardBlack);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+.instalacion-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(255, 0, 0, 0.2);
+}
+
+.instalacion-image-container {
+    position: relative;
+    height: 300px;
+    overflow: hidden;
+}
+
+.instalacion-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s ease;
+}
+
+.instalacion-card:hover .instalacion-image {
+    transform: scale(1.1);
+}
+
+.instalacion-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, 
+        transparent 0%, 
+        rgba(0, 0, 0, 0.8) 100%);
+}
+
+.instalacion-content {
+    padding: 1.5rem;
+}
+
+.instalacion-subtitle {
+    color: var(--primary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+}
+
+.instalacion-description {
+    color: var(--gray);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* Características de instalaciones */
+.instalacion-feature {
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.instalacion-feature:hover {
+    background: rgba(255, 0, 0, 0.05);
+    transform: translateY(-5px);
+}
+
+.instalacion-feature-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(255, 0, 0, 0.1);
+    border: 2px solid var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+}
+
+.instalacion-feature-icon .material-symbols-outlined {
+    color: var(--primary);
+    font-size: 2rem;
+}
+
+/* Tarjetas de transporte */
+.transporte-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.transporte-card:hover {
+    border-color: var(--primary);
+    transform: translateX(10px);
+}
+
+.transporte-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.transporte-publico {
+    background: linear-gradient(45deg, #4CAF50, #2E7D32);
+}
+
+.transporte-particular {
+    background: linear-gradient(45deg, #2196F3, #0D47A1);
+}
+
+.transporte-icon .material-symbols-outlined {
+    color: white;
+    font-size: 2rem;
+}
+
+/* Tarjeta de referencias */
+.ubicacion-referencia-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid var(--primary);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+}
+
+.referencia-item {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.referencia-item:last-child {
+    border-bottom: none;
+}
+
+.referencia-marker {
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ubicacion-hero h1 {
+        font-size: 3.5rem !important;
+    }
+    
+    .ubicacion-hero h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    .ubicacion-map-frame {
+        height: 300px;
+    }
+    
+    .instalacion-image-container {
+        height: 200px;
+    }
+    
+    .transporte-card:hover {
+        transform: translateY(-5px);
+    }
+}
+
+/* Animaciones */
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(255, 0, 0, 0.5);
+    }
+}
+
+.pulse-glow {
+    animation: pulse-glow 2s infinite;
+}

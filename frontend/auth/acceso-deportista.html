@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Deportista | Titanes Evolution</title>
+
+    <!-- Fuentes -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="../shared/css/main.css">
+    <link rel="stylesheet" href="acceso-deportista.css">
+</head>
+
+<body class="acceso-deportista-body">
+
+    <!-- Botón Volver (superior izquierda) -->
+    <a href="acceso.html" class="btn-back">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Volver
+    </a>
+
+    <div class="acceso-deportista-container">
+        <!-- Sección de Iniciar Sesión -->
+        <div class="acceso-section acceso-login-section">
+            <div class="acceso-section-bg"></div>
+            <div class="acceso-section-content">
+                <span class="acceso-section-badge">Ya soy Titan</span>
+                <h2 class="acceso-section-title">
+                    Iniciar<br><span class="text-primary">Sesión</span>
+                </h2>
+                <a href="login.html?role=deportista" class="btn-acceso-deportista btn-login">
+                    Entrar Ahora
+                </a>
+            </div>
+        </div>
+
+        <!-- Sección de Registro -->
+        <div class="acceso-section acceso-register-section">
+            <div class="acceso-section-bg"></div>
+            <div class="acceso-section-content">
+                <span class="acceso-section-badge">Nuevo en el Equipo</span>
+                <h2 class="acceso-section-title">
+                    Registrar<br><span class="text-white">Se</span>
+                </h2>
+                <a href="registro-deportista.html" class="btn-acceso-deportista btn-register">
+                    Crear Cuenta
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="acceso-deportista-footer">
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-label">Comunidad</div>
+                <div class="stat-value">+500 ATLETAS</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Niveles</div>
+                <div class="stat-value">USASF L1 - L6</div>
+            </div>
+        </div>
+        <div class="footer-info">
+            <span class="copyright">Titanes Evolution 2024</span>
+            <div class="divider"></div>
+        </div>
+    </footer>
+
+    <!-- Elementos decorativos -->
+    <div class="decorative-shape shape-1"></div>
+    <div class="decorative-shape shape-2"></div>
+
+    <!-- Scripts -->
+    <script src="../shared/js/auth.js"></script>
+    <script src="../shared/js/utils.js"></script>
+    <script src="acceso-deportista.js"></script>
+</body>
+
+</html>

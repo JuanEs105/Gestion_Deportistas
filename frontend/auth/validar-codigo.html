@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validar Código | Titanes Evolution</title>
+    
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="../shared/css/main.css">
+    <link rel="stylesheet" href="validar-codigo.css">
+</head>
+<body class="validar-body">
+    <!-- Background Pattern -->
+    <div class="bg-pattern"></div>
+    
+    <!-- Botón Volver -->
+    <button class="btn-back-validar" onclick="window.location.href='recuperar-contrasena.html'">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Volver
+    </button>
+    
+    <!-- Container Principal -->
+    <div class="validar-container">
+        <!-- Logo -->
+        <div class="logo-header">
+            <div class="logo-circle">
+                <img src="../assets/images/logo titanes.jpg" 
+                     alt="Logo Titanes Evolution" class="logo-img">
+            </div>
+        </div>
+
+        <!-- Tarjeta de Validación -->
+        <div class="validar-card">
+            <!-- Header -->
+            <div class="validar-header">
+                <div class="validar-status">
+                    <span class="material-symbols-outlined status-icon">check_circle</span>
+                    <span class="status-text">Código enviado a tu correo</span>
+                </div>
+                <h1 class="validar-title">
+                    VERIFICAR <span class="text-primary">CÓDIGO</span>
+                </h1>
+                <p class="validar-subtitle" id="emailInfo">
+                    <!-- Email se llena con JS -->
+                </p>
+                <p class="validar-instructions">
+                    Ingresa los 6 dígitos que enviamos para validar tu identidad
+                </p>
+            </div>
+
+            <!-- Formulario -->
+            <form id="validarForm" class="validar-form">
+                <!-- Inputs de código (6 dígitos) -->
+                <div class="code-inputs">
+                    <input type="text" class="code-input" maxlength="1" placeholder="-" data-index="0" autofocus>
+                    <input type="text" class="code-input" maxlength="1" placeholder="-" data-index="1">
+                    <input type="text" class="code-input" maxlength="1" placeholder="-" data-index="2">
+                    <input type="text" class="code-input" maxlength="1" placeholder="-" data-index="3">
+                    <input type="text" class="code-input" maxlength="1" placeholder="-" data-index="4">
+                    <input type="text" class="code-input" maxlength="1" placeholder="-" data-index="5">
+                </div>
+                
+                <input type="hidden" id="fullCode" name="code">
+
+                <!-- Mensajes de error/éxito -->
+                <div class="error-message" id="errorCode"></div>
+                <div class="success-message" id="successCode"></div>
+
+                <!-- Botón Validar -->
+                <button type="submit" class="btn-validar" id="btnValidar">
+                    <span>VERIFICAR CÓDIGO</span>
+                    <span class="material-symbols-outlined">verified</span>
+                    <div class="loading-spinner hidden" id="loadingSpinner"></div>
+                </button>
+            </form>
+
+            <!-- Reenviar código -->
+            <div class="resend-section">
+                <p class="resend-text">¿No recibiste el código?</p>
+                <button class="btn-resend" id="btnResend">
+                    <span class="material-symbols-outlined">refresh</span>
+                    Reenviar código
+                </button>
+                <div class="timer" id="timer">(Puedes reenviar en <span id="countdown">60</span> segundos)</div>
+            </div>
+
+            <!-- Volver al login -->
+            <div class="login-link">
+                <a href="login.html" class="login-back">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Volver al inicio de sesión
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="validar-footer">
+            <div class="footer-content">
+                <span class="copyright">Titanes Evolution © 2024</span>
+                <div class="divider"></div>
+                <span class="tagline">Sports Excellence Program</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../shared/js/utils.js"></script>
+    <script src="validar-codigo.js"></script>
+</body>
+</html>

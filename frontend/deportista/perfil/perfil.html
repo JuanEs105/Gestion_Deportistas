@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil | Titanes Evolution</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#E21B23",
+                        secondary: "#1A1A1A",
+                        "background-light": "#F8F9FA",
+                        "background-dark": "#0A0A0A",
+                    },
+                    fontFamily: {
+                        display: ["Oswald", "sans-serif"],
+                        body: ["Montserrat", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../dashboard.css">
+    <link rel="stylesheet" href="perfil.css">
+</head>
+
+<body class="font-body bg-background-light dark:bg-background-dark text-secondary dark:text-gray-100">
+    
+    <!-- SIDEBAR -->
+    <aside class="fixed left-0 top-0 h-full w-20 lg:w-72 bg-secondary text-white z-50 transition-all duration-300 border-r border-white/5">
+        <div class="flex flex-col h-full">
+            <!-- Logo -->
+            <div class="p-6 flex items-center gap-3">
+                <div class="w-10 h-10 bg-primary rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden">
+                    <img alt="Logo" class="w-full h-full object-cover scale-110" src="../../assets/images/logo titanes.jpg"/>
+                </div>
+                <span class="font-display text-2xl font-bold tracking-tighter uppercase italic hidden lg:inline">
+                    Titanes<span class="text-primary">Evolution</span>
+                </span>
+            </div>
+            
+            <!-- Perfil del Deportista -->
+            <div class="px-6 mb-6" onclick="window.location.href='perfil.html'" style="cursor: default;">
+                <div class="flex items-center gap-3 w-full p-2 rounded-xl bg-white/5">
+                    <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary" id="sidebarAvatarContainer">
+                        <div class="w-full h-full bg-primary flex items-center justify-center">
+                            <span class="text-white font-bold text-xl" id="sidebarInitial">D</span>
+                        </div>
+                    </div>
+                    <div class="hidden lg:block overflow-hidden">
+                        <p class="text-sm font-bold truncate" id="sidebarName">Cargando...</p>
+                        <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">DEPORTISTA</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navegación -->
+            <nav class="flex-1 px-4 space-y-1">
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group text-gray-400 hover:text-white" href="../dashboard.html">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="font-semibold hidden lg:inline">Dashboard</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group text-gray-400 hover:text-white" href="../mis-evaluaciones/index.html">
+                    <span class="material-symbols-outlined">assignment</span>
+                    <span class="font-semibold hidden lg:inline">Mis Evaluaciones</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group text-gray-400 hover:text-white" href="../progreso/index.html">
+                    <span class="material-symbols-outlined">trending_up</span>
+                    <span class="font-semibold hidden lg:inline">Mi Progreso</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group text-gray-400 hover:text-white" href="../calendario/index.html">
+                    <span class="material-symbols-outlined">calendar_month</span>
+                    <span class="font-semibold hidden lg:inline">Calendario</span>
+                </a>
+            </nav>
+            
+            <!-- Footer -->
+            <div class="p-4 border-t border-white/10 space-y-1">
+                <button class="flex items-center gap-4 px-4 py-3 w-full hover:bg-white/10 rounded-lg transition-colors group text-gray-400 hover:text-white" id="toggleTheme">
+                    <span class="material-symbols-outlined">dark_mode</span>
+                    <span class="font-semibold hidden lg:inline">Modo Oscuro</span>
+                </button>
+                <button class="flex items-center gap-4 px-4 py-3 w-full hover:bg-white/10 rounded-lg transition-colors group text-red-500" id="logoutBtn">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="font-semibold hidden lg:inline">Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="ml-20 lg:ml-72 p-4 lg:p-10">
+        <!-- Header -->
+        <header class="mb-10 flex justify-between items-start">
+            <div>
+                <h1 class="font-display text-4xl md:text-6xl font-black uppercase italic tracking-tighter leading-none">
+                    MI <span class="text-primary">PERFIL</span>
+                </h1>
+                <div class="h-1.5 w-32 bg-primary mt-2"></div>
+            </div>
+            <button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-white/10 rounded-lg hover:border-primary transition-colors" onclick="window.history.back()">
+                <span class="material-symbols-outlined">arrow_back</span>
+                <span class="hidden sm:inline font-bold text-sm">Volver</span>
+            </button>
+        </header>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="flex justify-center items-center py-20">
+            <div class="text-center">
+                <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto mb-4"></div>
+                <p class="text-gray-600 dark:text-gray-400 font-semibold">Cargando tu perfil...</p>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="mainContent" class="hidden">
+            <div class="grid lg:grid-cols-12 gap-8">
+                <!-- Columna Izquierda - Foto y Info Rápida -->
+                <div class="lg:col-span-4 space-y-6">
+                    <!-- Tarjeta de Foto -->
+                    <div class="bg-white dark:bg-zinc-900 p-6 shadow-sm">
+                        <h3 class="font-display text-sm font-bold uppercase tracking-widest text-gray-500 mb-4">FOTO DE PERFIL</h3>
+                        
+                        <div class="relative w-48 h-48 mx-auto mb-6 group cursor-pointer" id="photoContainer">
+                            <img id="profilePhoto" src="https://via.placeholder.com/200" alt="Foto de perfil" class="w-full h-full rounded-full object-cover border-4 border-primary">
+                            <div class="absolute inset-0 bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button class="w-14 h-14 bg-primary rounded-full flex items-center justify-center hover:scale-110 transition-transform" id="changePhotoBtn">
+                                    <span class="material-symbols-outlined text-2xl">photo_camera</span>
+                                </button>
+                            </div>
+                        </div>
+                        <input type="file" id="photoInput" accept="image/*" class="hidden">
+                        
+                        <button class="hidden w-full px-4 py-3 bg-primary text-white rounded-lg font-bold hover:bg-red-700 transition-colors flex items-center justify-center gap-2" id="uploadPhotoBtn">
+                            <span class="material-symbols-outlined">upload</span>
+                            Subir Foto
+                        </button>
+                        
+                        <p class="text-xs text-center text-gray-500 mt-3">JPG, PNG | Máx 5MB</p>
+                    </div>
+
+                    <!-- Info Rápida -->
+                    <div class="bg-secondary text-white p-6 shadow-sm">
+                        <h3 class="font-display text-sm font-bold uppercase tracking-widest text-gray-400 mb-4">MI ESTADO</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                                <span class="text-sm text-gray-400">Nivel Actual</span>
+                                <span class="font-bold" id="quickNivel">--</span>
+                            </div>
+                            <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                                <span class="text-sm text-gray-400">Equipo</span>
+                                <span class="font-bold text-sm" id="quickEquipo">--</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-400">Estado</span>
+                                <span class="font-bold" id="quickEstado">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha - Información -->
+                <div class="lg:col-span-8 space-y-6">
+                    <!-- Información Personal Editable -->
+                    <div class="bg-white dark:bg-zinc-900 p-6 shadow-sm">
+                        <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-primary">
+                            <h3 class="font-display text-xl font-bold uppercase flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">person</span>
+                                INFORMACIÓN PERSONAL
+                            </h3>
+                            <button class="px-4 py-2 bg-primary text-white rounded-lg font-bold text-sm hover:bg-red-700 transition-colors flex items-center gap-2" id="editInfoBtn">
+                                <span class="material-symbols-outlined text-lg">edit</span>
+                                <span class="hidden sm:inline">Editar</span>
+                            </button>
+                        </div>
+
+                        <!-- Vista Modo Lectura -->
+                        <div id="infoReadMode">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Nombre Completo</label>
+                                    <p class="mt-1 px-3 py-2 bg-gray-50 dark:bg-black/20 rounded font-semibold" id="displayNombre">--</p>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Correo Electrónico</label>
+                                    <p class="mt-1 px-3 py-2 bg-gray-50 dark:bg-black/20 rounded font-semibold" id="displayEmail">--</p>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Teléfono</label>
+                                    <p class="mt-1 px-3 py-2 bg-gray-50 dark:bg-black/20 rounded font-semibold" id="displayTelefono">--</p>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Dirección</label>
+                                    <p class="mt-1 px-3 py-2 bg-gray-50 dark:bg-black/20 rounded font-semibold" id="displayDireccion">--</p>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Fecha de Nacimiento</label>
+                                    <p class="mt-1 px-3 py-2 bg-gray-50 dark:bg-black/20 rounded font-semibold" id="displayFechaNac">--</p>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold uppercase tracking-wider text-gray-500">EPS</label>
+                                    <p class="mt-1 px-3 py-2 bg-gray-50 dark:bg-black/20 rounded font-semibold" id="displayEPS">--</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vista Modo Edición (oculta por defecto) -->
+                        <form id="infoEditMode" class="hidden">
+                            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Teléfono</label>
+                                    <input type="tel" id="editTelefono" class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Dirección</label>
+                                    <input type="text" id="editDireccion" class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold uppercase tracking-wider text-gray-500">EPS</label>
+                                    <input type="text" id="editEPS" class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Talla de Camiseta</label>
+                                    <select id="editTalla" class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                                        <option value="">Seleccionar...</option>
+                                        <option value="10">10</option>
+                                        <option value="12">12</option>
+                                        <option value="14">14</option>
+                                        <option value="16">16</option>
+                                        <option value="S">S</option>
+                                        <option value="M">M</option>
+                                        <option value="L">L</option>
+                                        <option value="XL">XL</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex justify-end gap-3">
+                                <button type="button" class="px-4 py-2 border border-gray-300 dark:border-white/20 rounded font-bold hover:bg-gray-50 dark:hover:bg-white/5 transition-colors" id="cancelInfoBtn">
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="px-4 py-2 bg-primary text-white rounded font-bold hover:bg-red-700 transition-colors flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-lg">check</span>
+                                    Guardar Cambios
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Contacto de Emergencia Editable -->
+                    <div class="bg-white dark:bg-zinc-900 p-6 shadow-sm">
+                        <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-primary">
+                            <h3 class="font-display text-xl font-bold uppercase flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">emergency</span>
+                                CONTACTO DE EMERGENCIA
+                            </h3>
+                            <button class="px-4 py-2 bg-primary text-white rounded-lg font-bold text-sm hover:bg-red-700 transition-colors flex items-center gap-2" id="editEmergenciaBtn">
+                                <span class="material-symbols-outlined text-lg">edit</span>
+                                <span class="hidden sm:inline">Editar</span>
+                            </button>
+                        </div>
+
+                        <!-- Vista Modo Lectura -->
+                        <div id="emergenciaReadMode">
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Nombre</label>
+                                    <p class="mt-1 px-3 py-2 bg-gray-50 dark:bg-black/20 rounded font-semibold" id="displayEmergenciaNombre">--</p>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Teléfono</label>
+                                    <p class="mt-1 px-3 py-2 bg-gray-50 dark:bg-black/20 rounded font-semibold" id="displayEmergenciaTel">--</p>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Parentesco</label>
+                                    <p class="mt-1 px-3 py-2 bg-gray-50 dark:bg-black/20 rounded font-semibold" id="displayEmergenciaParentesco">--</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vista Modo Edición -->
+                        <form id="emergenciaEditMode" class="hidden">
+                            <div class="grid md:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Nombre</label>
+                                    <input type="text" id="editEmergenciaNombre" class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Teléfono</label>
+                                    <input type="tel" id="editEmergenciaTel" class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Parentesco</label>
+                                    <input type="text" id="editEmergenciaParentesco" class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                                </div>
+                            </div>
+                            <div class="flex justify-end gap-3">
+                                <button type="button" class="px-4 py-2 border border-gray-300 dark:border-white/20 rounded font-bold hover:bg-gray-50 dark:hover:bg-white/5 transition-colors" id="cancelEmergenciaBtn">
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="px-4 py-2 bg-primary text-white rounded font-bold hover:bg-red-700 transition-colors flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-lg">check</span>
+                                    Guardar Cambios
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Información Deportiva (Solo Lectura) -->
+                    <div class="bg-white dark:bg-zinc-900 p-6 shadow-sm">
+                        <div class="mb-6 pb-4 border-b-2 border-secondary dark:border-white/20">
+                            <h3 class="font-display text-xl font-bold uppercase flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">sports_kabaddi</span>
+                                INFORMACIÓN DEPORTIVA
+                            </h3>
+                        </div>
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Nivel Actual</label>
+                                <div class="mt-1 px-3 py-2 bg-gray-50 dark:bg-black/20 rounded">
+                                    <span class="nivel-badge" id="infoNivel">--</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Equipo Competitivo</label>
+                                <p class="mt-1 px-3 py-2 bg-gray-50 dark:bg-black/20 rounded font-semibold" id="infoEquipo">--</p>
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Estado</label>
+                                <div class="mt-1 px-3 py-2 bg-gray-50 dark:bg-black/20 rounded">
+                                    <span class="badge-estado" id="infoEstado">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cambiar Contraseña -->
+                    <div class="bg-white dark:bg-zinc-900 p-6 shadow-sm">
+                        <div class="mb-4 pb-4 border-b-2 border-secondary dark:border-white/20">
+                            <h3 class="font-display text-xl font-bold uppercase flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">lock</span>
+                                SEGURIDAD
+                            </h3>
+                        </div>
+                        <button class="w-full px-6 py-4 bg-secondary dark:bg-white/10 text-white rounded-lg font-bold hover:bg-primary transition-colors flex items-center justify-center gap-3" id="cambiarPasswordBtn">
+                            <span class="material-symbols-outlined text-2xl">vpn_key</span>
+                            <span>Cambiar Contraseña</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Cambiar Contraseña -->
+    <div id="modalPassword" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-zinc-900 rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200 dark:border-white/10 flex justify-between items-center">
+                <h2 class="font-display text-2xl font-bold uppercase flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">vpn_key</span>
+                    Cambiar Contraseña
+                </h2>
+                <button class="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 flex items-center justify-center transition-colors" id="closePasswordModal">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            
+            <form id="formCambiarPassword" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Contraseña Actual *</label>
+                    <div class="relative">
+                        <input type="password" id="passwordActual" required class="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-white/20 rounded-lg bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors toggle-password" data-target="passwordActual">
+                            <span class="material-symbols-outlined text-gray-500">visibility</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Nueva Contraseña *</label>
+                    <div class="relative">
+                        <input type="password" id="passwordNueva" required minlength="6" class="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-white/20 rounded-lg bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors toggle-password" data-target="passwordNueva">
+                            <span class="material-symbols-outlined text-gray-500">visibility</span>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Mínimo 6 caracteres</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Confirmar Nueva Contraseña *</label>
+                    <div class="relative">
+                        <input type="password" id="passwordConfirmar" required minlength="6" class="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-white/20 rounded-lg bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors toggle-password" data-target="passwordConfirmar">
+                            <span class="material-symbols-outlined text-gray-500">visibility</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="p-6 border-t border-gray-200 dark:border-white/10 flex justify-end gap-3">
+                <button type="button" class="px-6 py-2 border border-gray-300 dark:border-white/20 rounded-lg font-bold hover:bg-gray-50 dark:hover:bg-white/5 transition-colors" id="cancelPasswordBtn">
+                    Cancelar
+                </button>
+                <button type="submit" form="formCambiarPassword" class="px-6 py-2 bg-primary text-white rounded-lg font-bold hover:bg-red-700 transition-colors flex items-center gap-2">
+                    <span class="material-symbols-outlined">check</span>
+                    Cambiar Contraseña
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../api.js"></script>
+    <script src="perfil.js"></script>
+</body>
+</html>

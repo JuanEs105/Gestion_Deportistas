@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historia | Titanes Evolution</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;700;900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+        rel="stylesheet">
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="assets/css/landing.css">
+    <!-- Configuración Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#FF0000",
+                        primaryDark: "#CC0000",
+                        deepBlack: "#050505",
+                        cardBlack: "#0F0F0F",
+                    },
+                    fontFamily: {
+                        'sport': ['Oswald', 'sans-serif'],
+                        'montserrat': ['Montserrat', 'sans-serif']
+                    },
+                    animation: {
+                        'ping-slow': 'ping 3s cubic-bezier(0, 0, 0.2, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Estilos específicos para Historia -->
+    <style>
+        /* Corregir movimientos problemáticos */
+        * {
+            transform-style: flat !important;
+        }
+
+        .navbar {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            transform: none !important;
+            will-change: auto !important;
+        }
+
+        body {
+            padding-top: 96px !important;
+        }
+
+        /* Timeline fijo */
+        .timeline-line {
+            position: absolute !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            will-change: auto !important;
+        }
+
+        /* Quitar todas las transformaciones problemáticas */
+        .hero-section,
+        .section-padding,
+        .masonry,
+        .masonry-item,
+        .skewed-image-frame,
+        .angular-clip,
+        .angular-clip-left {
+            transform: none !important;
+            position: static !important;
+        }
+
+        /* Mantener solo clip-path */
+        .angular-clip {
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%) !important;
+        }
+
+        .angular-clip-left {
+            clip-path: polygon(0 0, 90% 0, 100% 100%, 10% 100%) !important;
+        }
+
+        /* Timeline responsive */
+        @media (max-width: 768px) {
+            .timeline-line {
+                left: 2rem !important;
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="overflow-x-hidden bg-deepBlack text-white font-montserrat">
+    <!-- Navbar FIJO -->
+    <nav class="navbar fixed w-full z-[100] bg-black/95 backdrop-blur-xl border-b border-primary/20 scrolled">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between h-24 items-center">
+                <!-- Logo -->
+                <div class="flex items-center gap-4 group cursor-pointer">
+                    <div
+                        class="relative w-16 h-16 overflow-hidden border-2 border-primary rounded-sm transform -skew-x-12">
+                        <img alt="Logo Titanes Evolution" class="object-cover w-full h-full scale-110"
+                            src="assets/images/logo titanes.jpg" />
+                        <div class="absolute inset-0 bg-primary/20 animate-pulse mix-blend-overlay"></div>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-sport text-3xl leading-none tracking-tighter">TITANES</span>
+                        <span class="font-sport text-primary text-xl leading-none tracking-widest">EVOLUTION</span>
+                    </div>
+                </div>
+
+                <!-- Menú Desktop -->
+                <div class="hidden lg:flex items-center space-x-10">
+                    <a class="nav-link" href="index.html">INICIO</a>
+                    <a class="nav-link text-primary" href="historia.html">HISTORIA</a>
+                    <a class="nav-link" href="competencias.html">COMPETENCIAS</a>
+                    <a class="nav-link" href="ubicacion.html">UBICACIÓN</a>
+                    <a class="nav-btn" href="auth/acceso.html">
+                        ACCESO SISTEMA
+                    </a>
+                </div>
+
+                <!-- Menú Mobile -->
+                <button class="lg:hidden text-primary" id="mobileMenuBtn">
+                    <span class="material-symbols-outlined text-4xl">menu</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Menú Mobile (oculto por defecto) -->
+        <div class="lg:hidden hidden bg-deepBlack border-t border-primary/20" id="mobileMenu">
+            <div class="max-w-7xl mx-auto px-6 py-6 space-y-4">
+                <a class="block nav-link text-lg" href="index.html">INICIO</a>
+                <a class="block nav-link text-lg text-primary" href="historia.html">HISTORIA</a>
+                <a class="block nav-link text-lg" href="competencias.html">COMPETENCIAS</a>
+                <a class="block nav-link text-lg" href="ubicacion.html">UBICACIÓN</a>
+                <a class="block nav-btn mt-4 text-center" href="auth/acceso.html">
+                    ACCESO SISTEMA
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Historia -->
+    <header class="relative h-[70vh] md:h-[80vh] flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <!-- Imagen de fondo del hero - MUCHO MÁS VISIBLE -->
+            <img alt="Equipo histórico Titanes Evolution"
+                class="w-full h-full object-cover object-center grayscale opacity-95"
+                src="assets/images/historia/Titanes inverciones worlds 2024.jpg">
+            <!-- Gradiente más suave para no oscurecer tanto -->
+            <div class="absolute inset-0 bg-gradient-to-b from-deepBlack/10 via-deepBlack/30 to-deepBlack/60"></div>
+            <div class="absolute inset-0 grid-overlay opacity-15"></div>
+        </div>
+        <div class="relative z-10 text-center px-6">
+            <h2 class="font-sport text-primary text-2xl md:text-3xl tracking-[0.2em] mb-4">
+                20 AÑOS DE GLORIA
+            </h2>
+            <h1 class="font-sport text-6xl md:text-9xl leading-none text-white">
+                NUESTRA <br />
+                <span class="neon-red">HISTORIA</span>
+            </h1>
+        </div>
+    </header>
+
+    <!-- Sección Timeline -->
+    <section class="section-padding bg-cardBlack relative">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="relative">
+                <!-- Línea del tiempo vertical -->
+                <div
+                    class="timeline-line absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-primary via-primary/50 to-transparent hidden md:block">
+                </div>
+
+                <div class="space-y-24 md:space-y-32 relative">
+
+                    <!-- 2004 - Fundación -->
+                    <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                        <div class="md:w-1/2 md:pr-12 md:text-right">
+                            <span class="font-sport text-primary text-5xl md:text-6xl block">2004</span>
+                            <h3 class="font-sport text-2xl md:text-3xl text-white mt-2">Fundación en Duitama</h3>
+                            <p class="text-gray-400 mt-4 leading-relaxed">
+                                El primer Tryout marcó el inicio de un sueño. Un grupo de jóvenes con la visión
+                                de cambiar el deporte en Boyacá y crear el equipo de cheerleading más potente
+                                de la región.
+                            </p>
+                        </div>
+                        <div class="relative z-10 w-6 h-6 bg-primary rounded-full shadow-glow"></div>
+                        <div class="md:w-1/2 md:pl-12">
+                            <div class="angular-clip-left overflow-hidden border-2 border-primary/30 rounded-lg">
+                                <img alt="Fundación 2004"
+                                    class="w-full h-64 md:h-72 object-cover transition-transform duration-700 hover:scale-105"
+                                    src="assets/images/historia/454821413_10232958021762149_1493314490892520699_n.jpg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2004-2010 - Primeros Pasos -->
+                    <div class="flex flex-col md:flex-row-reverse items-center gap-8 md:gap-12">
+                        <div class="md:w-1/2 md:pl-12">
+                            <span class="font-sport text-primary text-5xl md:text-6xl block">2004-2010</span>
+                            <h3 class="font-sport text-2xl md:text-3xl text-white mt-2">Primeros Pasos</h3>
+                            <p class="text-gray-400 mt-4 leading-relaxed">
+                                Crecimiento con pocos recursos y mucha pasión. Entrenamientos con colchonetas
+                                prestadas y el hambre de gloria intacta. La base de lo que sería una dinastía.
+                            </p>
+                        </div>
+                        <div class="relative z-10 w-6 h-6 bg-primary rounded-full shadow-glow"></div>
+                        <div class="md:w-1/2 md:pr-12">
+                            <div class="angular-clip overflow-hidden border-2 border-primary/30 rounded-lg">
+                                <img alt="Primeros años"
+                                    class="w-full h-64 md:h-72 object-cover transition-transform duration-700 hover:scale-105"
+                                    src="assets/images/historia/465764941_10162046979781083_9204549771829438394_n.jpg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2010 - Podio Nacional -->
+                    <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                        <div class="md:w-1/2 md:pr-12 md:text-right">
+                            <span class="font-sport text-primary text-5xl md:text-6xl block">2010</span>
+                            <h3 class="font-sport text-2xl md:text-3xl text-white mt-2">Podio Nacional</h3>
+                            <p class="text-gray-400 mt-4 leading-relaxed">
+                                Cartagena fue testigo de nuestro primer gran hito: 3er puesto nacional.
+                                Los Titanes empezaban a hacerse un nombre en el panorama nacional del cheerleading.
+                            </p>
+                        </div>
+                        <div class="relative z-10 w-6 h-6 bg-primary rounded-full shadow-glow"></div>
+                        <div class="md:w-1/2 md:pl-12">
+                            <div class="angular-clip-left overflow-hidden border-2 border-primary/30 rounded-lg">
+                                <img alt="Podio 2010"
+                                    class="w-full h-64 md:h-72 object-cover transition-transform duration-700 hover:scale-105"
+                                    src="assets/images/historia/464417318_10161995694901083_6072761045113285189_n.jpg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2012 - Primer Título -->
+                    <div class="flex flex-col md:flex-row-reverse items-center gap-8 md:gap-12">
+                        <div class="md:w-1/2 md:pl-12">
+                            <span class="font-sport text-primary text-5xl md:text-6xl block">2012</span>
+                            <h3 class="font-sport text-2xl md:text-3xl text-white mt-2">Primer Título Nacional</h3>
+                            <p class="text-gray-400 mt-4 leading-relaxed">
+                                Capital Cheer nos coronó campeones por primera vez. El esfuerzo de casi una década
+                                se materializó en oro. Duitama tenía su primer campeón nacional de cheerleading.
+                            </p>
+                        </div>
+                        <div class="relative z-10 w-6 h-6 bg-primary rounded-full shadow-glow"></div>
+                        <div class="md:w-1/2 md:pr-12">
+                            <div class="angular-clip overflow-hidden border-2 border-primary/30 rounded-lg">
+                                <img alt="Primer título 2012"
+                                    class="w-full h-64 md:h-72 object-cover transition-transform duration-700 hover:scale-105"
+                                    src="assets/images/historia/463494004_8757767117608268_2417024215320297222_n.jpg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2014 - Mundial USA -->
+                    <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                        <div class="md:w-1/2 md:pr-12 md:text-right">
+                            <span class="font-sport text-primary text-5xl md:text-6xl block">2014</span>
+                            <h3 class="font-sport text-2xl md:text-3xl text-white mt-2">Sueño Mundialista</h3>
+                            <p class="text-gray-400 mt-4 leading-relaxed">
+                                Cruzamos fronteras para nuestro primer Mundial en USA, logrando un histórico
+                                puesto 20 entre los mejores del mundo. Titanes Evolution ponía a Boyacá en el mapa
+                                mundial.
+                            </p>
+                        </div>
+                        <div class="relative z-10 w-6 h-6 bg-primary rounded-full shadow-glow"></div>
+                        <div class="md:w-1/2 md:pl-12">
+                            <div class="angular-clip-left overflow-hidden border-2 border-primary/30 rounded-lg">
+                                <img alt="Mundial 2014"
+                                    class="w-full h-64 md:h-72 object-cover transition-transform duration-700 hover:scale-105"
+                                    src="assets/images/historia/equipo mundial 2014.jpg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2019 - Consolidación Elite -->
+                    <div class="flex flex-col md:flex-row-reverse items-center gap-8 md:gap-12">
+                        <div class="md:w-1/2 md:pl-12">
+                            <span class="font-sport text-primary text-5xl md:text-6xl block">2019</span>
+                            <h3 class="font-sport text-2xl md:text-3xl text-white mt-2">Consolidación Elite</h3>
+                            <p class="text-gray-400 mt-4 leading-relaxed">
+                                4to puesto Mundial y 3ro de Naciones. Titanes Evolution se ratifica como potencia
+                                internacional y referente del cheerleading latinoamericano.
+                            </p>
+                        </div>
+                        <div class="relative z-10 w-6 h-6 bg-primary rounded-full shadow-glow"></div>
+                        <div class="md:w-1/2 md:pr-12">
+                            <div class="angular-clip overflow-hidden border-2 border-primary/30 rounded-lg">
+                                <img alt="Consolidación 2019"
+                                    class="w-full h-64 md:h-72 object-cover transition-transform duration-700 hover:scale-105"
+                                    src="assets/images/historia/467344433_18282036454243764_5336067035151010175_n.jpg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2024 - Cerca de la Cima -->
+                    <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                        <div class="md:w-1/2 md:pr-12 md:text-right">
+                            <span class="font-sport text-primary text-5xl md:text-6xl block">2024</span>
+                            <h3 class="font-sport text-2xl md:text-3xl text-white mt-2">Cerca de la Cima</h3>
+                            <p class="text-gray-400 mt-4 leading-relaxed">
+                                Histórico 2do puesto de Naciones. 20 años de evolución constante nos ponen
+                                en la élite absoluta del cheerleading mundial. El próximo paso: ser los #1.
+                            </p>
+                        </div>
+                        <div
+                            class="relative z-10 w-8 h-8 bg-white rounded-full shadow-[0_0_20px_rgba(255,255,255,0.8)] border-4 border-primary">
+                        </div>
+                        <div class="md:w-1/2 md:pl-12">
+                            <div
+                                class="angular-clip-left overflow-hidden border-4 border-primary/50 shadow-[0_0_30px_rgba(255,0,0,0.4)] rounded-lg">
+                                <img alt="Actualidad 2024"
+                                    class="w-full h-72 md:h-80 object-cover transition-transform duration-700 hover:scale-105"
+                                    src="assets/images/historia/equipo que participo en campeoanto mundial 2024.jpeg">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Galería -->
+    <section class="section-padding bg-deepBlack">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="font-sport text-5xl md:text-7xl lg:text-8xl text-center mb-16">
+                <span class="neon-red">MOMENTOS</span> ETERNOS
+            </h2>
+
+            <!-- Galería Masonry -->
+            <div class="masonry grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+
+                <!-- Imagen 1 -->
+                <div class="masonry-item group relative overflow-hidden rounded-lg h-[300px]">
+                    <img alt="Entrenamiento histórico"
+                        class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                        src="assets/images/historia/equipo del mundial 2014.jpg">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-4 left-4">
+                        <span class="font-sport text-white text-lg">ENTRENO 2005</span>
+                    </div>
+                </div>
+
+                <!-- Cita 1 -->
+                <div
+                    class="masonry-item bg-primary angular-clip-left p-6 md:p-8 flex items-center justify-center text-center h-[300px]">
+                    <h3 class="font-sport text-3xl md:text-4xl text-black">NO EXCUSAS</h3>
+                </div>
+
+                <!-- Imagen 2 -->
+                <div class="masonry-item group relative overflow-hidden rounded-lg h-[300px]">
+                    <img alt="Primera competencia"
+                        class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                        src="assets/images/historia/IMG_1161 (1).jpg">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                </div>
+
+                <!-- Imagen 3 -->
+                <div class="masonry-item group relative overflow-hidden rounded-lg h-[300px]">
+                    <img alt="Celebración temprana"
+                        class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                        src="assets/images/historia/103504D-3717-wide__99999_32.jpg">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                </div>
+
+                <!-- Cita 2 -->
+                <div
+                    class="masonry-item bg-white/5 border border-primary/20 angular-clip p-6 md:p-8 flex items-center justify-center text-center h-[300px]">
+                    <p class="font-sport text-2xl text-primary italic">EL DOLOR ES TEMPORAL, EL ORGULLO ES PARA SIEMPRE.
+                    </p>
+                </div>
+
+                <!-- Imagen 4 -->
+                <div class="masonry-item group relative overflow-hidden rounded-lg h-[300px]">
+                    <img alt="Primer trofeo"
+                        class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                        src="assets/images/historia/Quipi mundial.jpg">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                </div>
+
+                <!-- Imagen 5 -->
+                <div class="masonry-item group relative overflow-hidden rounded-lg h-[300px]">
+                    <img alt="Equipo completo 2010"
+                        class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                        src="assets/images/historia/equipo nivel 3 en el campeonato mundial UCA.jpg">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                </div>
+
+                <!-- Cita 3 -->
+                <div
+                    class="masonry-item bg-deepBlack border-4 border-primary angular-clip p-6 md:p-8 flex items-center justify-center text-center h-[300px]">
+                    <h3 class="font-sport text-3xl md:text-4xl text-white">TRABAJO DURO</h3>
+                </div>
+
+                <!-- Imagen 6 - MODIFICADA PARA OCUPAR 2 COLUMNAS DE ANCHO -->
+                <div
+                    class="masonry-item masonry-item-wide group relative overflow-hidden rounded-lg h-[300px] md:h-[320px] lg:col-span-2">
+                    <img alt="Entrenamiento temprano - Saltos front"
+                        class="w-full h-full object-cover object-center grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                        src="assets/images/historia/saltos front.jpg">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                    <!-- Texto opcional -->
+                    <div class="absolute bottom-6 left-6">
+                        <span class="font-sport text-white text-xl bg-black/70 px-4 py-2 rounded angular-clip">SALTOS
+                            FRONT</span>
+                    </div>
+                </div>
+
+                <!-- Imagen vertical - SUBIDA ARRIBA -->
+                <div
+                    class="group relative overflow-hidden rounded-lg h-[300px] md:h-[620px] lg:row-span-2 lg:col-start-1 lg:row-start-1">
+                    <img alt="Titán en acción"
+                        class="w-full h-full object-cover object-center grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                        src="assets/images/historia/093641F-3717-tim_3152.jpg">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-6 left-6">
+                        <span class="font-sport text-white text-xl bg-primary/90 px-4 py-2 rounded angular-clip">TITÁN
+                            EN ACCIÓN</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Fundadores -->
+    <section class="section-padding bg-cardBlack relative">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent">
+        </div>
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+
+                <div class="relative">
+                    <div class="absolute -inset-4 bg-primary/20 blur-3xl opacity-50 rounded-full"></div>
+                    <div class="relative bg-gradient-to-br from-white/5 to-transparent p-1 angular-clip rounded-lg">
+                        <img alt="Ludwing y Angélica Fonseca"
+                            class="w-full h-[500px] object-cover object-center contrast-125 angular-clip"
+                            src="assets/images/historia/fundadores.jpg">
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <div class="inline-block bg-primary text-black px-6 py-2 font-sport text-xl skew-x-[-12deg]">
+                        EL LEGADO
+                    </div>
+
+                    <h2 class="font-sport text-5xl md:text-6xl text-white">
+                        LUDWING & ANGÉLICA <br />
+                        <span class="text-primary">FONSECA</span>
+                    </h2>
+
+                    <div class="h-2 w-48 bg-primary"></div>
+
+                    <div class="space-y-6 text-gray-400 text-lg italic leading-relaxed">
+                        <p>
+                            "Nuestra visión desde 2004 fue clara: crear no solo deportistas de alto rendimiento,
+                            sino seres humanos íntegros capaces de superar cualquier obstáculo."
+                        </p>
+                        <p>
+                            "Titanes Evolution nació de la necesidad de un espacio profesional y especializado en
+                            Duitama.
+                            Hoy, somos una familia de cientos de guerreros que llevan el nombre de Boyacá a lo más alto
+                            del podio mundial."
+                        </p>
+                    </div>
+
+                    <div class="flex gap-8 md:gap-12 pt-8">
+                        <div>
+                            <span class="font-sport text-4xl md:text-5xl text-white block counter"
+                                data-target="20">0</span>
+                            <span class="text-primary font-bold tracking-widest text-xs uppercase">Años Liderando</span>
+                        </div>
+                        <div>
+                            <span class="font-sport text-4xl md:text-5xl text-white block counter"
+                                data-target="15">0</span>
+                            <span class="text-primary font-bold tracking-widest text-xs uppercase">Títulos
+                                Nacionales</span>
+                        </div>
+                        <div>
+                            <span class="font-sport text-4xl md:text-5xl text-white block counter"
+                                data-target="200">0</span>
+                            <span class="text-primary font-bold tracking-widest text-xs uppercase">Deportistas</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-12 lg:gap-16 mb-12 lg:mb-20">
+                <!-- Logo y descripción -->
+                <div class="col-span-2 space-y-6">
+                    <div class="flex items-center gap-4">
+                        <div class="font-sport text-4xl lg:text-5xl tracking-tighter">
+                            TITANES<span class="text-primary">EVOLUTION</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 max-w-md text-lg italic">
+                        El primer club de porrismo en Duitama enfocado en alto rendimiento y formación integral.
+                        Liderando el camino hacia la excelencia deportiva desde 2004.
+                    </p>
+                    <!-- Redes sociales -->
+                    <div class="flex gap-4">
+                        <a class="social-link" href="https://www.facebook.com/groups/titanescheerevolution/"
+                            target="_blank" rel="noopener noreferrer" title="Facebook Titanes Evolution">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z">
+                                </path>
+                            </svg>
+                        </a>
+                        <a class="social-link" href="https://www.instagram.com/titanescheerevolution/reels/"
+                            target="_blank" rel="noopener noreferrer" title="Instagram Titanes Evolution">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z">
+                                </path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Navegación -->
+                <div>
+                    <h5 class="font-sport text-xl mb-6">NAVEGACIÓN</h5>
+                    <ul class="space-y-3">
+                        <li><a class="footer-link" href="index.html">INICIO</a></li>
+                        <li><a class="footer-link" href="historia.html">HISTORIA</a></li>
+                        <li><a class="footer-link" href="competencias.html">COMPETENCIAS</a></li>
+                        <li><a class="footer-link" href="ubicacion.html">UBICACIÓN</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contacto -->
+                <div>
+                    <h5 class="font-sport text-xl mb-6">CONTACTO</h5>
+                    <ul class="space-y-4 text-gray-400">
+                        <li class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary">phone_iphone</span>
+                            +57 313 3864382
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="footer-bottom">
+                <p>© 2026 TITANES EVOLUTION. ALL RIGHTS RESERVED.</p>
+                <div class="flex gap-6 md:gap-8">
+                    <a class="footer-legal-link" href="#">PRIVACIDAD</a>
+                    <a class="footer-legal-link" href="#">TÉRMINOS</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Button -->
+    <a class="whatsapp-btn" href="https://wa.me/573133864382" target="_blank">
+        <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24">
+            <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z">
+            </path>
+        </svg>
+    </a>
+
+    <!-- JavaScript CORREGIDO (sin parallax problemático) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('✅ Página Historia - Titanes Evolution');
+
+            // Mobile menu toggle
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', function () {
+                    mobileMenu.classList.toggle('hidden');
+                    this.classList.toggle('active');
+                });
+
+                // Cerrar menú al hacer clic en un enlace
+                mobileMenu.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        mobileMenu.classList.add('hidden');
+                    });
+                });
+            }
+
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#' || targetId.startsWith('#!')) return;
+
+                    // Si es un enlace interno (#) hacer scroll suave
+                    if (targetId.startsWith('#')) {
+                        e.preventDefault();
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            const navbar = document.querySelector('.navbar');
+                            const navbarHeight = navbar ? navbar.offsetHeight : 0;
+                            const targetPosition = targetElement.offsetTop - navbarHeight;
+
+                            window.scrollTo({
+                                top: targetPosition,
+                                behavior: 'smooth'
+                            });
+
+                            // Cerrar menú móvil si está abierto
+                            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                                mobileMenu.classList.add('hidden');
+                            }
+                        }
+                    }
+                });
+            });
+
+            // WhatsApp button animation
+            const whatsappBtn = document.querySelector('.whatsapp-btn');
+            if (whatsappBtn) {
+                whatsappBtn.addEventListener('mouseenter', function () {
+                    this.style.transform = 'scale(1.1)';
+                });
+
+                whatsappBtn.addEventListener('mouseleave', function () {
+                    this.style.transform = 'scale(1)';
+                });
+            }
+
+            // Counter animation for stats
+            const counters = document.querySelectorAll('.counter');
+
+            const startCounter = (counter) => {
+                const target = +counter.getAttribute('data-target');
+                const increment = target / 100;
+                let current = 0;
+
+                const updateCounter = () => {
+                    if (current < target) {
+                        current += increment;
+                        counter.textContent = Math.ceil(current);
+                        setTimeout(updateCounter, 20);
+                    } else {
+                        counter.textContent = target;
+                    }
+                };
+
+                updateCounter();
+            };
+
+            // Iniciar contadores cuando son visibles
+            if (counters.length > 0) {
+                const counterObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            startCounter(entry.target);
+                            counterObserver.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.5,
+                    rootMargin: '50px'
+                });
+
+                counters.forEach(counter => counterObserver.observe(counter));
+            }
+
+            // AOS simple para elementos de la timeline
+            const timelineItems = document.querySelectorAll('div[class*="flex flex-col md:flex-row"]');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '50px'
+            });
+
+            timelineItems.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+
+            // Gallery hover effects
+            const galleryImages = document.querySelectorAll('.masonry-item img');
+            galleryImages.forEach(img => {
+                img.addEventListener('mouseenter', function () {
+                    this.style.transform = 'scale(1.05)';
+                });
+
+                img.addEventListener('mouseleave', function () {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

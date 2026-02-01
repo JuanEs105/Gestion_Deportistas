@@ -487,6 +487,97 @@ class DeportistaController {
       });
     }
   }
+  static async updateMiPerfil(req, res) {
+  const transaction = await sequelize.transaction();
+  
+  try {
+    const userId = req.user.id;
+    
+    console.log('📝 UPDATE mi perfil - User ID:', userId);
+    console.log('📦 Datos recibidos:', req.body);
+    
+    // Buscar deportista por user_id
+    const deportista = await Deportista.findOne({
+      where: { user_id: userId },
+      include: [{
+        model: User,
+        as: 'user'
+      }],
+      transaction
+    });
+    
+    if (!deportista) {
+      await transaction.rollback();
+      return res.status(404).json({
+        error: 'Perfil no encontrado'
+      });
+    }
+    
+    const {
+      telefono,
+      direccion,
+      eps,
+      talla_camiseta,
+      contacto_emergencia_nombre,
+      contacto_emergencia_telefono,
+      contacto_emergencia_parentesco
+    } = req.body;
+    
+    console.log('📋 Campos a actualizar:');
+    console.log('- Teléfono:', telefono);
+    console.log('- Dirección:', direccion);
+    console.log('- EPS:', eps);
+    console.log('- Talla camiseta:', talla_camiseta);
+    console.log('- Contacto emergencia:', contacto_emergencia_nombre);
+    
+    // ✅ ACTUALIZAR CAMPOS DEL DEPORTISTA
+    if (direccion !== undefined) deportista.direccion = direccion;
+    if (eps !== undefined) deportista.eps = eps;
+    if (talla_camiseta !== undefined) deportista.talla_camiseta = talla_camiseta;
+    if (contacto_emergencia_nombre !== undefined) deportista.contacto_emergencia_nombre = contacto_emergencia_nombre;
+    if (contacto_emergencia_telefono !== undefined) deportista.contacto_emergencia_telefono = contacto_emergencia_telefono;
+    if (contacto_emergencia_parentesco !== undefined) deportista.contacto_emergencia_parentesco = contacto_emergencia_parentesco;
+    
+    // ✅ ACTUALIZAR TELÉFONO DEL USUARIO
+    if (telefono !== undefined && deportista.user) {
+      deportista.user.telefono = telefono;
+      await deportista.user.save({ transaction });
+    }
+    
+    // Guardar cambios
+    await deportista.save({ transaction });
+    
+    // Confirmar transacción
+    await transaction.commit();
+    
+    console.log('✅ Perfil actualizado exitosamente');
+    
+    // Obtener datos actualizados
+    const deportistaActualizado = await Deportista.findOne({
+      where: { user_id: userId },
+      include: [{
+        model: User,
+        as: 'user',
+        attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
+      }]
+    });
+    
+    return res.json({
+      success: true,
+      message: 'Perfil actualizado exitosamente',
+      deportista: deportistaActualizado
+    });
+    
+  } catch (error) {
+    await transaction.rollback();
+    console.error('❌ Error actualizando perfil:', error);
+    
+    return res.status(500).json({
+      error: 'Error actualizando tu perfil',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+}
 
   // Asignar Equipo de Competencia
   static async asignarEquipo(req, res) {

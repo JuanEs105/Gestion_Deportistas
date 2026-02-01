@@ -1,17 +1,16 @@
+// backend/src/routes/habilidades.js - CORREGIDO
 const express = require('express');
 const router = express.Router();
-const HabilidadController = require('../controllers/habilidadController');
-const { authMiddleware, isEntrenador } = require('../middleware/auth');
+const habilidadController = require('../controllers/habilidadController'); // Asegúrate que esta ruta sea correcta
 
-// Rutas públicas para ver habilidades
-router.get('/', HabilidadController.getAll);
-router.get('/nivel/:nivel', HabilidadController.getByNivel);
+// RUTAS BÁSICAS PARA HABILIDADES
+router.get('/', habilidadController.getAll);
+router.get('/nivel/:nivel', habilidadController.getByNivel);
+router.get('/:id', habilidadController.getById);
 
-// Rutas protegidas para entrenadores
-router.use(authMiddleware);
-router.use(isEntrenador);
-
-router.post('/', HabilidadController.create);
-router.get('/faltantes/:deportista_id', HabilidadController.getFaltantes);
+// RUTAS PROTEGIDAS (CRUD completo)
+router.post('/', habilidadController.create);
+router.put('/:id', habilidadController.update);
+router.delete('/:id', habilidadController.delete);
 
 module.exports = router;

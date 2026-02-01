@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Entrenador - Paso 3 | Titanes Evolution</title>
+    
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="../shared/css/main.css">
+    <link rel="stylesheet" href="registro-entrenador.css">
+</head>
+<body class="registro-entrenador-body">
+    <!-- Botón Volver -->
+    <a href="registro-entrenador-step2.html" class="btn-back-registro">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Paso Anterior
+    </a>
+
+    <!-- Contenedor principal -->
+    <div class="registro-container">
+        <!-- Logo -->
+        <div class="registro-logo-container">
+            <div class="registro-logo-circle">
+                <img src="../assets/images/logo titanes.jpg" 
+                     alt="Titanes Evolution" class="registro-logo-img">
+            </div>
+            <h1 class="registro-logo-text">
+                Titanes<span class="registro-logo-red">Evolution</span>
+            </h1>
+            <p class="registro-subtitle">Configura tu Contraseña</p>
+        </div>
+
+        <!-- Contenido del formulario -->
+        <div class="registro-form-container">
+            <!-- Barra de progreso -->
+            <div class="registro-progress">
+                <div class="registro-progress-bar">
+                    <div class="registro-progress-fill" style="width: 100%"></div>
+                </div>
+                <div class="registro-progress-steps">
+                    <div class="registro-progress-step completed">
+                        <span class="registro-step-number">1</span>
+                        <span class="registro-step-label">Correo</span>
+                    </div>
+                    <div class="registro-progress-step completed">
+                        <span class="registro-step-number">2</span>
+                        <span class="registro-step-label">Código</span>
+                    </div>
+                    <div class="registro-progress-step active">
+                        <span class="registro-step-number">3</span>
+                        <span class="registro-step-label">Contraseña</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Título del paso -->
+            <div class="registro-header">
+                <h2 class="registro-title">Crea tu Contraseña</h2>
+                <p class="registro-description">
+                    Configura una contraseña segura para acceder a tu cuenta de entrenador.
+                </p>
+            </div>
+
+            <!-- Formulario -->
+            <form id="passwordForm" class="registro-form">
+                <div class="registro-form-group">
+                    <label for="password" class="registro-label">
+                        <span class="material-symbols-outlined">lock</span>
+                        Nueva Contraseña
+                    </label>
+                    <div class="registro-input-with-icon">
+                        <input type="password" 
+                               id="password" 
+                               name="password" 
+                               class="registro-input"
+                               placeholder="Ingresa tu contraseña"
+                               required
+                               minlength="8"
+                               autocomplete="new-password">
+                        <button type="button" class="registro-toggle-password" data-target="password">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Validación de contraseña -->
+                    <div class="registro-password-validation">
+                        <div class="registro-validation-item" id="validationLength">
+                            <span class="registro-validation-icon">●</span>
+                            <span class="registro-validation-text">Mínimo 8 caracteres</span>
+                        </div>
+                        <div class="registro-validation-item" id="validationUppercase">
+                            <span class="registro-validation-icon">●</span>
+                            <span class="registro-validation-text">Al menos una mayúscula</span>
+                        </div>
+                        <div class="registro-validation-item" id="validationLowercase">
+                            <span class="registro-validation-icon">●</span>
+                            <span class="registro-validation-text">Al menos una minúscula</span>
+                        </div>
+                        <div class="registro-validation-item" id="validationNumber">
+                            <span class="registro-validation-icon">●</span>
+                            <span class="registro-validation-text">Al menos un número</span>
+                        </div>
+                        <div class="registro-validation-item" id="validationSpecial">
+                            <span class="registro-validation-icon">●</span>
+                            <span class="registro-validation-text">Al menos un carácter especial</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="registro-form-group">
+                    <label for="confirmPassword" class="registro-label">
+                        <span class="material-symbols-outlined">lock_reset</span>
+                        Confirmar Contraseña
+                    </label>
+                    <div class="registro-input-with-icon">
+                        <input type="password" 
+                               id="confirmPassword" 
+                               name="confirmPassword" 
+                               class="registro-input"
+                               placeholder="Repite tu contraseña"
+                               required
+                               autocomplete="new-password">
+                        <button type="button" class="registro-toggle-password" data-target="confirmPassword">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                    <div class="registro-confirm-message" id="confirmMessage"></div>
+                </div>
+
+                <!-- Fortaleza de contraseña -->
+                <div class="registro-password-strength">
+                    <div class="registro-strength-header">
+                        <span class="material-symbols-outlined">security</span>
+                        <span class="registro-strength-title">Fortaleza de la contraseña</span>
+                    </div>
+                    <div class="registro-strength-bar">
+                        <div class="registro-strength-fill" id="strengthFill"></div>
+                    </div>
+                    <div class="registro-strength-text" id="strengthText">Débil</div>
+                </div>
+
+                <div class="registro-form-actions">
+                    <button type="submit" class="registro-btn-primary">
+                        <span class="registro-btn-text">Completar Registro</span>
+                        <span class="material-symbols-outlined">check_circle</span>
+                    </button>
+                </div>
+
+                <div class="registro-terms">
+                    <label class="registro-terms-label">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <span class="registro-terms-text">
+                            Acepto los 
+                            <a href="#" class="registro-terms-link">Términos de Uso</a> y la 
+                            <a href="#" class="registro-terms-link">Política de Privacidad</a>
+                        </span>
+                    </label>
+                </div>
+            </form>
+
+            <!-- Información de seguridad -->
+            <div class="registro-security-info">
+                <div class="registro-security-header">
+                    <span class="material-symbols-outlined">shield</span>
+                    <h3 class="registro-security-title">Consejos de Seguridad</h3>
+                </div>
+                <ul class="registro-security-list">
+                    <li>No compartas tu contraseña con nadie</li>
+                    <li>Utiliza una contraseña única para esta cuenta</li>
+                    <li>Considera usar un gestor de contraseñas</li>
+                    <li>Cambia tu contraseña periódicamente</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="registro-footer">
+            <p class="registro-copyright">© 2024 Titanes Evolution - Último Paso del Registro</p>
+            <div class="registro-footer-stats">
+                <div class="registro-stat">
+                    <span class="registro-stat-value">100%</span>
+                    <span class="registro-stat-label">Seguro</span>
+                </div>
+                <div class="registro-divider"></div>
+                <div class="registro-stat">
+                    <span class="registro-stat-value">SSL</span>
+                    <span class="registro-stat-label">Encriptado</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../shared/js/auth.js"></script>
+    <script src="../shared/js/api.js"></script>
+    <script src="registro-entrenador-step3.js"></script>
+</body>
+</html>

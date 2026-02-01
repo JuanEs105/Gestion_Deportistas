@@ -1,0 +1,368 @@
+/* ==========================================
+   ACCESO DEPORTISTA - TITANES EVOLUTION
+   ========================================== */
+
+.acceso-deportista-body {
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+    min-height: 100vh;
+    background: #0A0A0A;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Botón volver */
+.btn-back {
+    position: fixed;
+    top: 1.5rem;
+    left: 1.5rem;
+    z-index: 100;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    background: rgba(226, 27, 35, 0.2);
+    border-color: #E21B23;
+    transform: translateX(-5px);
+}
+
+.btn-back .material-symbols-outlined {
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+}
+
+.btn-back:hover .material-symbols-outlined {
+    transform: translateX(-3px);
+}
+
+/* Container principal */
+.acceso-deportista-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+    .acceso-deportista-container {
+        flex-direction: column;
+    }
+}
+
+/* Secciones */
+.acceso-section {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+@media (min-width: 769px) {
+    .acceso-section {
+        min-height: 100vh;
+    }
+}
+
+.acceso-section:hover {
+    flex: 1.2;
+}
+
+.acceso-section-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.3;
+    filter: grayscale(100%);
+    transition: all 0.5s ease;
+}
+
+.acceso-section:hover .acceso-section-bg {
+    opacity: 0.5;
+    filter: grayscale(0%);
+    transform: scale(1.05);
+}
+
+.acceso-login-section .acceso-section-bg {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), 
+                     url('https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?auto=format&fit=crop&q=80&w=1920');
+}
+
+.acceso-register-section .acceso-section-bg {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), 
+                     url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&q=80&w=1920');
+}
+
+.acceso-section-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 2rem;
+    max-width: 500px;
+}
+
+/* Badge */
+.acceso-section-badge {
+    display: inline-block;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #E21B23;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
+@media (min-width: 768px) {
+    .acceso-section-badge {
+        font-size: 1.125rem;
+    }
+}
+
+/* Título */
+.acceso-section-title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    text-transform: uppercase;
+    font-size: 3rem;
+    line-height: 1;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+    .acceso-section-title {
+        font-size: 4rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .acceso-section-title {
+        font-size: 5rem;
+    }
+}
+
+/* Botones */
+.btn-acceso-deportista {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem 3rem;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 1.125rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    overflow: hidden;
+    min-width: 250px;
+}
+
+.btn-login {
+    background: white;
+    color: #1A1A1A;
+}
+
+.btn-login:hover {
+    background: #E21B23;
+    color: white;
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 20px 40px rgba(226, 27, 35, 0.3);
+}
+
+.btn-register {
+    background: #E21B23;
+    color: white;
+    box-shadow: 0 0 30px rgba(226, 27, 35, 0.4);
+}
+
+.btn-register:hover {
+    background: white;
+    color: #1A1A1A;
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 20px 40px rgba(255, 255, 255, 0.2);
+}
+
+/* Efecto hover para botones */
+.btn-acceso-deportista::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.btn-acceso-deportista:hover::after {
+    transform: translateX(100%);
+}
+
+/* Footer */
+.acceso-deportista-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 50;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .acceso-deportista-footer {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+}
+
+.stats {
+    display: flex;
+    gap: 3rem;
+}
+
+.stat-item {
+    text-align: left;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #E21B23;
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.footer-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    opacity: 0.7;
+}
+
+.copyright {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+}
+
+.divider {
+    width: 3rem;
+    height: 2px;
+    background: #E21B23;
+}
+
+/* Elementos decorativos */
+.decorative-shape {
+    position: fixed;
+    background: rgba(226, 27, 35, 0.1);
+    border: 1px solid rgba(226, 27, 35, 0.2);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.shape-1 {
+    top: -100px;
+    right: -100px;
+    width: 200px;
+    height: 200px;
+    transform: rotate(45deg);
+}
+
+.shape-2 {
+    bottom: -100px;
+    left: -100px;
+    width: 200px;
+    height: 200px;
+    transform: rotate(45deg);
+}
+
+/* Text stroke effect */
+.text-stroke {
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.acceso-section-content {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.acceso-login-section .acceso-section-content {
+    animation-delay: 0.1s;
+}
+
+.acceso-register-section .acceso-section-content {
+    animation-delay: 0.3s;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .acceso-section-title {
+        font-size: 2.5rem;
+    }
+    
+    .btn-acceso-deportista {
+        padding: 1rem 2rem;
+        min-width: 200px;
+        font-size: 1rem;
+    }
+    
+    .stats {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .acceso-deportista-footer {
+        padding: 1rem;
+    }
+}

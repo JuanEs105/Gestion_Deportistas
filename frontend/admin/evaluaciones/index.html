@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluaciones | Titanes Evolution</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- CSS Externo -->
+    <link rel="stylesheet" href="../style.css">
+
+    <!-- Estilos específicos para evaluaciones -->
+    <style>
+        .skill-row:hover {
+            background-color: rgba(226, 27, 35, 0.03);
+        }
+        
+        .progreso-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .star-filled {
+            color: #fbbf24;
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        .star-empty {
+            color: #d1d5db;
+        }
+        
+        .estado-dominado {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .estado-proceso {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .estado-iniciado {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .estado-pendiente {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+        
+        .categoria-activa {
+            border-bottom: 4px solid #E21B23;
+            color: #E21B23;
+        }
+        
+        .stats-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dark .stats-card:hover {
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.05);
+        }
+    </style>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#E21B23",
+                        secondary: "#1A1A1A",
+                        "background-light": "#F8F9FA",
+                        "background-dark": "#0A0A0A",
+                    },
+                    fontFamily: {
+                        display: ["Oswald", "sans-serif"],
+                        body: ["Montserrat", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "4px",
+                    },
+                },
+            },
+        };
+    </script>
+</head>
+
+<body class="font-body bg-background-light dark:bg-background-dark text-secondary dark:text-gray-100 transition-colors duration-300 min-h-screen">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="hidden fixed inset-0 bg-black/70 z-50 flex flex-col items-center justify-center">
+        <div class="bg-white dark:bg-zinc-800 rounded-xl p-8 flex flex-col items-center gap-4 shadow-2xl">
+            <div class="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent"></div>
+            <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">Cargando evaluaciones...</p>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="fixed left-0 top-0 h-full w-20 lg:w-64 bg-secondary text-white z-40 transition-all duration-300">
+        <div class="flex flex-col h-full">
+            <!-- Logo -->
+            <div class="p-6 flex items-center gap-3">
+                <div class="w-10 h-10 bg-primary rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden">
+                    <img alt="Logo" class="w-full h-full object-cover scale-110"
+                        src="../../assets/images/logo titanes.jpg" />
+                </div>
+                <span class="font-display text-xl font-bold tracking-tighter uppercase italic hidden lg:inline">
+                    Titanes<span class="text-primary">Evolution</span>
+                </span>
+            </div>
+
+            <!-- Navegación -->
+            <nav class="flex-1 mt-6 px-4 space-y-1">
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-all group sidebar-item"
+                    href="../dashboard.html">
+                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">dashboard</span>
+                    <span class="font-semibold hidden lg:inline">Dashboard</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-all group sidebar-item"
+                    href="../administradores/index.html">
+                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">admin_panel_settings</span>
+                    <span class="font-semibold hidden lg:inline">Administradores</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-all group sidebar-item"
+                    href="../entrenadores/index.html">
+                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">groups_3</span>
+                    <span class="font-semibold hidden lg:inline">Entrenadores</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-all group sidebar-item"
+                    href="../deportistas/index.html">
+                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">sports_handball</span>
+                    <span class="font-semibold hidden lg:inline">Deportistas</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 bg-primary text-white rounded-lg transition-all group sidebar-item active"
+                    href="index.html">
+                    <span class="material-symbols-outlined text-white">assignment</span>
+                    <span class="font-semibold hidden lg:inline">Evaluaciones</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-all group sidebar-item"
+                    href="../calendario/index.html">
+                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">calendar_month</span>
+                    <span class="font-semibold hidden lg:inline">Calendario</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-all group sidebar-item"
+                    href="../reportes/index.html">
+                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">bar_chart</span>
+                    <span class="font-semibold hidden lg:inline">Reportes</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-all group sidebar-item"
+                    href="../habilidades/index.html">
+                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">sports_kabaddi</span>
+                    <span class="font-semibold hidden lg:inline">Habilidades</span>
+                </a>
+            </nav>
+
+            <!-- Footer del Sidebar -->
+            <div class="mt-auto p-4 space-y-2 border-t border-white/10">
+                <!-- Info Usuario -->
+                <div class="flex items-center gap-3 px-4 py-3">
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
+                        <span class="material-symbols-outlined">person</span>
+                    </div>
+                    <div class="sidebar-text overflow-hidden">
+                        <p class="text-xs font-bold truncate uppercase font-display tracking-tight italic">Administrador
+                        </p>
+                        <p id="userEmail" class="text-[10px] text-gray-400 truncate">admin@titanes.com</p>
+                    </div>
+                </div>
+
+                <!-- Tema Oscuro -->
+                <button
+                    class="flex items-center gap-4 px-4 py-3 w-full hover:bg-white/10 rounded-lg transition-all group"
+                    onclick="toggleTheme()">
+                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">dark_mode</span>
+                    <span class="sidebar-text font-semibold">Modo Oscuro</span>
+                </button>
+
+                <!-- Cerrar Sesión -->
+                <button
+                    class="flex items-center gap-4 px-4 py-3 w-full bg-red-950/30 hover:bg-red-900/40 text-red-400 rounded-lg transition-all group"
+                    onclick="logout()">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="sidebar-text font-semibold">Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="ml-20 lg:ml-64 p-4 lg:p-8 transition-all duration-300 min-h-screen">
+        <!-- Header -->
+        <header class="mb-8 lg:mb-12">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                    <h1 class="sports-heading text-3xl lg:text-4xl font-bold text-secondary dark:text-white mb-2">
+                        Monitoreo de <span class="text-primary">Evaluaciones</span>
+                    </h1>
+                    <p class="text-gray-500 dark:text-gray-400 font-medium">Vista detallada de rendimiento y progreso técnico de deportistas</p>
+                </div>
+                <div class="flex items-center gap-3 bg-white dark:bg-zinc-900 px-4 py-2 border border-gray-200 dark:border-white/10 rounded-full shadow-sm">
+                    <span class="material-symbols-outlined text-primary">person</span>
+                    <span class="text-sm font-bold uppercase italic" id="adminName">Administrador</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Filtros de Búsqueda -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="md:col-span-1 space-y-1">
+                <label class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Deportista</label>
+                <select id="filtroDeportista" class="w-full bg-white dark:bg-zinc-900 border-gray-200 dark:border-white/10 rounded px-3 py-2 text-sm font-semibold focus:ring-primary">
+                    <option value="">Seleccionar deportista...</option>
+                    <!-- Se llenará dinámicamente -->
+                </select>
+            </div>
+            <div class="md:col-span-1 space-y-1">
+                <label class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Nivel</label>
+                <select id="filtroNivel" class="w-full bg-white dark:bg-zinc-900 border-gray-200 dark:border-white/10 rounded px-3 py-2 text-sm font-semibold focus:ring-primary">
+                    <option value="">Todos los niveles</option>
+                    <option value="baby_titans">Baby Titans</option>
+                    <option value="1_basico">1 Básico</option>
+                    <option value="1_medio">1 Medio</option>
+                    <option value="1_avanzado">1 Avanzado</option>
+                    <option value="2">Nivel 2</option>
+                    <option value="3">Nivel 3</option>
+                    <option value="4">Nivel 4</option>
+                </select>
+            </div>
+            <div class="md:col-span-1 space-y-1">
+                <label class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Grupo Competitivo</label>
+                <select id="filtroGrupo" class="w-full bg-white dark:bg-zinc-900 border-gray-200 dark:border-white/10 rounded px-3 py-2 text-sm font-semibold focus:ring-primary">
+                    <option value="">Todos los grupos</option>
+                    <!-- Se llenará dinámicamente -->
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button id="btnFiltrar" class="w-full bg-secondary text-white px-4 py-2 rounded font-bold uppercase text-xs tracking-widest hover:bg-black transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-sm">search</span> Filtrar
+                </button>
+            </div>
+        </div>
+
+        <!-- Estadísticas Generales -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8 lg:mb-12">
+            <!-- Total Evaluaciones -->
+            <div class="stats-card bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-100 dark:border-white/5">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-sm font-bold uppercase tracking-widest text-gray-500">Total Evaluaciones</span>
+                    <span class="material-symbols-outlined text-primary">assignment</span>
+                </div>
+                <div id="totalEvaluaciones" class="text-3xl font-bold text-secondary dark:text-white mb-2">0</div>
+                <div class="text-xs text-gray-500">Registros en el sistema</div>
+            </div>
+            
+            <!-- Evaluaciones Completadas -->
+            <div class="stats-card bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-100 dark:border-white/5">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-sm font-bold uppercase tracking-widest text-gray-500">Completadas</span>
+                    <span class="material-symbols-outlined text-green-500">check_circle</span>
+                </div>
+                <div id="evaluacionesCompletadas" class="text-3xl font-bold text-green-600 mb-2">0</div>
+                <div class="text-xs text-gray-500">Habilidades dominadas</div>
+            </div>
+            
+            <!-- Promedio General -->
+            <div class="stats-card bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-100 dark:border-white/5">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-sm font-bold uppercase tracking-widest text-gray-500">Promedio General</span>
+                    <span class="material-symbols-outlined text-yellow-500">star</span>
+                </div>
+                <div id="promedioGeneral" class="text-3xl font-bold text-yellow-600 mb-2">0.0</div>
+                <div class="text-xs text-gray-500">Puntuación promedio /10</div>
+            </div>
+            
+            <!-- Cambios Pendientes -->
+            <div class="stats-card bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-100 dark:border-white/5">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-sm font-bold uppercase tracking-widest text-gray-500">Cambios Pendientes</span>
+                    <span class="material-symbols-outlined text-blue-500">pending</span>
+                </div>
+                <div id="cambiosPendientes" class="text-3xl font-bold text-blue-600 mb-2">0</div>
+                <div class="text-xs text-gray-500">Deportistas para promover</div>
+            </div>
+        </div>
+
+        <!-- Gráficas de Análisis -->
+        <div class="grid lg:grid-cols-3 gap-8 mb-8">
+            <div class="lg:col-span-1 bg-white dark:bg-zinc-900 p-6 border border-gray-100 dark:border-white/5 shadow-sm rounded-xl">
+                <h3 class="font-display text-lg font-bold uppercase italic tracking-tighter mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">analytics</span> Equilibrio de Competencias
+                </h3>
+                <div class="h-64 flex items-center justify-center">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+            <div class="lg:col-span-2 bg-white dark:bg-zinc-900 p-6 border border-gray-100 dark:border-white/5 shadow-sm rounded-xl">
+                <h3 class="font-display text-lg font-bold uppercase italic tracking-tighter mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">bar_chart</span> Progreso por Categoría
+                </h3>
+                <div class="h-64 flex items-center justify-center">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido Principal de Evaluaciones -->
+        <div class="space-y-12 pb-12">
+            <!-- Información del Deportista Seleccionado -->
+            <div id="deportistaInfo" class="hidden bg-gradient-to-r from-primary to-red-600 text-white p-6 rounded-xl shadow-lg">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-20 h-20 rounded-full bg-white flex items-center justify-center text-primary text-2xl font-bold">
+                            <span id="deportistaInicial">?</span>
+                        </div>
+                        <div>
+                            <h2 id="deportistaNombre" class="text-2xl font-bold mb-1">Selecciona un deportista</h2>
+                            <p id="deportistaDetalles" class="text-white/80">Nivel: - • Grupo: - • Evaluaciones: 0</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-3xl font-bold mb-1" id="progresoPorcentaje">0%</div>
+                        <div class="text-sm text-white/80">Progreso del nivel</div>
+                        <div class="w-48 bg-white/20 h-2 rounded-full mt-2 overflow-hidden">
+                            <div id="progresoBar" class="bg-white h-full rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs de Categorías -->
+            <div class="flex space-x-2 mb-6 border-b border-gray-200 dark:border-white/5">
+                <button id="tabHabilidades" class="px-6 py-3 font-semibold transition-all duration-200 categoria-activa">
+                    <span class="material-symbols-outlined align-middle mr-2">sports_kabaddi</span>
+                    Habilidades
+                </button>
+                <button id="tabEjercicios" class="px-6 py-3 font-semibold text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200">
+                    <span class="material-symbols-outlined align-middle mr-2">fitness_center</span>
+                    Ejercicios Accesorios
+                </button>
+                <button id="tabPosturas" class="px-6 py-3 font-semibold text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200">
+                    <span class="material-symbols-outlined align-middle mr-2">self_improvement</span>
+                    Posturas
+                </button>
+            </div>
+
+            <!-- Tabla de Habilidades -->
+            <section id="seccionHabilidades">
+                <div class="flex items-center gap-4 mb-6 border-b-4 border-primary pb-2">
+                    <h2 class="font-display text-2xl font-black uppercase italic tracking-tighter">HABILIDADES TÉCNICAS</h2>
+                    <span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded uppercase">Categoría Principal</span>
+                </div>
+                <div class="bg-white dark:bg-zinc-900 overflow-hidden border border-gray-100 dark:border-white/5 shadow-xl rounded-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-secondary text-white">
+                            <tr>
+                                <th class="px-6 py-3 font-display text-xs uppercase tracking-widest">Técnica / Movimiento</th>
+                                <th class="px-6 py-3 font-display text-xs uppercase tracking-widest text-center">Calificación</th>
+                                <th class="px-6 py-3 font-display text-xs uppercase tracking-widest">Retroalimentación</th>
+                                <th class="px-6 py-3 font-display text-xs uppercase tracking-widest text-right">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaHabilidades" class="divide-y divide-gray-100 dark:divide-white/5">
+                            <!-- Se llenará dinámicamente -->
+                            <tr id="sinHabilidades">
+                                <td colspan="4" class="text-center py-12 text-gray-400">
+                                    <span class="material-symbols-outlined text-4xl mb-2 block">assignment</span>
+                                    <p class="text-sm">Selecciona un deportista para ver sus habilidades</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Sección de Ejercicios Accesorios (oculta por defecto) -->
+            <section id="seccionEjercicios" class="hidden">
+                <div class="flex items-center gap-4 mb-6 border-b-4 border-gray-400 pb-2">
+                    <h2 class="font-display text-2xl font-black uppercase italic tracking-tighter">EJERCICIOS ACCESORIOS</h2>
+                    <span class="bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Soporte Técnico</span>
+                </div>
+                <div class="bg-white dark:bg-zinc-900 overflow-hidden border border-gray-100 dark:border-white/5 shadow-xl rounded-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-secondary text-white">
+                            <tr>
+                                <th class="px-6 py-3 font-display text-xs uppercase tracking-widest">Ejercicio de Apoyo</th>
+                                <th class="px-6 py-3 font-display text-xs uppercase tracking-widest text-center">Nivel de Logro</th>
+                                <th class="px-6 py-3 font-display text-xs uppercase tracking-widest">Observaciones</th>
+                                <th class="px-6 py-3 font-display text-xs uppercase tracking-widest text-right">Check</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaEjercicios" class="divide-y divide-gray-100 dark:divide-white/5">
+                            <!-- Se llenará dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Sección de Posturas (oculta por defecto) -->
+            <section id="seccionPosturas" class="hidden">
+                <div class="flex items-center gap-4 mb-6 border-b-4 border-primary/40 pb-2">
+                    <h2 class="font-display text-2xl font-black uppercase italic tracking-tighter">POSTURAS CORPORALES</h2>
+                    <span class="bg-primary/5 text-primary/60 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Fundamentos</span>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="gridPosturas">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Últimas Evaluaciones -->
+            <section>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-display text-2xl font-black uppercase italic tracking-tighter">📋 ÚLTIMAS EVALUACIONES</h2>
+                    <button id="btnActualizar" class="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-700 transition-all">
+                        <span class="material-symbols-outlined text-sm">refresh</span>
+                        Actualizar
+                    </button>
+                </div>
+                <div id="listaEvaluaciones" class="space-y-3">
+                    <!-- Se llenará dinámicamente -->
+                    <div class="text-center py-8 text-gray-400">
+                        <span class="material-symbols-outlined text-4xl mb-2 block">history</span>
+                        <p class="text-sm">No hay evaluaciones recientes</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="ml-20 lg:ml-64 p-6 border-t border-gray-200 dark:border-white/5">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
+            <p class="text-gray-500 dark:text-gray-400 font-medium">© 2024 TITANES EVOLUTION - SISTEMA DE EVALUACIONES</p>
+            <div class="flex items-center gap-6">
+                <div class="status flex items-center gap-2">
+                    <span id="statusDot" class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span id="serverStatus" class="text-gray-500 dark:text-gray-400 font-medium">Conectado</span>
+                </div>
+                <span class="text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">visibility</span>
+                    Modo Solo Lectura
+                </span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botón de Ayuda -->
+    <button id="btnAyuda" class="floating-help-btn fixed bottom-6 right-6 w-14 h-14 bg-primary text-white rounded-full shadow-2xl hover:scale-110 transition-transform z-30 flex items-center justify-center group">
+        <span class="material-symbols-outlined group-hover:rotate-12 transition-transform">help</span>
+    </button>
+
+    <!-- Modal para Detalles de Evaluación -->
+    <div id="modalDetalle" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-gray-200 dark:border-white/5 flex items-center justify-between">
+                <h3 id="modalTitulo" class="text-2xl font-bold text-secondary dark:text-white">Detalles de Evaluación</h3>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-2xl">&times;</button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="p-6" id="modalContenido">
+                <!-- Se llenará dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Container para notificaciones -->
+    <div id="notificationContainer"></div>
+
+    <!-- Incluir scripts -->
+    <script src="../api.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

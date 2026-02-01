@@ -1,0 +1,948 @@
+/* =========================================
+   EVALUACIONES - ESTILOS ESPECÍFICOS
+   Titanes Evolution - Sistema Entrenador
+========================================= */
+
+/* Variables específicas */
+:root {
+    --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --transition-default: all 0.3s ease;
+}
+
+/* =========================================
+   TARJETAS DE DEPORTISTA (selección)
+========================================= */
+.athlete-card {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: var(--transition-default);
+    cursor: pointer;
+    text-align: left;
+}
+
+.dark .athlete-card {
+    background: #18181B;
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.athlete-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--card-shadow-hover);
+    border-color: var(--primary);
+}
+
+.athlete-card:hover .athlete-name {
+    color: var(--primary);
+}
+
+.athlete-photo-container {
+    position: relative;
+    aspect-ratio: 4/5;
+    background: #F3F4F6;
+    overflow: hidden;
+}
+
+.dark .athlete-photo-container {
+    background: #27272A;
+}
+
+.athlete-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.athlete-card:hover .athlete-photo {
+    transform: scale(1.05);
+}
+
+.athlete-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: var(--primary);
+    color: white;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.athlete-info {
+    padding: 1.25rem;
+    border-top: 4px solid #1A1A1A;
+}
+
+.dark .athlete-info {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.athlete-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.025em;
+    margin-bottom: 0.5rem;
+    transition: color 0.2s;
+    line-height: 1.2;
+}
+
+.athlete-details {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.athlete-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--primary);
+    border-radius: 9999px;
+    flex-shrink: 0;
+}
+
+.athlete-meta {
+    font-size: 0.6875rem;
+    color: #6B7280;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.dark .athlete-meta {
+    color: #9CA3AF;
+}
+
+/* =========================================
+   BOTONES DE EVALUACIÓN
+========================================= */
+.btn-evaluate {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-evaluate:hover {
+    background: #C41820;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(226, 27, 35, 0.3);
+}
+
+.btn-evaluate:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* =========================================
+   RATING STARS (ESTRELLAS EN LUGAR DE CARITAS)
+========================================= */
+.rating-container {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.rating-stars {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.rating-star {
+    font-size: 1.5rem;
+    color: #E5E7EB;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dark .rating-star {
+    color: #4B5563;
+}
+
+.rating-star.filled {
+    color: #F59E0B;
+    text-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+}
+
+.rating-star:hover {
+    transform: scale(1.2);
+}
+
+.rating-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.dark .rating-label {
+    color: #D1D5DB;
+}
+
+.rating-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    margin-left: 0.5rem;
+}
+
+.rating-badge.excelente {
+    background: #10B981;
+    color: white;
+}
+
+.rating-badge.bueno {
+    background: #3B82F6;
+    color: white;
+}
+
+.rating-badge.regular {
+    background: #F59E0B;
+    color: white;
+}
+
+.rating-badge.deficiente {
+    background: #EF4444;
+    color: white;
+}
+
+.rating-badge.malo {
+    background: #DC2626;
+    color: white;
+}
+
+/* Clases para texto de calificación */
+.excelente-text {
+    color: #10B981;
+}
+
+.bueno-text {
+    color: #3B82F6;
+}
+
+.regular-text {
+    color: #F59E0B;
+}
+
+.deficiente-text {
+    color: #EF4444;
+}
+
+.malo-text {
+    color: #DC2626;
+}
+
+/* =========================================
+   FORMULARIOS DE EVALUACIÓN
+========================================= */
+.evaluation-form {
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid #E5E7EB;
+    padding: 1.5rem;
+}
+
+.dark .evaluation-form {
+    background: #18181B;
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.evaluation-group {
+    margin-bottom: 1.5rem;
+}
+
+.evaluation-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.dark .evaluation-group label {
+    color: #D1D5DB;
+}
+
+.evaluation-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #D1D5DB;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    resize: vertical;
+    min-height: 80px;
+    transition: all 0.2s;
+}
+
+.dark .evaluation-group textarea {
+    background: #27272A;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #F9FAFB;
+}
+
+.evaluation-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(226, 27, 35, 0.1);
+}
+
+/* =========================================
+   GRÁFICAS DE EVALUACIÓN
+========================================= */
+.chart-container {
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid #E5E7EB;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.dark .chart-container {
+    background: #18181B;
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.chart-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.dark .chart-title {
+    color: #F9FAFB;
+}
+
+.chart-subtitle {
+    font-size: 0.875rem;
+    color: #6B7280;
+    margin-bottom: 1.5rem;
+}
+
+.dark .chart-subtitle {
+    color: #9CA3AF;
+}
+
+/* =========================================
+   PROGRESS BARS
+========================================= */
+.progress-container {
+    width: 100%;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #6B7280;
+    margin-bottom: 0.25rem;
+}
+
+.dark .progress-label {
+    color: #9CA3AF;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 0.5rem;
+    background: #E5E7EB;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.dark .progress-bar {
+    background: #374151;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 0.3s ease;
+}
+
+/* =========================================
+   BADGES DE NIVEL (CORREGIDOS PARA MOSTRAR "SIN DEFINIR")
+========================================= */
+.nivel-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.nivel-pendiente {
+    background: #9CA3AF;
+    color: #111827;
+}
+
+.dark .nivel-pendiente {
+    background: #6B7280;
+    color: #F9FAFB;
+}
+
+.nivel-baby {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.dark .nivel-baby {
+    background: rgba(245, 158, 11, 0.2);
+    color: #F59E0B;
+}
+
+.nivel-1 {
+    background: #DBEAFE;
+    color: #1E40AF;
+}
+
+.dark .nivel-1 {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3B82F6;
+}
+
+.nivel-2 {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.dark .nivel-2 {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10B981;
+}
+
+.nivel-3 {
+    background: #F3E8FF;
+    color: #7C3AED;
+}
+
+.dark .nivel-3 {
+    background: rgba(139, 92, 246, 0.2);
+    color: #8B5CF6;
+}
+
+.nivel-4 {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.dark .nivel-4 {
+    background: rgba(239, 68, 68, 0.2);
+    color: #EF4444;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+@media (max-width: 768px) {
+    .athlete-card {
+        max-width: 100%;
+    }
+    
+    .athlete-name {
+        font-size: 1.125rem;
+    }
+    
+    .chart-container {
+        padding: 1rem;
+    }
+    
+    .rating-container {
+        flex-wrap: wrap;
+    }
+}
+
+/* =========================================
+   UTILIDADES
+========================================= */
+.text-gradient {
+    background: linear-gradient(135deg, var(--primary) 0%, #F59E0B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.border-gradient {
+    border: 2px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(135deg, var(--primary) 0%, #F59E0B 100%) border-box;
+}
+
+.dark .border-gradient {
+    background: linear-gradient(#18181B, #18181B) padding-box,
+                linear-gradient(135deg, var(--primary) 0%, #F59E0B 100%) border-box;
+}
+
+/* =========================================
+   ANIMACIONES
+========================================= */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes progress-animation {
+    0% {
+        width: 0%;
+    }
+    100% {
+        width: var(--progress-width);
+    }
+}
+
+/* =========================================
+   SCROLLBAR PERSONALIZADO
+========================================= */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #D1D5DB;
+    border-radius: 9999px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #4B5563;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #9CA3AF;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #6B7280;
+}
+/* =========================================
+   ANIMACIONES PARA ESTRELLAS EN TIEMPO REAL
+========================================= */
+@keyframes star-pop {
+    0% {
+        transform: scale(0.8);
+    }
+    50% {
+        transform: scale(1.3);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.star-pop-animation {
+    animation: star-pop 0.3s ease-out;
+}
+
+@keyframes pulse-once {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.pulse-once {
+    animation: pulse-once 0.3s ease-out;
+}
+
+@keyframes shimmer-progress {
+    0% {
+        background-position: -40px 0;
+    }
+    100% {
+        background-position: 40px 0;
+    }
+}
+
+.progress-fill {
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.1) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0.1) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: 40px 100%;
+    animation: shimmer-progress 2s infinite linear;
+}
+
+/* =========================================
+   ESTILOS PARA "SIN DEFINIR"
+========================================= */
+.text-sin-definir {
+    color: #6B7280;
+    font-style: italic;
+}
+
+.dark .text-sin-definir {
+    color: #9CA3AF;
+}
+
+.nivel-pendiente-sindefinir {
+    background: #6B7280 !important;
+    color: white !important;
+    border: 2px solid #9CA3AF;
+    font-style: italic;
+}
+
+.dark .nivel-pendiente-sindefinir {
+    background: #4B5563 !important;
+    color: #F3F4F6 !important;
+    border: 2px solid #6B7280;
+}
+
+/* =========================================
+   ESTRELLAS DE RATING - VERSIÓN CORREGIDA
+========================================= */
+.rating-star-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    transition: all 0.2s;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rating-star-btn:hover {
+    transform: scale(1.2);
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.rating-star-btn .material-symbols-outlined {
+    font-size: 2rem;
+    color: #E5E7EB;
+    transition: all 0.2s;
+}
+
+.dark .rating-star-btn .material-symbols-outlined {
+    color: #4B5563;
+}
+
+.rating-star-btn.filled .material-symbols-outlined {
+    color: #F59E0B;
+    text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+    font-variation-settings: 'FILL' 1;
+}
+
+/* Clases para texto de calificación */
+.excelente-text {
+    color: #10B981 !important;
+}
+
+.bueno-text {
+    color: #3B82F6 !important;
+}
+
+.regular-text {
+    color: #F59E0B !important;
+}
+
+.deficiente-text {
+    color: #EF4444 !important;
+}
+
+.malo-text {
+    color: #DC2626 !important;
+}
+
+/* =========================================
+   BARRA DE PROGRESO MEJORADA
+========================================= */
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: #E5E7EB;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+
+.dark .progress-bar {
+    background: #374151;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #10B981, #34D399);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* =========================================
+   BOTÓN AVANZAR NIVEL
+========================================= */
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 20px 10px rgba(16, 185, 129, 0.7);
+    }
+}
+
+.animate-pulse {
+    animation: pulse-glow 2s infinite;
+}
+/* =========================================
+   ESTRELLAS DE RATING - VERSIÓN MEJORADA
+========================================= */
+.rating-star {
+    font-size: 2rem !important;
+    color: #E5E7EB !important;
+    cursor: pointer;
+    transition: all 0.2s !important;
+    font-variation-settings: 'FILL' 0 !important;
+}
+
+.dark .rating-star {
+    color: #4B5563 !important;
+}
+
+.rating-star.filled {
+    color: #F59E0B !important;
+    text-shadow: 0 0 10px rgba(245, 158, 11, 0.5) !important;
+    font-variation-settings: 'FILL' 1 !important;
+}
+
+.rating-star:hover {
+    transform: scale(1.2) !important;
+}
+
+/* Animación cuando se selecciona una estrella */
+.rating-star.filled.star-pop-animation {
+    animation: star-bounce 0.4s ease-out;
+}
+
+@keyframes star-bounce {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.3);
+    }
+}
+
+/* Contenedor de estrellas */
+.rating-stars {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+/* Contenedor principal */
+.rating-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: rgba(243, 244, 246, 0.5);
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.dark .rating-container {
+    background: rgba(55, 65, 81, 0.3);
+}
+
+/* Calificación actual */
+.calificacion-actual {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.valor-puntuacion {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.max-puntuacion {
+    color: #6B7280;
+    font-size: 1rem;
+}
+
+.dark .max-puntuacion {
+    color: #9CA3AF;
+}
+
+/* Badge de calificación */
+.rating-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    letter-spacing: 0.05em;
+}
+
+/* =========================================
+   ANIMACIONES MEJORADAS
+========================================= */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes number-pop {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+        color: var(--primary);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.pulse-once {
+    animation: number-pop 0.3s ease-out;
+}
+
+/* =========================================
+   FEEDBACK VISUAL PARA ESTRELLAS
+========================================= */
+.rating-star:hover ~ .rating-star:not(.filled) {
+    color: rgba(245, 158, 11, 0.3) !important;
+}
+
+/* =========================================
+   RESPONSIVE PARA ESTRELLAS
+========================================= */
+@media (max-width: 768px) {
+    .rating-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    
+    .rating-stars {
+        justify-content: center;
+        order: 1;
+    }
+    
+    .calificacion-actual {
+        order: 2;
+        justify-content: center;
+    }
+    
+    .rating-badge {
+        order: 3;
+        align-self: center;
+    }
+    
+    .rating-star {
+        font-size: 1.75rem !important;
+    }
+}
+
+/* =========================================
+   ESTADO DE CARGANDO PARA ESTRELLAS
+========================================= */
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+.rating-star.loading {
+    background: linear-gradient(90deg, #E5E7EB 25%, #F3F4F6 50%, #E5E7EB 75%);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 50%;
+}
+
+.dark .rating-star.loading {
+    background: linear-gradient(90deg, #4B5563 25%, #374151 50%, #4B5563 75%);
+}

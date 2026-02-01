@@ -1,0 +1,521 @@
+/* ==========================================
+   CAMBIAR CONTRASEÑA - TITANES EVOLUTION
+   ========================================== */
+
+/* Variables */
+:root {
+    --primary-red: #E21B23;
+    --secondary-black: #1A1A1A;
+    --background-dark: #0A0A0A;
+    --gray-300: #D1D5DB;
+    --gray-400: #9CA3AF;
+    --gray-500: #6B7280;
+    --gray-800: #1F2937;
+    --success-green: #10B981;
+    --warning-yellow: #F59E0B;
+}
+
+/* Body */
+.cambiar-body {
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+    min-height: 100vh;
+    background: var(--background-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+/* Background Pattern */
+.bg-pattern {
+    position: fixed;
+    inset: 0;
+    background-image: 
+        radial-gradient(circle at 2px 2px, rgba(226, 27, 35, 0.05) 1px, transparent 0);
+    background-size: 32px 32px;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Botón Volver */
+.btn-back-cambiar {
+    position: fixed;
+    top: 1.5rem;
+    left: 1.5rem;
+    z-index: 100;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-back-cambiar:hover {
+    background: rgba(226, 27, 35, 0.2);
+    border-color: #E21B23;
+    transform: translateX(-5px);
+}
+
+/* Container Principal */
+.cambiar-container {
+    width: 100%;
+    max-width: 440px;
+    padding: 1rem;
+    position: relative;
+    z-index: 10;
+    margin: 20px 0;
+}
+
+/* Logo Header */
+.logo-header {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.logo-circle {
+    width: 5rem;
+    height: 5rem;
+    background: var(--primary-red);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(226, 27, 35, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo-img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+}
+
+/* Tarjeta de Cambio de Contraseña */
+.cambiar-card {
+    background: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    margin-bottom: 1.5rem;
+}
+
+/* Header con pasos */
+.step-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.step-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.step-number {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--primary-red);
+    background: rgba(226, 27, 35, 0.1);
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--primary-red);
+}
+
+.step-text {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: white;
+}
+
+.email-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--gray-400);
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    margin-top: 0.5rem;
+}
+
+.email-display .material-symbols-outlined {
+    font-size: 1rem;
+    color: var(--primary-red);
+}
+
+/* Formulario */
+.cambiar-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gray-400);
+}
+
+.password-container {
+    position: relative;
+}
+
+.form-input {
+    width: 100%;
+    padding: 1rem;
+    padding-right: 3rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.25rem;
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 2px rgba(226, 27, 35, 0.2);
+}
+
+.toggle-password {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--gray-500);
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.toggle-password:hover {
+    color: var(--primary-red);
+}
+
+.toggle-password .material-symbols-outlined {
+    font-size: 1.25rem;
+}
+
+/* Requisitos de contraseña */
+.password-requirements {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 0.25rem;
+    padding: 1.25rem;
+    margin-top: 1rem;
+}
+
+.requirements-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gray-400);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+}
+
+.requirements-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+}
+
+.requirement {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.requirement::before {
+    content: "●";
+    font-size: 0.6rem;
+}
+
+.requirement.valid {
+    color: var(--success-green);
+}
+
+.requirement.valid::before {
+    content: "✓";
+    font-size: 0.8rem;
+}
+
+.requirement.invalid {
+    color: var(--gray-500);
+}
+
+/* Botón Cambiar */
+.btn-cambiar {
+    width: 100%;
+    padding: 1.125rem;
+    background: var(--primary-red);
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    font-weight: 900;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(226, 27, 35, 0.3);
+    margin-top: 1rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-cambiar:hover:not(:disabled) {
+    background: white;
+    color: var(--secondary-black);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(226, 27, 35, 0.6);
+}
+
+.btn-cambiar:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-cambiar .material-symbols-outlined {
+    font-size: 1.25rem;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    right: 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Error Messages */
+.error-message {
+    font-size: 0.75rem;
+    color: var(--primary-red);
+    margin-top: 0.25rem;
+    min-height: 1rem;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.success-message {
+    font-size: 0.875rem;
+    color: var(--success-green);
+    margin: 1rem 0;
+    text-align: center;
+    display: none;
+    padding: 1rem;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 0.25rem;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.success-message.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Redirección Info */
+.redirect-info {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 0.25rem;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.redirect-text {
+    font-size: 0.8rem;
+    color: var(--warning-yellow);
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Enlace para Login */
+.login-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.login-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--gray-400);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.login-back:hover {
+    color: var(--primary-red);
+}
+
+.login-back .material-symbols-outlined {
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+.login-back:hover .material-symbols-outlined {
+    transform: translateX(-3px);
+}
+
+/* Footer */
+.cambiar-footer {
+    margin-top: 2rem;
+    text-align: center;
+    opacity: 0.6;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.copyright {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--gray-500);
+}
+
+.divider {
+    width: 2.5rem;
+    height: 1px;
+    background: var(--primary-red);
+}
+
+.tagline {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gray-500);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .cambiar-body {
+        padding-top: 80px;
+        padding-bottom: 20px;
+    }
+    
+    .cambiar-container {
+        padding: 0.75rem;
+    }
+    
+    .cambiar-card {
+        padding: 1.5rem;
+    }
+    
+    .step-text {
+        font-size: 1rem;
+    }
+    
+    .btn-cambiar {
+        padding: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .logo-circle {
+        width: 4rem;
+        height: 4rem;
+    }
+    
+    .btn-back-cambiar {
+        top: 1rem;
+        left: 1rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+    }
+}

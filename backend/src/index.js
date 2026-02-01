@@ -1,4 +1,4 @@
-// backend/src/index.js - VERSIÓN CON TAREAS PROGRAMADAS Y RUTAS CORREGIDAS
+// backend/src/index.js - VERSIÓN COMPLETA CON RUTAS ENTRENADOR
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -20,26 +20,49 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' }
 }));
 
+// ====================
+// CONFIGURACIÓN CORS CORREGIDA
+// ====================
 const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = [
       'http://localhost:3000',
       'http://localhost:3001',
       'http://localhost:5173',
+      'http://localhost:8080',
       'http://127.0.0.1:3000',
+      'http://127.0.0.1:5173',
+      'http://127.0.0.1:8080',
+      'http://0.0.0.0:8080',
+      'http://localhost:5500',
+      'http://127.0.0.1:5500',
+      'http://192.168.1.*:*', // Para red local
       process.env.FRONTEND_URL
     ].filter(Boolean);
 
+    // Permitir peticiones sin origen (Postman, curl, etc.)
     if (!origin) {
       return callback(null, true);
     }
 
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    // EN DESARROLLO: Permitir cualquier origen (SOLO PARA TESTING)
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`🌐 Permitiendo CORS para: ${origin}`);
+      return callback(null, true);
+    }
+
+    // En producción: verificar orígenes permitidos
+    if (allowedOrigins.some(allowedOrigin => {
+      if (allowedOrigin.includes('*')) {
+        const regex = new RegExp(allowedOrigin.replace(/\*/g, '.*'));
+        return regex.test(origin);
+      }
+      return allowedOrigin === origin;
+    })) {
       return callback(null, true);
     } else {
-      const msg = `El origen ${origin} no tiene acceso a esta API.`;
-      console.warn('⚠️  CORS bloqueado:', msg);
-      return callback(new Error(msg), false);
+      console.warn(`⚠️  Origen no permitido: ${origin}`);
+      return callback(new Error('Origen no permitido por CORS'), false);
     }
   },
   credentials: true,
@@ -49,20 +72,48 @@ const corsOptions = {
     'Authorization', 
     'X-Requested-With', 
     'Accept', 
-    'Origin'
+    'Origin',
+    'Access-Control-Allow-Origin',
+    'Access-Control-Allow-Headers'
   ],
-  exposedHeaders: ['Content-Disposition']
+  exposedHeaders: ['Content-Disposition'],
+  maxAge: 86400,
+  preflightContinue: false,
+  optionsSuccessStatus: 200
 };
 
+// Aplicar CORS
 app.use(cors(corsOptions));
 
+// IMPORTANTE: Manejar OPTIONS requests para CORS preflight
+app.options('*', cors(corsOptions));
+
+// Middleware adicional para headers CORS
+app.use((req, res, next) => {
+  // Si la petición es OPTIONS, responder inmediatamente
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    return res.status(200).end();
+  }
+  
+  // Para otras peticiones, agregar headers
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  next();
+});
+
+// Middleware de logging mejorado
 app.use((req, res, next) => {
   const start = Date.now();
   
   res.on('finish', () => {
     const duration = Date.now() - start;
     const statusColor = res.statusCode >= 400 ? '❌' : res.statusCode >= 300 ? '⚠️ ' : '✅';
-    console.log(`${statusColor} ${new Date().toLocaleTimeString()} - ${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration}ms`);
+    const origin = req.headers.origin || 'Sin origen';
+    console.log(`${statusColor} [${new Date().toLocaleTimeString()}] ${req.method} ${req.originalUrl} - ${res.statusCode} (${duration}ms) - Origen: ${origin}`);
   });
   
   next();
@@ -84,38 +135,42 @@ const initializeServer = async () => {
     console.log('\n📁 Cargando rutas...');
     
     // ====================
-    // SECCIÓN DE RUTAS (CORREGIDA)
+    // SECCIÓN DE RUTAS - ORDEN CORREGIDO
     // ====================
-    // Cargar rutas CRÍTICAS (si fallan, detenemos el servidor)
+    
+    // 1. RUTAS CRÍTICAS (si fallan, el servidor debería detenerse)
     try {
       const authRoutes = require('./routes/authRoutes');
       app.use('/api/auth', authRoutes);
       console.log('✅ /api/auth cargado');
     } catch (error) {
       console.error('❌ ERROR CRÍTICO: No se pudo cargar authRoutes:', error.message);
+      console.error('Stack:', error.stack);
+      process.exit(1);
     }
     
-    try {
-      const deportistaRoutes = require('./routes/deportistaRoutes');
-      app.use('/api/deportistas', deportistaRoutes);
-      console.log('✅ /api/deportistas cargado');
-    } catch (error) {
-      console.warn('⚠️  deportistaRoutes no encontrado');
+    // 2. RUTAS PRINCIPALES
+    const mainRoutes = [
+      { path: '/api/deportistas', file: './routes/deportistaRoutes', required: true },
+      { path: '/api/reportes', file: './routes/reportesRoutes', required: true },
+      { path: '/api/entrenador', file: './routes/entrenadorRoutes', required: true } // ✅ AGREGADA
+    ];
+    
+    for (const route of mainRoutes) {
+      try {
+        const routeModule = require(route.file);
+        app.use(route.path, routeModule);
+        console.log(`✅ ${route.path} cargado`);
+      } catch (error) {
+        console.error(`❌ Error cargando ${route.path}:`, error.message);
+        if (route.required) {
+          console.error('Stack:', error.stack);
+        }
+      }
     }
     
-    // ⚠️ IMPORTANTE: AGREGAR reportesRoutes ANTES de las rutas opcionales
-    try {
-      const reportesRoutes = require('./routes/reportesRoutes');
-      app.use('/api/reportes', reportesRoutes);
-      console.log('✅ /api/reportes cargado');
-    } catch (error) {
-      console.error('❌ ERROR: No se pudo cargar reportesRoutes:', error.message);
-      // No detenemos el servidor, pero lo reportamos como error
-    }
-    
-    // Rutas opcionales (si no existen, solo mostramos advertencia)
+    // 3. RUTAS OPCIONALES
     const optionalRoutes = [
-      { path: '/api/entrenador', file: './routes/entrenadorRoutes' },
       { path: '/api/admin', file: './routes/adminRoutes' },
       { path: '/api/evaluaciones', file: './routes/evaluacionRoutes' },
       { path: '/api/habilidades', file: './routes/habilidadRoutes' },
@@ -133,7 +188,7 @@ const initializeServer = async () => {
         if (error.code === 'MODULE_NOT_FOUND') {
           console.log(`🔶 ${route.file} no encontrado (opcional)`);
         } else {
-          console.error(`❌ Error cargando ${route.path}:`, error.message);
+          console.warn(`⚠️  Error cargando ${route.path}:`, error.message);
         }
       }
     }
@@ -152,6 +207,54 @@ const initializeServer = async () => {
     // ====================
     // RUTAS DEL SISTEMA
     // ====================
+    // Ruta de prueba CORS
+    app.get('/api/test-cors', (req, res) => {
+      res.json({
+        success: true,
+        message: 'CORS funcionando correctamente',
+        origin: req.headers.origin || 'No especificado',
+        timestamp: new Date().toISOString(),
+        allowedMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
+      });
+    });
+    
+    // Health check mejorado
+    app.get('/api/health', async (req, res) => {
+      try {
+        const { sequelize } = require('./config/database');
+        await sequelize.authenticate();
+        
+        const healthCheck = {
+          status: 'healthy',
+          timestamp: new Date().toISOString(),
+          service: 'eval-deportistas-api',
+          uptime: process.uptime(),
+          cors: {
+            enabled: true,
+            origin: req.headers.origin || 'No especificado',
+            status: 'active'
+          },
+          memory: {
+            rss: `${(process.memoryUsage().rss / 1024 / 1024).toFixed(2)} MB`,
+            heapTotal: `${(process.memoryUsage().heapTotal / 1024 / 1024).toFixed(2)} MB`,
+            heapUsed: `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB`
+          },
+          database: 'connected',
+          environment: process.env.NODE_ENV || 'development'
+        };
+        
+        res.json(healthCheck);
+      } catch (dbError) {
+        res.status(503).json({
+          status: 'degraded',
+          timestamp: new Date().toISOString(),
+          database: 'disconnected',
+          error: dbError.message
+        });
+      }
+    });
+    
+    // Ruta principal
     app.get('/', (req, res) => {
       res.json({
         api: 'Sistema de Gestión Deportiva - Titanes Cheer Evolution',
@@ -159,94 +262,88 @@ const initializeServer = async () => {
         environment: process.env.NODE_ENV || 'development',
         timestamp: new Date().toISOString(),
         status: 'operational',
+        cors: 'enabled',
         features: {
           deportistas: 'Gestión completa de deportistas',
           reportes: 'Generación de reportes PDF y Excel con filtros',
           calendario: 'Sistema de eventos con filtros por nivel y grupo',
           notificaciones: 'Notificaciones automáticas (24h y 1h antes)',
           evaluaciones: 'Sistema de evaluación de habilidades',
-          upload: 'Subida de archivos y documentos'
+          upload: 'Subida de archivos y documentos',
+          entrenador: 'Sistema completo para entrenadores' // ✅ AGREGADA
         },
         endpoints: {
           auth: '/api/auth',
           deportistas: '/api/deportistas',
           reportes: '/api/reportes',
+          entrenador: '/api/entrenador', // ✅ AGREGADA
           calendario: '/api/calendario',
           notificaciones: '/api/notificaciones',
-          health: '/api/health'
+          health: '/api/health',
+          testCors: '/api/test-cors'
         },
-        reportes_disponibles: [
-          '/api/reportes/excel/grupal - Reporte Excel de deportistas',
-          '/api/reportes/documento/:id - Documento individual PDF',
-          '/api/reportes/documentos/masivos - Documentos masivos en ZIP',
-          '/api/reportes/opciones-filtros - Opciones para filtros'
-        ]
+        documentation: 'Ver README.md para más información'
       });
     });
     
-    app.get('/api/health', async (req, res) => {
-      const healthCheck = {
-        status: 'healthy',
-        timestamp: new Date().toISOString(),
-        service: 'eval-deportistas-api',
-        uptime: process.uptime(),
-        memory: {
-          rss: `${(process.memoryUsage().rss / 1024 / 1024).toFixed(2)} MB`,
-          heapTotal: `${(process.memoryUsage().heapTotal / 1024 / 1024).toFixed(2)} MB`,
-          heapUsed: `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB`
-        }
-      };
-      
-      try {
-        const { sequelize } = require('./config/database');
-        await sequelize.authenticate();
-        healthCheck.database = 'connected';
-      } catch (dbError) {
-        healthCheck.database = 'disconnected';
-        healthCheck.status = 'degraded';
-      }
-      
-      res.json(healthCheck);
-    });
-    
+    // ====================
+    // MANEJO DE ERRORES
+    // ====================
     // Ruta 404
     app.use('*', (req, res) => {
       res.status(404).json({
         success: false,
         error: 'Ruta no encontrada',
         path: req.originalUrl,
-        method: req.method
+        method: req.method,
+        timestamp: new Date().toISOString(),
+        suggested_endpoints: [
+          '/api/auth/login',
+          '/api/health',
+          '/api/deportistas',
+          '/api/entrenador/perfil', // ✅ AGREGADA
+          '/api/test-cors'
+        ]
       });
     });
     
     // Manejo global de errores
     app.use((err, req, res, next) => {
       console.error('❌ Error del servidor:', err.message);
+      console.error('Stack:', err.stack);
       
-      let statusCode = 500;
-      let errorMessage = 'Error interno del servidor';
-      
-      if (err.status) {
-        statusCode = err.status;
-        errorMessage = err.message;
+      // Si es error CORS, dar más información
+      if (err.message.includes('CORS') || err.message.includes('origen')) {
+        return res.status(403).json({
+          success: false,
+          error: 'Error CORS',
+          message: `El origen '${req.headers.origin}' no tiene acceso.`,
+          timestamp: new Date().toISOString(),
+          solution: 'Contacta al administrador para agregar tu dominio a la lista blanca de CORS'
+        });
       }
+      
+      let statusCode = err.status || 500;
+      let errorMessage = err.message || 'Error interno del servidor';
       
       res.status(statusCode).json({
         success: false,
         error: errorMessage,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        path: req.originalUrl
       });
     });
     
     // ====================
     // INICIAR SERVIDOR
     // ====================
-    app.listen(PORT, '0.0.0.0', () => {
+    const server = app.listen(PORT, '0.0.0.0', () => {
       console.log('\n' + '='.repeat(70));
       console.log('🚀 SISTEMA DE GESTIÓN DEPORTIVA - TITANES CHEER EVOLUTION');
       console.log('='.repeat(70));
       console.log(`📡 Servidor:    http://localhost:${PORT}`);
       console.log(`🌐 Ambiente:    ${process.env.NODE_ENV || 'development'}`);
+      console.log(`🔒 CORS:        Habilitado para desarrollo`);
       console.log(`⏰ Iniciado:    ${new Date().toLocaleString()}`);
       console.log('='.repeat(70));
       
@@ -258,71 +355,63 @@ const initializeServer = async () => {
       console.log('│ ✅ Calendario con filtros por nivel y grupo            │');
       console.log('│ ✅ Notificaciones automáticas (24h y 1h antes)         │');
       console.log('│ ✅ Sistema de evaluaciones                             │');
+      console.log('│ ✅ Panel de entrenadores (NUEVO)                       │'); // ✅ AGREGADA
+      console.log('│ ✅ CORS completamente habilitado                       │');
       console.log('└─────────────────────────────────────────────────────────┘');
       
-      console.log('\n📊 SISTEMA DE REPORTES:');
-      console.log('   - Reporte Excel con filtros avanzados');
-      console.log('   - Documentos PDF individuales');
-      console.log('   - Descarga masiva en formato ZIP');
-      console.log('   - Filtros por nivel, grupo, estado y rangos');
+      console.log('\n🌐 DOMINIOS PERMITIDOS (CORS):');
+      console.log('   - http://localhost:8080');
+      console.log('   - http://127.0.0.1:8080');
+      console.log('   - http://localhost:3000');
+      console.log('   - http://127.0.0.1:3000');
+      console.log('   - http://localhost:5173');
+      console.log('   - http://localhost:5500');
+      console.log('   - * (Todos en modo desarrollo)');
       
-      console.log('\n🔔 NOTIFICACIONES:');
-      console.log('   - Recordatorios 24h antes del evento');
-      console.log('   - Recordatorios 1h antes del evento');
-      console.log('   - Notificaciones de creación/modificación/eliminación');
-      console.log('   - Tarea automática cada 30 minutos');
+      console.log('\n🔧 RUTAS DE PRUEBA:');
+      console.log('   GET  /api/health                    - Verificar estado del servidor');
+      console.log('   GET  /api/test-cors                 - Probar configuración CORS');
+      console.log('   POST /api/auth/login                - Iniciar sesión');
+      console.log('   GET  /api/entrenador/perfil         - Perfil del entrenador'); // ✅ AGREGADA
       
-      console.log('\n💡 ENDPOINTS PRINCIPALES:');
-      console.log('   GET  /api/health');
-      console.log('   GET  /api/reportes/excel/grupal');
-      console.log('   GET  /api/calendario/filtros');
-      console.log('   POST /api/calendario');
-      console.log('   GET  /api/notificaciones');
+      console.log('\n💡 PARA PROBAR PERFIL ENTRENADOR:');
+      console.log('   1. Inicia sesión como entrenador');
+      console.log('   2. Ve a la consola del navegador (F12)');
+      console.log('   3. Ejecuta: fetch("http://localhost:5000/api/entrenador/perfil", {');
+      console.log('        headers: { "Authorization": "Bearer TU_TOKEN_AQUÍ" }');
+      console.log('      })');
+      console.log('   4. Deberías ver los datos del entrenador');
+      
       console.log('\n' + '='.repeat(70));
-      
-      console.log('\n🔧 RUTAS CARGADAS:');
-      console.log('   ✅ /api/auth');
-      console.log('   ✅ /api/deportistas');
-      console.log('   ✅ /api/reportes');
-      
-      // Verificar rutas opcionales cargadas
-      const rutasCargadas = [];
-      const rutasNoCargadas = [];
-      
-      optionalRoutes.forEach(route => {
-        try {
-          require.resolve(route.file);
-          rutasCargadas.push(route.path);
-        } catch {
-          rutasNoCargadas.push(route.file.split('/').pop().replace('Routes.js', ''));
-        }
+    });
+    
+    // Manejo de señales de terminación
+    const gracefulShutdown = () => {
+      console.log('\n🛑 Recibida señal de terminación. Cerrando servidor...');
+      server.close(() => {
+        console.log('✅ Servidor cerrado exitosamente');
+        process.exit(0);
       });
       
-      if (rutasCargadas.length > 0) {
-        console.log(`   ✅ ${rutasCargadas.join('\n   ✅ ')}`);
-      }
-      
-      if (rutasNoCargadas.length > 0) {
-        console.log(`   🔶 Módulos no encontrados: ${rutasNoCargadas.join(', ')}`);
-      }
-    });
+      // Forzar cierre después de 10 segundos
+      setTimeout(() => {
+        console.error('❌ Timeout forzando cierre del servidor');
+        process.exit(1);
+      }, 10000);
+    };
     
-    process.on('SIGTERM', () => {
-      console.log('\n🛑 Recibido SIGTERM. Cerrando servidor...');
-      process.exit(0);
-    });
-    
-    process.on('SIGINT', () => {
-      console.log('\n🛑 Recibido SIGINT. Cerrando servidor...');
-      process.exit(0);
-    });
+    process.on('SIGTERM', gracefulShutdown);
+    process.on('SIGINT', gracefulShutdown);
+    process.on('SIGUSR2', gracefulShutdown); // Para nodemon
     
   } catch (error) {
     console.error('❌ Error crítico al iniciar el servidor:', error);
+    console.error('Stack:', error.stack);
     process.exit(1);
   }
 };
 
+// Iniciar servidor
 initializeServer();
 
 module.exports = app;

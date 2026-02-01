@@ -1,4 +1,4 @@
-// backend/src/routes/adminRoutes.js - VERSIÓN COMPLETA (YA CORRECTA)
+// backend/src/routes/adminRoutes.js - VERSIÓN CORREGIDA
 const express = require('express');
 const router = express.Router();
 const AdminController = require('../controllers/adminController');
@@ -26,7 +26,7 @@ router.delete('/entrenadores/:id', AdminController.deleteEntrenador);
 router.patch('/entrenadores/:id/toggle-status', AdminController.toggleEntrenadorStatus);
 
 // ==========================================
-// GESTIÓN DE ADMINISTRADORES (NUEVO)
+// GESTIÓN DE ADMINISTRADORES
 // ==========================================
 router.get('/administradores', AdminController.getAllAdministradores);
 router.post('/administradores', AdminController.createAdministrador);
@@ -35,16 +35,39 @@ router.delete('/administradores/:id', AdminController.deleteAdministrador);
 router.patch('/administradores/:id/toggle-status', AdminController.toggleAdministradorStatus);
 
 // ==========================================
-// VISTA GLOBAL DE DEPORTISTAS
+// GESTIÓN DE DEPORTISTAS - CORREGIDO
 // ==========================================
-router.get('/deportistas/all', AdminController.getAllDeportistasGlobal);
-router.get('/deportistas/by-entrenador/:entrenador_id', AdminController.getDeportistasByEntrenador);
+
+// 🔥 CORRECCIÓN CRÍTICA: SOLO USAR EL MÉTODO QUE EXISTE
+router.delete('/deportistas/:id', AdminController.eliminarDeportistaCompleto);// ⬅️ ÚNICO DELETE
+
+// RUTAS ESPECÍFICAS
+router.patch('/deportistas/:id/campo', AdminController.updateDeportistaCampo);
+router.patch('/deportistas/:id/info', AdminController.updateDeportistaInfo);
+router.patch('/deportistas/:id/toggle-status', AdminController.toggleDeportistaStatus);
+
+// 🔥 ELIMINAR ESTA RUTA DUPLICADA (causa el error 404)
+// router.delete('/deportistas/:id/eliminar', AdminController.eliminarDeportistaCompleto);
+
+// Rutas con parámetros específicos
+router.get('/deportistas/:id', AdminController.getDeportistaById);
+router.put('/deportistas/:id', AdminController.updateDeportista);
+
+// Rutas generales
+router.get('/deportistas/search', AdminController.searchDeportistas);
+router.get('/deportistas', AdminController.getAllDeportistasGlobal);
+
+
+// ==========================================
+// EVALUACIONES
+// ==========================================
+router.get('/evaluaciones', AdminController.getAllEvaluaciones);
+router.get('/evaluaciones/recientes', AdminController.getEvaluacionesRecientes);
 
 // ==========================================
 // REPORTES
 // ==========================================
 router.get('/reportes/resumen', AdminController.getReporteResumen);
-router.get('/reportes/progreso-global', AdminController.getReporteProgresoGlobal);
 router.get('/reportes/actividad', AdminController.getReporteActividad);
 
 module.exports = router;

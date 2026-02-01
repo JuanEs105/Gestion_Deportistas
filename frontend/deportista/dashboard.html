@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Mi Dashboard | Titanes Evolution</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#E21B23",
+                        secondary: "#1A1A1A",
+                        "background-light": "#F8F9FA",
+                        "background-dark": "#0A0A0A",
+                    },
+                    fontFamily: {
+                        display: ["Oswald", "sans-serif"],
+                        body: ["Montserrat", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "4px",
+                    },
+                },
+            },
+        };
+    </script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body class="font-body bg-background-light dark:bg-background-dark text-secondary dark:text-gray-100 transition-colors duration-300 min-h-screen">
+    
+    <!-- SIDEBAR -->
+    <aside class="fixed left-0 top-0 h-full w-20 lg:w-72 bg-secondary text-white z-50 transition-all duration-300 border-r border-white/5">
+        <div class="flex flex-col h-full">
+            <!-- Logo -->
+            <div class="p-6 flex items-center gap-3">
+                <div class="w-10 h-10 bg-primary rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden">
+                    <img alt="Logo" class="w-full h-full object-cover scale-110" src="../assets/images/logo titanes.jpg"/>
+                </div>
+                <span class="font-display text-2xl font-bold tracking-tighter uppercase italic hidden lg:inline">
+                    Titanes<span class="text-primary">Evolution</span>
+                </span>
+            </div>
+            
+            <!-- Perfil del Deportista -->
+            <div class="px-6 mb-6" onclick="window.location.href='perfil/perfil.html'" style="cursor: default;">
+                <button class="flex items-center gap-3 w-full p-2 rounded-xl hover:bg-white/5 transition-colors text-left group">
+                    <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary" id="profileAvatarContainer">
+                        <div class="w-full h-full bg-primary flex items-center justify-center">
+                            <span class="text-white font-bold text-xl" id="profileInitial">?</span>
+                        </div>
+                    </div>
+                    <div class="hidden lg:block overflow-hidden">
+                        <p class="text-sm font-bold truncate" id="profileName">Cargando...</p>
+                        <p class="text-[10px] uppercase tracking-widest text-primary font-bold">Ver Mi Perfil</p>
+                    </div>
+                </button>
+            </div>
+            
+            <!-- Navegación -->
+            <nav class="flex-1 px-4 space-y-1">
+                <a class="flex items-center gap-4 px-4 py-3 bg-primary rounded-lg text-white group" href="dashboard.html">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="font-semibold hidden lg:inline">Dashboard</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group text-gray-400 hover:text-white" href="mis-evaluaciones/index.html">
+                    <span class="material-symbols-outlined">assignment</span>
+                    <span class="font-semibold hidden lg:inline">Mis Evaluaciones</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group text-gray-400 hover:text-white" href="progreso/index.html">
+                    <span class="material-symbols-outlined">trending_up</span>
+                    <span class="font-semibold hidden lg:inline">Mi Progreso</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group text-gray-400 hover:text-white" href="calendario/index.html">
+                    <span class="material-symbols-outlined">calendar_month</span>
+                    <span class="font-semibold hidden lg:inline">Calendario</span>
+                </a>
+            </nav>
+            
+            <!-- Footer -->
+            <div class="p-4 border-t border-white/10 space-y-1">
+                <button class="flex items-center gap-4 px-4 py-3 w-full hover:bg-white/10 rounded-lg transition-colors group text-gray-400 hover:text-white" id="toggleTheme">
+                    <span class="material-symbols-outlined">dark_mode</span>
+                    <span class="font-semibold hidden lg:inline">Modo Oscuro</span>
+                </button>
+                <button class="flex items-center gap-4 px-4 py-3 w-full hover:bg-white/10 rounded-lg transition-colors group text-red-500" id="logoutBtn">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="font-semibold hidden lg:inline">Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="ml-20 lg:ml-72 p-4 lg:p-10 transition-all duration-300">
+        <!-- Header -->
+        <header class="mb-10">
+            <h1 class="font-display text-4xl md:text-6xl font-black uppercase italic tracking-tighter leading-none">
+                MI <span class="text-primary">RENDIMIENTO</span>
+            </h1>
+            <div class="h-1.5 w-32 bg-primary mt-2"></div>
+        </header>
+
+        <!-- Estado de Carga -->
+        <div id="loadingState" class="flex justify-center items-center py-20">
+            <div class="text-center">
+                <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto mb-4"></div>
+                <p class="text-gray-600 dark:text-gray-400 font-semibold">Cargando tu información...</p>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="hidden bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-6">
+            <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-red-500 text-3xl">error</span>
+                <div class="flex-1">
+                    <h3 class="font-bold text-red-800 dark:text-red-300 mb-2">Error al cargar datos</h3>
+                    <p class="text-red-600 dark:text-red-400 text-sm" id="errorMessage"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido Principal (oculto hasta que cargue) -->
+        <div id="mainContent" class="hidden">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
+                <!-- Nivel Actual -->
+                <div class="bg-white dark:bg-zinc-900 p-6 shadow-sm border-l-4 border-primary">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 font-bold uppercase text-[10px] tracking-[0.2em]">Nivel Actual</span>
+                        <span class="material-symbols-outlined text-primary">monitoring</span>
+                    </div>
+                    <div class="text-3xl font-display font-bold" id="nivelActual">--</div>
+                    <div class="text-xs text-gray-500 mt-2 uppercase tracking-widest font-semibold" id="nivelSubtitulo">Cargando...</div>
+                </div>
+
+                <!-- Promedio General -->
+                <div class="bg-white dark:bg-zinc-900 p-6 shadow-sm border-l-4 border-secondary dark:border-white/20">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 font-bold uppercase text-[10px] tracking-[0.2em]">Promedio General</span>
+                        <span class="material-symbols-outlined text-primary">grade</span>
+                    </div>
+                    <div class="text-4xl font-display font-bold text-primary" id="promedioGeneral">0.0</div>
+                    <div class="text-xs text-gray-500 mt-2 font-bold uppercase tracking-widest" id="promedioTexto">Sin evaluaciones</div>
+                </div>
+
+                <!-- Total Evaluaciones -->
+                <div class="bg-white dark:bg-zinc-900 p-6 shadow-sm border-l-4 border-primary">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 font-bold uppercase text-[10px] tracking-[0.2em]">Evaluaciones</span>
+                        <span class="material-symbols-outlined text-primary">assignment</span>
+                    </div>
+                    <div class="text-4xl font-display font-bold" id="totalEvaluaciones">0</div>
+                    <div class="text-xs text-gray-500 mt-2" id="evaluacionesCompletadas">0 completadas</div>
+                </div>
+
+                <!-- Equipo Competitivo -->
+                <div class="bg-white dark:bg-zinc-900 p-6 shadow-sm border-l-4 border-secondary dark:border-white/20">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 font-bold uppercase text-[10px] tracking-[0.2em]">Equipo</span>
+                        <span class="material-symbols-outlined text-primary">groups</span>
+                    </div>
+                    <div class="text-xl font-display font-bold" id="equipoNombre">Sin equipo</div>
+                    <div class="text-xs text-gray-500 mt-2 uppercase tracking-widest font-semibold">Competitivo</div>
+                </div>
+            </div>
+
+            <!-- Grid Principal -->
+            <div class="grid lg:grid-cols-12 gap-10">
+                <!-- Columna Izquierda -->
+                <div class="lg:col-span-8 space-y-10">
+                    <!-- Acceso Rápido -->
+                    <section>
+                        <h3 class="font-display text-xl font-bold uppercase italic tracking-wider mb-6 flex items-center gap-2">
+                            <span class="w-2 h-6 bg-primary"></span>
+                            ACCESO RÁPIDO
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <a href="habilidades/index.html" class="bg-secondary text-white p-6 rounded-lg hover:bg-primary transition-all flex flex-col items-center justify-center gap-4 group text-center border-b-4 border-primary">
+                                <span class="material-symbols-outlined text-4xl group-hover:scale-110 transition-transform">sports_kabaddi</span>
+                                <span class="font-display font-bold uppercase tracking-tight text-lg">Mis Habilidades</span>
+                            </a>
+                            <a href="mis-evaluaciones/index.html" class="bg-white dark:bg-zinc-900 p-6 rounded-lg hover:border-primary border-2 border-transparent transition-all flex flex-col items-center justify-center gap-4 text-center shadow-sm">
+                                <span class="material-symbols-outlined text-4xl text-primary">assignment</span>
+                                <span class="font-display font-bold uppercase tracking-tight text-lg">Ver Evaluaciones</span>
+                            </a>
+                            <a href="progreso/index.html" class="bg-white dark:bg-zinc-900 p-6 rounded-lg hover:border-primary border-2 border-transparent transition-all flex flex-col items-center justify-center gap-4 text-center shadow-sm">
+                                <span class="material-symbols-outlined text-4xl text-primary">trending_up</span>
+                                <span class="font-display font-bold uppercase tracking-tight text-lg">Mi Progreso</span>
+                            </a>
+                        </div>
+                    </section>
+
+                    <!-- Últimas Evaluaciones -->
+                    <section>
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="font-display text-xl font-bold uppercase italic tracking-wider flex items-center gap-2">
+                                <span class="w-2 h-6 bg-secondary dark:bg-white"></span>
+                                ÚLTIMAS EVALUACIONES
+                            </h3>
+                            <a href="mis-evaluaciones/index.html" class="text-primary hover:underline text-sm font-bold uppercase">Ver todas →</a>
+                        </div>
+                        <div class="space-y-4" id="ultimasEvaluaciones">
+                            <!-- Se llenará dinámicamente -->
+                            <div class="text-center py-8 text-gray-400">
+                                <span class="material-symbols-outlined text-5xl mb-2">assignment</span>
+                                <p>Cargando evaluaciones...</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Columna Derecha -->
+                <div class="lg:col-span-4 space-y-8">
+                    <!-- Meta del Mes / Progreso -->
+                    <div class="bg-secondary text-white p-8 relative overflow-hidden">
+                        <div class="relative z-10">
+                            <h4 class="font-display text-2xl font-bold uppercase italic tracking-tighter mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">ads_click</span>
+                                PROGRESO ACTUAL
+                            </h4>
+                            <div class="space-y-6">
+                                <div>
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-xs uppercase font-bold text-gray-400 tracking-widest">Habilidades Completadas</span>
+                                        <span class="text-xs font-bold text-primary" id="porcentajeProgreso">0%</span>
+                                    </div>
+                                    <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+                                        <div class="bg-primary h-full transition-all duration-500" id="barraProgreso" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-400 italic" id="mensajeMotivacion">
+                                    "La disciplina es el puente entre las metas y el logro. ¡Sigue así!"
+                                </p>
+                            </div>
+                        </div>
+                        <div class="absolute -bottom-4 -right-4 font-display text-8xl font-black text-white/[0.03] italic uppercase pointer-events-none">
+                            META
+                        </div>
+                    </div>
+
+                    <!-- Información Personal -->
+                    <div class="bg-white dark:bg-zinc-900 p-6 border border-gray-100 dark:border-white/5">
+                        <h4 class="font-display text-lg font-bold uppercase italic tracking-wider mb-4 border-b-2 border-primary w-fit pb-1">Mi Información</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center pb-2 border-b border-gray-100 dark:border-white/5">
+                                <span class="text-sm text-gray-500">Estado</span>
+                                <span class="font-bold" id="estadoDeportista">--</span>
+                            </div>
+                            <div class="flex justify-between items-center pb-2 border-b border-gray-100 dark:border-white/5">
+                                <span class="text-sm text-gray-500">Peso</span>
+                                <span class="font-bold" id="pesoDeportista">-- kg</span>
+                            </div>
+                            <div class="flex justify-between items-center pb-2 border-b border-gray-100 dark:border-white/5">
+                                <span class="text-sm text-gray-500">Altura</span>
+                                <span class="font-bold" id="alturaDeportista">-- m</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500">IMC</span>
+                                <span class="font-bold" id="imcDeportista">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="ml-20 lg:ml-72 p-8 border-t border-gray-200 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-medium">
+        <p>© 2026 Titanes Evolution - Gestión de Rendimiento Deportivo.</p>
+        <div class="flex items-center gap-6">
+            <span class="flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span> 
+                Modo Atleta Activo
+            </span>
+        </div>
+    </footer>
+
+    <!-- Botón de Ayuda -->
+    <button class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform z-50 group" id="helpBtn">
+        <span class="material-symbols-outlined group-hover:rotate-12 transition-transform">help</span>
+    </button>
+
+    <!-- Scripts -->
+    <script src="api.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>

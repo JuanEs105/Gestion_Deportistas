@@ -35,6 +35,21 @@ const Deportista = sequelize.define('Deportista', {
     allowNull: true,
     comment: 'Nivel deportivo general (ej: Intermedio)'
   },
+    direccion: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Dirección de residencia'
+  },
+  eps: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'EPS o sistema de salud'
+  },
+  talla_camiseta: {
+    type: DataTypes.STRING(10),
+    allowNull: true,
+    comment: 'Talla de camiseta (S, M, L, XL, etc)'
+  },
   
   // ==========================================
   // NIVELES (SISTEMA ORIGINAL + BABY TITANS)
@@ -121,6 +136,7 @@ const Deportista = sequelize.define('Deportista', {
     type: DataTypes.STRING,
     allowNull: true
   },
+  
   acepta_terminos: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,

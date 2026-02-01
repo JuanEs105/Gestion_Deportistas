@@ -1,4 +1,4 @@
-// backend/src/models/Habilidad.js - ACTUALIZADO
+// backend/src/models/Habilidad.js - ACTUALIZADO CON PUNTUACIÓN 1-5
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
@@ -22,10 +22,16 @@ const Habilidad = sequelize.define('Habilidad', {
     allowNull: true
   },
   nivel: {
-    type: DataTypes.ENUM('1_basico', '1_medio', '1_avanzado', '2', '3', '4'),
-    allowNull: false,
-    defaultValue: '1_basico',
-    comment: 'Nivel de dificultad: 1_basico, 1_medio, 1_avanzado, 2, 3, 4'
+    type: DataTypes.ENUM(
+        'baby_titans',
+        '1_basico', 
+        '1_medio', 
+        '1_avanzado', 
+        '2', 
+        '3', 
+        '4'
+    ),
+    allowNull: false
   },
   categoria: {
     type: DataTypes.ENUM('habilidad', 'ejercicio_accesorio', 'postura'),
@@ -40,12 +46,12 @@ const Habilidad = sequelize.define('Habilidad', {
   },
   puntuacion_minima: {
     type: DataTypes.INTEGER,
-    defaultValue: 7,
+    defaultValue: 3, // 🔥 CAMBIADO: Ahora 3/5 es el mínimo (antes era 7/10)
     validate: {
       min: 1,
-      max: 10
+      max: 5  // 🔥 CAMBIADO: Máximo ahora es 5 (antes era 10)
     },
-    comment: 'Puntuación mínima (1-10) para considerar completada'
+    comment: 'Puntuación mínima (1-5) para considerar completada la habilidad'
   },
   tipo: {
     type: DataTypes.STRING,
@@ -78,12 +84,42 @@ const Habilidad = sequelize.define('Habilidad', {
   ]
 });
 
-// Métodos de instancia
+// ==========================================
+// MÉTODOS DE INSTANCIA
+// ==========================================
+
+/**
+ * Verifica si una habilidad está completada según la puntuación
+ * @param {number} puntuacion - Puntuación obtenida (1-5)
+ * @returns {boolean}
+ */
 Habilidad.prototype.estaCompletada = function(puntuacion) {
   return puntuacion >= this.puntuacion_minima;
 };
 
-// Métodos estáticos
+/**
+ * Obtiene el nivel de desempeño según la puntuación
+ * @param {number} puntuacion - Puntuación obtenida (1-5)
+ * @returns {string}
+ */
+Habilidad.prototype.getNivelDesempeno = function(puntuacion) {
+  if (puntuacion >= 5) return 'Excelente';
+  if (puntuacion >= 4) return 'Bueno';
+  if (puntuacion >= 3) return 'Regular';
+  if (puntuacion >= 2) return 'Deficiente';
+  return 'Malo';
+};
+
+// ==========================================
+// MÉTODOS ESTÁTICOS
+// ==========================================
+
+/**
+ * Obtener habilidades por nivel y opcionalmente por categoría
+ * @param {string} nivel - Nivel de la habilidad
+ * @param {string|null} categoria - Categoría opcional
+ * @returns {Promise<Array>}
+ */
 Habilidad.obtenerPorNivelYCategoria = async function(nivel, categoria = null) {
   const where = { nivel, activa: true };
   if (categoria) {
@@ -96,6 +132,11 @@ Habilidad.obtenerPorNivelYCategoria = async function(nivel, categoria = null) {
   });
 };
 
+/**
+ * Obtener estadísticas de habilidades por nivel
+ * @param {string} nivel - Nivel a consultar
+ * @returns {Promise<Object>}
+ */
 Habilidad.obtenerEstadisticasPorNivel = async function(nivel) {
   const habilidades = await this.findAll({
     where: { nivel, activa: true },
@@ -113,15 +154,12 @@ Habilidad.obtenerEstadisticasPorNivel = async function(nivel) {
   }, {});
 };
 
-// Asociaciones
-Habilidad.associate = function(models) {
-  Habilidad.hasMany(models.Evaluacion, {
-    foreignKey: 'habilidad_id',
-    as: 'evaluaciones'
-  });
-};
-
-// Método para obtener habilidades con estado de evaluación
+/**
+ * Obtener habilidades con estado de evaluación para un deportista
+ * @param {string} deportistaId - ID del deportista
+ * @param {string} nivel - Nivel a consultar
+ * @returns {Promise<Array>}
+ */
 Habilidad.getConEstadoEvaluacion = async function(deportistaId, nivel) {
   const habilidades = await this.findAll({
     where: { nivel, activa: true },
@@ -157,6 +195,17 @@ Habilidad.getConEstadoEvaluacion = async function(deportistaId, nivel) {
         completada: evalu.mejor_puntuacion >= h.puntuacion_minima
       } : null
     };
+  });
+};
+
+// ==========================================
+// ASOCIACIONES
+// ==========================================
+
+Habilidad.associate = function(models) {
+  Habilidad.hasMany(models.Evaluacion, {
+    foreignKey: 'habilidad_id',
+    as: 'evaluaciones'
   });
 };
 

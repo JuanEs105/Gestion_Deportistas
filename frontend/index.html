@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titanes Evolution | Elite Cheerleading Club</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;700;900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+        rel="stylesheet">
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="assets/css/landing.css">
+    <!-- Configuración Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#FF0000",
+                        primaryDark: "#CC0000",
+                        deepBlack: "#050505",
+                        cardBlack: "#0F0F0F",
+                    },
+                    fontFamily: {
+                        'sport': ['Oswald', 'sans-serif'],
+                        'montserrat': ['Montserrat', 'sans-serif']
+                    },
+                    animation: {
+                        'ping-slow': 'ping 3s cubic-bezier(0, 0, 0.2, 1) infinite',
+                    },
+                    transform: {
+                        'skew-20': 'skewX(-20deg)',
+                        'skew-10': 'skewX(-10deg)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Estilos adicionales para el efecto ladeado */
+        .skewed-container {
+            transform: skewX(-15deg);
+        }
+
+        .unskew-content {
+            transform: skewX(15deg);
+        }
+
+        .skewed-image-frame {
+            transform: perspective(1000px) rotateY(5deg) rotateX(2deg) skewX(-12deg);
+            transform-style: preserve-3d;
+        }
+
+        /* Remover parallax problemático */
+        .hero-section {
+            transform: none !important;
+        }
+
+        /* Fix para que no se mueva el texto */
+        .section-content {
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+    </style>
+</head>
+
+<body class="overflow-x-hidden bg-deepBlack text-white font-montserrat">
+    <!-- Navbar -->
+    <nav class="navbar fixed w-full z-[100] bg-black/80 backdrop-blur-xl border-b border-primary/20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between h-24 items-center">
+                <!-- Logo -->
+                <div class="flex items-center gap-4 group cursor-pointer">
+                    <div
+                        class="relative w-16 h-16 overflow-hidden border-2 border-primary rounded-sm transform -skew-x-12">
+                        <img alt="Logo Titanes Evolution" class="object-cover w-full h-full scale-110"
+                            src="assets/images/logo titanes.jpg" />
+                        <div class="absolute inset-0 bg-primary/20 animate-pulse mix-blend-overlay"></div>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-sport text-3xl leading-none tracking-tighter">TITANES</span>
+                        <span class="font-sport text-primary text-xl leading-none tracking-widest">EVOLUTION</span>
+                    </div>
+                </div>
+
+                <!-- Menú Desktop -->
+                <div class="hidden lg:flex items-center space-x-10">
+                    <a class="nav-link" href="index.html">INICIO</a>
+                    <a class="nav-link" href="historia.html">HISTORIA</a>
+                    <a class="nav-link" href="competencias.html">COMPETENCIAS</a>
+                    <a class="nav-link" href="ubicacion.html">UBICACIÓN</a>
+                    <a class="nav-btn" href="auth/acceso.html">
+                        ACCESO SISTEMA
+                    </a>
+                </div>
+
+                <!-- Menú Mobile -->
+                <button class="lg:hidden text-primary" id="mobileMenuBtn">
+                    <span class="material-symbols-outlined text-4xl">menu</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Menú Mobile (oculto por defecto) -->
+        <div class="lg:hidden hidden bg-deepBlack border-t border-primary/20" id="mobileMenu">
+            <div class="max-w-7xl mx-auto px-6 py-6 space-y-4">
+                <a class="block nav-link text-lg" href="index.html">INICIO</a>
+                <a class="block nav-link text-lg" href="historia.html">HISTORIA</a>
+                <a class="block nav-link text-lg" href="competencias.html">COMPETENCIAS</a>
+                <a class="block nav-link text-lg" href="ubicacion.html">UBICACIÓN</a>
+                <a class="block nav-btn mt-4 text-center" href="auth/acceso.html">
+                    ACCESO SISTEMA
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section con Video en marco horizontal -->
+    <header class="hero-section relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-deepBlack">
+
+        <!-- Contenedor principal -->
+        <div class="relative z-20 w-full max-w-7xl mx-auto px-6 py-12 lg:py-20">
+            <div class="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+
+                <!-- Columna izquierda: Video en marco horizontal -->
+                <div class="relative group order-2 lg:order-1">
+                    <!-- Marco exterior con efecto 3D -->
+                    <div
+                        class="relative skewed-image-frame transition-all duration-500 hover:skew-x-[-8deg] hover:scale-[1.02]">
+                        <!-- Sombra de fondo -->
+                        <div
+                            class="absolute -inset-6 bg-gradient-to-br from-primary/30 via-red-600/20 to-primary/10 blur-3xl rounded-3xl opacity-60 group-hover:opacity-80 transition-opacity duration-700">
+                        </div>
+
+                        <!-- Marco principal horizontal -->
+                        <div class="relative overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black border-2 border-primary/30 backdrop-blur-sm"
+                            style="clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);">
+
+                            <!-- Video dentro del marco -->
+                            <div class="relative h-[600px] lg:h-[700px] w-full overflow-hidden">
+                                <video autoplay muted loop playsinline
+                                    class="absolute inset-0 w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105"
+                                    style="transform: skewX(8deg) scale(1.05); transform-origin: center;">
+                                    <source src="assets/images/c0009_UuwZy5Ci.mp4" type="video/mp4">
+                                    <!-- Fallback si no carga el video -->
+                                    <img src="assets/images/InicioGif.gif" alt="Titanes Evolution"
+                                        class="w-full h-full object-cover">
+                                </video>
+
+                                <!-- Overlay de gradiente para mejor legibilidad -->
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent">
+                                </div>
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40">
+                                </div>
+                            </div>
+
+                            <!-- Borde luminoso interior -->
+                            <div class="absolute inset-0 border border-white/10 pointer-events-none"></div>
+                        </div>
+
+                        <!-- Esquina decorativa superior derecha -->
+                        <div class="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 border-primary rounded-tr-lg">
+                        </div>
+
+                        <!-- Esquina decorativa inferior izquierda -->
+                        <div
+                            class="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 border-primary rounded-bl-lg">
+                        </div>
+
+                        <!-- Badge "VIDEO" en esquina -->
+                        <div
+                            class="absolute -top-3 -left-3 bg-primary text-white px-4 py-1 font-sport text-sm angular-clip shadow-lg z-10">
+                            VIDEO
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna derecha: Texto y botones -->
+                <div class="space-y-8 lg:space-y-10 order-1 lg:order-2">
+                    <!-- Badge Elite -->
+                    <div class="inline-block bg-primary text-white px-6 py-2 font-sport text-xl skew-x-[-20deg] mb-6">
+                        <span class="inline-block skew-x-[20deg]">ELITE CHEERLEADING</span>
+                    </div>
+
+                    <!-- Título Principal -->
+                    <div class="mb-6">
+                        <h1 class="font-sport text-5xl md:text-7xl lg:text-8xl leading-[0.8] text-white mb-2">
+                            TITANES
+                        </h1>
+                        <h1 class="font-sport text-5xl md:text-7xl lg:text-8xl leading-[0.8] text-white">
+                            <span class="text-primary">EVOLUTION</span>
+                        </h1>
+                    </div>
+
+                    <!-- Subtítulo -->
+                    <h2 class="font-sport text-3xl md:text-4xl lg:text-5xl text-white mb-6">
+                        FORJANDO <span class="neon-red">LEYENDAS</span>
+                    </h2>
+
+                    <!-- Descripción -->
+                    <div class="space-y-4 mb-8">
+                        <p
+                            class="text-xl md:text-2xl font-light text-gray-200 italic border-l-4 border-primary pl-4 py-2">
+                            Duitama se rinde ante la potencia.
+                        </p>
+                        <p class="text-lg md:text-xl text-gray-300">
+                            Únete al club de porrismo más laureado de la región.
+                            Entrenamiento profesional, competiciones nacionales
+                            y formación integral.
+                        </p>
+                    </div>
+
+                    <!-- Estadísticas rápidas -->
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div class="bg-white/5 p-4 rounded-lg border border-white/10">
+                            <div class="font-sport text-3xl text-primary">15+</div>
+                            <div class="text-xs uppercase tracking-widest text-gray-400 mt-1">Títulos</div>
+                        </div>
+                        <div class="bg-white/5 p-4 rounded-lg border border-white/10">
+                            <div class="font-sport text-3xl text-primary">200+</div>
+                            <div class="text-xs uppercase tracking-widest text-gray-400 mt-1">Deportistas</div>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="historia.html" class="btn-primary flex-1 text-center justify-center">
+                            <span class="flex items-center justify-center gap-3">
+                                <span>EMPEZAR AHORA</span>
+                                <span
+                                    class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sección Historia -->
+    <section class="section-padding bg-cardBlack" id="historia">
+        <div class="max-w-7xl mx-auto px-6 section-content">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                <!-- Columna Izquierda: Imagen con marco LADEADO -->
+                <div class="relative group order-2 lg:order-1">
+                    <!-- Marco ladeado con efecto 3D -->
+                    <div
+                        class="relative skewed-image-frame transition-all duration-500 hover:skew-x-[-10deg] hover:scale-[1.02]">
+                        <!-- Sombra roja de fondo -->
+                        <div
+                            class="absolute -inset-6 bg-gradient-to-br from-primary/30 via-red-600/20 to-primary/10 blur-3xl rounded-3xl opacity-60 group-hover:opacity-80 transition-opacity duration-700">
+                        </div>
+
+                        <!-- Marco principal ladeado -->
+                        <div class="relative overflow-hidden bg-gradient-to-br from-primary/20 via-red-700/10 to-primary/10 border-2 border-primary/30 backdrop-blur-sm"
+                            style="clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%);">
+
+                            <!-- Imagen dentro del marco ladeado -->
+                            <div class="relative h-[550px] overflow-hidden">
+                                <img alt="Historia del equipo Titanes Evolution"
+                                    class="w-full h-full object-cover object-center transform transition-transform duration-700 group-hover:scale-105"
+                                    src="assets/images/historia.jpg" loading="lazy"
+                                    style="transform: skewX(12deg) scale(1.1); transform-origin: center;">
+
+                                <!-- Overlay de gradiente -->
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent mix-blend-overlay">
+                                </div>
+                            </div>
+
+                            <!-- Borde luminoso interior -->
+                            <div class="absolute inset-0 border-2 border-white/10 pointer-events-none"></div>
+                        </div>
+
+                        <!-- Efecto de esquina superior derecha -->
+                        <div
+                            class="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-primary/70 rounded-tr-lg">
+                        </div>
+
+                        <!-- Efecto de esquina inferior izquierda -->
+                        <div
+                            class="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-primary/70 rounded-bl-lg">
+                        </div>
+
+                        <!-- Badge ladeado -->
+                        <div
+                            class="absolute -bottom-6 -right-4 bg-gradient-to-br from-primary to-primaryDark px-8 py-3 font-sport text-xl angular-clip-left shadow-2xl z-10 border-2 border-white/20 transform -skew-x-12">
+                            <span class="inline-block skew-x-12 text-white drop-shadow-lg">EST. 2024
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Contenido -->
+                <div class="space-y-8 order-1 lg:order-2">
+                    <div>
+                        <h2 class="font-sport text-5xl md:text-6xl lg:text-7xl italic leading-none text-white">
+                            NUESTRA <br>
+                            <span class="text-primary">HISTORIA</span>
+                        </h2>
+                        <div class="h-2 w-32 bg-primary mt-4"></div>
+                    </div>
+
+                    <p class="text-gray-300 text-lg md:text-xl leading-relaxed">
+                        Titanes Evolution no es solo un equipo, es una filosofía de vida.
+                        Nacidos en Duitama con el sueño de elevar el nivel del cheerleading
+                        en Boyacá, hemos transformado el esfuerzo en oro y el sudor en
+                        gloria nacional.
+                    </p>
+
+                    <!-- Estadísticas con fondo ladeado -->
+                    <div class="grid grid-cols-2 gap-6 md:gap-8 pt-6">
+                        <div class="relative overflow-hidden group">
+                            <!-- Fondo ladeado -->
+                            <div
+                                class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent transform -skew-x-6 -ml-2">
+                            </div>
+                            <!-- Contenido -->
+                            <div
+                                class="relative text-center p-6 border border-white/10 hover:border-primary/30 transition-all duration-300">
+                                <span class="font-sport text-4xl md:text-5xl text-white block counter"
+                                    data-target="15">0</span>
+                                <span class="text-primary font-bold tracking-widest text-xs uppercase mt-2">Títulos
+                                    Nacionales</span>
+                                <div class="h-1 w-0 bg-primary mt-3 group-hover:w-full transition-all duration-500">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative overflow-hidden group">
+                            <!-- Fondo ladeado -->
+                            <div
+                                class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent transform -skew-x-6 -ml-2">
+                            </div>
+                            <!-- Contenido -->
+                            <div
+                                class="relative text-center p-6 border border-white/10 hover:border-primary/30 transition-all duration-300">
+                                <span class="font-sport text-4xl md:text-5xl text-white block counter"
+                                    data-target="200">0</span>
+                                <span class="text-primary font-bold tracking-widest text-xs uppercase mt-2">Deportistas
+                                    Activos</span>
+                                <div class="h-1 w-0 bg-primary mt-3 group-hover:w-full transition-all duration-500">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botón ver más -->
+                    <div class="pt-6">
+                        <a href="historia.html"
+                            class="inline-flex items-center gap-2 font-bold uppercase text-sm tracking-widest text-primary hover:gap-4 transition-all group">
+                            VER HISTORIA COMPLETA
+                            <span
+                                class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Competencias -->
+    <section class="section-padding bg-deepBlack" id="competencias">
+        <div class="max-w-7xl mx-auto px-6 section-content">
+            <!-- Header de sección -->
+            <div class="mb-12 lg:mb-16 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                <div>
+                    <h2 class="font-sport text-5xl md:text-6xl lg:text-8xl text-primary neon-red">DOMINIO</h2>
+                    <h3 class="font-sport text-4xl md:text-5xl lg:text-6xl text-white">EN EL TAPETE</h3>
+                </div>
+                <div class="max-w-md text-left lg:text-right text-gray-400 font-medium">
+                    Momentos épicos capturados en las competencias más exigentes del país.
+                </div>
+            </div>
+
+            <!-- Galería de competencias - Imagen principal más grande -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 mb-6 md:mb-8">
+                <!-- Imagen 1 PRINCIPAL - Más grande verticalmente -->
+                <div
+                    class="lg:col-span-7 h-[1000px] md:h-[1000px] lg:h-[750px] relative overflow-hidden group rounded-xl">
+                    <!-- Gradiente sutil de fondo mientras carga -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-30"></div>
+
+                    <img alt="Competencia nacional - Titanes Evolution"
+                        class="w-full h-full object-cover object-center transition-all duration-700 group-hover:scale-105"
+                        src="assets/images/esta queremos que sea la principal ya que nos gusta mucho.jpg"
+                        loading="eager" style="transform-origin: center center;">
+
+                    <!-- Overlay de gradiente para texto -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+                    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent"></div>
+
+                    <!-- Texto en la imagen -->
+                    <div class="absolute bottom-0 left-0 right-0 p-6 md:p-8 lg:p-10">
+                        <div class="mb-3">
+                            <span
+                                class="font-sport text-3xl md:text-4xl text-white bg-primary/90 px-5 py-3 rounded-lg inline-block">
+                                GLORIA NACIONAL
+                            </span>
+                        </div>
+                        <h4 class="font-sport text-4xl md:text-5xl lg:text-6xl text-white mb-3">
+                            2024
+                        </h4>
+                        <p class="text-gray-200 text-lg md:text-xl max-w-2xl">
+                            Titanes inverciones final worlds 2024
+                        </p>
+                    </div>
+
+                    <!-- Efecto de brillo al hover -->
+                    <div
+                        class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000">
+                    </div>
+                </div>
+
+                <!-- Columna derecha con dos imágenes más pequeñas -->
+                <div class="lg:col-span-5 flex flex-col gap-4 md:gap-6">
+                    <!-- Imagen 2 (arriba) -->
+                    <div class="h-[550px] md:h-[650px] relative overflow-hidden group rounded-xl">
+                        <img alt="Entrenamiento intenso"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            src="assets/images/IMG_1175.jpg" loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent">
+                        </div>
+                        <div class="absolute bottom-6 left-6">
+                            <span class="font-sport text-xl text-white bg-primary/90 px-4 py-2 rounded">ENTRENO</span>
+                        </div>
+                        <!-- Texto superpuesto -->
+                        <div class="absolute top-6 right-6 text-right">
+                            <p class="text-white/80 text-sm uppercase tracking-widest">PREPARACIÓN</p>
+                        </div>
+                    </div>
+
+                    <!-- Imagen 3 (abajo) -->
+                    <div class="h-[350px] md:h-[400px] relative overflow-hidden group rounded-xl">
+                        <img alt="Celebración del equipo"
+                            class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                            src="assets/images/IMG_2416.jpg" loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                        <!-- Texto central grande -->
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center w-full">
+                            <h4
+                                class="font-sport text-4xl md:text-5xl lg:text-6xl text-white/20 group-hover:text-white/40 transition-colors uppercase">
+                                EQUIPO
+                            </h4>
+                        </div>
+                        <!-- Badge esquina -->
+                        <div class="absolute bottom-6 right-6">
+                            <span class="font-sport text-xl text-white bg-primary/90 px-4 py-2 rounded">UNIÓN</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila inferior con texto destacado -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6 md:mt-8">
+                <!-- Texto destacado -->
+                <div
+                    class="lg:col-span-5 h-[250px] md:h-[300px] flex items-center justify-center bg-primary transform -skew-x-3 lg:-skew-x-6 -ml-4 lg:-ml-10 z-10 rounded-xl">
+                    <div class="transform skew-x-3 lg:skew-x-6 text-center p-6 lg:p-8">
+                        <h5 class="font-sport text-3xl md:text-4xl lg:text-5xl text-black leading-tight">
+                            MÁS QUE UN <br />
+                            <span class="text-white">EQUIPO</span>
+                        </h5>
+                        <p class="text-black/90 font-bold uppercase mt-4 tracking-tighter text-sm md:text-base">
+                            Una evolución imparable hacia la cima
+                        </p>
+                        <div class="mt-6">
+                            <div class="inline-flex items-center gap-2 text-black font-bold">
+                                <span>FAMILIA</span>
+                                <span class="material-symbols-outlined">favorite</span>
+                                <span>PASIÓN</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Imagen 4 -->
+                <div class="lg:col-span-7 h-[250px] md:h-[300px] relative overflow-hidden group rounded-xl">
+                    <img alt="Trofeos y reconocimientos"
+                        class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
+                        src="assets/images/Titanes toe toch worlds 2024.jpg" loading="lazy">
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-6 left-6 max-w-md">
+                        <h6 class="font-sport text-2xl md:text-3xl text-white mb-2">RECONOCIMIENTOS</h6>
+                        <p class="text-gray-200 text-sm md:text-base">
+                            15+ títulos nacionales y 3 internacionales
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón ver más -->
+            <div class="text-center mt-12 md:mt-16">
+                <a href="competencias.html"
+                    class="inline-flex items-center gap-2 font-bold uppercase text-sm tracking-widest text-primary hover:gap-4 transition-all group px-8 py-4 border-2 border-primary/30 hover:border-primary rounded-lg">
+                    VER TODAS LAS COMPETENCIAS
+                    <span
+                        class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Ubicación -->
+    <section class="section-padding bg-cardBlack" id="ubicacion">
+        <div class="max-w-7xl mx-auto px-6 section-content">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <!-- Contenido -->
+                <div class="space-y-8 lg:space-y-10">
+                    <div class="relative">
+                        <h2 class="font-sport text-5xl md:text-6xl lg:text-7xl text-white leading-none">
+                            DONDE <br />
+                            <span class="text-primary">ENTRENAMOS</span>
+                        </h2>
+                        <span
+                            class="absolute -top-6 -left-6 text-[80px] md:text-[120px] font-sport text-white/5 pointer-events-none">
+                            VENUE
+                        </span>
+                    </div>
+
+                    <!-- Información de contacto -->
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-6 group">
+                            <div class="info-icon">
+                                <span class="material-symbols-outlined text-3xl">location_on</span>
+                            </div>
+                            <div>
+                                <h4 class="font-sport text-xl md:text-2xl text-white">CENTRO DE ALTO RENDIMIENTO</h4>
+                                <p class="text-gray-400 font-medium mt-2">📍 Duitama/Boyacá Carrera 25# 22 -14</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-6 group">
+                            <div class="info-icon">
+                                <span class="material-symbols-outlined text-3xl">timer</span>
+                            </div>
+                            <div>
+                                <h4 class="font-sport text-xl md:text-2xl text-white">HORARIOS ELITE</h4>
+                                <p class="text-gray-400 font-medium mt-2">Lunes a Sábado: 4:00 PM - 10:00 PM</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cita -->
+                    <div class="p-6 border-2 border-primary/30 angular-clip-left bg-primary/5">
+                        <p class="italic text-gray-300 text-lg">
+                            "Instalaciones equipadas con Tatami profesional de 12 tiras, zona de acrobacia y gimnasio de
+                            fuerza."
+                        </p>
+                    </div>
+
+                    <!-- Botón ver más -->
+                    <div>
+                        <a href="ubicacion.html"
+                            class="inline-flex items-center gap-2 font-bold uppercase text-sm tracking-widest text-primary hover:gap-4 transition-all group">
+                            VER UBICACIÓN COMPLETA
+                            <span
+                                class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Mapa/Imagen -->
+                <div class="relative h-[400px] lg:h-[500px]">
+                    <div class="absolute inset-0 bg-primary/20 transform translate-x-3 translate-y-3 rounded-lg"></div>
+                    <div class="relative h-full w-full overflow-hidden border-2 border-white/20 shadow-2xl rounded-lg">
+                        <img alt="Gimnasio Titanes Evolution"
+                            class="w-full h-full object-cover object-center grayscale hover:grayscale-0 transition-all duration-700"
+                            src="assets/images/IMG_1175.jpg" loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent mix-blend-color">
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div
+                                class="w-16 h-16 md:w-20 md:h-20 bg-primary/90 rounded-full flex items-center justify-center animate-ping-slow absolute">
+                            </div>
+                            <div
+                                class="w-12 h-12 md:w-16 md:h-16 bg-primary rounded-full flex items-center justify-center relative z-10 border-4 border-white">
+                                <span class="material-symbols-outlined text-white">location_on</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-12 lg:gap-16 mb-12 lg:mb-20">
+                <!-- Logo y descripción -->
+                <div class="col-span-2 space-y-6">
+                    <div class="flex items-center gap-4">
+                        <div class="font-sport text-4xl lg:text-5xl tracking-tighter">
+                            TITANES<span class="text-primary">EVOLUTION</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 max-w-md text-lg italic">
+                        El primer club de porrismo en Duitama enfocado en alto rendimiento y formación integral.
+                        Liderando el camino hacia la excelencia deportiva desde 2012.
+                    </p>
+                    <!-- Redes sociales -->
+                    <div class="flex gap-4">
+                        <a class="social-link" href="https://www.facebook.com/groups/titanescheerevolution/"
+                            target="_blank" rel="noopener noreferrer" title="Facebook Titanes Evolution">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z">
+                                </path>
+                            </svg>
+                        </a>
+                        <a class="social-link" href="https://www.instagram.com/titanescheerevolution/reels/"
+                            target="_blank" rel="noopener noreferrer" title="Instagram Titanes Evolution">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z">
+                                </path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Navegación -->
+                <div>
+                    <h5 class="font-sport text-xl mb-6">NAVEGACIÓN</h5>
+                    <ul class="space-y-3">
+                        <li><a class="footer-link" href="index.html">INICIO</a></li>
+                        <li><a class="footer-link" href="historia.html">HISTORIA</a></li>
+                        <li><a class="footer-link" href="competencias.html">COMPETENCIAS</a></li>
+                        <li><a class="footer-link" href="ubicacion.html">UBICACIÓN</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contacto -->
+                <div>
+                    <h5 class="font-sport text-xl mb-6">CONTACTO</h5>
+                    <ul class="space-y-4 text-gray-400">
+                        <li class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary">phone_iphone</span>
+                            +57 313 3864382
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="footer-bottom">
+                <p>© 2026 TITANES EVOLUTION. ALL RIGHTS RESERVED.</p>
+                <div class="flex gap-6 md:gap-8">
+                    <a class="footer-legal-link" href="#">PRIVACIDAD</a>
+                    <a class="footer-legal-link" href="#">TÉRMINOS</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Button -->
+    <a class="whatsapp-btn" href="https://wa.me/573133864382" target="_blank">
+        <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24">
+            <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z">
+            </path>
+        </svg>
+    </a>
+
+    <!-- JavaScript corregido (sin parallax problemático) -->
+    <script src="assets/js/main.js"></script>
+    <script>
+        // Corrección específica para el parallax problemático
+        document.addEventListener('DOMContentLoaded', function () {
+            // Remover el listener de parallax problemático del JS original
+            const scrollEvent = window.addEventListener('scroll', function () {
+                // Esto previene cualquier movimiento extraño
+                requestAnimationFrame(() => {
+                    // Mantener todo estable
+                    document.querySelectorAll('.section-content').forEach(el => {
+                        el.style.transform = 'translateZ(0)';
+                    });
+                });
+            });
+
+            // Contador de estadísticas funciona normal
+            const counters = document.querySelectorAll('.counter');
+            if (counters.length > 0) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const target = +entry.target.getAttribute('data-target');
+                            const increment = target / 100;
+                            let current = 0;
+
+                            const updateCounter = () => {
+                                if (current < target) {
+                                    current += increment;
+                                    entry.target.textContent = Math.ceil(current);
+                                    setTimeout(updateCounter, 20);
+                                } else {
+                                    entry.target.textContent = target + '+';
+                                }
+                            };
+
+                            updateCounter();
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                counters.forEach(counter => observer.observe(counter));
+            }
+        });
+    </script>
+</body>
+
+</html>

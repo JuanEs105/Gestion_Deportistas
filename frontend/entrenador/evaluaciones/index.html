@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selección de Deportista | Titanes Evolution</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../dashboard.css">
+    <link rel="stylesheet" href="style.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#E21B23",
+                        secondary: "#1A1A1A",
+                        "dark-grey": "#333333",
+                        "background-light": "#F8F9FA",
+                        "background-dark": "#0A0A0A",
+                    },
+                    fontFamily: {
+                        display: ["Oswald", "sans-serif"],
+                        body: ["Montserrat", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "4px",
+                    },
+                },
+            },
+        };
+    </script>
+</head>
+<body class="font-body bg-background-light dark:bg-background-dark text-secondary dark:text-gray-100 transition-colors duration-300 min-h-screen">
+    <!-- SIDEBAR - ENTRENADOR -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-content">
+            <!-- Logo -->
+            <div class="sidebar-logo">
+                <div class="logo-container">
+                    <img src="../../assets/images/logo titanes.jpg" alt="Logo">
+                </div>
+                <span class="logo-text">TITANES<span class="text-primary">EVOLUTION</span></span>
+            </div>
+
+            <!-- Perfil del Entrenador -->
+            <div class="coach-profile">
+                <div class="profile-avatar">
+                    <img id="sidebarAvatar" src="https://via.placeholder.com/100" alt="Foto de perfil">
+                </div>
+                <div class="profile-info">
+                    <p class="profile-name" id="sidebarName">Cargando...</p>
+                    <p class="profile-role">ENTRENADOR</p>
+                </div>
+                <span class="material-symbols-outlined profile-icon">check_circle</span>
+            </div>
+
+            <!-- Navegación -->
+            <nav class="sidebar-nav">
+                <a href="../dashboard.html" class="nav-item">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="../deportistas/index.html" class="nav-item">
+                    <span class="material-symbols-outlined">groups</span>
+                    <span class="nav-text">Deportistas</span>
+                </a>
+                <a href="index.html" class="nav-item active">
+                    <span class="material-symbols-outlined">assignment</span>
+                    <span class="nav-text">Evaluaciones</span>
+                </a>
+                <a href="../calendario/index.html" class="nav-item">
+                    <span class="material-symbols-outlined">calendar_month</span>
+                    <span class="nav-text">Calendario</span>
+                </a>
+            </nav>
+
+            <!-- Footer del Sidebar -->
+            <div class="sidebar-footer">
+                <button class="nav-item" id="toggleTheme">
+                    <span class="material-symbols-outlined">dark_mode</span>
+                    <span class="nav-text">Modo Oscuro</span>
+                </button>
+                <button class="nav-item logout-btn" id="logoutBtn">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="nav-text">Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="mb-8 lg:mb-12">
+            <div>
+                <h1 class="sports-heading text-3xl lg:text-4xl font-bold text-secondary dark:text-white mb-2">
+                    Evaluaciones <span class="text-primary">Técnicas</span>
+                </h1>
+                <p class="text-gray-500 dark:text-gray-400 font-medium">
+                    Selecciona un deportista para evaluar habilidades, ejercicios y posturas
+                </p>
+            </div>
+        </header>
+
+        <!-- Filtros -->
+        <div class="bg-white dark:bg-zinc-900 p-4 lg:p-6 mb-8 shadow-lg border-b-4 border-primary grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Búsqueda por Nombre -->
+            <div class="relative">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">search</span>
+                <input id="searchInput" 
+                       class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-white/10 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-sm font-medium uppercase tracking-wider" 
+                       placeholder="Buscar por Nombre" 
+                       type="text">
+            </div>
+            
+            <!-- Filtro por Nivel -->
+            <div class="relative">
+                <select id="filtroNivel" 
+                        class="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-white/10 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-sm font-medium uppercase tracking-wider appearance-none">
+                    <option value="">Todos los Niveles</option>
+                    <option value="pendiente">⏳ Pendiente</option>
+                    <option value="baby_titans">👶 Baby Titans</option>
+                    <option value="1_basico">🥉 1 Básico</option>
+                    <option value="1_medio">🥈 1 Medio</option>
+                    <option value="1_avanzado">🥇 1 Avanzado</option>
+                    <option value="2">⭐ Nivel 2</option>
+                    <option value="3">🌟🌟 Nivel 3</option>
+                    <option value="4">🌟🌟🌟 Nivel 4</option>
+                </select>
+                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">expand_more</span>
+            </div>
+            
+            <!-- Filtro por Equipo -->
+            <div class="relative">
+                <select id="filtroEquipo" 
+                        class="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-white/10 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-sm font-medium uppercase tracking-wider appearance-none">
+                    <option value="">Todos los Equipos</option>
+                    <option value="sin_equipo">🚫 Sin Equipo</option>
+                    <option value="rocks_titans">🪨 Rocks Titans</option>
+                    <option value="lightning_titans">⚡ Lightning Titans</option>
+                    <option value="storm_titans">🌪️ Storm Titans</option>
+                    <option value="fire_titans">🔥 Fire Titans</option>
+                    <option value="electric_titans">⚡ Electric Titans</option>
+                </select>
+                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none">expand_more</span>
+            </div>
+        </div>
+
+        <!-- Grid de Deportistas -->
+        <div id="deportistasContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Los deportistas se cargarán aquí dinámicamente -->
+            <div class="text-center py-12 col-span-full">
+                <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto mb-4"></div>
+                <p class="text-gray-500 dark:text-gray-400">Cargando deportistas...</p>
+            </div>
+        </div>
+
+        <!-- Sin resultados -->
+        <div id="noResults" class="hidden text-center py-16">
+            <span class="material-symbols-outlined text-6xl text-gray-300 dark:text-gray-600 mb-4">search_off</span>
+            <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                No se encontraron deportistas
+            </h3>
+            <p class="text-gray-500 dark:text-gray-400">
+                Intenta con otros filtros o asegúrate de que haya deportistas asignados
+            </p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-content p-6 border-t border-gray-200 dark:border-white/5">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
+            <p class="text-gray-500 dark:text-gray-400 font-medium">© 2024 TITANES EVOLUTION - SISTEMA DE EVALUACIONES</p>
+            <div class="flex items-center gap-6">
+                <div class="status flex items-center gap-2">
+                    <span id="statusDot" class="w-2 h-2 rounded-full bg-gray-400"></span>
+                    <span id="serverStatus" class="text-gray-500 dark:text-gray-400 font-medium">Conectando...</span>
+                </div>
+                <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary transition-colors font-medium">Soporte</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Container para notificaciones -->
+    <div id="notificationContainer"></div>
+
+    <!-- Scripts -->
+    <script src="../api.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

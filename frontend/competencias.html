@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competencias | Titanes Evolution</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;700;900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="assets/css/landing.css">
+    <link rel="stylesheet" href="assets/css/competencias.css">
+    <!-- Configuración Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#FF0000",
+                        primaryDark: "#CC0000",
+                        deepBlack: "#050505",
+                        cardBlack: "#0F0F0F",
+                    },
+                    fontFamily: {
+                        'sport': ['Oswald', 'sans-serif'],
+                        'montserrat': ['Montserrat', 'sans-serif']
+                    },
+                    animation: {
+                        'ping-slow': 'ping 3s cubic-bezier(0, 0, 0.2, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="overflow-x-hidden bg-deepBlack text-white font-montserrat">
+    <!-- Navbar FIJO -->
+    <nav class="navbar fixed w-full z-[100] bg-black/95 backdrop-blur-xl border-b border-primary/20 scrolled">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between h-24 items-center">
+                <!-- Logo -->
+                <div class="flex items-center gap-4 group cursor-pointer">
+                    <div class="relative w-16 h-16 overflow-hidden border-2 border-primary rounded-sm transform -skew-x-12">
+                        <img alt="Logo Titanes Evolution" class="object-cover w-full h-full scale-110" src="assets/images/logo titanes.jpg"/>
+                        <div class="absolute inset-0 bg-primary/20 animate-pulse mix-blend-overlay"></div>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-sport text-3xl leading-none tracking-tighter">TITANES</span>
+                        <span class="font-sport text-primary text-xl leading-none tracking-widest">EVOLUTION</span>
+                    </div>
+                </div>
+                
+                <!-- Menú Desktop -->
+                <div class="hidden lg:flex items-center space-x-10">
+                    <a class="nav-link" href="index.html">INICIO</a>
+                    <a class="nav-link" href="historia.html">HISTORIA</a>
+                    <a class="nav-link text-primary" href="competencias.html">COMPETENCIAS</a>
+                    <a class="nav-link" href="ubicacion.html">UBICACIÓN</a>
+                    <a class="nav-btn" href="auth/acceso.html">
+                        ACCESO SISTEMA
+                    </a>
+                </div>
+                
+                <!-- Menú Mobile -->
+                <button class="lg:hidden text-primary" id="mobileMenuBtn">
+                    <span class="material-symbols-outlined text-4xl">menu</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Menú Mobile (oculto por defecto) -->
+        <div class="lg:hidden hidden bg-deepBlack border-t border-primary/20" id="mobileMenu">
+            <div class="max-w-7xl mx-auto px-6 py-6 space-y-4">
+                <a class="block nav-link text-lg" href="index.html">INICIO</a>
+                <a class="block nav-link text-lg" href="historia.html">HISTORIA</a>
+                <a class="block nav-link text-lg text-primary" href="competencias.html">COMPETENCIAS</a>
+                <a class="block nav-link text-lg" href="ubicacion.html">UBICACIÓN</a>
+                <a class="block nav-btn mt-4 text-center" href="auth/acceso.html">
+                    ACCESO SISTEMA
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Competencias -->
+    <header class="competition-hero relative h-[70vh] md:h-[80vh] flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <!-- Imagen de fondo del hero -->
+            <img alt="Competencias Titanes Evolution" 
+                 class="w-full h-full object-cover object-center competition-hero-img"
+                 src="assets/images/competencias/hero-competencia.jpg">
+            <div class="absolute inset-0 competition-gradient"></div>
+            <div class="absolute inset-0 grid-overlay opacity-30"></div>
+        </div>
+        
+        <div class="relative z-10 text-center px-6">
+            <h2 class="font-sport text-primary text-2xl md:text-3xl tracking-[0.2em] mb-4">
+                GLORIA EN EL TAPETE
+            </h2>
+            <h1 class="font-sport text-6xl md:text-9xl leading-none text-white">
+                NUESTRAS <br/>
+                <span class="neon-red">COMPETENCIAS</span>
+            </h1>
+            <p class="text-gray-300 mt-8 max-w-2xl mx-auto text-lg md:text-xl">
+                20 años dominando los podios nacionales e internacionales
+            </p>
+        </div>
+    </header>
+
+    <!-- Sección Introducción -->
+    <section class="section-padding bg-deepBlack">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="font-sport text-4xl md:text-6xl text-white mb-6">
+                    MÁS DE <span class="neon-red">20 AÑOS</span><br/>
+                    FORMANDO CAMPEONES
+                </h2>
+                <div class="h-1 w-32 bg-primary mx-auto mb-8"></div>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <p class="text-gray-300 text-lg leading-relaxed">
+                        Titanes nace en Duitama el 27 de noviembre de 2004, como respuesta a una necesidad muy clara: 
+                        <span class="text-primary font-bold">no permitir que la pasión por el porrismo terminara con el colegio.</span>
+                    </p>
+                    
+                    <p class="text-gray-300 text-lg leading-relaxed">
+                        En ese momento, el porrismo en la ciudad existía únicamente a nivel colegial. Muchos jóvenes, 
+                        con procesos sólidos y años de experiencia, estaban a punto de graduarse y enfrentaban una realidad 
+                        común: no existía un espacio que les permitiera continuar su formación deportiva de manera estructurada, 
+                        segura y competitiva una vez finalizada su etapa escolar.
+                    </p>
+                </div>
+                
+                <div class="relative">
+                    <div class="competition-intro-card p-8 border-2 border-primary/30 angular-clip">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 bg-primary flex items-center justify-center rounded-sm">
+                                <span class="material-symbols-outlined text-white text-2xl">emoji_events</span>
+                            </div>
+                            <h3 class="font-sport text-2xl text-white">NUESTRO PROPÓSITO</h3>
+                        </div>
+                        <p class="text-gray-300 italic">
+                            "Crear un equipo independiente, con visión a largo plazo, enfocado en competir a nivel open, 
+                            pero, sobre todo, en dar continuidad a los procesos deportivos y a la pasión de quienes no 
+                            estaban listos para despedirse del porrismo."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Trayectoria Competitiva -->
+    <section class="section-padding bg-cardBlack relative">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-sport text-5xl md:text-7xl text-white mb-4">
+                    <span class="neon-red">TRAYECTORIA</span> COMPETITIVA
+                </h2>
+                <p class="text-gray-400 text-lg">
+                    De Duitama al mundo: resultados que respaldan el proceso
+                </p>
+            </div>
+            
+            <!-- Timeline de competencias -->
+            <div class="competition-timeline relative">
+                <!-- Línea vertical -->
+                <div class="competition-timeline-line hidden md:block"></div>
+                
+                <div class="space-y-16 md:space-y-24">
+                    
+                    <!-- 2010 - Primer Podio -->
+                    <div class="timeline-item">
+                        <div class="timeline-year">2010</div>
+                        <div class="timeline-content">
+                            <div class="timeline-card">
+                                <h3 class="font-sport text-2xl md:text-3xl text-white mb-3">
+                                    Primer Podio Nacional
+                                </h3>
+                                <p class="text-gray-400 mb-4">
+                                    <span class="text-primary font-bold">Cartagena de Indias</span> - 5 de noviembre de 2010.<br/>
+                                    Titanes logró por primera vez subir al podio nacional, alcanzando el 
+                                    <span class="text-primary font-bold">tercer puesto</span> en una de las categorías más complejas del país, 
+                                    durante el campeonato nacional organizado por Cheer and Dance.
+                                </p>
+                                <div class="badge badge-bronze">
+                                    3er PUESTO
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 2012 - Primer Título -->
+                    <div class="timeline-item timeline-item-right">
+                        <div class="timeline-year">2012</div>
+                        <div class="timeline-content">
+                            <div class="timeline-card">
+                                <h3 class="font-sport text-2xl md:text-3xl text-white mb-3">
+                                    Primer Título Nacional
+                                </h3>
+                                <p class="text-gray-400 mb-4">
+                                    <span class="text-primary font-bold">Capital Cheer</span> - Un nuevo hito para el club.<br/>
+                                    Titanes se coronó campeón nacional por primera vez, demostrando que el proceso 
+                                    y la perseverancia dan resultados concretos en las competencias más exigentes del país.
+                                </p>
+                                <div class="badge badge-gold">
+                                    1er PUESTO
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 2014 - Primer Mundial -->
+                    <div class="timeline-item">
+                        <div class="timeline-year">2014</div>
+                        <div class="timeline-content">
+                            <div class="timeline-card">
+                                <h3 class="font-sport text-2xl md:text-3xl text-white mb-3">
+                                    Debut Mundialista
+                                </h3>
+                                <p class="text-gray-400 mb-4">
+                                    <span class="text-primary font-bold">Campeonato Mundial - Estados Unidos</span><br/>
+                                    16 deportistas representaron al club y al país, logrando el 
+                                    <span class="text-primary font-bold">puesto 20 a nivel mundial</span>. 
+                                    De los equipos colombianos participantes, solo tres lograron clasificar a las finales, 
+                                    y Titanes fue uno de ellos.
+                                </p>
+                                <div class="badge badge-international">
+                                    PUESTO 20
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 2019 - Consolidación Mundial -->
+                    <div class="timeline-item timeline-item-right">
+                        <div class="timeline-year">2019</div>
+                        <div class="timeline-content">
+                            <div class="timeline-card">
+                                <h3 class="font-sport text-2xl md:text-3xl text-white mb-3">
+                                    Consolidación Mundial
+                                </h3>
+                                <p class="text-gray-400 mb-4">
+                                    <span class="text-primary font-bold">Campeonato Mundial ICU</span><br/>
+                                    Titanes regresó al Campeonato Mundial con su equipo nivel 6, alcanzando un histórico 
+                                    <span class="text-primary font-bold">cuarto puesto mundial y tercer puesto de naciones</span>. 
+                                    Un logro que posicionó a Colombia en el mapa mundial del cheerleading.
+                                </p>
+                                <div class="flex gap-3">
+                                    <div class="badge badge-international">
+                                        4° MUNDIAL
+                                    </div>
+                                    <div class="badge badge-bronze">
+                                        3° NACIONES
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 2024 - Élite Mundial -->
+                    <div class="timeline-item">
+                        <div class="timeline-year">2024</div>
+                        <div class="timeline-content">
+                            <div class="timeline-card">
+                                <h3 class="font-sport text-2xl md:text-3xl text-white mb-3">
+                                    Élite Absoluta
+                                </h3>
+                                <p class="text-gray-400 mb-4">
+                                    <span class="text-primary font-bold">Campeonato UCA - Orlando, Florida</span><br/>
+                                    El club volvió a escribir historia al obtener nuevamente el 
+                                    <span class="text-primary font-bold">cuarto lugar a nivel mundial y el segundo puesto de naciones</span>, 
+                                    convirtiéndose en el equipo latinoamericano más cercano al podio mundial en su categoría.
+                                </p>
+                                <div class="flex gap-3">
+                                    <div class="badge badge-international">
+                                        4° MUNDIAL
+                                    </div>
+                                    <div class="badge badge-silver">
+                                        2° NACIONES
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Logros Destacados - SOLO 2 IMÁGENES GRANDES -->
+    <section class="section-padding bg-deepBlack">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-sport text-5xl md:text-7xl text-white mb-6">
+                    <span class="neon-red">LOGROS</span> DESTACADOS
+                </h2>
+                <p class="text-gray-400 text-lg max-w-3xl mx-auto">
+                    Cada trofeo cuenta una historia de esfuerzo, dedicación y pasión por el cheerleading
+                </p>
+            </div>
+            
+            <!-- Solo 2 imágenes grandes lado a lado -->
+            <div class="grid md:grid-cols-2 gap-8 mb-12">
+                
+                <!-- Imagen 1 - Mundial UCA 2024 -->
+                <div class="relative overflow-hidden rounded-lg group">
+                    <div class="h-[500px] md:h-[600px]">
+                        <img alt="Mundial UCA 2024" 
+                             class="w-full h-full object-cover object-center transform transition-transform duration-700 group-hover:scale-105"
+                             src="assets/images/competencias/mundial-uca-2024.jpg">
+                    </div>
+                    <!-- Bordes decorativos -->
+                    <div class="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-primary"></div>
+                    <div class="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-primary"></div>
+                </div>
+                
+                <!-- Imagen 2 - Capital Cheer 2023 -->
+                <div class="relative overflow-hidden rounded-lg group">
+                    <div class="h-[500px] md:h-[600px]">
+                        <img alt="Capital Cheer 2023" 
+                             class="w-full h-full object-cover object-center transform transition-transform duration-700 group-hover:scale-105"
+                             src="assets/images/competencias/capital-cheer-2023.jpg">
+                    </div>
+                    <!-- Bordes decorativos -->
+                    <div class="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-primary"></div>
+                    <div class="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-primary"></div>
+                </div>
+                
+            </div>
+            
+            <!-- TODO EL TEXTO DESCRIPTIVO DEBAJO -->
+            <div class="grid md:grid-cols-2 gap-12 mt-12">
+                
+                <!-- Descripción 1 - Mundial UCA 2024 -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center border-4 border-white shadow-lg">
+                            <span class="font-sport text-3xl text-black">2°</span>
+                        </div>
+                        <div>
+                            <h3 class="font-sport text-3xl md:text-4xl text-white">MUNDIAL UCA 2024</h3>
+                            <p class="text-primary font-bold">Orlando, Florida</p>
+                        </div>
+                    </div>
+                    
+                    <p class="text-gray-300 text-lg leading-relaxed">
+                        Histórico segundo puesto de Naciones en el Campeonato Mundial UCA. 
+                        El club volvió a escribir historia al posicionarse como el equipo latinoamericano 
+                        más cercano al podio mundial en su categoría.
+                    </p>
+                    
+                    <div class="flex items-center gap-4 pt-4">
+                        <span class="px-4 py-2 bg-primary text-white font-bold rounded">INTERNACIONAL</span>
+                        <span class="text-gray-400">Abril 2024</span>
+                    </div>
+                    
+                    <div class="flex gap-3 pt-2">
+                        <div class="badge badge-international">4° MUNDIAL</div>
+                        <div class="badge badge-silver">2° NACIONES</div>
+                    </div>
+                </div>
+                
+                <!-- Descripción 2 - Capital Cheer 2023 -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center border-4 border-white shadow-lg">
+                            <span class="font-sport text-3xl text-black">1°</span>
+                        </div>
+                        <div>
+                            <h3 class="font-sport text-3xl md:text-4xl text-white">CAPITAL CHEER 2023</h3>
+                            <p class="text-primary font-bold">Bogotá, Colombia</p>
+                        </div>
+                    </div>
+                    
+                    <p class="text-gray-300 text-lg leading-relaxed">
+                        Campeones Nacionales en la categoría Elite. Una victoria que consolida la 
+                        hegemonía de Titanes en las competencias nacionales más importantes y exigentes 
+                        del país, demostrando la calidad constante del equipo.
+                    </p>
+                    
+                    <div class="flex items-center gap-4 pt-4">
+                        <span class="px-4 py-2 bg-green-600 text-white font-bold rounded">NACIONAL</span>
+                        <span class="text-gray-400">Noviembre 2023</span>
+                    </div>
+                    
+                    <div class="flex gap-3 pt-2">
+                        <div class="badge badge-gold">1er PUESTO</div>
+                        <div class="badge badge-gold">CATEGORÍA ELITE</div>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!-- Logros adicionales en formato compacto -->
+            <div class="mt-16 pt-16 border-t border-primary/20">
+                <h3 class="font-sport text-3xl md:text-4xl text-white text-center mb-12">
+                    OTROS <span class="neon-red">LOGROS DESTACADOS</span>
+                </h3>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    
+                    <!-- Mundial ICU 2019 -->
+                    <div class="flex gap-6 items-start bg-cardBlack p-6 rounded-lg border border-primary/20">
+                        <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="font-sport text-2xl text-white">4°</span>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-sport text-2xl text-white mb-2">MUNDIAL ICU 2019</h4>
+                            <p class="text-gray-400 text-sm mb-3">
+                                Orlando, Florida - Cuarto puesto mundial y tercer puesto de Naciones. 
+                                Un logro histórico que posicionó a Colombia en el mapa mundial del cheerleading.
+                            </p>
+                            <div class="flex gap-2">
+                                <span class="competition-tag international">INTERNACIONAL</span>
+                                <span class="competition-date">Abril 2019</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Primer Título 2012 -->
+                    <div class="flex gap-6 items-start bg-cardBlack p-6 rounded-lg border border-primary/20">
+                        <div class="w-20 h-20 bg-yellow-400 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="font-sport text-2xl text-black">1°</span>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-sport text-2xl text-white mb-2">PRIMER TÍTULO 2012</h4>
+                            <p class="text-gray-400 text-sm mb-3">
+                                Capital Cheer - El inicio de una dinastía competitiva. Titanes se coronó 
+                                campeón nacional por primera vez, marcando el comienzo de una era dorada.
+                            </p>
+                            <div class="flex gap-2">
+                                <span class="competition-tag national">NACIONAL</span>
+                                <span class="competition-date">2012</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Selección Boyacá -->
+    <section class="section-padding bg-cardBlack">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8">
+                    <h2 class="font-sport text-4xl md:text-6xl text-white">
+                        PILAR DE LA <span class="neon-red">SELECCIÓN BOYACÁ</span>
+                    </h2>
+                    
+                    <div class="space-y-4 text-gray-300 text-lg">
+                        <p>
+                            Con la creación de la Federación Colombiana de Porrismo como ente oficial del deporte, 
+                            Titanes se consolidó también como un pilar del desarrollo departamental.
+                        </p>
+                        
+                        <p class="bg-primary/10 p-6 border-l-4 border-primary angular-clip-left italic">
+                            "Año tras año, los atletas formados en el club han representado al departamento con 
+                            excelentes resultados a nivel nacional, siendo la principal base para la conformación 
+                            de los equipos departamentales."
+                        </p>
+                        
+                        <p>
+                            Esto refleja la confianza institucional y la solidez del proceso formativo en nuestro 
+                            gimnasio Titanes.
+                        </p>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-6 pt-6">
+                        <div class="text-center">
+                            <div class="font-sport text-4xl md:text-5xl text-primary mb-2">15+</div>
+                            <div class="text-xs uppercase tracking-widest text-gray-400">AÑOS</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="font-sport text-4xl md:text-5xl text-primary mb-2">200+</div>
+                            <div class="text-xs uppercase tracking-widest text-gray-400">DEPORTISTAS</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="font-sport text-4xl md:text-5xl text-primary mb-2">80%</div>
+                            <div class="text-xs uppercase tracking-widest text-gray-400">SELECCIÓN</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="relative">
+                    <div class="competition-seleccion-card p-8 border-2 border-primary/20 angular-clip">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-16 h-16 bg-primary flex items-center justify-center rounded-sm">
+                                <span class="material-symbols-outlined text-white text-3xl">flag</span>
+                            </div>
+                            <div>
+                                <h3 class="font-sport text-3xl text-white">CONTRIBUCIÓN DEPARTAMENTAL</h3>
+                                <p class="text-primary text-sm font-bold">Representación Boyacá</p>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">check_circle</span>
+                                <span class="text-gray-300">Base principal de la Selección Boyacá</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">check_circle</span>
+                                <span class="text-gray-300">Procesos formativos reconocidos</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">check_circle</span>
+                                <span class="text-gray-300">Desarrollo de talento local</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">check_circle</span>
+                                <span class="text-gray-300">Referente nacional en formación</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-12 lg:gap-16 mb-12 lg:mb-20">
+                <!-- Logo y descripción -->
+                <div class="col-span-2 space-y-6">
+                    <div class="flex items-center gap-4">
+                        <div class="font-sport text-4xl lg:text-5xl tracking-tighter">
+                            TITANES<span class="text-primary">EVOLUTION</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 max-w-md text-lg italic">
+                        Forjando el futuro del porrismo colombiano. 20 años de historia, pasión y títulos mundiales 
+                        que respaldan nuestro legado.
+                    </p>
+                    <!-- Redes sociales -->
+                    <div class="flex gap-4">
+                        <a class="social-link" href="https://www.facebook.com/groups/titanescheerevolution/" target="_blank" rel="noopener noreferrer" title="Facebook Titanes Evolution">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path></svg>
+                        </a>
+                        <a class="social-link" href="https://www.instagram.com/titanescheerevolution/reels/" target="_blank" rel="noopener noreferrer" title="Instagram Titanes Evolution">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"></path></svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Navegación -->
+                <div>
+                    <h5 class="font-sport text-xl mb-6">NAVEGACIÓN</h5>
+                    <ul class="space-y-3">
+                        <li><a class="footer-link" href="index.html">INICIO</a></li>
+                        <li><a class="footer-link" href="historia.html">HISTORIA</a></li>
+                        <li><a class="footer-link text-primary" href="competencias.html">COMPETENCIAS</a></li>
+                        <li><a class="footer-link" href="ubicacion.html">UBICACIÓN</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contacto -->
+                <div>
+                    <h5 class="font-sport text-xl mb-6">CONTACTO</h5>
+                    <ul class="space-y-4 text-gray-400">
+                        <li class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary">phone_iphone</span>
+                            +57 313 3864382
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Copyright -->
+            <div class="footer-bottom">
+                <p>© 2026 TITANES EVOLUTION. ALL RIGHTS RESERVED.</p>
+                <div class="flex gap-6 md:gap-8">
+                    <a class="footer-legal-link" href="#">PRIVACIDAD</a>
+                    <a class="footer-legal-link" href="#">TÉRMINOS</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Button -->
+    <a class="whatsapp-btn" href="https://wa.me/573133864382" target="_blank">
+        <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"></path></svg>
+    </a>
+
+    <!-- JavaScript -->
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/competencias.js"></script>
+</body>
+</html>

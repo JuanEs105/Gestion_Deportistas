@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Deportista | Titanes Evolution Pro</title>
+
+    <!-- Fuentes -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="../shared/css/main.css">
+    <link rel="stylesheet" href="../auth/registro-deportista.css">
+</head>
+
+<body class="registro-body">
+    <!-- Header -->
+    <header class="registro-header">
+        <div class="logo-container">
+            <div class="logo-circle">
+                <img src="../assets/images/logo titanes.jpg"
+                    alt="Logo Titanes Evolution" class="logo-img">
+            </div>
+            <span class="logo-text">Titanes<span class="text-primary">Evolution</span></span>
+        </div>
+        <button class="btn-volver" onclick="window.location.href='acceso-deportista.html'">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Volver a Selección
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="registro-main">
+        <!-- Background Text -->
+        <div class="bg-text">
+            <h2 class="bg-text-1">REGISTRO</h2>
+            <h2 class="bg-text-2">TITAN</h2>
+        </div>
+
+        <div class="container">
+            <!-- Header del Formulario -->
+            <div class="form-header">
+                <h1 class="titulo">Inscripción <span class="text-primary">Deportista</span></h1>
+                <p class="subtitulo">Completa tus datos para unirte al equipo</p>
+            </div>
+
+            <!-- Formulario -->
+            <form id="formRegistro" class="form-registro" enctype="multipart/form-data">
+                <!-- Sección 1: Información del Deportista -->
+                <section class="seccion">
+                    <div class="seccion-header">
+                        <span class="seccion-numero">01</span>
+                        <h3>Información del Deportista</h3>
+                    </div>
+
+                    <div class="grid-form">
+                        <!-- Apellidos -->
+                        <div class="form-group">
+                            <label for="apellidos" class="field-required">Apellidos del deportista</label>
+                            <input type="text" id="apellidos" name="apellidos" placeholder="EJ. RAMIREZ PEREZ" required>
+                            <div class="error-message" id="errorApellidos"></div>
+                        </div>
+
+                        <!-- Nombres -->
+                        <div class="form-group">
+                            <label for="nombres" class="field-required">Nombre(s) del deportista</label>
+                            <input type="text" id="nombres" name="nombres" placeholder="EJ. JUAN DAVID" required>
+                            <div class="error-message" id="errorNombres"></div>
+                        </div>
+
+                        <!-- Tipo de Documento -->
+                        <div class="form-group full-width">
+                            <label class="field-required">Tipo de documento de identidad</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="tipo_documento" value="registro_civil" required>
+                                    <span>Registro Civil</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="tipo_documento" value="tarjeta_identidad" required>
+                                    <span>Tarjeta Identidad</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="tipo_documento" value="cedula_ciudadania" required>
+                                    <span>Cédula Ciudadanía</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="tipo_documento" value="cedula_extranjeria" required>
+                                    <span>Cédula Extranjería</span>
+                                </label>
+                            </div>
+                            <div class="error-message" id="errorTipoDocumento"></div>
+                        </div>
+
+                        <!-- Número de Documento -->
+                        <div class="form-group">
+                            <label for="numero_documento" class="field-required">Número de identificación</label>
+                            <input type="text" id="numero_documento" name="numero_documento"
+                                placeholder="N° DE DOCUMENTO" required>
+                            <div class="error-message" id="errorNumeroDocumento"></div>
+                        </div>
+
+                        <!-- Correo Electrónico -->
+                        <div class="form-group">
+                            <label for="email" class="field-required">Correo Electrónico</label>
+                            <input type="email" id="email" name="email" placeholder="CORREO@EJEMPLO.COM" required>
+                            <div class="error-message" id="errorEmail"></div>
+                        </div>
+
+                        <!-- NUEVO: Contraseña -->
+                        <div class="form-group">
+                            <label for="password" class="field-required">Contraseña</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" id="password" name="password" placeholder="INGRESA TU CONTRASEÑA" required minlength="6">
+                                <button type="button" class="toggle-password" id="togglePassword">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
+                            </div>
+                            <div class="error-message" id="errorPassword"></div>
+                            <div class="password-hint">Mínimo 6 caracteres</div>
+                        </div>
+
+                        <!-- NUEVO: Confirmar Contraseña -->
+                        <div class="form-group">
+                            <label for="confirm_password" class="field-required">Confirmar Contraseña</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" id="confirm_password" name="confirm_password" placeholder="CONFIRMA TU CONTRASEÑA" required minlength="6">
+                                <button type="button" class="toggle-password" id="toggleConfirmPassword">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
+                            </div>
+                            <div class="error-message" id="errorConfirmPassword"></div>
+                        </div>
+
+                        <!-- Fecha de Nacimiento -->
+                        <div class="form-group">
+                            <label for="fecha_nacimiento" class="field-required">Fecha de Nacimiento</label>
+                            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required max="2012-12-31">
+                            <div class="error-message" id="errorFechaNacimiento"></div>
+                        </div>
+
+                        <!-- Ciudad de Nacimiento -->
+                        <div class="form-group">
+                            <label for="ciudad_nacimiento" class="field-required">Ciudad de Nacimiento</label>
+                            <input type="text" id="ciudad_nacimiento" name="ciudad_nacimiento" placeholder="CIUDAD"
+                                required>
+                            <div class="error-message" id="errorCiudadNacimiento"></div>
+                        </div>
+
+                        <!-- Dirección -->
+                        <div class="form-group">
+                            <label for="direccion" class="field-required">Dirección</label>
+                            <input type="text" id="direccion" name="direccion" placeholder="CALLE / CARRERA / BARRIO"
+                                required>
+                            <div class="error-message" id="errorDireccion"></div>
+                        </div>
+
+                        <!-- Celular -->
+                        <div class="form-group">
+                            <label for="celular" class="field-optional">Celular Deportista</label>
+                            <input type="tel" id="celular" name="celular" placeholder="+57 300 000 0000">
+                            <div class="error-message" id="errorCelular"></div>
+                        </div>
+
+                        <!-- EPS -->
+                        <div class="form-group eps-container">
+                            <label for="eps" class="field-required">EPS</label>
+                            <select id="eps" name="eps" required>
+                                <option value="" disabled selected>SELECCIONA TU EPS</option>
+                                <option value="Sura">EPS Sura</option>
+                                <option value="Nueva EPS">Nueva EPS</option>
+                                <option value="Sanitas">Sanitas</option>
+                                <option value="Coomeva">Coomeva</option>
+                                <option value="Salud Total">Salud Total</option>
+                                <option value="Compensar">Compensar</option>
+                                <option value="Famisanar">Famisanar</option>
+                                <option value="Cafesalud">Cafesalud</option>
+                                <option value="Medimas">Medimas</option>
+                                <option value="Asmet Salud">Asmet Salud</option>
+                                <option value="Aliansalud">Aliansalud</option>
+                                <option value="Capital Salud">Capital Salud</option>
+                                <option value="Comfamiliar">Comfamiliar</option>
+                                <option value="Comfenalco">Comfenalco</option>
+                                <option value="Comfaboy">Comfaboy</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                            <div class="eps-otro-input" id="epsOtroContainer">
+                                <input type="text" id="eps_otro" name="eps_otro" placeholder="ESPECIFICA TU EPS">
+                            </div>
+                            <div class="error-message" id="errorEps"></div>
+                        </div>
+
+                        <!-- Talla de Camiseta -->
+                        <div class="form-group">
+                            <label for="talla_camiseta" class="field-required">Talla de Camiseta</label>
+                            <select id="talla_camiseta" name="talla_camiseta" required>
+                                <option value="" disabled selected>SELECCIONA TALLA</option>
+                                <option value="10">10</option>
+                                <option value="12">12</option>
+                                <option value="14">14</option>
+                                <option value="16">16</option>
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                            </select>
+                            <div class="error-message" id="errorTallaCamiseta"></div>
+                        </div>
+                    </div>
+
+                    <!-- Archivos -->
+                    <div class="archivos-grid">
+                        <div class="archivo-group">
+                            <label class="field-required">PDF Documento Identidad</label>
+                            <div class="upload-area" id="uploadDocumento">
+                                <span class="upload-text">Subir PDF</span>
+                                <span class="material-symbols-outlined upload-icon">upload_file</span>
+                                <input type="file" id="documento" name="documento" accept=".pdf" class="hidden"
+                                    required>
+                                <div class="file-info" id="fileInfoDocumento"></div>
+                            </div>
+                            <div class="error-message" id="errorDocumento"></div>
+                        </div>
+
+                        <div class="archivo-group">
+                            <label class="field-optional">Fotografía Deportista</label>
+                            <div class="upload-area" id="uploadFoto">
+                                <span class="upload-text">Subir Foto (JPG/PNG)</span>
+                                <span class="material-symbols-outlined upload-icon">photo_camera</span>
+                                <input type="file" id="foto" name="foto" accept=".jpg,.jpeg,.png" class="hidden">
+                                <div class="file-info" id="fileInfoFoto"></div>
+                            </div>
+                            <div class="preview-container" id="previewFoto"></div>
+                            <div class="error-message" id="errorFoto"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sección 2: Datos del Acudiente -->
+                <section class="seccion">
+                    <div class="seccion-header">
+                        <span class="seccion-numero">02</span>
+                        <h3>Datos del Acudiente</h3>
+                    </div>
+
+                    <div class="grid-acudiente">
+                        <!-- Nombre Acudiente -->
+                        <div class="form-group">
+                            <label for="nombre_acudiente" class="field-required">Nombre Completo Acudiente</label>
+                            <input type="text" id="nombre_acudiente" name="nombre_acudiente"
+                                placeholder="NOMBRE Y APELLIDO" required>
+                            <div class="error-message" id="errorNombreAcudiente"></div>
+                        </div>
+
+                        <!-- Teléfono Acudiente -->
+                        <div class="form-group">
+                            <label for="telefono_acudiente" class="field-required">Teléfono de Contacto</label>
+                            <input type="tel" id="telefono_acudiente" name="telefono_acudiente"
+                                placeholder="CELULAR ACUDIENTE" required>
+                            <div class="error-message" id="errorTelefonoAcudiente"></div>
+                        </div>
+
+                        <!-- Email Acudiente -->
+                        <div class="form-group">
+                            <label for="email_acudiente" class="field-required">Correo Electrónico</label>
+                            <input type="email" id="email_acudiente" name="email_acudiente"
+                                placeholder="EMAIL ACUDIENTE" required>
+                            <div class="error-message" id="errorEmailAcudiente"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Términos y Botón -->
+                <div class="form-footer">
+                    <div class="terminos-container">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="terminos" name="terminos" required>
+                            <span class="checkmark"></span>
+                            He leído y acepto los
+                            <a href="#" id="openTerminosBtn">términos y condiciones</a>
+                            de Titanes Evolution y el manejo de datos personales.
+                        </label>
+                        <div class="error-message" id="errorTerminos"></div>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="btnSubmit" disabled>
+                        <span>REGISTRAR DEPORTISTA</span>
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                        <div class="loading-spinner hidden" id="loadingSpinner"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="registro-footer">
+        <div class="footer-content">
+            <span class="copyright">Titanes Evolution 2024</span>
+            <div class="divider"></div>
+            <span class="niveles">Niveles USASF L1 - L6</span>
+        </div>
+    </footer>
+
+    <!-- Modal de Términos y Condiciones (OCULTO POR DEFECTO) -->
+    <div id="terminosModal" class="modal-terminos-overlay hidden">
+        <div class="modal-terminos-content">
+            <div class="modal-terminos-header">
+                <div class="logo-container">
+                    <div class="logo-circle">
+                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcw5Zw_VZ5QoFPk9QYIT89zW1mZesKOh5HIHLL41Mtd6HKuExl984TKKSHxE2FqiuFkaUeaMHfO-dutvPmOFiuT4xa0bJGzfv5ohyPe9Vgl7BroW_NqKwKJ-OCWoB0jQxk8nvXMo_BVwY1WqezyMIKcth1GPpIosmGURpSBe3Eac8HR9iSTJdTqRgnz3CTJCIFlrnxyl7afGX8iitVgkEYrseFRx9EIjWZuQGeoIL71DWubp-u6atx_t8w79rEnwBRufn6xLryzNq8"
+                            alt="Logo Titanes Evolution">
+                    </div>
+                    <h2>Titanes<span class="text-primary">Evolution</span></h2>
+                </div>
+                <button class="modal-terminos-close" id="closeTerminosBtn">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="modal-terminos-body">
+                <div class="terminos-header">
+                    <h1>TÉRMINOS Y <span class="text-primary">CONDICIONES</span></h1>
+                    <p>Contrato de Registro Titanes Evolution</p>
+                </div>
+
+                <div class="terminos-content custom-scrollbar">
+                    <!-- Contenido completo de los términos -->
+                    <section class="seccion-terminos">
+                        <h3>1. REGLAMENTO INTERNO</h3>
+                        <p>Como miembro de Titanes Evolution, el atleta se compromete a mantener una conducta deportiva
+                            ejemplar en todo momento. El respeto hacia los entrenadores, compañeros y personal
+                            administrativo es obligatorio. Cualquier acto de indisciplina, bullying o comportamiento que
+                            manche la imagen del club será motivo de sanción o expulsión inmediata.</p>
+                    </section>
+
+                    <section class="seccion-terminos">
+                        <h3>2. COMPROMISO Y ASISTENCIA</h3>
+                        <p>La asistencia a los entrenamientos es fundamental para el desarrollo del equipo. El atleta
+                            debe cumplir con los horarios establecidos y notificar cualquier ausencia con antelación. En
+                            temporadas de competencia, la asistencia al 100% de las prácticas es requisito indispensable
+                            para la participación.</p>
+                    </section>
+
+                    <section class="seccion-terminos">
+                        <h3>3. RESPONSABILIDAD MÉDICA</h3>
+                        <p>El representante legal declara que el atleta se encuentra en condiciones físicas óptimas para
+                            realizar actividad deportiva de alto impacto. Titanes Evolution no se hace responsable por
+                            lesiones preexistentes o condiciones de salud no informadas oportunamente en este registro.
+                        </p>
+                    </section>
+
+                    <section class="seccion-terminos">
+                        <h3>4. DERECHOS DE IMAGEN</h3>
+                        <p>Al registrarse, se autoriza el uso de la imagen (fotografías y videos) del atleta con fines
+                            promocionales, educativos e informativos relacionados exclusivamente con las actividades del
+                            club Titanes Evolution en redes sociales y medios de comunicación.</p>
+                    </section>
+
+                    <section class="seccion-terminos">
+                        <h3>5. POLÍTICA DE PAGOS</h3>
+                        <p>Las mensualidades y costos de inscripción deben cancelarse dentro de los primeros cinco (5)
+                            días de cada mes. El incumplimiento en los pagos puede generar la suspensión temporal del
+                            atleta de las prácticas regulares.</p>
+                    </section>
+
+                    <section class="seccion-terminos">
+                        <h3>6. LÍMITE DE INASISTENCIAS</h3>
+                        <p>Se permitirá un máximo de dos inasistencias no justificadas por semestre:</p>
+                        <ul>
+                            <li>3ra inasistencia sin justificación: El deportista será transferido a la línea recreativa
+                                del club.</li>
+                            <li>Para reincorporarse a un equipo de competencia, el deportista deberá presentar una
+                                solicitud formal que será evaluada por la comisión técnica del club.</li>
+                            <li>En caso de ser aceptado nuevamente, se deberá firmar un compromiso de asistencia.</li>
+                        </ul>
+                    </section>
+
+                    <section class="seccion-terminos">
+                        <h3>7. POLÍTICAS DE DEVOLUCIONES</h3>
+                        <div class="subseccion">
+                            <h4>7.1. Inscripciones y Afiliaciones:</h4>
+                            <p>No se realizarán devoluciones del valor pagado por inscripciones o afiliaciones al club
+                                bajo ninguna circunstancia.</p>
+                        </div>
+                        <div class="subseccion">
+                            <h4>7.2. Mensualidades:</h4>
+                            <p>No se reembolsarán pagos realizados por mensualidades, independientemente de la
+                                asistencia o participación del deportista.</p>
+                        </div>
+                        <div class="subseccion">
+                            <h4>7.3. Competencias:</h4>
+                            <p>Los pagos realizados por inscripciones a competencias no son reembolsables, salvo que la
+                                competencia sea cancelada por los organizadores.</p>
+                        </div>
+                    </section>
+
+                    <section class="seccion-terminos">
+                        <h3>8. AUTORIZACIÓN DE TRATAMIENTO DE DATOS</h3>
+                        <p>Declaro de manera libre, expresa, inequívoca e informada, que AUTORIZO al CLUB TITANES CHEER
+                            EVOLUTION para que realice la recolección, almacenamiento, uso, circulación, supresión, y en
+                            general, tratamiento de mis datos, de mi hijo(a) y/o acudido incluyendo datos sensibles
+                            (condiciones de salud física y mental, información médica, etc.).</p>
+                    </section>
+
+                    <section class="seccion-terminos">
+                        <h3>9. CANALES DE CONTACTO Y RECLAMOS</h3>
+                        <p>Mediante la firma del presente documento, manifiesto que reconozco y acepto que cualquier
+                            consulta o reclamación relacionada con el Tratamiento de mis datos personales podrá ser
+                            elevada por escrito ante el responsable del Tratamiento:</p>
+                        <div class="contacto-info">
+                            <p><strong>Correo Electrónico:</strong> titanesallstarscolombia@gmail.com</p>
+                            <p><strong>Teléfonos:</strong> 313-3864382 | 314-4624936</p>
+                        </div>
+                    </section>
+
+                    <div class="firma-section">
+                        <p>El presente documento se firma en Duitama - Boyacá</p>
+                        <p class="fecha">Mes de enero de 2025</p>
+                        <div class="firma-line"></div>
+                        <p class="firma-nombre">LUDWING JAIR FONSECA MONROY</p>
+                        <p class="firma-cargo">Representante Legal</p>
+                    </div>
+                </div>
+
+                <div class="terminos-footer">
+                    <button class="btn-terminos-cerrar" id="cerrarTerminosBtn">
+                        Cerrar y Continuar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../shared/js/auth.js"></script>
+    <script src="../shared/js/utils.js"></script>
+    <script src="registro-deportista.js"></script>
+</body>
+
+</html>

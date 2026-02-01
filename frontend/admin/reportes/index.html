@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes y Documentos | Titanes Evolution</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS Externo -->
+    <link rel="stylesheet" href="./style.css">
+
+    <!-- JS Externo (diferido) -->
+    <script defer src="./script.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#E21B23",
+                        secondary: "#1A1A1A",
+                        "dark-grey": "#333333",
+                        "background-light": "#F8F9FA",
+                        "background-dark": "#0A0A0A",
+                    },
+                    fontFamily: {
+                        display: ["Oswald", "sans-serif"],
+                        body: ["Montserrat", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "4px",
+                    },
+                },
+            },
+        };
+    </script>
+</head>
+
+<body
+    class="font-body bg-background-light dark:bg-background-dark text-secondary dark:text-gray-100 transition-colors duration-300 min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="fixed left-0 top-0 h-full w-20 lg:w-64 bg-secondary text-white z-50 transition-all duration-300">
+        <div class="flex flex-col h-full">
+            <div class="p-6 flex items-center gap-3">
+                <div
+                    class="w-10 h-10 bg-primary rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden">
+                    <img alt="Logo" class="w-full h-full object-cover scale-110"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcw5Zw_VZ5QoFPk9QYIT89zW1mZesKOh5HIHLL41Mtd6HKuExl984TKKSHxE2FqiuFkaUeaMHfO-dutvPmOFiuT4xa0bJGzfv5ohyPe9Vgl7BroW_NqKwKJ-OCWoB0jQxk8nvXMo_BVwY1WqezyMIKcth1GPpIosmGURpSBe3Eac8HR9iSTJdTqRgnz3CTJCIFlrnxyl7afGX8iitVgkEYrseFRx9EIjWZuQGeoIL71DWubp-u6atx_t8w79rEnwBRufn6xLryzNq8" />
+                </div>
+                <span
+                    class="font-display text-xl font-bold tracking-tighter uppercase italic hidden lg:inline">Titanes<span
+                        class="text-primary">Evolution</span></span>
+            </div>
+
+            <nav class="flex-1 mt-6 px-4 space-y-1">
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group"
+                    href="../dashboard.html">
+                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">dashboard</span>
+                    <span class="font-semibold hidden lg:inline">Dashboard</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group"
+                    href="../administradores/index.html">
+                    <span
+                        class="material-symbols-outlined text-gray-400 group-hover:text-white">admin_panel_settings</span>
+                    <span class="font-semibold hidden lg:inline">Administradores</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group"
+                    href="../entrenadores/index.html">
+                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">groups_3</span>
+                    <span class="font-semibold hidden lg:inline">Entrenadores</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group"
+                    href="../deportistas/index.html">
+                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">sports_handball</span>
+                    <span class="font-semibold hidden lg:inline">Deportistas</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group"
+                    href="../evaluaciones/index.html">
+                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">assignment</span>
+                    <span class="font-semibold hidden lg:inline">Evaluaciones</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group"
+                    href="../calendario/index.html">
+                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">calendar_month</span>
+                    <span class="font-semibold hidden lg:inline">Calendario</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 bg-primary text-white rounded-lg transition-colors group"
+                    href="./index.html">
+                    <span class="material-symbols-outlined text-white">bar_chart</span>
+                    <span class="font-semibold hidden lg:inline">Reportes</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group"
+                    href="../habilidades/index.html">
+                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">sports_kabaddi</span>
+                    <span class="font-semibold hidden lg:inline">Habilidades</span>
+                </a>
+            </nav>
+
+            <div class="mt-auto p-4 space-y-2 border-t border-white/10">
+                <!-- Info Usuario -->
+                <div class="flex items-center gap-3 px-4 py-3">
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
+                        <span class="material-symbols-outlined">person</span>
+                    </div>
+                    <div class="sidebar-text overflow-hidden">
+                        <p class="text-xs font-bold truncate uppercase font-display tracking-tight italic">Administrador
+                        </p>
+                        <p id="userEmail" class="text-[10px] text-gray-400 truncate">admin@titanes.com</p>
+                    </div>
+                </div>
+
+                <!-- Tema Oscuro -->
+                <button
+                    class="flex items-center gap-4 px-4 py-3 w-full hover:bg-white/10 rounded-lg transition-all group"
+                    onclick="toggleTheme()">
+                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">dark_mode</span>
+                    <span class="sidebar-text font-semibold">Modo Oscuro</span>
+                </button>
+
+                <!-- Cerrar Sesión -->
+                <button
+                    class="flex items-center gap-4 px-4 py-3 w-full bg-red-950/30 hover:bg-red-900/40 text-red-400 rounded-lg transition-all group"
+                    onclick="ReportesApp.logout()">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="sidebar-text font-semibold">Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="ml-20 lg:ml-64 p-4 lg:p-8 transition-all duration-300">
+        <!-- Header -->
+        <header class="mb-10">
+            <h1 class="sports-heading text-4xl font-bold text-secondary dark:text-white">Reportes y Descargas de Datos
+            </h1>
+            <p class="text-gray-500 dark:text-gray-400 font-medium">Panel de exportación y consulta detallada de Titanes
+                Evolution</p>
+        </header>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator"
+            class="hidden fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-3">
+            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            <span class="font-semibold">⏳ Procesando...</span>
+        </div>
+
+        <!-- Sección 1: Reportes Excel -->
+        <section class="mb-12">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <h2 class="sports-heading text-2xl font-bold text-secondary dark:text-white">1) REPORTE DE DATOS (EXCEL)
+                </h2>
+                <button id="descargarExcelBtn"
+                    class="bg-primary text-white px-8 py-3 rounded shadow-lg shadow-primary/20 font-display font-bold text-sm hover:bg-red-700 transition-all flex items-center gap-2 uppercase italic tracking-wider disabled:opacity-50">
+                    <span class="material-symbols-outlined">download</span> DESCARGAR EXCEL
+                </button>
+            </div>
+
+            <!-- Filtros completos para Excel -->
+            <div
+                class="bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-white/5 mb-8">
+                <p class="text-xs font-bold uppercase tracking-widest italic text-gray-400 mb-4">Filtros de Datos de
+                    Deportistas</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <!-- Datos Personales -->
+                    <div class="space-y-1">
+                        <label
+                            class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Apellidos</label>
+                        <input type="text" id="filtroApellidos"
+                            class="w-full bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                            placeholder="Ej: Perez">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Nombres</label>
+                        <input type="text" id="filtroNombres"
+                            class="w-full bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                            placeholder="Ej: Juan">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Tipo
+                            Documento</label>
+                        <select id="filtroTipoDocumento"
+                            class="w-full bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none">
+                            <option value="">Todos</option>
+                            <option value="CC">C.C.</option>
+                            <option value="TI">T.I.</option>
+                            <option value="RC">R.C.</option>
+                            <option value="CE">C.E.</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Número
+                            ID</label>
+                        <input type="text" id="filtroNumeroDocumento"
+                            class="w-full bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                            placeholder="0000000">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Email</label>
+                        <input type="email" id="filtroEmail"
+                            class="w-full bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                            placeholder="email@ejemplo.com">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Fecha
+                            Nacimiento</label>
+                        <input type="date" id="filtroFechaNacimiento"
+                            class="w-full bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none text-gray-500">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Ciudad</label>
+                        <input type="text" id="filtroCiudad"
+                            class="w-full bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                            placeholder="Ej: Bogotá">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label
+                            class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Dirección</label>
+                        <input type="text" id="filtroDireccion"
+                            class="w-full bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                            placeholder="Calle...">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Teléfono</label>
+                        <input type="text" id="filtroTelefono"
+                            class="w-full bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                            placeholder="300 000 0000">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">EPS</label>
+                        <input type="text" id="filtroEPS"
+                            class="w-full bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                            placeholder="Ej: Sura">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Talla
+                            Camiseta</label>
+                        <select id="filtroTallaCamiseta"
+                            class="w-full bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none">
+                            <option value="">Todas</option>
+                            <option value="10">10</option>
+                            <option value="12">12</option>
+                            <option value="14">14</option>
+                            <option value="16">16</option>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Nombre
+                            Acudiente</label>
+                        <input type="text" id="filtroAcudiente"
+                            class="w-full bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                            placeholder="Ej: Maria Lopez">
+                    </div>
+                </div>
+
+                <!-- Filtros Adicionales (Nivel, Grupo, Estado, etc.) -->
+                <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <p class="text-xs font-bold uppercase tracking-widest italic text-gray-400 mb-4">Filtros Adicionales
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div class="space-y-1">
+                            <label
+                                class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Nivel</label>
+                            <select id="filtroNivel"
+                                class="w-full bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none">
+                                <option value="">Todos</option>
+                                <option value="pendiente">Pendiente</option>
+                                <option value="1_basico">1 Básico</option>
+                                <option value="1_medio">1 Medio</option>
+                                <option value="1_avanzado">1 Avanzado</option>
+                                <option value="2">Nivel 2</option>
+                                <option value="3">Nivel 3</option>
+                                <option value="4">Nivel 4</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Grupo
+                                Competitivo</label>
+                            <select id="filtroGrupo"
+                                class="w-full bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none">
+                                <option value="">Todos</option>
+                                <!-- Grupos se cargarán dinámicamente -->
+                            </select>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label
+                                class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Estado</label>
+                            <select id="filtroEstado"
+                                class="w-full bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none">
+                                <option value="">Todos</option>
+                                <option value="activo">Activo</option>
+                                <option value="lesionado">Lesionado</option>
+                                <option value="descanso">Descanso</option>
+                                <option value="inactivo">Inactivo</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Peso
+                                (kg)</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="filtroPesoMin"
+                                    class="flex-1 bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                                    placeholder="Min">
+                                <input type="number" id="filtroPesoMax"
+                                    class="flex-1 bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                                    placeholder="Max">
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Altura
+                                (cm)</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="filtroAlturaMin"
+                                    class="flex-1 bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                                    placeholder="Min">
+                                <input type="number" id="filtroAlturaMax"
+                                    class="flex-1 bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                                    placeholder="Max">
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Edad</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="filtroEdadMin"
+                                    class="flex-1 bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                                    placeholder="Min">
+                                <input type="number" id="filtroEdadMax"
+                                    class="flex-1 bg-gray-50 dark:bg-zinc-800 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                                    placeholder="Max">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="mt-6 flex justify-end gap-2">
+                    <button id="limpiarFiltrosExcel"
+                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        Limpiar Filtros
+                    </button>
+                    <button id="aplicarFiltrosExcel"
+                        class="px-4 py-2 bg-primary text-white rounded text-sm font-semibold hover:bg-red-700 transition-colors">
+                        Aplicar Filtros
+                    </button>
+                </div>
+
+                <!-- Contador de resultados -->
+                <div class="mt-4 text-right">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">
+                        <span id="contadorExcel">0</span> deportistas encontrados
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección 2: Descarga de Documentos PDF -->
+        <section>
+            <h2 class="sports-heading text-2xl font-bold text-secondary dark:text-white mb-6">2) DESCARGA DE DOCUMENTOS
+                (PDF)</h2>
+
+            <div
+                class="bg-white dark:bg-zinc-900 shadow-xl border border-gray-100 dark:border-white/5 rounded-lg overflow-hidden mb-8">
+                <div class="p-6 bg-gray-50/50 dark:bg-zinc-800/50 border-b border-gray-100 dark:border-white/5">
+                    <p class="text-xs font-bold uppercase tracking-widest italic text-gray-400 mb-4">Filtrar para
+                        descarga individual de documentos de identidad</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="space-y-1">
+                            <label
+                                class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Nombre</label>
+                            <input type="text" id="filtroPDFNombre"
+                                class="w-full bg-white dark:bg-zinc-900 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                                placeholder="Buscar deportista...">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label
+                                class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Correo</label>
+                            <input type="email" id="filtroPDFEmail"
+                                class="w-full bg-white dark:bg-zinc-900 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none"
+                                placeholder="email@titanes.com">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label
+                                class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Nivel</label>
+                            <select id="filtroPDFNivel"
+                                class="w-full bg-white dark:bg-zinc-900 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none">
+                                <option value="">Todos</option>
+                                <option value="pendiente">Pendiente</option>
+                                <option value="1_basico">1 Básico</option>
+                                <option value="1_medio">1 Medio</option>
+                                <option value="1_avanzado">1 Avanzado</option>
+                                <option value="2">Nivel 2</option>
+                                <option value="3">Nivel 3</option>
+                                <option value="4">Nivel 4</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400">Grupo
+                                Competitivo</label>
+                            <select id="filtroPDFGrupo"
+                                class="w-full bg-white dark:bg-zinc-900 border-none rounded text-sm px-3 py-2 focus:ring-2 focus:ring-primary outline-none">
+                                <option value="">Todos</option>
+                                <!-- Grupos se cargarán dinámicamente -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex justify-end gap-2">
+                        <button id="limpiarFiltrosPDF"
+                            class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                            Limpiar Filtros
+                        </button>
+                        <button id="aplicarFiltrosPDF"
+                            class="px-4 py-2 bg-primary text-white rounded text-sm font-semibold hover:bg-red-700 transition-colors">
+                            Buscar Documentos
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabla de documentos -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead
+                            class="bg-secondary text-white text-xs font-display font-bold uppercase tracking-widest italic">
+                            <tr>
+                                <th class="px-8 py-5">Deportista</th>
+                                <th class="px-6 py-5">Documento</th>
+                                <th class="px-6 py-5">Nivel / Grupo</th>
+                                <th class="px-6 py-5 text-right">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaDocumentos" class="divide-y divide-gray-100 dark:divide-white/5">
+                            <!-- Los documentos se cargarán dinámicamente aquí -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mensaje vacío -->
+                <div id="mensajeSinDocumentos" class="hidden text-center py-16 text-gray-400">
+                    <span class="material-symbols-outlined w-20 h-20 mx-auto mb-4 opacity-50">description</span>
+                    <h4 class="text-xl font-bold mb-2">No hay documentos para mostrar</h4>
+                    <p class="text-gray-500">Ajusta los filtros para ver resultados</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer
+        class="ml-20 lg:ml-64 p-8 border-t border-gray-200 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-bold uppercase tracking-widest">
+        <p>© 2024 TITANES EVOLUTION - DATA REPORTING UNIT</p>
+        <div class="flex items-center gap-6">
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> ONLINE</span>
+            <a class="hover:text-primary transition-colors" href="#">Seguridad</a>
+            <a class="hover:text-primary transition-colors" href="#">Logs de Actividad</a>
+        </div>
+    </footer>
+
+    <!-- Botón de Ayuda -->
+    <button
+        class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded shadow-2xl hover:scale-105 transition-transform z-50 group flex items-center justify-center">
+        <span class="material-symbols-outlined group-hover:rotate-12 transition-transform">help</span>
+    </button>
+
+    <!-- Container para notificaciones -->
+    <div id="notificationContainer"></div>
+</body>
+
+</html>

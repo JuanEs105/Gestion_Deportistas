@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Entrenador - Paso 1 | Titanes Evolution</title>
+    
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="../shared/css/main.css">
+    <link rel="stylesheet" href="registro-entrenador.css">
+</head>
+<body class="registro-entrenador-body">
+    <!-- Botón Volver -->
+    <a href="acceso-entrenador.html" class="btn-back-registro">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Volver
+    </a>
+
+    <!-- Contenedor principal -->
+    <div class="registro-container">
+        <!-- Logo -->
+        <div class="registro-logo-container">
+            <div class="registro-logo-circle">
+                <img src="../assets/images/logo titanes.jpg" 
+                     alt="Titanes Evolution" class="registro-logo-img">
+            </div>
+            <h1 class="registro-logo-text">
+                Titanes<span class="registro-logo-red">Evolution</span>
+            </h1>
+            <p class="registro-subtitle">Registro de Entrenador</p>
+        </div>
+
+        <!-- Contenido del formulario -->
+        <div class="registro-form-container">
+            <!-- Barra de progreso -->
+            <div class="registro-progress">
+                <div class="registro-progress-bar">
+                    <div class="registro-progress-fill" style="width: 33%"></div>
+                </div>
+                <div class="registro-progress-steps">
+                    <div class="registro-progress-step active">
+                        <span class="registro-step-number">1</span>
+                        <span class="registro-step-label">Correo</span>
+                    </div>
+                    <div class="registro-progress-step">
+                        <span class="registro-step-number">2</span>
+                        <span class="registro-step-label">Código</span>
+                    </div>
+                    <div class="registro-progress-step">
+                        <span class="registro-step-number">3</span>
+                        <span class="registro-step-label">Contraseña</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Título del paso -->
+            <div class="registro-header">
+                <h2 class="registro-title">Verifica tu Identidad</h2>
+                <p class="registro-description">
+                    Ingresa el correo con el que fuiste registrado por el administrador. 
+                    Te enviaremos un código de verificación.
+                </p>
+            </div>
+
+            <!-- Formulario -->
+            <form id="emailForm" class="registro-form">
+                <div class="registro-form-group">
+                    <label for="email" class="registro-label">
+                        <span class="material-symbols-outlined">mail</span>
+                        Correo Institucional
+                    </label>
+                    <input type="email" 
+                           id="email" 
+                           name="email" 
+                           class="registro-input"
+                           placeholder="ejemplo@titanesevolution.com"
+                           required
+                           autocomplete="email">
+                    <div class="registro-input-hint">
+                        <span class="material-symbols-outlined">info</span>
+                        Debe ser el correo proporcionado por el administrador
+                    </div>
+                </div>
+
+                <div class="registro-form-actions">
+                    <button type="submit" class="registro-btn-primary" disabled>
+                        <span class="registro-btn-text">Enviar Código de Verificación</span>
+                        <span class="material-symbols-outlined">send</span>
+                    </button>
+                </div>
+
+                <div class="registro-form-footer">
+                    <p class="registro-footer-text">
+                        ¿No recibiste el correo de invitación?
+                        <a href="#" class="registro-footer-link">Contacta al administrador</a>
+                    </p>
+                </div>
+            </form>
+
+            <!-- Información adicional -->
+            <div class="registro-info-box">
+                <div class="registro-info-header">
+                    <span class="material-symbols-outlined">verified_user</span>
+                    <h3 class="registro-info-title">Importante</h3>
+                </div>
+                <ul class="registro-info-list">
+                    <li>El correo debe coincidir con el registrado por el administrador</li>
+                    <li>Recibirás un código de 6 dígitos en tu bandeja de entrada</li>
+                    <li>El código expira en 15 minutos</li>
+                    <li>Verifica también la carpeta de spam</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="registro-footer">
+            <p class="registro-copyright">© 2024 Titanes Evolution - Sistema de Entrenadores</p>
+            <div class="registro-footer-stats">
+                <div class="registro-stat">
+                    <span class="registro-stat-value">+25</span>
+                    <span class="registro-stat-label">Entrenadores</span>
+                </div>
+                <div class="registro-divider"></div>
+                <div class="registro-stat">
+                    <span class="registro-stat-value">100%</span>
+                    <span class="registro-stat-label">Verificados</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../shared/js/auth.js"></script>
+    <script src="../shared/js/api.js"></script>
+    <script src="registro-entrenador-step1.js"></script>
+</body>
+</html>

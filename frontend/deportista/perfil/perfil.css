@@ -1,0 +1,156 @@
+/* ===================================
+   PERFIL DEPORTISTA - ESTILOS ADICIONALES
+   =================================== */
+
+.nivel-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.nivel-badge.pendiente {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.nivel-badge.baby_titans {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.nivel-badge.nivel-1 {
+    background: #DBEAFE;
+    color: #1E40AF;
+}
+
+.nivel-badge.nivel-2 {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.nivel-badge.nivel-3 {
+    background: #E0E7FF;
+    color: #3730A3;
+}
+
+.nivel-badge.nivel-4 {
+    background: #FED7AA;
+    color: #C2410C;
+}
+
+.badge-estado {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.badge-estado.activo {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.badge-estado.pendiente {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.badge-estado.lesionado {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.badge-estado.descanso {
+    background: #DBEAFE;
+    color: #1E40AF;
+}
+
+.badge-estado.inactivo {
+    background: #F3F4F6;
+    color: #6B7280;
+}
+
+.badge-estado.pendiente_de_pago {
+    background: #FED7AA;
+    color: #C2410C;
+}
+
+/* Dark Mode Adjustments */
+body.dark .nivel-badge.pendiente {
+    background: rgba(251, 191, 36, 0.2);
+    color: #FCD34D;
+}
+
+body.dark .nivel-badge.baby_titans {
+    background: rgba(239, 68, 68, 0.2);
+    color: #FCA5A5;
+}
+
+body.dark .nivel-badge.nivel-1 {
+    background: rgba(59, 130, 246, 0.2);
+    color: #93C5FD;
+}
+
+body.dark .nivel-badge.nivel-2 {
+    background: rgba(16, 185, 129, 0.2);
+    color: #6EE7B7;
+}
+
+body.dark .nivel-badge.nivel-3 {
+    background: rgba(99, 102, 241, 0.2);
+    color: #A5B4FC;
+}
+
+body.dark .nivel-badge.nivel-4 {
+    background: rgba(249, 115, 22, 0.2);
+    color: #FDBA74;
+}
+
+body.dark .badge-estado.activo {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10B981;
+}
+
+body.dark .badge-estado.pendiente {
+    background: rgba(251, 191, 36, 0.2);
+    color: #FCD34D;
+}
+
+body.dark .badge-estado.lesionado {
+    background: rgba(239, 68, 68, 0.2);
+    color: #EF4444;
+}
+
+body.dark .badge-estado.descanso {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60A5FA;
+}
+
+body.dark .badge-estado.inactivo {
+    background: rgba(156, 163, 175, 0.2);
+    color: #9CA3AF;
+}
+
+body.dark .badge-estado.pendiente_de_pago {
+    background: rgba(249, 115, 22, 0.2);
+    color: #FB923C;
+}
+
+/* Loading Animation */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Entrenador | Titanes Evolution</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-content">
+            <!-- Logo -->
+            <div class="sidebar-logo">
+                <div class="logo-container">
+                    <img src="../assets/images/logo titanes.jpg" alt="Logo">
+                </div>
+                <span class="logo-text">TITANES<span class="text-primary">EVOLUTION</span></span>
+            </div>
+
+            <!-- Perfil del Entrenador -->
+            <div class="coach-profile" id="coachProfile" onclick="window.location.href='perfil/index.html'" style="cursor: pointer;">
+                <div class="profile-avatar">
+                    <img id="coachAvatar" src="https://via.placeholder.com/100" alt="Foto de perfil">
+                </div>
+                <div class="profile-info">
+                    <p class="profile-name" id="coachName">Cargando...</p>
+                    <p class="profile-role">ENTRENADOR</p>
+                </div>
+                <span class="material-symbols-outlined profile-icon">chevron_right</span>
+            </div>
+
+            <!-- Navegación -->
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item active">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="deportistas/index.html" class="nav-item">
+                    <span class="material-symbols-outlined">groups</span>
+                    <span class="nav-text">Deportistas</span>
+                </a>
+                <a href="evaluaciones/index.html" class="nav-item">
+                    <span class="material-symbols-outlined">assignment</span>
+                    <span class="nav-text">Evaluaciones</span>
+                </a>
+                <a href="calendario/index.html" class="nav-item">
+                    <span class="material-symbols-outlined">calendar_month</span>
+                    <span class="nav-text">Calendario</span>
+                </a>
+            </nav>
+
+            <!-- Footer del Sidebar -->
+            <div class="sidebar-footer">
+                <button class="nav-item" id="toggleTheme">
+                    <span class="material-symbols-outlined">dark_mode</span>
+                    <span class="nav-text">Modo Oscuro</span>
+                </button>
+                <button class="nav-item logout-btn" id="logoutBtn">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="nav-text">Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="page-header">
+            <div>
+                <h1 class="page-title">
+                    PANEL DEL <span class="text-primary">ENTRENADOR</span>
+                </h1>
+                <div class="title-divider"></div>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <section class="stats-grid">
+            <div class="stat-card stat-primary">
+                <div class="stat-header">
+                    <span class="stat-label">MIS DEPORTISTAS</span>
+                    <span class="material-symbols-outlined stat-icon">groups</span>
+                </div>
+                <div class="stat-value" id="totalDeportistas">0</div>
+                <div class="stat-footer">Total asignados</div>
+            </div>
+
+            <div class="stat-card stat-warning">
+                <div class="stat-header">
+                    <span class="stat-label">EVALUACIONES PENDIENTES</span>
+                    <span class="material-symbols-outlined stat-icon">pending_actions</span>
+                </div>
+                <div class="stat-value" id="evaluacionesPendientes">0</div>
+                <div class="stat-footer pending">Requieren atención</div>
+            </div>
+
+            <div class="stat-card stat-info">
+                <div class="stat-header">
+                    <span class="stat-label">PRÓXIMO ENTRENAMIENTO</span>
+                    <span class="material-symbols-outlined stat-icon">event</span>
+                </div>
+                <div class="stat-value small" id="proximoEntrenamiento">--</div>
+                <div class="stat-footer" id="nivelProximoEntrenamiento">--</div>
+            </div>
+
+            <div class="stat-card stat-success">
+                <div class="stat-header">
+                    <span class="stat-label">EVALUACIONES REALIZADAS</span>
+                    <span class="material-symbols-outlined stat-icon">assignment_turned_in</span>
+                </div>
+                <div class="stat-value" id="evaluacionesRealizadas">0</div>
+                <div class="stat-footer">Este mes</div>
+            </div>
+        </section>
+
+        <!-- Main Grid -->
+        <div class="dashboard-grid">
+            <!-- Left Column -->
+            <div class="dashboard-left">
+                <!-- Acceso Rápido -->
+                <section class="card">
+                    <h3 class="section-title">
+                        <span class="title-bar"></span>
+                        ACCESO RÁPIDO
+                    </h3>
+                    <div class="quick-actions">
+                        <button class="action-btn secondary" onclick="window.location.href='evaluaciones/index.html'">
+                            <span class="material-symbols-outlined">add_task</span>
+                            <span>Nueva Evaluación</span>
+                        </button>
+                        <button class="action-btn secondary" onclick="window.location.href='calendario/index.html'">
+                            <span class="material-symbols-outlined">calendar_today</span>
+                            <span>Calendario Hoy</span>
+                        </button>
+                        <button class="action-btn secondary" onclick="window.location.href='deportistas/index.html'">
+                            <span class="material-symbols-outlined">format_list_bulleted</span>
+                            <span>Lista Deportistas</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Deportistas por Nivel -->
+                <section class="card">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <span class="title-bar"></span>
+                            DEPORTISTAS POR NIVEL
+                        </h3>
+                    </div>
+                    <div id="nivelesChart" class="chart-container">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                </section>
+
+                <!-- Deportistas Recientes -->
+                <section class="card">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <span class="title-bar dark"></span>
+                            DEPORTISTAS RECIENTES
+                        </h3>
+                        <button class="link-btn" onclick="window.location.href='deportistas/index.html'">Ver todos</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>DEPORTISTA</th>
+                                    <th>NIVEL ACTUAL</th>
+                                    <th>ÚLTIMA EVALUACIÓN</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="deportistasRecientes">
+                                <tr>
+                                    <td colspan="4" class="loading-cell">
+                                        <div class="loader"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column -->
+            <div class="dashboard-right">
+                <!-- Niveles Asignados -->
+                <div class="card">
+                    <h4 class="card-title-small">
+                        <span class="title-bar primary"></span>
+                        NIVELES ASIGNADOS
+                    </h4>
+                    <div id="nivelesAsignados" class="badges-container">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Próximas Actividades -->
+                <div class="card">
+                    <h4 class="card-title-small">
+                        <span class="title-bar primary"></span>
+                        PRÓXIMAS ACTIVIDADES
+                    </h4>
+                    <div class="notifications-list" id="proximasActividades">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Acciones Rápidas -->
+                <div class="card">
+                    <h4 class="card-title-small">
+                        <span class="title-bar primary"></span>
+                        ACCIONES INMEDIATAS
+                    </h4>
+                    <div class="activity-list" id="accionesInmediatas">
+                        <div class="activity-item" onclick="window.location.href='evaluaciones/nueva.html'" style="cursor: pointer;">
+                            <div class="activity-text">Crear evaluación rápida</div>
+                            <div class="activity-time">Haz clic para iniciar</div>
+                        </div>
+                        <div class="activity-item" onclick="window.location.href='deportistas/registrar.html'" style="cursor: pointer;">
+                            <div class="activity-text">Registrar nuevo deportista</div>
+                            <div class="activity-time">Formulario rápido</div>
+                        </div>
+                        <div class="activity-item" onclick="window.location.href='calendario/agregar.html'" style="cursor: pointer;">
+                            <div class="activity-text">Programar entrenamiento</div>
+                            <div class="activity-time">Agregar al calendario</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estadísticas Rápidas -->
+                <div class="card dark-card">
+                    <h4 class="card-title">ESTADÍSTICAS RÁPIDAS</h4>
+                    <div class="stats-list">
+                        <div class="stat-item">
+                            <span class="stat-item-label">Deportistas Activos</span>
+                            <span class="stat-item-value text-primary" id="deportistasActivos">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-item-label">Evaluaciones Mes</span>
+                            <span class="stat-item-value" id="evaluacionesMes">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-item-label">Promedio Calificación</span>
+                            <span class="stat-item-value" id="promedioCalificacion">--</span>
+                        </div>
+                    </div>
+                    <button class="btn-primary-block" onclick="window.location.href='reportes/index.html'">
+                        VER REPORTES COMPLETOS
+                    </button>
+                    <div class="watermark">TNS</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="api.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-// backend/src/routes/uploadRoutes.js
+// backend/src/routes/uploadRoutes.js - VERSIÓN COMPLETA
 const express = require('express');
 const router = express.Router();
 const UploadController = require('../controllers/uploadController');
@@ -8,20 +8,38 @@ const { upload } = require('../config/cloudinary');
 // Todas las rutas requieren autenticación
 router.use(authMiddleware);
 
-// Solo entrenadores pueden subir fotos
+// 📌 RUTAS PARA DEPORTISTAS
+// Solo entrenadores pueden subir fotos de deportistas
 router.use(isEntrenador);
 
 // Subir foto de perfil de deportista
 router.post(
   '/deportista/:id/foto',
-  upload.single('foto'), // 'foto' es el nombre del campo en el form
+  upload.single('foto'),
   UploadController.uploadDeportistaFoto
 );
 
-// Eliminar foto de perfil
+// Eliminar foto de perfil de deportista
 router.delete(
   '/deportista/:id/foto',
   UploadController.deleteDeportistaFoto
+);
+
+// 📌 RUTAS PARA ENTRENADORES
+// Cualquier usuario autenticado puede subir SU PROPIA foto
+// (El middleware verifica que sea el mismo usuario)
+
+// Subir foto de perfil de entrenador
+router.post(
+  '/entrenador/:id/foto',
+  upload.single('foto'),
+  UploadController.uploadEntrenadorFoto
+);
+
+// Eliminar foto de perfil de entrenador
+router.delete(
+  '/entrenador/:id/foto',
+  UploadController.deleteEntrenadorFoto
 );
 
 // Subir múltiples imágenes (para galería)

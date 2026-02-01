@@ -1,4 +1,4 @@
-// backend/src/models/CalendarioEvento.js - VERSIÓN ACTUALIZADA CON NORMALIZACIÓN
+// backend/src/models/CalendarioEvento.js - VERSIÓN COMPLETA Y CORREGIDA
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
@@ -37,8 +37,18 @@ const CalendarioEvento = sequelize.define('CalendarioEvento', {
       }
     }
   },
+  hora: {
+    type: DataTypes.TIME,
+    allowNull: true,
+    comment: 'Hora del evento'
+  },
+  ubicacion: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Ubicación del evento'
+  },
   nivel: {
-    type: DataTypes.ENUM('1_basico', '1_medio', '1_avanzado', '2', '3', '4', 'todos'),
+    type: DataTypes.ENUM('baby_titans','1_basico', '1_medio', '1_avanzado', '2', '3', '4', 'todos'),
     allowNull: false,
     defaultValue: 'todos',
     validate: {
@@ -46,7 +56,7 @@ const CalendarioEvento = sequelize.define('CalendarioEvento', {
         msg: 'El nivel es requerido'
       },
       isIn: {
-        args: [['1_basico', '1_medio', '1_avanzado', '2', '3', '4', 'todos']],
+        args: [['baby_titans','1_basico', '1_medio', '1_avanzado', '2', '3', '4', 'todos']],
         msg: 'Nivel inválido'
       }
     },
@@ -56,11 +66,9 @@ const CalendarioEvento = sequelize.define('CalendarioEvento', {
     type: DataTypes.STRING,
     allowNull: true,
     defaultValue: null,
-    comment: 'Grupo competitivo específico (ej: ROCKS TITANS). Null = para todos los grupos',
+    comment: 'Grupo competitivo específico. Null = para todos los grupos',
     set(value) {
-      // ✅ Normalizar antes de guardar
       if (value) {
-        // Convertir a minúsculas y reemplazar espacios con guiones bajos
         const normalized = value.toLowerCase().replace(/\s+/g, '_');
         this.setDataValue('grupo_competitivo', normalized);
       } else {
@@ -71,17 +79,21 @@ const CalendarioEvento = sequelize.define('CalendarioEvento', {
       const rawValue = this.getDataValue('grupo_competitivo');
       if (!rawValue) return null;
       
-      // Convertir de nuevo a formato legible al obtener
       return rawValue.split('_')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
     }
   },
   tipo: {
-    type: DataTypes.ENUM('competencia', 'entrenamiento', 'evaluacion', 'festivo', 'general'),
+    type: DataTypes.ENUM('competencia', 'entrenamiento', 'evaluacion', 'festivo', 'general', 'otro'),
     defaultValue: 'general',
     allowNull: false,
     comment: 'Tipo de evento'
+  },
+  tipo_personalizado: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Tipo personalizado cuando tipo = "otro"'
   },
   entrenador_id: {
     type: DataTypes.UUID,

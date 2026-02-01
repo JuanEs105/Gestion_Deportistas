@@ -1,189 +1,231 @@
-// backend/src/controllers/habilidadController.js - ACTUALIZADO
+// backend/src/controllers/habilidadController.js - VERSIÓN CORREGIDA
 const { Habilidad, Evaluacion } = require('../models');
-const { sequelize } = require('../config/database');
 
 class HabilidadController {
-  // Obtener todas las habilidades
+  // ==========================================
+  // OBTENER TODAS LAS HABILIDADES
+  // ==========================================
   static async getAll(req, res) {
     try {
-      const { nivel, tipo, categoria } = req.query;
+      console.log('📚 GET /api/habilidades - Obteniendo todas las habilidades');
       
-      const whereClause = { activa: true };
-      if (nivel) whereClause.nivel = nivel;
-      if (tipo) whereClause.tipo = tipo;
-      if (categoria) whereClause.categoria = categoria;
-
       const habilidades = await Habilidad.findAll({
-        where: whereClause,
+        where: { activa: true }, // 🔥 FILTRAR SOLO ACTIVAS
         order: [
           ['nivel', 'ASC'],
           ['categoria', 'ASC'],
           ['orden', 'ASC']
         ]
       });
-
-      // Agrupar por nivel y categoría
-      const agrupadas = {};
       
-      habilidades.forEach(h => {
-        if (!agrupadas[h.nivel]) {
-          agrupadas[h.nivel] = {};
-        }
-        if (!agrupadas[h.nivel][h.categoria]) {
-          agrupadas[h.nivel][h.categoria] = [];
-        }
-        agrupadas[h.nivel][h.categoria].push(h);
-      });
-
-      res.json({
-        total: habilidades.length,
-        habilidades,
-        agrupadas
-      });
-
+      console.log(`✅ ${habilidades.length} habilidades activas encontradas`);
+      res.json(habilidades);
     } catch (error) {
-      console.error('Error obteniendo habilidades:', error);
-      res.status(500).json({
-        error: 'Error en el servidor'
-      });
+      console.error('❌ Error en getAll:', error);
+      res.status(500).json({ error: error.message });
     }
   }
 
-  // Crear nueva habilidad
-  static async create(req, res) {
+  // ==========================================
+  // OBTENER HABILIDAD POR ID
+  // ==========================================
+  static async getById(req, res) {
     try {
-      const habilidad = await Habilidad.create(req.body);
-
-      res.status(201).json({
-        success: true,
-        message: 'Habilidad creada',
-        habilidad
-      });
-
+      console.log(`🔍 GET /api/habilidades/${req.params.id}`);
+      
+      const habilidad = await Habilidad.findByPk(req.params.id);
+      
+      if (!habilidad) {
+        console.log('❌ Habilidad no encontrada');
+        return res.status(404).json({ error: 'Habilidad no encontrada' });
+      }
+      
+      console.log(`✅ Habilidad encontrada: ${habilidad.nombre}`);
+      res.json(habilidad);
     } catch (error) {
-      console.error('Error creando habilidad:', error);
-      res.status(500).json({
-        error: 'Error en el servidor',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      });
+      console.error('❌ Error en getById:', error);
+      res.status(500).json({ error: error.message });
     }
   }
 
-  // Obtener habilidades para un nivel específico
+  // ==========================================
+  // OBTENER HABILIDADES POR NIVEL - 🔥 CORREGIDO
+  // ==========================================
   static async getByNivel(req, res) {
     try {
-      const { nivel } = req.params;
-      const { deportista_id } = req.query;
-
-      let habilidades;
-
-      if (deportista_id) {
-        // Obtener habilidades con estado de evaluación
-        habilidades = await Habilidad.getConEstadoEvaluacion(deportista_id, nivel);
-      } else {
-        // Obtener solo habilidades
-        habilidades = await Habilidad.findAll({
-          where: { nivel, activa: true },
-          order: [['categoria', 'ASC'], ['orden', 'ASC']]
-        });
-      }
-
-      // Agrupar por categoría
-      const porCategoria = {
-        habilidad: [],
-        ejercicio_accesorio: [],
-        postura: []
-      };
-
-      habilidades.forEach(h => {
-        const categoria = h.categoria || 'habilidad';
-        if (porCategoria[categoria]) {
-          porCategoria[categoria].push(h);
-        }
-      });
-
-      res.json({
-        nivel,
-        total: habilidades.length,
-        habilidades,
-        por_categoria: porCategoria
-      });
-
-    } catch (error) {
-      console.error('Error obteniendo habilidades por nivel:', error);
-      res.status(500).json({
-        error: 'Error en el servidor'
-      });
-    }
-  }
-
-  // Obtener habilidades faltantes para un deportista
-  static async getFaltantes(req, res) {
-    try {
-      const { deportista_id } = req.params;
-      const { nivel } = req.query;
-
-      // Si no se especifica nivel, usar el nivel actual del deportista
-      let nivelBuscar = nivel;
-      if (!nivelBuscar) {
-        const { Deportista } = require('../models');
-        const deportista = await Deportista.findByPk(deportista_id);
-        if (!deportista) {
-          return res.status(404).json({
-            error: 'Deportista no encontrado'
-          });
-        }
-        nivelBuscar = deportista.nivel_actual;
-      }
-
-      // Obtener evaluaciones del deportista
-      const evaluaciones = await sequelize.query(`
-        SELECT DISTINCT habilidad_id, MAX(puntuacion) as mejor_puntuacion
-        FROM evaluaciones 
-        WHERE deportista_id = :deportista_id
-        GROUP BY habilidad_id
-      `, {
-        replacements: { deportista_id },
-        type: sequelize.QueryTypes.SELECT
-      });
-
-      // Obtener todas las habilidades del nivel
-      const todasHabilidades = await Habilidad.findAll({
-        where: { nivel: nivelBuscar, activa: true },
+      const nivel = req.params.nivel;
+      console.log('========================================');
+      console.log(`🎯 GET /api/habilidades/nivel/${nivel}`);
+      console.log('========================================');
+      
+      // 🔥 AGREGAR FILTRO activa = true
+      const habilidades = await Habilidad.findAll({
+        where: { 
+          nivel: nivel,
+          activa: true  // ← 🔥 ESTE ES EL FIX CRÍTICO
+        },
         order: [
-          ['categoria', 'ASC'],
+          ['categoria', 'ASC'], 
           ['orden', 'ASC']
         ]
       });
-
-      // Filtrar habilidades faltantes o no completadas
-      const faltantes = [];
       
-      for (const h of todasHabilidades) {
-        const evalu = evaluaciones.find(e => e.habilidad_id === h.id);
-        
-        if (!evalu || evalu.mejor_puntuacion < h.puntuacion_minima) {
-          faltantes.push({
-            ...h.toJSON(),
-            estado: !evalu ? 'no_evaluada' : 'en_progreso',
-            mejor_puntuacion: evalu ? evalu.mejor_puntuacion : null
-          });
-        }
-      }
-
+      console.log(`✅ ${habilidades.length} habilidades activas encontradas para nivel ${nivel}`);
+      
+      // Agrupar por categoría para mejor organización
+      const porCategoria = {
+        habilidad: habilidades.filter(h => h.categoria === 'habilidad'),
+        ejercicio_accesorio: habilidades.filter(h => h.categoria === 'ejercicio_accesorio'),
+        postura: habilidades.filter(h => h.categoria === 'postura')
+      };
+      
+      console.log('📊 Distribución por categoría:');
+      console.log(`   - Habilidades: ${porCategoria.habilidad.length}`);
+      console.log(`   - Ejercicios: ${porCategoria.ejercicio_accesorio.length}`);
+      console.log(`   - Posturas: ${porCategoria.postura.length}`);
+      console.log('========================================');
+      
+      // Devolver en formato consistente con el frontend
       res.json({
-        nivel: nivelBuscar,
-        total_habilidades: todasHabilidades.length,
-        completadas: todasHabilidades.length - faltantes.length,
-        faltantes: faltantes.length,
-        habilidades_faltantes: faltantes
+        habilidades: habilidades,
+        por_categoria: porCategoria,
+        total: habilidades.length
       });
-
+      
     } catch (error) {
-      console.error('Error obteniendo habilidades faltantes:', error);
-      res.status(500).json({
-        error: 'Error en el servidor'
+      console.error('❌ Error en getByNivel:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // ==========================================
+  // CREAR NUEVA HABILIDAD
+  // ==========================================
+  static async create(req, res) {
+    try {
+      console.log('➕ POST /api/habilidades - Creando nueva habilidad');
+      console.log('Datos recibidos:', req.body);
+      
+      const habilidad = await Habilidad.create(req.body);
+      
+      console.log(`✅ Habilidad creada: ${habilidad.nombre} (ID: ${habilidad.id})`);
+      res.status(201).json(habilidad);
+    } catch (error) {
+      console.error('❌ Error en create:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // ==========================================
+  // ACTUALIZAR HABILIDAD
+  // ==========================================
+  static async update(req, res) {
+    try {
+      console.log(`✏️ PUT /api/habilidades/${req.params.id}`);
+      
+      const habilidad = await Habilidad.findByPk(req.params.id);
+      
+      if (!habilidad) {
+        console.log('❌ Habilidad no encontrada');
+        return res.status(404).json({ error: 'Habilidad no encontrada' });
+      }
+      
+      await habilidad.update(req.body);
+      
+      console.log(`✅ Habilidad actualizada: ${habilidad.nombre}`);
+      res.json(habilidad);
+    } catch (error) {
+      console.error('❌ Error en update:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // ==========================================
+  // ELIMINAR HABILIDAD (SOFT DELETE)
+  // ==========================================
+  static async delete(req, res) {
+    try {
+      console.log(`🗑️ DELETE /api/habilidades/${req.params.id}`);
+      
+      const habilidad = await Habilidad.findByPk(req.params.id);
+      
+      if (!habilidad) {
+        console.log('❌ Habilidad no encontrada');
+        return res.status(404).json({ error: 'Habilidad no encontrada' });
+      }
+      
+      // 🔥 SOFT DELETE: Marcar como inactiva en lugar de eliminar
+      await habilidad.update({ activa: false });
+      
+      console.log(`✅ Habilidad desactivada: ${habilidad.nombre}`);
+      res.json({ 
+        message: 'Habilidad desactivada correctamente',
+        habilidad: habilidad
       });
+    } catch (error) {
+      console.error('❌ Error en delete:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // ==========================================
+  // OBTENER HABILIDADES CON PROGRESO DE UN DEPORTISTA
+  // ==========================================
+  static async getHabilidadesConProgreso(req, res) {
+    try {
+      const { nivel, deportistaId } = req.params;
+      console.log(`📊 GET /api/habilidades/nivel/${nivel}/deportista/${deportistaId}`);
+      
+      const habilidades = await Habilidad.findAll({
+        where: { 
+          nivel: nivel,
+          activa: true
+        },
+        include: [{
+          model: Evaluacion,
+          as: 'evaluaciones',
+          where: { deportista_id: deportistaId },
+          required: false // LEFT JOIN
+        }],
+        order: [
+          ['categoria', 'ASC'], 
+          ['orden', 'ASC']
+        ]
+      });
+      
+      console.log(`✅ ${habilidades.length} habilidades con progreso obtenidas`);
+      res.json({
+        habilidades: habilidades,
+        total: habilidades.length
+      });
+      
+    } catch (error) {
+      console.error('❌ Error en getHabilidadesConProgreso:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // ==========================================
+  // ACTIVAR/DESACTIVAR HABILIDAD
+  // ==========================================
+  static async toggleActiva(req, res) {
+    try {
+      const habilidad = await Habilidad.findByPk(req.params.id);
+      
+      if (!habilidad) {
+        return res.status(404).json({ error: 'Habilidad no encontrada' });
+      }
+      
+      await habilidad.update({ activa: !habilidad.activa });
+      
+      console.log(`✅ Habilidad ${habilidad.activa ? 'activada' : 'desactivada'}: ${habilidad.nombre}`);
+      res.json({ 
+        message: `Habilidad ${habilidad.activa ? 'activada' : 'desactivada'} correctamente`,
+        habilidad: habilidad
+      });
+    } catch (error) {
+      console.error('❌ Error en toggleActiva:', error);
+      res.status(500).json({ error: error.message });
     }
   }
 }

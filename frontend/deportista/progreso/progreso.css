@@ -1,0 +1,339 @@
+/* ===================================
+   PROGRESO DEPORTISTA - CSS
+   Titanes Evolution
+   =================================== */
+
+:root {
+    --primary-red: #E21B23;
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #E21B23;
+    border-radius: 10px;
+}
+
+.text-sport-stroke {
+    -webkit-text-stroke: 1px currentColor;
+}
+
+/* ===================================
+   RADAR CHART STYLES
+   =================================== */
+.radar-grid {
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 1;
+}
+
+.radar-axis {
+    stroke: rgba(255, 255, 255, 0.3);
+    stroke-width: 1;
+}
+
+.radar-area-current {
+    fill: rgba(226, 27, 35, 0.5);
+    stroke: #E21B23;
+    stroke-width: 2;
+    transition: all 0.5s ease-in-out;
+}
+
+.radar-area-target {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.5);
+    stroke-width: 2;
+    stroke-dasharray: 4;
+}
+
+/* ===================================
+   ANIMACIONES
+   =================================== */
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(226, 27, 35, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 20px 10px rgba(226, 27, 35, 0);
+    }
+}
+
+.pulse-animation {
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.slide-in-right {
+    animation: slideInRight 0.5s ease-out;
+}
+
+.slide-in-up {
+    animation: slideInUp 0.3s ease-out;
+}
+
+/* ===================================
+   HABILIDADES CARDS
+   =================================== */
+.habilidad-card {
+    transition: all 0.3s ease;
+}
+
+.habilidad-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.habilidad-completada {
+    border-left: 4px solid #10B981;
+}
+
+.habilidad-pendiente {
+    border-left: 4px solid #F59E0B;
+}
+
+.habilidad-bloqueada {
+    border-left: 4px solid #6B7280;
+    opacity: 0.6;
+}
+
+/* ===================================
+   PROGRESS BARS
+   =================================== */
+.progress-bar-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-image: linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.2) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.2) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: 30px 30px;
+    animation: move-stripes 1s linear infinite;
+}
+
+@keyframes move-stripes {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 30px 0;
+    }
+}
+
+/* ===================================
+   BADGES Y ETIQUETAS
+   =================================== */
+.badge-nivel {
+    position: relative;
+    overflow: hidden;
+}
+
+.badge-nivel::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% {
+        transform: rotate(45deg) translateX(-100%);
+    }
+    100% {
+        transform: rotate(45deg) translateX(100%);
+    }
+}
+
+/* ===================================
+   CATEGORÍA ICONS
+   =================================== */
+.categoria-icon {
+    font-size: 2rem;
+    transition: transform 0.3s ease;
+}
+
+.categoria-icon:hover {
+    transform: scale(1.2) rotate(5deg);
+}
+
+/* ===================================
+   ESTADOS DE HABILIDADES
+   =================================== */
+.estado-completado {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+}
+
+.estado-en-progreso {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    color: white;
+}
+
+.estado-bloqueado {
+    background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
+    color: white;
+}
+
+/* ===================================
+   TOOLTIPS
+   =================================== */
+.tooltip {
+    position: relative;
+}
+
+.tooltip::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    margin-bottom: 8px;
+}
+
+.tooltip:hover::before {
+    opacity: 1;
+}
+
+/* ===================================
+   SKELETON LOADERS
+   =================================== */
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.05) 25%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0.05) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ===================================
+   RESPONSIVE ADJUSTMENTS
+   =================================== */
+@media (max-width: 768px) {
+    .radar-chart-container {
+        max-width: 250px;
+        margin: 0 auto;
+    }
+    
+    .habilidad-card {
+        font-size: 0.9rem;
+    }
+    
+    .badge-nivel {
+        font-size: 1.2rem;
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* ===================================
+   DARK MODE ESPECÍFICO
+   =================================== */
+.dark .bg-white\/5 {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark .border-white\/10 {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .text-gray-400 {
+    color: rgb(156, 163, 175);
+}
+
+/* ===================================
+   EFECTOS HOVER MEJORADOS
+   =================================== */
+.hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.hover-scale {
+    transition: transform 0.2s ease;
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}
