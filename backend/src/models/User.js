@@ -1,3 +1,4 @@
+// backend/src/models/User.js - VERSIÓN COMPLETA CON CAMPOS DE DOCUMENTACIÓN
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 const bcrypt = require('bcryptjs');
@@ -8,13 +9,23 @@ const User = sequelize.define('User', {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true
   },
+  
+  // ✅ CAMBIADO: Separar nombre y apellidos
   nombre: {
     type: DataTypes.STRING,
     allowNull: false,
     validate: {
       notEmpty: true
-    }
+    },
+    comment: 'Nombre(s) del usuario'
   },
+  apellidos: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: '',
+    comment: 'Apellidos del usuario'
+  },
+  
   email: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -24,22 +35,57 @@ const User = sequelize.define('User', {
     }
   },
   password: {
-  type: DataTypes.STRING,
-  allowNull: true,          // ✅ Esto ya está
-  defaultValue: null,       // ✅ Esto también
-  validate: {
-    // Quitar la validación de longitud mínima para permitir NULL
-    len: [0, 100]  // Cambiar de [6, 100] a [0, 100]
-  }
-},
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: null,
+    validate: {
+      len: [0, 100]
+    }
+  },
   role: {
     type: DataTypes.ENUM('entrenador', 'deportista', 'admin'),
     defaultValue: 'deportista'
   },
+  
+  // ✅ AGREGADO: Campos de documentación
+  tipo_documento: {
+    type: DataTypes.ENUM('CC', 'TI', 'CE', 'RC', 'PAS', 'registro_civil', 'tarjeta_identidad', 'cedula_ciudadania', 'cedula_extranjeria'),
+    allowNull: true,
+    defaultValue: null,
+    comment: 'Tipo de documento de identidad'
+  },
+  numero_documento: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: null,
+    comment: 'Número de documento de identidad'
+  },
+  ciudad: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: null,
+    comment: 'Ciudad de residencia'
+  },
+  
   telefono: {
     type: DataTypes.STRING,
     allowNull: true
   },
+  
+  // ✅ AGREGADO: Más campos de ubicación
+  direccion: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: null,
+    comment: 'Dirección completa (también en Deportista)'
+  },
+  fecha_nacimiento: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    defaultValue: null,
+    comment: 'Fecha de nacimiento (también en Deportista)'
+  },
+  
   activo: {
     type: DataTypes.BOOLEAN,
     defaultValue: true
@@ -86,25 +132,25 @@ const User = sequelize.define('User', {
     comment: 'Fecha de expiración del código'
   },
   verification_token: {
-  type: DataTypes.STRING,
-  allowNull: true,
-  comment: 'Token para verificación de registro'
-},
-verification_token_expires: {
-  type: DataTypes.DATE,
-  allowNull: true,
-  comment: 'Fecha de expiración del token de verificación'
-},
-requiere_registro: {
-  type: DataTypes.BOOLEAN,
-  defaultValue: false,
-  comment: 'Indica si el entrenador debe completar su registro'
-},
-token_registro: {
-  type: DataTypes.STRING,
-  allowNull: true,
-  comment: 'Token temporal para el enlace de registro'
-}
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Token para verificación de registro'
+  },
+  verification_token_expires: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    comment: 'Fecha de expiración del token de verificación'
+  },
+  requiere_registro: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    comment: 'Indica si el entrenador debe completar su registro'
+  },
+  token_registro: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Token temporal para el enlace de registro'
+  }
 }, {
   tableName: 'users',
   timestamps: true,
@@ -112,7 +158,6 @@ token_registro: {
   createdAt: 'created_at',
   updatedAt: 'updated_at',
   hooks: {
-    // ✅ CORRECCIÓN: Solo hashear si NO está ya hasheado
     beforeCreate: async (user) => {
       if (user.password && !user.password.startsWith('$2a$') && !user.password.startsWith('$2b$')) {
         console.log('🔐 Hook beforeCreate: Hasheando contraseña...');
@@ -124,10 +169,8 @@ token_registro: {
       }
     },
     
-    // ✅ CORRECCIÓN: Solo hashear si NO está ya hasheado
     beforeUpdate: async (user) => {
       if (user.changed('password') && user.password) {
-        // 🔥 CRÍTICO: Verificar si ya está hasheado
         if (!user.password.startsWith('$2a$') && !user.password.startsWith('$2b$')) {
           console.log('🔐 Hook beforeUpdate: Hasheando nueva contraseña...');
           const salt = await bcrypt.genSalt(10);
@@ -148,6 +191,11 @@ User.associate = function (models) {
     as: 'deportista',
     onDelete: 'CASCADE'
   });
+
+  // ✅ MÉTODO PARA OBTENER NOMBRE COMPLETO
+  User.prototype.getNombreCompleto = function () {
+    return `${this.nombre || ''} ${this.apellidos || ''}`.trim();
+  };
 
   // ✅ MÉTODO DE VALIDACIÓN
   User.prototype.validarPassword = async function (password) {
@@ -188,7 +236,6 @@ User.associate = function (models) {
         throw new Error('La nueva contraseña debe tener al menos 6 caracteres');
       }
 
-      // El hook beforeUpdate se encargará del hash
       this.password = passwordNueva;
       await this.save();
 
@@ -207,6 +254,9 @@ User.associate = function (models) {
     delete values.password;
     delete values.reset_password_code;
     delete values.reset_password_expires;
+    delete values.verification_token;
+    delete values.verification_token_expires;
+    delete values.token_registro;
     return values;
   };
 };

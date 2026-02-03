@@ -1,25 +1,36 @@
-// backend/src/routes/reportesRoutes.js
+// backend/src/routes/reportesRoutes.js - VERSIÓN CORREGIDA
 const express = require('express');
 const router = express.Router();
-const ReportesController = require('../controllers/reportesController'); // ← CORREGIDO
-const { authMiddleware, isAdminOrEntrenador } = require('../middleware/auth');
+const ReportesController = require('../controllers/reportesController');
+const { authMiddleware, isAdmin } = require('../middleware/auth');
+
+console.log('📋 Cargando rutas de reportes...');
 
 // ====================
-// RUTAS PROTEGIDAS
+// APLICAR MIDDLEWARE A TODAS LAS RUTAS
 // ====================
 router.use(authMiddleware);
-router.use(isAdminOrEntrenador);
 
-// GET /api/reportes/excel/grupal - Generar Excel con filtros completos
-router.get('/excel/grupal', ReportesController.generarExcelGrupal);
+// ====================
+// RUTAS DE ESTADÍSTICAS (PRIMERO - SIN isAdmin)
+// ====================
+router.get('/estadisticas', ReportesController.getEstadisticasDocumentos);
+router.get('/opciones-filtros', ReportesController.obtenerOpcionesFiltros);
+router.get('/deportistas', ReportesController.getDeportistasCompletos);
 
-// GET /api/reportes/documento/:deportista_id - Descargar documento individual
+// ====================
+// RUTAS DE DESCARGA (REQUIEREN isAdmin)
+// ====================
+router.get('/excel/grupal', isAdmin, ReportesController.generarExcelGrupal);
+router.get('/excel/documentos', isAdmin, ReportesController.generarExcelDocumentos);
 router.get('/documento/:deportista_id', ReportesController.descargarDocumentoPDF);
 
-// GET /api/reportes/documentos/masivos - Descargar documentos masivos con filtros
-router.get('/documentos/masivos', ReportesController.descargarDocumentosMasivos);
-
-// GET /api/reportes/opciones-filtros - Obtener opciones dinámicas
-router.get('/opciones-filtros', ReportesController.obtenerOpcionesFiltros);
+console.log('✅ Rutas de reportes cargadas correctamente');
+console.log('   - GET /api/reportes/estadisticas');
+console.log('   - GET /api/reportes/opciones-filtros');
+console.log('   - GET /api/reportes/deportistas');
+console.log('   - GET /api/reportes/excel/grupal (admin)');
+console.log('   - GET /api/reportes/excel/documentos (admin)');
+console.log('   - GET /api/reportes/documento/:deportista_id');
 
 module.exports = router;

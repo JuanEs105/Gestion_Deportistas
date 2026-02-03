@@ -415,7 +415,7 @@ function updateSubmitButton() {
     }
 }
 
-// Configurar envío del formulario
+// Configurar envío del formulario - VERSIÓN CORREGIDA
 function setupFormSubmit() {
     const form = document.getElementById('formRegistro');
     const btnSubmit = document.getElementById('btnSubmit');
@@ -454,30 +454,51 @@ function setupFormSubmit() {
                 // Crear FormData
                 const formData = new FormData(form);
                 
-                // Procesar EPS
-                const epsSelect = document.getElementById('eps');
-                if (epsSelect.value === 'Otro') {
-                    const epsOtro = document.getElementById('eps_otro').value;
-                    formData.set('eps', epsOtro);
-                }
-                
-                // Combinar apellidos y nombres para el campo "nombre" que espera el backend
-                const apellidos = document.getElementById('apellidos').value;
-                const nombres = document.getElementById('nombres').value;
+                // 🔥 CORRECCIÓN 1: Combinar apellidos y nombres CORRECTAMENTE
+                const apellidos = document.getElementById('apellidos').value.trim();
+                const nombres = document.getElementById('nombres').value.trim();
                 const nombreCompleto = `${apellidos} ${nombres}`;
                 
-                // El backend espera "nombre" en lugar de "apellidos" y "nombres" por separado
+                // 🔥 CORRECCIÓN 2: Agregar todos los campos que el backend espera
                 formData.set('nombre', nombreCompleto);
                 
-                // Asegurarse de que el teléfono del deportista esté en el campo correcto
-                const celularDeportista = document.getElementById('celular').value;
+                // 🔥 CORRECCIÓN 3: Enviar teléfono del deportista (opcional)
+                const celularDeportista = document.getElementById('celular').value.trim();
                 if (celularDeportista) {
                     formData.set('telefono', celularDeportista);
                 }
                 
-                // Agregar datos adicionales que el backend necesita
-                formData.append('terminos_aceptados', 'true'); // String 'true' como espera el backend
+                // 🔥 CORRECCIÓN 4: Procesar EPS
+                const epsSelect = document.getElementById('eps');
+                if (epsSelect.value === 'Otro') {
+                    const epsOtro = document.getElementById('eps_otro').value.trim();
+                    formData.set('eps', epsOtro);
+                } else {
+                    formData.set('eps', epsSelect.value);
+                }
                 
+                // 🔥 CORRECCIÓN 5: Agregar campos faltantes
+                // El backend espera estos nombres exactos:
+                formData.set('ciudad_nacimiento', document.getElementById('ciudad_nacimiento').value.trim());
+                formData.set('nombre_acudiente', document.getElementById('nombre_acudiente').value.trim());
+                formData.set('telefono_acudiente', document.getElementById('telefono_acudiente').value.trim());
+                formData.set('email_acudiente', document.getElementById('email_acudiente').value.trim());
+                
+                // 🔥 CORRECCIÓN 6: Agregar tipo de documento (no está en el backend pero lo agregamos)
+                const tipoDocumento = document.querySelector('input[name="tipo_documento"]:checked');
+                if (tipoDocumento) {
+                    formData.set('tipo_documento', tipoDocumento.value);
+                }
+                
+                // 🔥 CORRECCIÓN 7: Asegurar que terminos_aceptados sea string 'true'
+                formData.set('terminos_aceptados', 'true');
+                
+                // 🔥 CORRECCIÓN 8: Quitar campos que sobran (el backend no los espera)
+                // El backend solo espera 'nombre', no 'apellidos' y 'nombres' por separado
+                formData.delete('apellidos');
+                formData.delete('nombres');
+                
+                // 🔥 DEBUG: Verificar qué estamos enviando
                 console.log('📤 Enviando datos de registro...');
                 console.log('📋 FormData contenido:');
                 for (let [key, value] of formData.entries()) {
@@ -493,7 +514,6 @@ function setupFormSubmit() {
                     method: 'POST',
                     body: formData
                     // NO incluir headers de Content-Type cuando se usa FormData
-                    // El navegador lo establece automáticamente con el boundary correcto
                 });
                 
                 console.log('📥 Respuesta recibida, status:', response.status);

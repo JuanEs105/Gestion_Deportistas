@@ -1,813 +1,1342 @@
-// Aplicación principal de reportes con filtros completos
-const ReportesApp = {
-    // Estado de la aplicación
-    state: {
-        deportistas: [],
-        deportistasFiltrados: [],
-        deportistasConDocumentos: [],
-        loading: false,
-        gruposCompetitivos: [],
-        filtrosExcel: {
-            apellidos: '',
-            nombres: '',
-            tipoDocumento: '',
-            numeroDocumento: '',
-            email: '',
-            fechaNacimiento: '',
-            ciudad: '',
-            direccion: '',
-            telefono: '',
-            eps: '',
-            tallaCamiseta: '',
-            acudiente: '',
-            nivel: '',
-            grupo: '',
-            estado: '',
-            pesoMin: '',
-            pesoMax: '',
-            alturaMin: '',
-            alturaMax: '',
-            edadMin: '',
-            edadMax: ''
-        },
-        filtrosPDF: {
-            nombre: '',
-            email: '',
-            nivel: '',
-            grupo: ''
-        }
-    },
+// ==========================================
+// REPORTES APP - VERSIÓN COMPLETA Y DEFINITIVA
+// ==========================================
 
-    // Inicialización
-    init() {
-        console.log('🚀 Inicializando aplicación de reportes...');
+// Solo definir ReportesApp si no existe
+if (typeof window.ReportesApp === 'undefined') {
+    window.ReportesApp = {
+        // Estado de la aplicación
+        state: {
+            deportistas: [],
+            deportistasFiltrados: [],
+            documentosFiltrados: [],
+            loading: false,
+            opcionesFiltros: {
+                niveles: [],
+                equipos: [],
+                estados: [],
+                eps: []
+            },
+            
+            // Filtros actuales
+            filtros: {
+                // Datos Personales
+                nombreCompleto: '',
+                tipoDocumento: '',
+                numeroDocumento: '',
+                ciudad: '',
+                direccion: '',
+                telefono: '',
+                email: '',
+                fechaNacimiento: '',
+                eps: '',
+                acudiente: '',
+                estado: '',
+                nivel: '',
+                
+                // Datos Médicos
+                tallaCamiseta: '',
+                pesoMin: '',
+                pesoMax: '',
+                alturaMin: '',
+                alturaMax: '',
+                edadMin: '',
+                edadMax: '',
+                
+                // Datos Deportivos
+                equipoCompetitivo: '',
+                
+                // Documentos
+                tieneDocumento: 'todos'
+            },
+            
+            // Estadísticas
+            estadisticas: {
+                totalDeportistas: 0,
+                conDocumento: 0,
+                sinDocumento: 0,
+                cloudinaryDocs: 0,
+                otrosDocs: 0,
+                porcentajeCompletos: 0
+            }
+        },
+
+        // ==========================================
+        // MÉTODOS DE INICIALIZACIÓN
+        // ==========================================
+        async init() {
+            console.log('🚀 Inicializando ReportesApp...');
+            
+            // Verificar autenticación
+            if (!this.checkAuth()) {
+                return;
+            }
+            
+            // Cargar estadísticas
+            await this.cargarEstadisticas();
+            
+            // Cargar opciones de filtros
+            await this.cargarOpcionesFiltros();
+            
+            // Cargar deportistas iniciales
+            await this.cargarDeportistas();
+            
+            // Configurar eventos
+            this.configurarEventos();
+            
+            // Actualizar información de usuario
+            this.updateUserInfo();
+            
+            console.log('✅ ReportesApp inicializado correctamente');
+        },
 
         // Verificar autenticación
-        if (!this.checkAuth()) {
-            return;
-        }
-
-        // Cargar datos del usuario
-        this.cargarUsuario();
-
-        // Configurar eventos
-        this.configurarEventos();
-
-        // Cargar datos iniciales
-        this.cargarDatosIniciales();
-    },
-
-    // Verificar autenticación
-    checkAuth() {
-        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-        if (!token) {
-            this.showNotification('Sesión expirada. Redirigiendo al login...', 'warning');
-            setTimeout(() => {
-                window.location.href = '../auth/login.html';
-            }, 1500);
-            return false;
-        }
-
-        // Verificar rol de usuario
-        try {
-            const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
-            const user = userStr ? JSON.parse(userStr) : null;
-
-            if (user) {
-                const userRole = user.role || user.tipo || user.rol;
-                if (userRole !== 'admin') {
-                    this.showNotification('Acceso restringido a administradores', 'error');
-                    setTimeout(() => this.logout(), 2000);
-                    return false;
-                }
-            }
-        } catch (error) {
-            console.error('Error verificando usuario:', error);
-        }
-
-        return true;
-    },
-
-    // Cargar datos del usuario
-    cargarUsuario() {
-        try {
-            const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
-            const user = userStr ? JSON.parse(userStr) : null;
-
-            if (user && user.email) {
-                const userEmailElement = document.getElementById('userEmail');
-                if (userEmailElement) {
-                    userEmailElement.textContent = user.email;
-                }
-            }
-        } catch (error) {
-            console.error('Error cargando usuario:', error);
-        }
-    },
-
-    // Configurar eventos
-    configurarEventos() {
-        // Eventos para filtros Excel
-        const filtrosExcelIds = [
-            'filtroApellidos', 'filtroNombres', 'filtroTipoDocumento', 'filtroNumeroDocumento',
-            'filtroEmail', 'filtroFechaNacimiento', 'filtroCiudad', 'filtroDireccion',
-            'filtroTelefono', 'filtroEPS', 'filtroTallaCamiseta', 'filtroAcudiente',
-            'filtroNivel', 'filtroGrupo', 'filtroEstado', 'filtroPesoMin', 'filtroPesoMax',
-            'filtroAlturaMin', 'filtroAlturaMax', 'filtroEdadMin', 'filtroEdadMax'
-        ];
-
-        filtrosExcelIds.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.addEventListener('input', (e) => {
-                    const fieldName = id.replace('filtro', '').replace(/([A-Z])/g, '_$1').toLowerCase().substring(1);
-                    this.state.filtrosExcel[fieldName] = e.target.value;
-                });
-
-                element.addEventListener('change', (e) => {
-                    const fieldName = id.replace('filtro', '').replace(/([A-Z])/g, '_$1').toLowerCase().substring(1);
-                    this.state.filtrosExcel[fieldName] = e.target.value;
-                });
-            }
-        });
-
-        // Eventos para filtros PDF
-        const filtrosPDFIds = ['filtroPDFNombre', 'filtroPDFEmail', 'filtroPDFNivel', 'filtroPDFGrupo'];
-        filtrosPDFIds.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.addEventListener('input', (e) => {
-                    const fieldName = id.replace('filtroPDF', '').toLowerCase();
-                    this.state.filtrosPDF[fieldName] = e.target.value;
-                });
-
-                element.addEventListener('change', (e) => {
-                    const fieldName = id.replace('filtroPDF', '').toLowerCase();
-                    this.state.filtrosPDF[fieldName] = e.target.value;
-                });
-            }
-        });
-
-        // Botones de acción
-        document.getElementById('aplicarFiltrosExcel').addEventListener('click', () => {
-            this.aplicarFiltrosExcel();
-        });
-
-        document.getElementById('limpiarFiltrosExcel').addEventListener('click', () => {
-            this.limpiarFiltrosExcel();
-        });
-
-        document.getElementById('aplicarFiltrosPDF').addEventListener('click', () => {
-            this.aplicarFiltrosPDF();
-        });
-
-        document.getElementById('limpiarFiltrosPDF').addEventListener('click', () => {
-            this.limpiarFiltrosPDF();
-        });
-
-        // Botón de descarga Excel
-        document.getElementById('descargarExcelBtn').addEventListener('click', () => {
-            this.descargarExcel();
-        });
-    },
-
-    // Cargar datos iniciales
-    async cargarDatosIniciales() {
-        try {
-            this.setLoading(true);
-
-            // Cargar deportistas
-            await this.cargarDeportistas();
-
-            // Cargar grupos competitivos
-            await this.cargarGruposCompetitivos();
-
-            // Aplicar filtros iniciales
-            this.aplicarFiltrosExcel();
-
-        } catch (error) {
-            console.error('Error cargando datos iniciales:', error);
-            this.showNotification('Error al cargar datos iniciales', 'error');
-        } finally {
-            this.setLoading(false);
-        }
-    },
-
-    // Cargar deportistas
-    async cargarDeportistas() {
-        try {
-            console.log('📥 Cargando deportistas...');
-
+        checkAuth() {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/admin/deportistas', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            
+            if (!token) {
+                console.warn('⚠️ No hay token de autenticación');
+                this.showNotification('Sesión expirada. Redirigiendo al login...', 'warning');
+                setTimeout(() => {
+                    window.location.href = '../auth/login-admin.html';
+                }, 1500);
+                return false;
             }
+            
+            return true;
+        },
 
-            const data = await response.json();
-            this.state.deportistas = data.deportistas || data || [];
-
-            console.log(`✅ ${this.state.deportistas.length} deportistas cargados`);
-
-        } catch (error) {
-            console.error('❌ Error cargando deportistas:', error);
-            this.showNotification('Error al cargar deportistas', 'error');
-            this.state.deportistas = [];
-        }
-    },
-
-    // Cargar grupos competitivos
-    async cargarGruposCompetitivos() {
-        try {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/admin/deportistas', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+        // ==========================================
+        // MÉTODO PRINCIPAL: DESCARGAR EXCEL COMPLETO
+        // ==========================================
+        async descargarExcelCompleto() {
+            try {
+                console.log('📊 PREPARANDO DESCARGAR EXCEL COMPLETO...');
+                
+                // 1. OBTENER TODOS LOS FILTROS DEL FORMULARIO
+                const filtros = this.obtenerTodosLosFiltrosDelFormulario();
+                console.log('🔍 Filtros obtenidos del formulario:', filtros);
+                
+                // 2. VALIDAR FILTROS
+                const errores = this.validarFiltros(filtros);
+                if (errores.length > 0) {
+                    this.showNotification(`❌ Errores en filtros:\n${errores.join('\n')}`, 'error');
+                    return;
                 }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const data = await response.json();
-            const todosDeportistas = data.deportistas || data || [];
-
-            // Extraer grupos únicos
-            const gruposSet = new Set();
-            todosDeportistas.forEach(d => {
-                if (d.grupo_competitivo) {
-                    gruposSet.add(d.grupo_competitivo);
-                }
-                if (Array.isArray(d.grupos_competitivos)) {
-                    d.grupos_competitivos.forEach(g => gruposSet.add(g));
-                }
-            });
-
-            this.state.gruposCompetitivos = [...gruposSet].sort();
-
-            // Actualizar selects de grupos
-            this.actualizarSelectsGrupos();
-
-            console.log(`✅ ${this.state.gruposCompetitivos.length} grupos cargados`);
-
-        } catch (error) {
-            console.error('❌ Error cargando grupos:', error);
-            this.state.gruposCompetitivos = [];
-        }
-    },
-
-    // Actualizar selects de grupos
-    actualizarSelectsGrupos() {
-        const selects = ['filtroGrupo', 'filtroPDFGrupo'];
-
-        selects.forEach(selectId => {
-            const select = document.getElementById(selectId);
-            if (select) {
-                // Guardar valor seleccionado actual
-                const valorActual = select.value;
-
-                // Limpiar opciones (excepto la primera)
-                while (select.options.length > 1) {
-                    select.remove(1);
-                }
-
-                // Agregar opciones de grupos
-                this.state.gruposCompetitivos.forEach(grupo => {
-                    const option = document.createElement('option');
-                    option.value = grupo;
-                    option.textContent = grupo;
-                    select.appendChild(option);
+                
+                // 3. MOSTRAR LOADING
+                this.mostrarLoading(true);
+                
+                // 4. CONSTRUIR PARÁMETROS DE LA URL
+                const params = new URLSearchParams();
+                
+                // Agregar TODOS los filtros al query string
+                Object.keys(filtros).forEach(key => {
+                    const value = filtros[key];
+                    if (value && value !== '' && value !== 'todos') {
+                        params.append(key, value);
+                    }
                 });
+                
+                // 5. OBTENER TOKEN DE AUTENTICACIÓN
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                if (!token) {
+                    throw new Error('No hay sesión activa');
+                }
+                
+                // 6. CONSTRUIR URL COMPLETA
+                const baseURL = 'http://localhost:5000/api/reportes/excel/grupal';
+                const queryString = params.toString();
+                const url = queryString ? `${baseURL}?${queryString}` : baseURL;
+                
+                console.log('🌐 URL generada para descargar Excel:', url);
+                
+                // 7. CREAR ELEMENTO DE ENLACE TEMPORAL
+                const link = document.createElement('a');
+                link.style.display = 'none';
+                
+                // 8. AGREGAR HEADERS DE AUTENTICACIÓN
+                const options = {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    }
+                };
+                
+                // 9. HACER LA PETICIÓN FETCH
+                const response = await fetch(url, options);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+                
+                // 10. OBTENER EL BLOB (archivo Excel)
+                const blob = await response.blob();
+                
+                // 11. CREAR URL TEMPORAL PARA EL BLOB
+                const blobUrl = window.URL.createObjectURL(blob);
+                
+                // 12. CONFIGURAR EL ENLACE DE DESCARGA
+                link.href = blobUrl;
+                
+                // Nombre del archivo con timestamp
+                const timestamp = new Date().toISOString().split('T')[0];
+                const hora = new Date().toTimeString().slice(0, 8).replace(/:/g, '-');
+                link.download = `reporte_deportistas_${timestamp}_${hora}.xlsx`;
+                
+                // 13. AGREGAR AL DOM Y HACER CLIC
+                document.body.appendChild(link);
+                link.click();
+                
+                // 14. LIMPIAR
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(blobUrl);
+                }, 100);
+                
+                // 15. MOSTRAR MENSAJE DE ÉXITO
+                const count = this.state.deportistasFiltrados.length || 'todos';
+                this.showNotification(`✅ Excel generado exitosamente\n📊 Exportando ${count} registros`, 'success', 5000);
+                
+            } catch (error) {
+                console.error('❌ ERROR CRÍTICO descargando Excel:', error);
+                
+                // Mostrar error específico
+                let mensajeError = 'Error al generar Excel';
+                
+                if (error.message.includes('Failed to fetch')) {
+                    mensajeError = '❌ No se pudo conectar con el servidor\n\nVerifica que:\n1. El backend esté corriendo en http://localhost:5000\n2. El servidor esté activo\n3. No haya errores de CORS';
+                } else if (error.message.includes('401') || error.message.includes('403')) {
+                    mensajeError = '🔒 Sesión expirada o sin permisos\n\nPor favor, inicia sesión nuevamente';
+                } else if (error.message.includes('500')) {
+                    mensajeError = '⚙️ Error interno del servidor\n\nRevisa los logs del backend para más detalles';
+                } else {
+                    mensajeError = error.message;
+                }
+                
+                this.showNotification(mensajeError, 'error', 8000);
+                
+            } finally {
+                // 16. OCULTAR LOADING
+                this.mostrarLoading(false);
+            }
+        },
 
-                // Restaurar valor seleccionado si existe
-                if (valorActual && this.state.gruposCompetitivos.includes(valorActual)) {
-                    select.value = valorActual;
+        // ==========================================
+        // OBTENER TODOS LOS FILTROS DEL FORMULARIO
+        // ==========================================
+        obtenerTodosLosFiltrosDelFormulario() {
+            const filtros = {};
+            
+            console.log('📝 Capturando todos los filtros del formulario...');
+            
+            // ========== DATOS PERSONALES (Pestaña 1) ==========
+            filtros.nombreCompleto = document.getElementById('filtroNombreCompleto')?.value?.trim() || '';
+            filtros.tipoDocumento = document.getElementById('filtroTipoDocumento')?.value || '';
+            filtros.numeroDocumento = document.getElementById('filtroNumeroDocumento')?.value?.trim() || '';
+            filtros.ciudad = document.getElementById('filtroCiudad')?.value?.trim() || '';
+            filtros.direccion = document.getElementById('filtroDireccion')?.value?.trim() || '';
+            filtros.telefono = document.getElementById('filtroTelefono')?.value?.trim() || '';
+            filtros.email = document.getElementById('filtroEmail')?.value?.trim() || '';
+            filtros.fechaNacimiento = document.getElementById('filtroFechaNacimiento')?.value || '';
+            filtros.eps = document.getElementById('filtroEPS')?.value?.trim() || '';
+            filtros.acudiente = document.getElementById('filtroAcudiente')?.value?.trim() || '';
+            
+            // Estado del chip activo
+            const estadoChip = document.querySelector('.filtro-chip.estado.active');
+            filtros.estado = estadoChip?.dataset.estado || '';
+            
+            // Nivel del chip activo
+            const nivelChip = document.querySelector('.filtro-chip.nivel.active');
+            filtros.nivel = nivelChip?.dataset.nivel || '';
+            
+            // ========== DATOS MÉDICOS (Pestaña 2) ==========
+            filtros.tallaCamiseta = document.getElementById('filtroTallaCamiseta')?.value || '';
+            
+            // Rangos numéricos
+            filtros.pesoMin = document.getElementById('filtroPesoMin')?.value?.trim() || '';
+            filtros.pesoMax = document.getElementById('filtroPesoMax')?.value?.trim() || '';
+            filtros.alturaMin = document.getElementById('filtroAlturaMin')?.value?.trim() || '';
+            filtros.alturaMax = document.getElementById('filtroAlturaMax')?.value?.trim() || '';
+            filtros.edadMin = document.getElementById('filtroEdadMin')?.value?.trim() || '';
+            filtros.edadMax = document.getElementById('filtroEdadMax')?.value?.trim() || '';
+            
+            // ========== DATOS DEPORTIVOS (Pestaña 3) ==========
+            filtros.equipoCompetitivo = document.getElementById('filtroGrupoCompetitivo')?.value || '';
+            
+            // Nivel detallado (sobrescribe el del chip si existe)
+            const nivelDetallado = document.getElementById('filtroNivelDetallado')?.value;
+            if (nivelDetallado && nivelDetallado !== '') {
+                filtros.nivel = nivelDetallado;
+            }
+            
+            // Filtro de documentos
+            const tieneDocumento = document.getElementById('filtroTieneDocumento')?.value;
+            filtros.tieneDocumento = tieneDocumento || 'todos';
+            
+            // ========== FILTROS DE DOCUMENTOS (Pestaña 4) ==========
+            const estadoDocumento = document.getElementById('filtroEstadoDocumento')?.value;
+            if (estadoDocumento && estadoDocumento !== 'todos') {
+                if (estadoDocumento === 'con_documento') {
+                    filtros.tieneDocumento = 'true';
+                } else if (estadoDocumento === 'sin_documento') {
+                    filtros.tieneDocumento = 'false';
+                } else if (estadoDocumento === 'cloudinary') {
+                    filtros.tieneDocumento = 'true'; // Cloudinary implica tener documento
+                    // Nota: El backend filtra por Cloudinary automáticamente
                 }
             }
-        });
-    },
+            
+            console.log('📋 Filtros capturados:', filtros);
+            return filtros;
+        },
 
-    // Aplicar filtros Excel
-    aplicarFiltrosExcel() {
-        console.log('🔍 Aplicando filtros Excel...');
-
-        this.state.deportistasFiltrados = this.state.deportistas.filter(deportista => {
-            const user = deportista.user || {};
-            const datos = deportista;
-
-            // Helper para comparar strings (case insensitive, partial match)
-            const matchesString = (value, filter) => {
-                if (!filter) return true;
-                if (!value) return false;
-                return value.toString().toLowerCase().includes(filter.toLowerCase());
-            };
-
-            // Helper para comparar números en rangos
-            const matchesRange = (value, min, max) => {
-                if (!value) return false;
-                const numValue = parseFloat(value);
-                if (isNaN(numValue)) return false;
-
-                if (min && numValue < parseFloat(min)) return false;
-                if (max && numValue > parseFloat(max)) return false;
-                return true;
-            };
-
-            // Helper para calcular edad
-            const calcularEdad = (fechaNacimiento) => {
-                if (!fechaNacimiento) return null;
+        // ==========================================
+        // VALIDAR FILTROS (EVITA ERRORES EN EL BACKEND)
+        // ==========================================
+        validarFiltros(filtros) {
+            const errores = [];
+            
+            // Validar rangos numéricos
+            if (filtros.pesoMin && filtros.pesoMax) {
+                const min = parseFloat(filtros.pesoMin);
+                const max = parseFloat(filtros.pesoMax);
+                if (min > max) {
+                    errores.push('❌ El peso mínimo no puede ser mayor que el máximo');
+                }
+                if (min < 0 || max < 0) {
+                    errores.push('❌ El peso no puede ser negativo');
+                }
+            }
+            
+            if (filtros.alturaMin && filtros.alturaMax) {
+                const min = parseFloat(filtros.alturaMin);
+                const max = parseFloat(filtros.alturaMax);
+                if (min > max) {
+                    errores.push('❌ La altura mínima no puede ser mayor que la máxima');
+                }
+                if (min < 0 || max < 0) {
+                    errores.push('❌ La altura no puede ser negativa');
+                }
+            }
+            
+            if (filtros.edadMin && filtros.edadMax) {
+                const min = parseInt(filtros.edadMin);
+                const max = parseInt(filtros.edadMax);
+                if (min > max) {
+                    errores.push('❌ La edad mínima no puede ser mayor que la máxima');
+                }
+                if (min < 0 || max < 0) {
+                    errores.push('❌ La edad no puede ser negativa');
+                }
+                if (max > 100) {
+                    errores.push('❌ La edad máxima no puede ser mayor a 100 años');
+                }
+            }
+            
+            // Validar fecha de nacimiento
+            if (filtros.fechaNacimiento) {
+                const fecha = new Date(filtros.fechaNacimiento);
                 const hoy = new Date();
-                const nacimiento = new Date(fechaNacimiento);
-                let edad = hoy.getFullYear() - nacimiento.getFullYear();
-                const mes = hoy.getMonth() - nacimiento.getMonth();
-                if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
-                    edad--;
+                if (fecha > hoy) {
+                    errores.push('❌ La fecha de nacimiento no puede ser futura');
                 }
-                return edad;
+            }
+            
+            // Validar email si está presente
+            if (filtros.email && filtros.email !== '') {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(filtros.email)) {
+                    errores.push('❌ El formato del email no es válido');
+                }
+            }
+            
+            return errores;
+        },
+
+        // ==========================================
+        // MÉTODO ALTERNATIVO: DESCARGAR EXCEL SIMPLE
+        // ==========================================
+        async descargarExcelSimple() {
+            try {
+                console.log('📥 DESCARGANDO EXCEL (MÉTODO SIMPLE)...');
+                
+                // 1. Obtener filtros
+                const filtros = this.obtenerTodosLosFiltrosDelFormulario();
+                
+                // 2. Construir query string
+                const params = new URLSearchParams();
+                
+                // Agregar solo filtros no vacíos
+                Object.keys(filtros).forEach(key => {
+                    const value = filtros[key];
+                    if (value && value !== '' && value !== 'todos') {
+                        params.append(key, value);
+                    }
+                });
+                
+                // 3. Obtener token
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                
+                // 4. Construir URL
+                const baseURL = 'http://localhost:5000/api/reportes/excel/grupal';
+                const queryString = params.toString();
+                const url = queryString ? `${baseURL}?${queryString}` : baseURL;
+                
+                console.log('🔗 URL final:', url);
+                
+                // 5. Usar window.open (más simple)
+                window.open(url, '_blank');
+                
+                this.showNotification('✅ Iniciando descarga del Excel...', 'success');
+                
+            } catch (error) {
+                console.error('❌ Error en descarga simple:', error);
+                this.showNotification('❌ Error al iniciar descarga', 'error');
+            }
+        },
+
+        // ==========================================
+        // DESCARGAR EXCEL DE DOCUMENTOS
+        // ==========================================
+        async descargarExcelDocumentos() {
+            try {
+                console.log('📄 PREPARANDO EXCEL DE DOCUMENTOS...');
+                
+                // 1. Obtener filtros básicos
+                const filtros = this.obtenerFiltrosBasicosParaDocumentos();
+                
+                // 2. Construir query string
+                const params = new URLSearchParams();
+                
+                Object.keys(filtros).forEach(key => {
+                    if (filtros[key] && filtros[key] !== '' && filtros[key] !== 'todos') {
+                        params.append(key, filtros[key]);
+                    }
+                });
+                
+                // Siempre pedir documentos (true)
+                params.append('tieneDocumento', 'true');
+                
+                // 3. Obtener token
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                
+                // 4. Construir URL
+                const baseURL = 'http://localhost:5000/api/reportes/excel/documentos';
+                const url = `${baseURL}?${params.toString()}`;
+                
+                console.log('🔗 URL documentos:', url);
+                
+                // 5. Descargar
+                window.open(url, '_blank');
+                
+                this.showNotification('✅ Generando Excel de documentos...', 'success');
+                
+            } catch (error) {
+                console.error('❌ Error descargando Excel de documentos:', error);
+                this.showNotification('❌ Error al generar Excel de documentos', 'error');
+            }
+        },
+
+        // ==========================================
+        // MÉTODOS AUXILIARES
+        // ==========================================
+        
+        obtenerFiltrosBasicosParaDocumentos() {
+            return {
+                nivel: this.state.filtros.nivel || '',
+                estado: this.state.filtros.estado || '',
+                equipoCompetitivo: this.state.filtros.equipoCompetitivo || ''
             };
+        },
 
-            // 1. Datos personales básicos
-            if (!matchesString(user.nombre || '', this.state.filtrosExcel.nombres)) return false;
-            if (!matchesString(user.apellidos || '', this.state.filtrosExcel.apellidos)) return false;
-            if (!matchesString(user.email || '', this.state.filtrosExcel.email)) return false;
-
-            // 2. Documento de identidad
-            if (this.state.filtrosExcel.tipoDocumento &&
-                user.tipo_documento !== this.state.filtrosExcel.tipoDocumento) return false;
-
-            if (this.state.filtrosExcel.numeroDocumento &&
-                !matchesString(user.numero_documento || '', this.state.filtrosExcel.numeroDocumento)) return false;
-
-            // 3. Fecha de nacimiento
-            if (this.state.filtrosExcel.fechaNacimiento) {
-                const fechaNac = new Date(datos.fecha_nacimiento || user.fecha_nacimiento);
-                const filtroFecha = new Date(this.state.filtrosExcel.fechaNacimiento);
-
-                if (fechaNac.toDateString() !== filtroFecha.toDateString()) return false;
-            }
-
-            // 4. Datos de ubicación y contacto
-            if (!matchesString(user.ciudad || datos.ciudad || '', this.state.filtrosExcel.ciudad)) return false;
-            if (!matchesString(user.direccion || datos.direccion || '', this.state.filtrosExcel.direccion)) return false;
-            if (!matchesString(user.telefono || datos.telefono || '', this.state.filtrosExcel.telefono)) return false;
-
-            // 5. Datos médicos y adicionales
-            if (!matchesString(datos.eps || user.eps || '', this.state.filtrosExcel.eps)) return false;
-            if (!matchesString(datos.talla_camiseta || user.talla_camiseta || '', this.state.filtrosExcel.talla_camiseta)) return false;
-            if (!matchesString(datos.acudiente_nombre || user.acudiente_nombre || '', this.state.filtrosExcel.acudiente)) return false;
-
-            // 6. Datos deportivos
-            if (this.state.filtrosExcel.nivel && datos.nivel_actual !== this.state.filtrosExcel.nivel) return false;
-            if (this.state.filtrosExcel.grupo && datos.grupo_competitivo !== this.state.filtrosExcel.grupo) return false;
-            if (this.state.filtrosExcel.estado && datos.estado !== this.state.filtrosExcel.estado) return false;
-
-            // 7. Mediciones físicas
-            if (!matchesRange(datos.peso, this.state.filtrosExcel.pesoMin, this.state.filtrosExcel.pesoMax)) return false;
-            if (!matchesRange(datos.altura, this.state.filtrosExcel.alturaMin, this.state.filtrosExcel.alturaMax)) return false;
-
-            // 8. Edad (calculada)
-            if (this.state.filtrosExcel.edadMin || this.state.filtrosExcel.edadMax) {
-                const edad = calcularEdad(datos.fecha_nacimiento || user.fecha_nacimiento);
-                if (!matchesRange(edad, this.state.filtrosExcel.edadMin, this.state.filtrosExcel.edadMax)) return false;
-            }
-
-            return true;
-        });
-
-        console.log(`✅ ${this.state.deportistasFiltrados.length} deportistas filtrados para Excel`);
-        this.actualizarContadorExcel();
-    },
-
-    // Aplicar filtros PDF
-    aplicarFiltrosPDF() {
-        console.log('🔍 Aplicando filtros PDF...');
-
-        // Filtrar solo deportistas con documentos
-        this.state.deportistasConDocumentos = this.state.deportistas.filter(deportista => {
-            const user = deportista.user || {};
-            const datos = deportista;
-
-            // Solo deportistas con documento de identidad
-            if (!datos.documento_identidad && !user.documento_identidad) return false;
-
-            // Aplicar filtros
-            if (this.state.filtrosPDF.nombre) {
-                const nombreCompleto = `${user.nombre || ''} ${user.apellidos || ''}`.toLowerCase();
-                if (!nombreCompleto.includes(this.state.filtrosPDF.nombre.toLowerCase())) {
-                    return false;
+        // Cargar estadísticas
+        async cargarEstadisticas() {
+            try {
+                console.log('📊 Cargando estadísticas...');
+                
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                const headers = {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                };
+                
+                const response = await fetch('http://localhost:5000/api/reportes/estadisticas', {
+                    headers: headers
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-            }
-
-            if (this.state.filtrosPDF.email && user.email) {
-                if (!user.email.toLowerCase().includes(this.state.filtrosPDF.email.toLowerCase())) {
-                    return false;
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.state.estadisticas = data.estadisticas;
+                    this.actualizarEstadisticasUI();
                 }
+                
+            } catch (error) {
+                console.error('❌ Error cargando estadísticas:', error);
+                this.showNotification('Error cargando estadísticas', 'error');
             }
+        },
 
-            if (this.state.filtrosPDF.nivel && datos.nivel_actual !== this.state.filtrosPDF.nivel) {
-                return false;
-            }
-
-            if (this.state.filtrosPDF.grupo && datos.grupo_competitivo !== this.state.filtrosPDF.grupo) {
-                return false;
-            }
-
-            return true;
-        });
-
-        console.log(`✅ ${this.state.deportistasConDocumentos.length} deportistas con documentos filtrados`);
-        this.renderizarTablaDocumentos();
-    },
-
-    // Actualizar contador Excel
-    actualizarContadorExcel() {
-        const contadorElement = document.getElementById('contadorExcel');
-        if (contadorElement) {
-            contadorElement.textContent = this.state.deportistasFiltrados.length;
-        }
-
-        // Habilitar/deshabilitar botón de descarga
-        const descargarBtn = document.getElementById('descargarExcelBtn');
-        if (descargarBtn) {
-            descargarBtn.disabled = this.state.deportistasFiltrados.length === 0;
-        }
-    },
-
-    // Renderizar tabla de documentos
-    renderizarTablaDocumentos() {
-        const tbody = document.getElementById('tablaDocumentos');
-        const mensajeVacio = document.getElementById('mensajeSinDocumentos');
-
-        if (!tbody) return;
-
-        if (this.state.deportistasConDocumentos.length === 0) {
-            tbody.innerHTML = '';
-            if (mensajeVacio) mensajeVacio.classList.remove('hidden');
-            return;
-        }
-
-        if (mensajeVacio) mensajeVacio.classList.add('hidden');
-
-        tbody.innerHTML = this.state.deportistasConDocumentos.map(deportista => {
-            const user = deportista.user || {};
-            const datos = deportista;
-            const nombreCompleto = `${user.nombre || ''} ${user.apellidos || ''}`.trim();
-            const iniciales = this.obtenerIniciales(nombreCompleto);
-
-            return `
-                <tr class="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
-                    <td class="px-8 py-6">
-                        <div class="deportista-info">
-                            <div class="avatar">${iniciales}</div>
-                            <div class="detalles-deportista">
-                                <p class="font-bold text-secondary dark:text-gray-200">${nombreCompleto || 'Sin nombre'}</p>
-                                <p class="text-[10px] text-gray-400">${user.email || 'Sin email'}</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-6">
-                        <div class="text-sm text-gray-600 dark:text-gray-400">
-                            ${user.tipo_documento || 'CC'} ${user.numero_documento || ''}
-                        </div>
-                    </td>
-                    <td class="px-6 py-6">
-                        <div class="badge-nivel">${this.getNivelNombre(datos.nivel_actual)}</div>
-                        <div class="badge-grupo mt-1">${datos.grupo_competitivo || 'Sin grupo'}</div>
-                    </td>
-                    <td class="px-6 py-6 text-right">
-                        <button onclick="ReportesApp.descargarDocumentoPDF('${deportista.id}', '${nombreCompleto.replace(/'/g, "\\'")}')"
-                                class="btn-accion">
-                            <span class="material-symbols-outlined text-sm">picture_as_pdf</span> 
-                            DESCARGAR IDENTIDAD
-                        </button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-    },
-
-    // Limpiar filtros Excel
-    limpiarFiltrosExcel() {
-        console.log('🧹 Limpiando filtros Excel...');
-
-        // Resetear estado
-        this.state.filtrosExcel = {
-            apellidos: '',
-            nombres: '',
-            tipoDocumento: '',
-            numeroDocumento: '',
-            email: '',
-            fechaNacimiento: '',
-            ciudad: '',
-            direccion: '',
-            telefono: '',
-            eps: '',
-            tallaCamiseta: '',
-            acudiente: '',
-            nivel: '',
-            grupo: '',
-            estado: '',
-            pesoMin: '',
-            pesoMax: '',
-            alturaMin: '',
-            alturaMax: '',
-            edadMin: '',
-            edadMax: ''
-        };
-
-        // Resetear inputs
-        const inputs = [
-            'filtroApellidos', 'filtroNombres', 'filtroNumeroDocumento', 'filtroEmail',
-            'filtroCiudad', 'filtroDireccion', 'filtroTelefono', 'filtroEPS',
-            'filtroAcudiente', 'filtroPesoMin', 'filtroPesoMax', 'filtroAlturaMin',
-            'filtroAlturaMax', 'filtroEdadMin', 'filtroEdadMax'
-        ];
-
-        inputs.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) element.value = '';
-        });
-
-        const selects = ['filtroTipoDocumento', 'filtroTallaCamiseta', 'filtroNivel', 'filtroGrupo', 'filtroEstado'];
-        selects.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) element.value = '';
-        });
-
-        // Resetear input de fecha
-        const fechaInput = document.getElementById('filtroFechaNacimiento');
-        if (fechaInput) fechaInput.value = '';
-
-        // Aplicar filtros vacíos
-        this.aplicarFiltrosExcel();
-
-        this.showNotification('✅ Filtros Excel limpiados', 'success');
-    },
-
-    // Limpiar filtros PDF
-    limpiarFiltrosPDF() {
-        console.log('🧹 Limpiando filtros PDF...');
-
-        // Resetear estado
-        this.state.filtrosPDF = {
-            nombre: '',
-            email: '',
-            nivel: '',
-            grupo: ''
-        };
-
-        // Resetear inputs
-        document.getElementById('filtroPDFNombre').value = '';
-        document.getElementById('filtroPDFEmail').value = '';
-        document.getElementById('filtroPDFNivel').value = '';
-        document.getElementById('filtroPDFGrupo').value = '';
-
-        // Aplicar filtros vacíos
-        this.aplicarFiltrosPDF();
-
-        this.showNotification('✅ Filtros PDF limpiados', 'success');
-    },
-
-    // Descargar Excel
-    async descargarExcel() {
-        if (this.state.deportistasFiltrados.length === 0) {
-            this.showNotification('No hay deportistas para descargar', 'warning');
-            return;
-        }
-
-        try {
-            this.setLoading(true);
-
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const params = new URLSearchParams();
-
-            // Agregar todos los filtros a los parámetros
-            Object.entries(this.state.filtrosExcel).forEach(([key, value]) => {
-                if (value && value !== '') {
-                    params.append(key, value);
+        // Cargar opciones de filtros
+        async cargarOpcionesFiltros() {
+            try {
+                console.log('🔧 Cargando opciones de filtros...');
+                
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                const headers = {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                };
+                
+                const response = await fetch('http://localhost:5000/api/reportes/opciones-filtros', {
+                    headers: headers
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-            });
-
-            const queryString = params.toString();
-            const url = `http://localhost:5000/api/reportes/excel/grupal${queryString ? '?' + queryString : ''}`;
-
-            console.log('📗 Descargando Excel con filtros:', this.state.filtrosExcel);
-
-            const response = await fetch(url, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (!response.ok) {
-                throw new Error('Error en la descarga');
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.state.opcionesFiltros = {
+                        niveles: data.niveles || [],
+                        equipos: data.equipos_competitivos || [],
+                        estados: data.estados || [],
+                        eps: data.eps || []
+                    };
+                }
+                
+            } catch (error) {
+                console.error('❌ Error cargando opciones de filtros:', error);
             }
+        },
 
-            const blob = await response.blob();
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-
-            // Nombre del archivo
-            const timestamp = new Date().toISOString().split('T')[0];
-            const nombreArchivo = `reporte_deportistas_${timestamp}.xlsx`;
-
-            link.download = nombreArchivo;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(link.href);
-
-            this.showNotification('✅ Excel descargado correctamente', 'success');
-
-        } catch (error) {
-            console.error('❌ Error descargando Excel:', error);
-            this.showNotification('❌ Error al descargar el reporte Excel', 'error');
-        } finally {
-            this.setLoading(false);
-        }
-    },
-
-    // Descargar documento PDF individual
-    async descargarDocumentoPDF(deportistaId, nombre) {
-        try {
-            this.setLoading(true);
-
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const url = `http://localhost:5000/api/reportes/documento/${deportistaId}`;
-
-            console.log(`📄 Descargando documento para deportista ${deportistaId}`);
-
-            const response = await fetch(url, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al descargar documento');
+        // Cargar deportistas
+        async cargarDeportistas() {
+            try {
+                console.log('📥 Cargando deportistas...');
+                this.mostrarLoading(true);
+                
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                const headers = {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                };
+                
+                const response = await fetch('http://localhost:5000/api/reportes/deportistas', {
+                    headers: headers
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.state.deportistas = data.deportistas || [];
+                    this.state.deportistasFiltrados = [...this.state.deportistas];
+                    this.actualizarVistaPrevia();
+                    this.actualizarContadores();
+                }
+                
+            } catch (error) {
+                console.error('❌ Error cargando deportistas:', error);
+                this.showNotification('Error cargando deportistas', 'error');
+            } finally {
+                this.mostrarLoading(false);
             }
+        },
 
-            const blob = await response.blob();
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
+        // Aplicar filtros
+        async aplicarFiltros() {
+            try {
+                console.log('🔍 Aplicando filtros...');
+                
+                // Construir query string
+                const params = new URLSearchParams();
+                
+                // Datos personales
+                if (this.state.filtros.nombreCompleto) {
+                    params.append('nombre', this.state.filtros.nombreCompleto);
+                }
+                
+                if (this.state.filtros.numeroDocumento) {
+                    params.append('numeroDocumento', this.state.filtros.numeroDocumento);
+                }
+                
+                if (this.state.filtros.estado && this.state.filtros.estado !== '') {
+                    params.append('estado', this.state.filtros.estado);
+                }
+                
+                if (this.state.filtros.nivel && this.state.filtros.nivel !== '') {
+                    params.append('nivel', this.state.filtros.nivel);
+                }
+                
+                if (this.state.filtros.equipoCompetitivo && this.state.filtros.equipoCompetitivo !== '') {
+                    params.append('equipoCompetitivo', this.state.filtros.equipoCompetitivo);
+                }
+                
+                if (this.state.filtros.tieneDocumento && this.state.filtros.tieneDocumento !== 'todos') {
+                    params.append('tieneDocumento', this.state.filtros.tieneDocumento);
+                }
+                
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                const headers = {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                };
+                
+                const url = `http://localhost:5000/api/reportes/deportistas?${params.toString()}`;
+                
+                const response = await fetch(url, {
+                    headers: headers
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.state.deportistasFiltrados = data.deportistas || [];
+                    this.actualizarVistaPrevia();
+                    this.actualizarContadores();
+                    
+                    // Mostrar indicador de filtros aplicados
+                    const filtrosAplicados = document.getElementById('filtrosAplicados');
+                    if (filtrosAplicados) {
+                        filtrosAplicados.classList.remove('hidden');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('❌ Error aplicando filtros:', error);
+                this.showNotification('Error aplicando filtros', 'error');
+            }
+        },
 
-            const nombreLimpio = nombre.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
-            link.download = `documento_${nombreLimpio}.pdf`;
+        // Buscar documentos individuales
+        async buscarDocumentos() {
+            try {
+                console.log('📄 Buscando documentos...');
+                this.mostrarLoading(true);
+                
+                const params = new URLSearchParams();
+                
+                const filtroPDFNombre = document.getElementById('filtroPDFNombre');
+                const filtroPDFDocumento = document.getElementById('filtroPDFDocumento');
+                const filtroPDFNivel = document.getElementById('filtroPDFNivel');
+                const filtroPDFConDocumento = document.getElementById('filtroPDFConDocumento');
+                
+                if (filtroPDFNombre?.value) {
+                    params.append('nombre', filtroPDFNombre.value);
+                }
+                
+                if (filtroPDFDocumento?.value) {
+                    params.append('numeroDocumento', filtroPDFDocumento.value);
+                }
+                
+                if (filtroPDFNivel?.value) {
+                    params.append('nivel', filtroPDFNivel.value);
+                }
+                
+                if (filtroPDFConDocumento?.value === 'si') {
+                    params.append('tieneDocumento', 'true');
+                } else if (filtroPDFConDocumento?.value === 'no') {
+                    params.append('tieneDocumento', 'false');
+                }
+                
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                const headers = {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                };
+                
+                const url = `http://localhost:5000/api/reportes/deportistas?${params.toString()}`;
+                
+                const response = await fetch(url, {
+                    headers: headers
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.state.documentosFiltrados = data.deportistas || [];
+                    this.actualizarTablaDocumentos();
+                }
+                
+            } catch (error) {
+                console.error('❌ Error buscando documentos:', error);
+                this.showNotification('Error buscando documentos', 'error');
+            } finally {
+                this.mostrarLoading(false);
+            }
+        },
 
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(link.href);
+        // Descargar documento individual
+        descargarDocumentoIndividual(deportistaId) {
+            try {
+                console.log(`📄 Descargando documento para deportista ${deportistaId}`);
+                
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                const url = `http://localhost:5000/api/reportes/documento/${deportistaId}`;
+                window.open(url, '_blank');
+                
+            } catch (error) {
+                console.error('❌ Error descargando documento:', error);
+                this.showNotification('Error descargando documento', 'error');
+            }
+        },
 
-            this.showNotification('✅ Documento descargado correctamente', 'success');
-
-        } catch (error) {
-            console.error('❌ Error descargando documento:', error);
-            this.showNotification(`❌ Error: ${error.message}`, 'error');
-        } finally {
-            this.setLoading(false);
-        }
-    },
-
-    // Helper: Obtener iniciales
-    obtenerIniciales(nombreCompleto) {
-        if (!nombreCompleto) return '?';
-        return nombreCompleto
-            .split(' ')
-            .map(word => word.charAt(0).toUpperCase())
-            .join('')
-            .substring(0, 2);
-    },
-
-    // Helper: Obtener nombre del nivel
-    getNivelNombre(nivel) {
-        const nombres = {
-            'pendiente': 'Pendiente',
-            '1_basico': '1 Básico',
-            '1_medio': '1 Medio',
-            '1_avanzado': '1 Avanzado',
-            '2': 'Nivel 2',
-            '3': 'Nivel 3',
-            '4': 'Nivel 4'
-        };
-        return nombres[nivel] || nivel;
-    },
-
-    // Set loading state
-    setLoading(loading) {
-        this.state.loading = loading;
-        const loadingElement = document.getElementById('loadingIndicator');
-        if (loadingElement) {
-            if (loading) {
-                loadingElement.classList.remove('hidden');
+        // Ver documento en nueva pestaña
+        verDocumento(url) {
+            if (url) {
+                window.open(url, '_blank');
             } else {
-                loadingElement.classList.add('hidden');
+                this.showNotification('No hay documento disponible', 'warning');
             }
-        }
-    },
+        },
 
-    // Mostrar notificación
-    showNotification(message, type = 'info', duration = 5000) {
-        console.log(`💬 Notificación [${type}]: ${message}`);
+        // ==========================================
+        // ACTUALIZAR INTERFAZ
+        // ==========================================
+        actualizarEstadisticasUI() {
+            const stats = this.state.estadisticas;
+            
+            const totalDeportistas = document.getElementById('totalDeportistas');
+            const conDocumento = document.getElementById('conDocumento');
+            const sinDocumento = document.getElementById('sinDocumento');
+            const cloudinaryDocs = document.getElementById('cloudinaryDocs');
+            
+            if (totalDeportistas) totalDeportistas.textContent = stats.total_deportistas || 0;
+            if (conDocumento) conDocumento.textContent = stats.con_documento || 0;
+            if (sinDocumento) sinDocumento.textContent = stats.sin_documento || 0;
+            if (cloudinaryDocs) cloudinaryDocs.textContent = stats.cloudinary || 0;
+        },
 
-        let container = document.getElementById('notificationContainer');
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'notificationContainer';
-            container.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 9999;
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                max-width: 400px;
-            `;
-            document.body.appendChild(container);
-        }
+        actualizarVistaPrevia() {
+            const tbody = document.getElementById('tablaResultados');
+            const sinResultados = document.getElementById('sinResultados');
+            const resultadosTotales = document.getElementById('resultadosTotales');
+            
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            if (this.state.deportistasFiltrados.length === 0) {
+                if (sinResultados) sinResultados.classList.remove('hidden');
+                if (resultadosTotales) resultadosTotales.textContent = 'Mostrando 0 resultados';
+                return;
+            }
+            
+            if (sinResultados) sinResultados.classList.add('hidden');
+            
+            // Mostrar solo los primeros 10 resultados
+            const resultados = this.state.deportistasFiltrados.slice(0, 10);
+            
+            resultados.forEach(deportista => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 dark:hover:bg-zinc-800 documento-row';
+                
+                // Formatear datos
+                const nombre = deportista.nombre_completo || `${deportista.user?.nombre || ''} ${deportista.user?.apellidos || ''}`.trim();
+                const documento = deportista.numero_documento || deportista.user?.numero_documento || '';
+                const nivel = this.formatearNivel(deportista.nivel_actual);
+                const estado = this.formatearEstado(deportista.estado);
+                const tieneDoc = deportista.tiene_documento || deportista.documento_identidad;
+                
+                row.innerHTML = `
+                    <td class="px-4 py-3 font-medium">${nombre}</td>
+                    <td class="px-4 py-3 text-gray-600 dark:text-gray-400">${documento}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 text-xs rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300">
+                            ${nivel}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 text-xs rounded-full ${this.getEstadoColor(estado)}">
+                            ${estado}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">
+                        ${tieneDoc ? 
+                            '<span class="px-2 py-1 text-xs rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300">✓ Subido</span>' : 
+                            '<span class="px-2 py-1 text-xs rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300">✗ Pendiente</span>'
+                        }
+                    </td>
+                    <td class="px-4 py-3">
+                        ${tieneDoc ? 
+                            `<button onclick="ReportesApp.descargarDocumentoIndividual('${deportista.id}')" 
+                              class="px-3 py-1 text-xs bg-primary text-white rounded hover:bg-red-700 transition-colors">
+                                Descargar
+                             </button>` : 
+                            '<span class="text-gray-400 text-xs">No disponible</span>'
+                        }
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            if (resultadosTotales) {
+                resultadosTotales.textContent = `Mostrando ${Math.min(resultados.length, 10)} de ${this.state.deportistasFiltrados.length} resultados`;
+            }
+        },
 
-        const notification = document.createElement('div');
-        const bgColor = type === 'error' ? '#EF4444' :
-            type === 'success' ? '#10B981' :
-                type === 'warning' ? '#F59E0B' : '#3B82F6';
-
-        notification.style.cssText = `
-            background: ${bgColor};
-            color: white;
-            padding: 16px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            animation: slideIn 0.3s ease-out;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 500;
-            min-width: 300px;
-        `;
-
-        const icon = type === 'success' ? 'check_circle' :
-            type === 'error' ? 'error' :
-                type === 'warning' ? 'warning' : 'info';
-
-        notification.innerHTML = `
-            <span class="material-symbols-outlined" style="font-size: 20px;">
-                ${icon}
-            </span>
-            <span style="flex: 1;">${message}</span>
-            <button onclick="this.parentElement.remove()" style="background: none; border: none; color: white; cursor: pointer;">
-                <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
-            </button>
-        `;
-
-        container.appendChild(notification);
-
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease-out';
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
+        actualizarTablaDocumentos() {
+            const tbody = document.getElementById('tablaDocumentos');
+            const mensajeSinDocumentos = document.getElementById('mensajeSinDocumentos');
+            
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            if (this.state.documentosFiltrados.length === 0) {
+                if (mensajeSinDocumentos) mensajeSinDocumentos.classList.remove('hidden');
+                return;
+            }
+            
+            if (mensajeSinDocumentos) mensajeSinDocumentos.classList.add('hidden');
+            
+            // Filtrar solo deportistas con documentos
+            const deportistasConDocumentos = this.state.documentosFiltrados.filter(d => 
+                d.documento_identidad || d.tiene_documento
+            );
+            
+            if (deportistasConDocumentos.length === 0) {
+                if (mensajeSinDocumentos) {
+                    mensajeSinDocumentos.classList.remove('hidden');
+                    mensajeSinDocumentos.querySelector('h4').textContent = 'Ningún deportista tiene documentos';
                 }
-            }, 300);
-        }, duration);
-    },
+                return;
+            }
+            
+            deportistasConDocumentos.forEach(deportista => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 dark:hover:bg-zinc-800 documento-row';
+                
+                const nombre = deportista.nombre_completo || `${deportista.user?.nombre || ''} ${deportista.user?.apellidos || ''}`.trim();
+                const documento = deportista.numero_documento || deportista.user?.numero_documento || '';
+                const nivel = this.formatearNivel(deportista.nivel_actual);
+                const equipo = this.formatearEquipo(deportista.equipo_competitivo);
+                const tipoDoc = deportista.user?.tipo_documento || 'No especificado';
+                const estado = this.formatearEstado(deportista.estado);
+                const esCloudinary = deportista.es_cloudinary || 
+                    (deportista.documento_identidad && 
+                     (deportista.documento_identidad.includes('cloudinary') || 
+                      deportista.documento_identidad.includes('res.cloudinary.com')));
+                
+                row.innerHTML = `
+                    <td class="px-8 py-4">
+                        <div>
+                            <p class="font-medium">${nombre}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">${deportista.user?.email || ''}</p>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="font-mono text-sm">${documento}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">${tipoDoc}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="font-medium">${nivel}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">${equipo}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                        ${esCloudinary ? 
+                            '<span class="px-2 py-1 text-xs rounded-full bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-300">☁️ Cloudinary</span>' : 
+                            '<span class="px-2 py-1 text-xs rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300">📁 Local</span>'
+                        }
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs rounded-full ${this.getEstadoColor(estado)}">
+                            ${estado}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex justify-end gap-2">
+                            <button onclick="ReportesApp.verDocumento('${deportista.documento_identidad || ''}')" 
+                                    class="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors ${!deportista.documento_identidad ? 'opacity-50 cursor-not-allowed' : ''}"
+                                    ${!deportista.documento_identidad ? 'disabled' : ''}>
+                                <span class="material-symbols-outlined text-sm">visibility</span>
+                            </button>
+                            <button onclick="ReportesApp.descargarDocumentoIndividual('${deportista.id}')" 
+                                    class="px-3 py-1 text-xs bg-primary text-white rounded hover:bg-red-700 transition-colors ${!deportista.documento_identidad ? 'opacity-50 cursor-not-allowed' : ''}"
+                                    ${!deportista.documento_identidad ? 'disabled' : ''}>
+                                <span class="material-symbols-outlined text-sm">download</span>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        },
 
-    logout() {
-        localStorage.clear();
-        sessionStorage.clear();
-        this.showNotification('Sesión cerrada exitosamente', 'info');
-        setTimeout(() => {
-            window.location.href = '../../auth/login-admin.html';
-        }, 1500);
-    },
-};
+        actualizarContadores() {
+            const contadorResultados = document.getElementById('contadorResultados');
+            if (contadorResultados) {
+                contadorResultados.textContent = this.state.deportistasFiltrados.length;
+            }
+        },
+
+        // ==========================================
+        // UTILIDADES
+        // ==========================================
+        formatearNivel(nivel) {
+            const niveles = {
+                'pendiente': 'Pendiente',
+                'baby_titans': 'Baby Titans',
+                '1_basico': '1 Básico',
+                '1_medio': '1 Medio',
+                '1_avanzado': '1 Avanzado',
+                '2': 'Nivel 2',
+                '3': 'Nivel 3',
+                '4': 'Nivel 4'
+            };
+            return niveles[nivel] || nivel;
+        },
+
+        formatearEquipo(equipo) {
+            const equipos = {
+                'sin_equipo': 'Sin equipo',
+                'rocks_titans': 'Rocks Titans',
+                'lightning_titans': 'Lightning Titans',
+                'storm_titans': 'Storm Titans',
+                'fire_titans': 'Fire Titans',
+                'electric_titans': 'Electric Titans'
+            };
+            return equipos[equipo] || equipo;
+        },
+
+        formatearEstado(estado) {
+            const estados = {
+                'activo': 'Activo',
+                'inactivo': 'Inactivo',
+                'lesionado': 'Lesionado',
+                'descanso': 'Descanso',
+                'pendiente': 'Pendiente'
+            };
+            return estados[estado] || estado;
+        },
+
+        getEstadoColor(estado) {
+            const colores = {
+                'Activo': 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300',
+                'Inactivo': 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300',
+                'Lesionado': 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-300',
+                'Descanso': 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300',
+                'Pendiente': 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300'
+            };
+            return colores[estado] || 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300';
+        },
+
+        // ==========================================
+        // UI HELPERS
+        // ==========================================
+        mostrarLoading(mostrar) {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            if (loadingIndicator) {
+                if (mostrar) {
+                    loadingIndicator.classList.remove('hidden');
+                } else {
+                    loadingIndicator.classList.add('hidden');
+                }
+            }
+        },
+
+        limpiarFiltros() {
+            console.log('🧹 Limpiando todos los filtros...');
+            
+            // Resetear estado
+            this.state.filtros = {
+                nombreCompleto: '',
+                tipoDocumento: '',
+                numeroDocumento: '',
+                ciudad: '',
+                direccion: '',
+                telefono: '',
+                email: '',
+                fechaNacimiento: '',
+                eps: '',
+                acudiente: '',
+                estado: '',
+                nivel: '',
+                tallaCamiseta: '',
+                pesoMin: '',
+                pesoMax: '',
+                alturaMin: '',
+                alturaMax: '',
+                edadMin: '',
+                edadMax: '',
+                equipoCompetitivo: '',
+                tieneDocumento: 'todos'
+            };
+            
+            // Resetear UI - TODOS los inputs
+            const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="number"], input[type="date"]');
+            inputs.forEach(input => {
+                input.value = '';
+            });
+            
+            // Resetear selects
+            const selects = document.querySelectorAll('select');
+            selects.forEach(select => {
+                select.value = '';
+                if (select.id === 'filtroTieneDocumento' || select.id === 'filtroEstadoDocumento') {
+                    select.value = 'todos';
+                }
+            });
+            
+            // Resetear chips activos
+            document.querySelectorAll('.filtro-chip.active').forEach(chip => {
+                chip.classList.remove('active', 'bg-primary', 'text-white');
+                chip.classList.add('bg-gray-100', 'dark:bg-zinc-800', 'text-gray-700', 'dark:text-gray-300');
+            });
+            
+            // Activar "Todos" chips
+            document.querySelectorAll('.filtro-chip[data-estado=""], .filtro-chip[data-nivel=""]').forEach(chip => {
+                chip.classList.add('active', 'bg-primary', 'text-white');
+                chip.classList.remove('bg-gray-100', 'dark:bg-zinc-800', 'text-gray-700', 'dark:text-gray-300');
+            });
+            
+            // Ocultar indicador de filtros aplicados
+            const filtrosAplicados = document.getElementById('filtrosAplicados');
+            if (filtrosAplicados) {
+                filtrosAplicados.classList.add('hidden');
+            }
+            
+            // Recargar deportistas sin filtros
+            this.cargarDeportistas();
+            
+            this.showNotification('✅ Filtros limpiados', 'success');
+        },
+
+        updateUserInfo() {
+            const userEmail = document.getElementById('userEmail');
+            if (userEmail) {
+                try {
+                    const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+                    const user = userStr ? JSON.parse(userStr) : null;
+                    if (user && user.email) {
+                        userEmail.textContent = user.email;
+                    }
+                } catch (e) {
+                    console.error('❌ Error parseando usuario:', e);
+                }
+            }
+        },
+
+        // ==========================================
+        // CONFIGURAR EVENTOS
+        // ==========================================
+        configurarEventos() {
+            console.log('⚙️ Configurando eventos...');
+            
+            // 1. BOTÓN DESCARGAR EXCEL COMPLETO
+            const descargarExcelCompletoBtn = document.getElementById('descargarExcelCompletoBtn');
+            if (descargarExcelCompletoBtn) {
+                descargarExcelCompletoBtn.addEventListener('click', () => {
+                    console.log('🖱️ Click en DESCARGAR EXCEL COMPLETO');
+                    this.descargarExcelCompleto();
+                });
+            }
+            
+            // 2. BOTÓN DESCARGAR EXCEL DE DOCUMENTOS
+            const descargarExcelDocumentosBtn = document.getElementById('descargarExcelDocumentosBtn');
+            if (descargarExcelDocumentosBtn) {
+                descargarExcelDocumentosBtn.addEventListener('click', () => {
+                    console.log('🖱️ Click en EXCEL DE DOCUMENTOS');
+                    this.descargarExcelDocumentos();
+                });
+            }
+            
+            // 3. BOTÓN APLICAR FILTROS
+            const aplicarFiltrosBtn = document.getElementById('aplicarFiltrosBtn');
+            if (aplicarFiltrosBtn) {
+                aplicarFiltrosBtn.addEventListener('click', () => {
+                    console.log('🖱️ Click en APLICAR FILTROS');
+                    
+                    // Actualizar estado con los valores actuales
+                    this.state.filtros = this.obtenerTodosLosFiltrosDelFormulario();
+                    
+                    // Aplicar filtros
+                    this.aplicarFiltros();
+                });
+            }
+            
+            // 4. BOTÓN LIMPIAR FILTROS
+            const limpiarFiltrosBtn = document.getElementById('limpiarFiltrosBtn');
+            if (limpiarFiltrosBtn) {
+                limpiarFiltrosBtn.addEventListener('click', () => {
+                    this.limpiarFiltros();
+                });
+            }
+            
+            // 5. BOTÓN BUSCAR DOCUMENTOS
+            const buscarDocumentosBtn = document.getElementById('buscarDocumentosBtn');
+            if (buscarDocumentosBtn) {
+                buscarDocumentosBtn.addEventListener('click', () => {
+                    this.buscarDocumentos();
+                });
+            }
+            
+            // 6. BOTÓN LIMPIAR FILTROS PDF
+            const limpiarFiltrosPDFBtn = document.getElementById('limpiarFiltrosPDFBtn');
+            if (limpiarFiltrosPDFBtn) {
+                limpiarFiltrosPDFBtn.addEventListener('click', () => {
+                    document.getElementById('filtroPDFNombre').value = '';
+                    document.getElementById('filtroPDFDocumento').value = '';
+                    document.getElementById('filtroPDFNivel').value = '';
+                    const filtroPDFConDocumento = document.getElementById('filtroPDFConDocumento');
+                    if (filtroPDFConDocumento) filtroPDFConDocumento.value = 'todos';
+                    this.buscarDocumentos();
+                });
+            }
+            
+            // 7. TABS DE FILTROS
+            document.querySelectorAll('.filtro-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const tabId = e.target.id.replace('tab', '').toLowerCase();
+                    
+                    // Remover clase active de todas las tabs
+                    document.querySelectorAll('.filtro-tab').forEach(t => {
+                        t.classList.remove('active', 'bg-primary', 'text-white');
+                        t.classList.add('bg-gray-100', 'dark:bg-zinc-800', 'text-gray-700', 'dark:text-gray-300');
+                    });
+                    
+                    // Agregar clase active a la tab clickeada
+                    e.target.classList.add('active', 'bg-primary', 'text-white');
+                    e.target.classList.remove('bg-gray-100', 'dark:bg-zinc-800', 'text-gray-700', 'dark:text-gray-300');
+                    
+                    // Mostrar contenido correspondiente
+                    document.querySelectorAll('.filtro-contenido').forEach(content => {
+                        content.classList.remove('active');
+                        content.classList.add('hidden');
+                    });
+                    
+                    const contenido = document.getElementById(`filtros${tabId}`);
+                    if (contenido) {
+                        contenido.classList.add('active');
+                        contenido.classList.remove('hidden');
+                    }
+                });
+            });
+            
+            // 8. CHIPS DE FILTRO
+            document.querySelectorAll('.filtro-chip').forEach(chip => {
+                chip.addEventListener('click', (e) => {
+                    const tipo = e.target.classList.contains('estado') ? 'estado' : 'nivel';
+                    const valor = e.target.dataset[tipo];
+                    
+                    // Remover active de todos los chips del mismo tipo
+                    document.querySelectorAll(`.filtro-chip.${tipo}`).forEach(c => {
+                        c.classList.remove('active', 'bg-primary', 'text-white');
+                        c.classList.add('bg-gray-100', 'dark:bg-zinc-800', 'text-gray-700', 'dark:text-gray-300');
+                    });
+                    
+                    // Agregar active al chip clickeado
+                    e.target.classList.add('active', 'bg-primary', 'text-white');
+                    e.target.classList.remove('bg-gray-100', 'dark:bg-zinc-800', 'text-gray-700', 'dark:text-gray-300');
+                    
+                    // Actualizar estado
+                    this.state.filtros[tipo] = valor;
+                });
+            });
+            
+            // 9. INPUTS DE FILTRO (actualizan estado en tiempo real)
+            document.querySelectorAll('input, select').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const id = e.target.id.replace('filtro', '');
+                    const key = id.charAt(0).toLowerCase() + id.slice(1);
+                    
+                    if (key in this.state.filtros) {
+                        this.state.filtros[key] = e.target.value;
+                    }
+                });
+            });
+            
+            // 10. BUSCAR CON ENTER EN FILTROS DE DOCUMENTOS
+            document.querySelectorAll('#filtroPDFNombre, #filtroPDFDocumento').forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.buscarDocumentos();
+                    }
+                });
+            });
+            
+            // 11. BUSCAR CON ENTER EN FILTROS PRINCIPALES
+            document.querySelectorAll('#filtroNombreCompleto, #filtroNumeroDocumento, #filtroEmail').forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.aplicarFiltros();
+                    }
+                });
+            });
+            
+            console.log('✅ Todos los eventos configurados correctamente');
+        },
+
+        // ==========================================
+        // MÉTODOS AUXILIARES
+        // ==========================================
+        logout() {
+            console.log('👋 CERRANDO SESIÓN...');
+            
+            this.showNotification('Sesión cerrada exitosamente', 'info');
+            
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            setTimeout(() => {
+                window.location.href = '../auth/login-admin.html';
+            }, 1500);
+        },
+
+        mostrarAyuda() {
+            this.showNotification(
+                '📘 AYUDA DE REPORTES\n\n' +
+                '1️⃣ FILTROS: Usa las pestañas para filtrar por diferentes criterios\n' +
+                '2️⃣ EXCEL COMPLETO: Exporta TODOS los datos con los filtros aplicados\n' +
+                '3️⃣ EXCEL DOCUMENTOS: Solo exporta información de documentos\n' +
+                '4️⃣ DESCARGAS INDIVIDUALES: Ve y descarga documentos uno por uno\n' +
+                '5️⃣ CLOUDINARY: Los documentos pueden estar en la nube o servidor local',
+                'info',
+                10000
+            );
+        },
+
+        // ==========================================
+        // SISTEMA DE NOTIFICACIONES
+        // ==========================================
+        showNotification(message, type = 'info', duration = 5000) {
+            console.log(`💬 Notificación [${type}]: ${message}`);
+
+            let container = document.getElementById('notificationContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'notificationContainer';
+                container.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 9999;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    max-width: 400px;
+                `;
+                document.body.appendChild(container);
+            }
+
+            const notification = document.createElement('div');
+            const bgColor = type === 'error' ? '#EF4444' :
+                type === 'success' ? '#10B981' :
+                    type === 'warning' ? '#F59E0B' : '#3B82F6';
+
+            notification.style.cssText = `
+                background: ${bgColor};
+                color: white;
+                padding: 16px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                animation: slideIn 0.3s ease-out;
+                font-family: 'Montserrat', sans-serif;
+                font-weight: 500;
+                min-width: 300px;
+            `;
+
+            const icon = type === 'success' ? 'check_circle' :
+                type === 'error' ? 'error' :
+                    type === 'warning' ? 'warning' : 'info';
+
+            notification.innerHTML = `
+                <span class="material-symbols-outlined" style="font-size: 20px;">
+                    ${icon}
+                </span>
+                <span style="flex: 1; white-space: pre-line;">${message}</span>
+                <button onclick="this.parentElement.remove()" style="background: none; border: none; color: white; cursor: pointer;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
+                </button>
+            `;
+
+            container.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, duration);
+        }
+    };
+}
 
 // ==========================================
-// FUNCIONES GLOBALES PARA EL HTML
+// INICIALIZACIÓN CUANDO EL DOM ESTÉ LISTO
 // ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('📄 DOM cargado, inicializando ReportesApp...');
+    
+    // Agregar estilos CSS para las animaciones de notificaciones si no existen
+    if (!document.querySelector('#notification-styles')) {
+        const style = document.createElement('style');
+        style.id = 'notification-styles';
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // Inicializar la aplicación
+    if (window.ReportesApp && window.ReportesApp.init) {
+        window.ReportesApp.init();
+    } else {
+        console.error('❌ ReportesApp no está definido correctamente');
+    }
+});
 
-function logout() {
-    if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-        ReportesApp.logout();
+// Función para cambiar tema (compartida)
+function toggleTheme() {
+    const html = document.documentElement;
+    if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+    } else {
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
     }
 }
 
-function toggleTheme() {
-    document.documentElement.classList.toggle('dark');
+// Cargar tema guardado
+if (localStorage.getItem('theme') === 'dark' || 
+    (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+} else {
+    document.documentElement.classList.remove('dark');
 }
-
-// ==========================================
-// INICIALIZACIÓN
-// ==========================================
-
-document.addEventListener('DOMContentLoaded', () => {
-    ReportesApp.init();
-});

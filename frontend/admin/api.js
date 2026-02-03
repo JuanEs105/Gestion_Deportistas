@@ -888,7 +888,6 @@ window.AdminAPI = {
             fecha_nacimiento: deportistaData.fecha_nacimiento,
             peso: deportistaData.peso,
             altura: deportistaData.altura,
-            // 🔥 AÑADE ESTA LÍNEA:
             talla_camiseta: deportistaData.talla_camiseta || deportistaData.talla,
             nivel_actual: deportistaData.nivel_actual,
             estado: deportistaData.estado,
@@ -1069,46 +1068,7 @@ window.AdminAPI = {
             return [];
         }
     },
-    deleteDeportista: async function (deportistaId) {
-        try {
-            console.log('🗑️ Eliminando deportista:', deportistaId);
-
-            // Intentar con el endpoint principal
-            const response = await fetch(`${this.baseURL}/admin/deportistas/${deportistaId}/eliminar`, {
-                method: 'DELETE',
-                headers: this.getHeaders()
-            });
-
-            // Verificar respuesta
-            const text = await response.text();
-
-            if (response.status === 404) {
-                console.log('⚠️ Endpoint /eliminar no encontrado, intentando endpoint estándar');
-
-                // Intentar con el endpoint estándar
-                const response2 = await fetch(`${this.baseURL}/admin/deportistas/${deportistaId}`, {
-                    method: 'DELETE',
-                    headers: this.getHeaders()
-                });
-
-                const text2 = await response2.text();
-                if (!response2.ok) {
-                    throw new Error(`HTTP ${response2.status}: No se pudo eliminar`);
-                }
-
-                return text2 ? JSON.parse(text2) : { success: true };
-            }
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${text || 'Error eliminando deportista'}`);
-            }
-
-            return text ? JSON.parse(text) : { success: true };
-        } catch (error) {
-            console.error('❌ Error en deleteDeportista:', error);
-            throw error;
-        }
-    },
+    
     // ==========================================
     // ENTRENADORES - COMPLETO
     // ==========================================

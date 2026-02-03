@@ -1427,3 +1427,499 @@
 .animate-fadeIn {
     animation: fadeIn 0.3s ease-out;
 }
+/* ===================================
+   BOTONES ESPECÍFICOS PARA TU FORMULARIO
+   =================================== */
+
+/* Botón "Crear Evento" */
+button[type="submit"], 
+input[type="submit"] {
+    background: linear-gradient(135deg, #E21B23 0%, #C4161D 100%);
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 6px rgba(226, 27, 35, 0.2);
+    white-space: nowrap;
+    min-width: 150px;
+    justify-content: center;
+}
+
+button[type="submit"]:hover,
+input[type="submit"]:hover {
+    background: linear-gradient(135deg, #C4161D 0%, #A81218 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(226, 27, 35, 0.3);
+}
+
+/* Botón "Cancelar" */
+button[type="button"].cancelar,
+button:contains("Cancelar"),
+input[type="button"][value="Cancelar"] {
+    background: white;
+    color: #6B7280;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    border: 1px solid #D1D5DB;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    min-width: 150px;
+    justify-content: center;
+}
+
+button[type="button"].cancelar:hover,
+button:contains("Cancelar"):hover,
+input[type="button"][value="Cancelar"]:hover {
+    background: #F3F4F6;
+    border-color: #374151;
+    color: #374151;
+}
+
+/* Botón "Editar" */
+button:contains("Editar"),
+.editar-btn {
+    background: #3B82F6;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+button:contains("Editar"):hover,
+.editar-btn:hover {
+    background: #2563EB;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+/* Botón "Cerrar" */
+button:contains("Cerrar"),
+.cerrar-btn {
+    background: #6B7280;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+button:contains("Cerrar"):hover,
+.cerrar-btn:hover {
+    background: #4B5563;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(107, 114, 128, 0.2);
+}
+
+/* Estilos específicos para el modal */
+.modal-panel-body button {
+    min-height: 44px; /* Para mejor accesibilidad táctil */
+    margin: 0;
+}
+
+/* Contenedor de botones en modales */
+.modal-panel-body > div:last-child {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #E5E7EB;
+}
+
+.dark .modal-panel-body > div:last-child {
+    border-color: #27272A;
+}
+/* ===================================
+   CLASES CSS FALTANTES PARA LOS BOTONES
+   =================================== */
+
+/* Botón primario (Crear/Actualizar Evento) */
+.btn-form-primary {
+    background: linear-gradient(135deg, #E21B23 0%, #C4161D 100%);
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 6px rgba(226, 27, 35, 0.2);
+    white-space: nowrap;
+    min-width: 150px;
+    justify-content: center;
+}
+
+.btn-form-primary:hover {
+    background: linear-gradient(135deg, #C4161D 0%, #A81218 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(226, 27, 35, 0.3);
+}
+
+.btn-form-primary:active {
+    transform: translateY(0);
+}
+
+/* Botón secundario (Cancelar) */
+.btn-form-secondary {
+    background: white;
+    color: #6B7280;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    border: 1px solid #D1D5DB;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    min-width: 150px;
+    justify-content: center;
+}
+
+.dark .btn-form-secondary {
+    background: #27272A;
+    color: #A1A1AA;
+    border-color: #4B5563;
+}
+
+.btn-form-secondary:hover {
+    background: #F3F4F6;
+    border-color: #374151;
+    color: #374151;
+}
+
+.dark .btn-form-secondary:hover {
+    background: #3F3F46;
+    border-color: #D1D5DB;
+    color: #D1D5DB;
+}
+
+/* Botón de peligro (Eliminar) */
+.btn-danger {
+    background: #EF4444;
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
+    white-space: nowrap;
+    min-width: 150px;
+    justify-content: center;
+}
+
+.btn-danger:hover {
+    background: #DC2626;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:active {
+    transform: translateY(0);
+}
+
+/* Botón de editar */
+.btn-editar {
+    background: #3B82F6;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.btn-editar:hover {
+    background: #2563EB;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+/* Botón de eliminar (pequeño) */
+.btn-eliminar {
+    background: #EF4444;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.btn-eliminar:hover {
+    background: #DC2626;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+}
+
+/* Contenedor de acciones del formulario */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #E5E7EB;
+    justify-content: flex-end;
+}
+
+.dark .form-actions {
+    border-color: #27272A;
+}
+
+/* Estilos para la tarjeta de evento */
+.evento-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    border: 1px solid #E5E7EB;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.dark .evento-card {
+    background: #18181B;
+    border-color: #27272A;
+}
+
+.evento-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    border-color: #E21B23;
+}
+
+.dark .evento-card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.evento-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.evento-icon {
+    background: rgba(226, 27, 35, 0.1);
+    color: #E21B23;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.evento-info {
+    flex: 1;
+}
+
+.evento-titulo {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1A1A1A;
+    margin-bottom: 0.5rem;
+}
+
+.dark .evento-titulo {
+    color: white;
+}
+
+.evento-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.evento-badge-small {
+    font-size: 0.625rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.evento-descripcion {
+    font-size: 0.875rem;
+    color: #4B5563;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: #F9FAFB;
+    border-radius: 0.5rem;
+    border-left: 3px solid #E21B23;
+}
+
+.dark .evento-descripcion {
+    background: #27272A;
+    color: #D1D5DB;
+}
+
+.evento-detalles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #6B7280;
+}
+
+.dark .evento-detalles {
+    color: #A1A1AA;
+}
+
+.evento-detalle {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.evento-detalle .material-symbols-outlined {
+    font-size: 1rem;
+    color: #E21B23;
+}
+
+.evento-acciones {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+/* Zona de peligro */
+.danger-zone {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid #EF4444;
+}
+
+.danger-zone h4 {
+    color: #EF4444;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+/* Para el checkmark de las opciones seleccionadas */
+.check-mark {
+    margin-left: 0.5rem;
+    font-weight: bold;
+    color: #E21B23;
+}
+
+/* Estilos para el contenedor de eventos del día */
+.eventos-dia-header {
+    margin-bottom: 1.5rem;
+}
+
+.eventos-dia-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1A1A1A;
+    margin: 0;
+}
+
+.dark .eventos-dia-title {
+    color: white;
+}
+
+.eventos-dia-fecha {
+    font-size: 0.875rem;
+    color: #6B7280;
+    margin-bottom: 0.5rem;
+}
+
+.dark .eventos-dia-fecha {
+    color: #9CA3AF;
+}
+
+.eventos-dia-stats {
+    font-size: 0.75rem;
+    color: #E21B23;
+    font-weight: 700;
+}
+
+.eventos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}

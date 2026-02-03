@@ -20,6 +20,11 @@ const Deportista = sequelize.define('Deportista', {
     type: DataTypes.DATE,
     allowNull: true
   },
+  ciudad_nacimiento: {  
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Ciudad de nacimiento'
+  },
   altura: {
     type: DataTypes.FLOAT,
     allowNull: true,
