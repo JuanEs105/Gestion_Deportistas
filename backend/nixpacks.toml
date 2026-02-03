@@ -1,0 +1,8 @@
+[phases.setup]
+providers = ["node"]
+
+[phases.install]
+cmds = ["npm ci --production=false"]
+
+[start]
+cmd = "npm start"
