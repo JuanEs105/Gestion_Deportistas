@@ -37,6 +37,7 @@ const corsOptions = {
       'http://localhost:5500',
       'http://127.0.0.1:5500',
       'http://192.168.1.*:*', // Para red local
+      'https://grey-goldfish-729112.hostingersite.com', // ⬅️ AGREGAR ESTA LÍNEA
       process.env.FRONTEND_URL
     ].filter(Boolean);
 
@@ -68,10 +69,10 @@ const corsOptions = {
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: [
-    'Content-Type', 
-    'Authorization', 
-    'X-Requested-With', 
-    'Accept', 
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
     'Origin',
     'Access-Control-Allow-Origin',
     'Access-Control-Allow-Headers'
@@ -97,25 +98,25 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Credentials', 'true');
     return res.status(200).end();
   }
-  
+
   // Para otras peticiones, agregar headers
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.header('Access-Control-Allow-Credentials', 'true');
-  
+
   next();
 });
 
 // Middleware de logging mejorado
 app.use((req, res, next) => {
   const start = Date.now();
-  
+
   res.on('finish', () => {
     const duration = Date.now() - start;
     const statusColor = res.statusCode >= 400 ? '❌' : res.statusCode >= 300 ? '⚠️ ' : '✅';
     const origin = req.headers.origin || 'Sin origen';
     console.log(`${statusColor} [${new Date().toLocaleTimeString()}] ${req.method} ${req.originalUrl} - ${res.statusCode} (${duration}ms) - Origen: ${origin}`);
   });
-  
+
   next();
 });
 
@@ -128,16 +129,16 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 const initializeServer = async () => {
   try {
     console.log('🔗 Conectando a la base de datos PostgreSQL...');
-    
+
     await connectDB();
     console.log('✅ Base de datos conectada exitosamente');
-    
+
     console.log('\n📁 Cargando rutas...');
-    
+
     // ====================
     // SECCIÓN DE RUTAS - ORDEN CORREGIDO
     // ====================
-    
+
     // 1. RUTAS CRÍTICAS (si fallan, el servidor debería detenerse)
     try {
       const authRoutes = require('./routes/authRoutes');
@@ -148,14 +149,14 @@ const initializeServer = async () => {
       console.error('Stack:', error.stack);
       process.exit(1);
     }
-    
+
     // 2. RUTAS PRINCIPALES
     const mainRoutes = [
       { path: '/api/deportistas', file: './routes/deportistaRoutes', required: true },
       { path: '/api/reportes', file: './routes/reportesRoutes', required: true },
       { path: '/api/entrenador', file: './routes/entrenadorRoutes', required: true } // ✅ AGREGADA
     ];
-    
+
     for (const route of mainRoutes) {
       try {
         const routeModule = require(route.file);
@@ -168,7 +169,7 @@ const initializeServer = async () => {
         }
       }
     }
-    
+
     // 3. RUTAS OPCIONALES
     const optionalRoutes = [
       { path: '/api/admin', file: './routes/adminRoutes' },
@@ -178,7 +179,7 @@ const initializeServer = async () => {
       { path: '/api/notificaciones', file: './routes/notificacionesRoutes' },
       { path: '/api/upload', file: './routes/uploadRoutes' }
     ];
-    
+
     for (const route of optionalRoutes) {
       try {
         const routeModule = require(route.file);
@@ -192,7 +193,7 @@ const initializeServer = async () => {
         }
       }
     }
-    
+
     // ====================
     // INICIAR TAREAS PROGRAMADAS
     // ====================
@@ -203,7 +204,7 @@ const initializeServer = async () => {
     } catch (error) {
       console.warn('⚠️  No se pudieron iniciar tareas programadas:', error.message);
     }
-    
+
     // ====================
     // RUTAS DEL SISTEMA
     // ====================
@@ -217,13 +218,13 @@ const initializeServer = async () => {
         allowedMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
       });
     });
-    
+
     // Health check mejorado
     app.get('/api/health', async (req, res) => {
       try {
         const { sequelize } = require('./config/database');
         await sequelize.authenticate();
-        
+
         const healthCheck = {
           status: 'healthy',
           timestamp: new Date().toISOString(),
@@ -242,7 +243,7 @@ const initializeServer = async () => {
           database: 'connected',
           environment: process.env.NODE_ENV || 'development'
         };
-        
+
         res.json(healthCheck);
       } catch (dbError) {
         res.status(503).json({
@@ -253,7 +254,7 @@ const initializeServer = async () => {
         });
       }
     });
-    
+
     // Ruta principal
     app.get('/', (req, res) => {
       res.json({
@@ -285,7 +286,7 @@ const initializeServer = async () => {
         documentation: 'Ver README.md para más información'
       });
     });
-    
+
     // ====================
     // MANEJO DE ERRORES
     // ====================
@@ -306,12 +307,12 @@ const initializeServer = async () => {
         ]
       });
     });
-    
+
     // Manejo global de errores
     app.use((err, req, res, next) => {
       console.error('❌ Error del servidor:', err.message);
       console.error('Stack:', err.stack);
-      
+
       // Si es error CORS, dar más información
       if (err.message.includes('CORS') || err.message.includes('origen')) {
         return res.status(403).json({
@@ -322,10 +323,10 @@ const initializeServer = async () => {
           solution: 'Contacta al administrador para agregar tu dominio a la lista blanca de CORS'
         });
       }
-      
+
       let statusCode = err.status || 500;
       let errorMessage = err.message || 'Error interno del servidor';
-      
+
       res.status(statusCode).json({
         success: false,
         error: errorMessage,
@@ -333,7 +334,7 @@ const initializeServer = async () => {
         path: req.originalUrl
       });
     });
-    
+
     // ====================
     // INICIAR SERVIDOR
     // ====================
@@ -346,7 +347,7 @@ const initializeServer = async () => {
       console.log(`🔒 CORS:        Habilitado para desarrollo`);
       console.log(`⏰ Iniciado:    ${new Date().toLocaleString()}`);
       console.log('='.repeat(70));
-      
+
       console.log('\n✨ CARACTERÍSTICAS ACTIVAS:');
       console.log('┌─────────────────────────────────────────────────────────┐');
       console.log('│ ✅ Sistema de autenticación JWT                        │');
@@ -358,7 +359,7 @@ const initializeServer = async () => {
       console.log('│ ✅ Panel de entrenadores (NUEVO)                       │'); // ✅ AGREGADA
       console.log('│ ✅ CORS completamente habilitado                       │');
       console.log('└─────────────────────────────────────────────────────────┘');
-      
+
       console.log('\n🌐 DOMINIOS PERMITIDOS (CORS):');
       console.log('   - http://localhost:8080');
       console.log('   - http://127.0.0.1:8080');
@@ -367,13 +368,13 @@ const initializeServer = async () => {
       console.log('   - http://localhost:5173');
       console.log('   - http://localhost:5500');
       console.log('   - * (Todos en modo desarrollo)');
-      
+
       console.log('\n🔧 RUTAS DE PRUEBA:');
       console.log('   GET  /api/health                    - Verificar estado del servidor');
       console.log('   GET  /api/test-cors                 - Probar configuración CORS');
       console.log('   POST /api/auth/login                - Iniciar sesión');
       console.log('   GET  /api/entrenador/perfil         - Perfil del entrenador'); // ✅ AGREGADA
-      
+
       console.log('\n💡 PARA PROBAR PERFIL ENTRENADOR:');
       console.log('   1. Inicia sesión como entrenador');
       console.log('   2. Ve a la consola del navegador (F12)');
@@ -381,10 +382,10 @@ const initializeServer = async () => {
       console.log('        headers: { "Authorization": "Bearer TU_TOKEN_AQUÍ" }');
       console.log('      })');
       console.log('   4. Deberías ver los datos del entrenador');
-      
+
       console.log('\n' + '='.repeat(70));
     });
-    
+
     // Manejo de señales de terminación
     const gracefulShutdown = () => {
       console.log('\n🛑 Recibida señal de terminación. Cerrando servidor...');
@@ -392,18 +393,18 @@ const initializeServer = async () => {
         console.log('✅ Servidor cerrado exitosamente');
         process.exit(0);
       });
-      
+
       // Forzar cierre después de 10 segundos
       setTimeout(() => {
         console.error('❌ Timeout forzando cierre del servidor');
         process.exit(1);
       }, 10000);
     };
-    
+
     process.on('SIGTERM', gracefulShutdown);
     process.on('SIGINT', gracefulShutdown);
     process.on('SIGUSR2', gracefulShutdown); // Para nodemon
-    
+
   } catch (error) {
     console.error('❌ Error crítico al iniciar el servidor:', error);
     console.error('Stack:', error.stack);
