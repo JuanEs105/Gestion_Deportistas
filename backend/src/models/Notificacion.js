@@ -1,4 +1,4 @@
-// backend/src/models/Notificacion.js
+// backend/src/models/Notificacion.js - VERSIÓN CORREGIDA
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
@@ -11,6 +11,7 @@ const Notificacion = sequelize.define('Notificacion', {
   user_id: {
     type: DataTypes.UUID,
     allowNull: false,
+    field: 'user_id',  // ⬅️ Explícitamente definir el nombre de la columna
     references: {
       model: 'users',
       key: 'id'
@@ -20,6 +21,7 @@ const Notificacion = sequelize.define('Notificacion', {
   evento_id: {
     type: DataTypes.UUID,
     allowNull: true,
+    field: 'evento_id',  // ⬅️ Explícitamente definir el nombre de la columna
     references: {
       model: 'calendario_eventos',
       key: 'id'
@@ -61,7 +63,8 @@ const Notificacion = sequelize.define('Notificacion', {
   },
   fecha_leida: {
     type: DataTypes.DATE,
-    allowNull: true
+    allowNull: true,
+    field: 'fecha_leida'
   },
   prioridad: {
     type: DataTypes.ENUM('baja', 'media', 'alta', 'urgente'),
@@ -83,27 +86,20 @@ const Notificacion = sequelize.define('Notificacion', {
   },
   expira_en: {
     type: DataTypes.DATE,
-    allowNull: true
-  },
-  createdAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
-  },
-  updatedAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
+    allowNull: true,
+    field: 'expira_en'
   }
 }, {
   tableName: 'notificaciones',
   timestamps: true,
-  underscored: true,
+  underscored: true,  // ⬅️ Esto convierte createdAt a created_at
   indexes: [
-    { fields: ['user_id'] },
-    { fields: ['evento_id'] },
-    { fields: ['tipo'] },
-    { fields: ['leida'] },
-    { fields: ['prioridad'] },
-    { fields: ['createdAt'] }
+    { fields: ['user_id'], name: 'notificaciones_user_id' },
+    { fields: ['evento_id'], name: 'notificaciones_evento_id' },
+    { fields: ['tipo'], name: 'notificaciones_tipo' },
+    { fields: ['leida'], name: 'notificaciones_leida' },
+    { fields: ['prioridad'], name: 'notificaciones_prioridad' },
+    { fields: ['created_at'], name: 'notificaciones_created_at' }  // ⬅️ CAMBIO CRÍTICO: usar created_at en lugar de createdAt
   ]
 });
 
