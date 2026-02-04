@@ -23,54 +23,49 @@ app.use(helmet({
 // ====================
 // CONFIGURACIÓN CORS CORREGIDA
 // ====================
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:5173',
+  'http://localhost:8080',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:8080',
+  'http://0.0.0.0:8080',
+  'http://localhost:5500',
+  'http://127.0.0.1:5500',
+  'https://grey-goldfish-729112.hostingersite.com',
+  'http://grey-goldfish-729112.hostingersite.com',
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
 const corsOptions = {
   origin: function (origin, callback) {
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://localhost:5173',
-      'http://localhost:8080',
-      'http://127.0.0.1:3000',
-      'http://127.0.0.1:5173',
-      'http://127.0.0.1:8080',
-      'http://0.0.0.0:8080',
-      'http://localhost:5500',
-      'http://127.0.0.1:5500',
-      'https://grey-goldfish-729112.hostingersite.com',
-      'http://grey-goldfish-729112.hostingersite.com',
-      process.env.FRONTEND_URL
-    ].filter(Boolean);
-
-    // Permitir peticiones sin origen (Postman, curl, etc.)
+    // Permitir peticiones sin origen (Postman, curl, apps móviles)
     if (!origin) {
+      console.log('✅ CORS: Petición sin origen (permitida)');
       return callback(null, true);
     }
 
-    // PERMITIR HOSTINGER SIEMPRE
-    const hostingerDomain = 'https://grey-goldfish-729112.hostingersite.com';
-    if (origin === hostingerDomain || origin === hostingerDomain.replace('https', 'http')) {
-      console.log(`✅ Permitiendo CORS para Hostinger: ${origin}`);
+    // Verificar si el origen está en la lista permitida O contiene hostingersite.com
+    const isAllowed = allowedOrigins.some(allowedOrigin => 
+      origin === allowedOrigin
+    ) || origin.includes('hostingersite.com');
+
+    if (isAllowed) {
+      console.log(`✅ CORS permitido para: ${origin}`);
       return callback(null, true);
     }
 
-    // EN DESARROLLO: Permitir cualquier origen (SOLO PARA TESTING)
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`🌐 Permitiendo CORS para: ${origin}`);
+    // En desarrollo, permitir cualquier origen
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🌐 CORS (desarrollo) permitido para: ${origin}`);
       return callback(null, true);
     }
-    // En producción: verificar orígenes permitidos
-    if (allowedOrigins.some(allowedOrigin => {
-      if (allowedOrigin.includes('*')) {
-        const regex = new RegExp(allowedOrigin.replace(/\*/g, '.*'));
-        return regex.test(origin);
-      }
-      return allowedOrigin === origin;
-    })) {
-      return callback(null, true);
-    } else {
-      console.warn(`⚠️  Origen no permitido: ${origin}`);
-      return callback(new Error('Origen no permitido por CORS'), false);
-    }
+
+    // Origen no permitido
+    console.warn(`⚠️ CORS bloqueado para: ${origin}`);
+    callback(new Error('No permitido por CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -79,13 +74,10 @@ const corsOptions = {
     'Authorization',
     'X-Requested-With',
     'Accept',
-    'Origin',
-    'Access-Control-Allow-Origin',
-    'Access-Control-Allow-Headers'
+    'Origin'
   ],
   exposedHeaders: ['Content-Disposition'],
   maxAge: 86400,
-  preflightContinue: false,
   optionsSuccessStatus: 200
 };
 
