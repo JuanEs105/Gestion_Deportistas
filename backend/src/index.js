@@ -36,8 +36,8 @@ const corsOptions = {
       'http://0.0.0.0:8080',
       'http://localhost:5500',
       'http://127.0.0.1:5500',
-      'http://192.168.1.*:*', // Para red local
-      'https://grey-goldfish-729112.hostingersite.com', // ⬅️ AGREGAR ESTA LÍNEA
+      'https://grey-goldfish-729112.hostingersite.com',
+      'http://grey-goldfish-729112.hostingersite.com',
       process.env.FRONTEND_URL
     ].filter(Boolean);
 
