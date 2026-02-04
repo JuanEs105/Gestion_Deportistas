@@ -46,12 +46,18 @@ const corsOptions = {
       return callback(null, true);
     }
 
+    // PERMITIR HOSTINGER SIEMPRE
+    const hostingerDomain = 'https://grey-goldfish-729112.hostingersite.com';
+    if (origin === hostingerDomain || origin === hostingerDomain.replace('https', 'http')) {
+      console.log(`✅ Permitiendo CORS para Hostinger: ${origin}`);
+      return callback(null, true);
+    }
+
     // EN DESARROLLO: Permitir cualquier origen (SOLO PARA TESTING)
     if (process.env.NODE_ENV !== 'production') {
       console.log(`🌐 Permitiendo CORS para: ${origin}`);
       return callback(null, true);
     }
-
     // En producción: verificar orígenes permitidos
     if (allowedOrigins.some(allowedOrigin => {
       if (allowedOrigin.includes('*')) {
