@@ -422,4 +422,3 @@ initializeServer();
 
 module.exports = app;
 
-echo // Force rebuild after fixing initDatabase >> src/index.js
