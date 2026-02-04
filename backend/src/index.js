@@ -25,20 +25,46 @@ app.use(helmet({
 // ====================
 app.use(cors({
   origin: (origin, callback) => {
-    // permitir Postman / curl
-    if (!origin) return callback(null, true);
+    // Lista de orígenes permitidos
+    const allowedOrigins = [
+      // Desarrollo local
+      'http://localhost:8080',
+      'http://127.0.0.1:8080',
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+      'http://localhost:5173',
+      'http://localhost:5500',
+      
+      // Hostinger - tu dominio temporal
+      'https://grey-goldfish-729112.hostingersite.com', // ✅ SIN /index.html
+      
+      // Si tienes dominio personalizado
+      'https://titanescheerevolution.com',
+      'https://www.titanescheerevolution.com',
+      
+      // Railway (el propio backend)
+      'https://gestiondeportistas-production.up.railway.app'
+    ];
 
-    // permitir localhost y Hostinger
-    if (
-      origin.includes('localhost') ||
-      origin.includes('127.0.0.1') ||
-      origin.includes('hostingersite.com')
-    ) {
+    // Permitir requests sin origin (Postman, curl, apps móviles)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Verificar si el origin está permitido
+    const isAllowed = allowedOrigins.some(allowed => {
+      // Permitir coincidencia exacta o subdominio
+      return origin === allowed || origin.startsWith(allowed);
+    });
+
+    if (isAllowed) {
+      console.log('✅ CORS permitido para:', origin);
       return callback(null, true);
     }
 
     console.log('❌ CORS bloqueado para:', origin);
-    return callback(new Error('CORS no permitido'), false);
+    console.log('💡 Dominios permitidos:', allowedOrigins);
+    return callback(new Error(`CORS no permitido para: ${origin}`), false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
