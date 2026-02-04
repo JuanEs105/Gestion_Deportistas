@@ -141,7 +141,7 @@ const initializeServer = async () => {
     console.log('\n📁 Cargando rutas...');
 
     // ====================
-    // SECCIÓN DE RUTAS - ORDEN CORREGIDO
+    // SECCIÓN DE RUTAS - ORDEN CORREGI
     // ====================
 
     // 1. RUTAS CRÍTICAS (si fallan, el servidor debería detenerse)
