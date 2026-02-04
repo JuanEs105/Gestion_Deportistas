@@ -58,7 +58,7 @@ const corsOptions = {
     }
 
     // En desarrollo, permitir cualquier origen
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV !== 'production') {
       console.log(`🌐 CORS (desarrollo) permitido para: ${origin}`);
       return callback(null, true);
     }
@@ -74,10 +74,12 @@ const corsOptions = {
     'Authorization',
     'X-Requested-With',
     'Accept',
-    'Origin'
+    'Origin',
+    'multipart/form-data',  // ← CRÍTICO PARA ARCHIVOS
+    'enctype'               // ← TAMBIÉN IMPORTANTE
   ],
-  exposedHeaders: ['Content-Disposition'],
-  maxAge: 86400,
+  exposedHeaders: ['Content-Disposition', 'Content-Length'],
+  maxAge: 600, // 10 minutos
   optionsSuccessStatus: 200
 };
 
