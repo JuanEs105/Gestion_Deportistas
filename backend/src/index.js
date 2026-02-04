@@ -126,12 +126,17 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // ====================
 // INICIALIZACIÓN
 // ====================
+const { initDatabase } = require('./scripts/initDatabase');
+
 const initializeServer = async () => {
   try {
     console.log('🔗 Conectando a la base de datos PostgreSQL...');
 
     await connectDB();
     console.log('✅ Base de datos conectada exitosamente');
+
+    // Inicializar datos (admin y habilidades)
+    await initDatabase();
 
     console.log('\n📁 Cargando rutas...');
 
