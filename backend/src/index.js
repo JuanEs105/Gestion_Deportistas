@@ -78,10 +78,20 @@ const corsOptions = {
 };
 
 // Aplicar CORS
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: true, // ← permite Hostinger, localhost, etc
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: [
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin'
+  ],
+  exposedHeaders: ['Content-Disposition']
+}));
 
-// IMPORTANTE: Manejar OPTIONS requests para CORS preflight
-app.options('*', cors(corsOptions));
+app.options('*', cors());
 
 // Middleware de logging mejorado
 app.use((req, res, next) => {

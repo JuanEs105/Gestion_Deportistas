@@ -203,171 +203,147 @@ class AuthController {
 
   // backend/src/controllers/authController.js
   static async registroDeportista(req, res) {
-  try {
-    console.log('\n📋 === REGISTRO DEPORTISTA SIMPLIFICADO ===');
-    console.log('📦 Body recibido:', req.body);
-    console.log('📁 Archivos recibidos:', req.files);
+    try {
+      console.log('\n📋 === REGISTRO DEPORTISTA SIMPLIFICADO ===');
+      console.log('📦 Body recibido:', req.body);
+      console.log('📁 Archivos recibidos:', req.files);
 
-    const {
-      nombre,
-      email,
-      password,
-      telefono,
-      fecha_nacimiento,
-      ciudad_nacimiento,
-      direccion,
-      eps,
-      talla_camiseta,
-      nombre_acudiente,
-      telefono_acudiente,
-      email_acudiente,
-      terminos_aceptados
-    } = req.body;
+      const {
+        nombre,
+        email,
+        password,
+        telefono,
+        fecha_nacimiento,
+        ciudad_nacimiento,
+        direccion,
+        eps,
+        talla_camiseta,
+        nombre_acudiente,
+        telefono_acudiente,
+        email_acudiente,
+        terminos_aceptados
+      } = req.body;
 
-    // Verificar campos requeridos
-    if (!nombre || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Nombre, email y contraseña son obligatorios'
-      });
-    }
-
-    // Verificar si el email ya existe
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: 'El email ya está registrado'
-      });
-    }
-
-    console.log('👤 Creando usuario...');
-
-    // Crear usuario
-    const user = await User.create({
-      nombre,
-      email,
-      password,
-      role: 'deportista',
-      telefono: telefono || null,
-      acepta_terminos: terminos_aceptados === 'true' || false
-    });
-
-    console.log('✅ Usuario creado ID:', user.id);
-
-    // Preparar datos del deportista
-    const deportistaData = {
-      user_id: user.id,
-      fecha_nacimiento: fecha_nacimiento || null,
-      ciudad_nacimiento: ciudad_nacimiento || null,
-      direccion: direccion || null,
-      eps: eps || null,
-      talla_camiseta: talla_camiseta || null,
-      contacto_emergencia_nombre: nombre_acudiente || null,
-      contacto_emergencia_telefono: telefono_acudiente || null,
-      contacto_emergencia_parentesco: 'Acudiente',
-      nivel_actual: 'pendiente',
-      estado: 'activo',
-      equipo_competitivo: 'sin_equipo',
-      acepta_terminos: terminos_aceptados === 'true' || false,
-      documento_identidad: 'pending_upload', // Por defecto
-      foto_perfil: null
-    };
-
-    // 🔥 MANEJO DE ARCHIVOS CON CLOUDINARY (OPCIONAL)
-    if (req.files) {
-      try {
-        const { uploadToCloudinary } = require('../config/cloudinary');
-
-        // Documento de identidad (opcional temporalmente)
-        if (req.files.documento && req.files.documento[0]) {
-          const documento = req.files.documento[0];
-          console.log('📎 Subiendo documento a Cloudinary...');
-          const documentoResult = await uploadToCloudinary(documento.buffer, {
-            folder: 'deportistas/documentos',
-            resource_type: 'raw'
-          });
-          deportistaData.documento_identidad = documentoResult.secure_url;
-          console.log('✅ Documento subido:', documentoResult.secure_url);
-        }
-
-        // Foto de perfil (opcional)
-        if (req.files.foto && req.files.foto[0]) {
-          const foto = req.files.foto[0];
-          console.log('📸 Subiendo foto a Cloudinary...');
-          const fotoResult = await uploadToCloudinary(foto.buffer, {
-            folder: 'deportistas/fotos',
-            resource_type: 'image'
-          });
-          deportistaData.foto_perfil = fotoResult.secure_url;
-          await user.update({ foto_perfil: fotoResult.secure_url });
-          console.log('✅ Foto subida:', fotoResult.secure_url);
-        }
-      } catch (cloudinaryError) {
-        console.warn('⚠️ Error con Cloudinary (continuando sin archivos):', cloudinaryError.message);
-        // Continuar sin archivos si hay error
+      // Verificar campos requeridos
+      if (!nombre || !email || !password) {
+        return res.status(400).json({
+          success: false,
+          message: 'Nombre, email y contraseña son obligatorios'
+        });
       }
-    }
 
-    console.log('🏃 Creando deportista con datos...');
+      // Verificar si el email ya existe
+      const existingUser = await User.findOne({ where: { email } });
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'El email ya está registrado'
+        });
+      }
 
-    // Crear deportista
-    const deportista = await Deportista.create(deportistaData);
+      console.log('👤 Creando usuario...');
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-    console.log('✅ Deportista creado ID:', deportista.id);
+      // Crear usuario
+      const user = await User.create({
+        nombre,
+        email,
+        password: hashedPassword,
+        role: 'deportista',
+        telefono: telefono || null,
+        acepta_terminos: terminos_aceptados === 'true' || false
+      });
 
-    // Generar token JWT
-    const tokenPayload = {
-      id: user.id,
-      email: user.email,
-      role: user.role
-    };
+      console.log('✅ Usuario creado ID:', user.id);
 
-    const token = jwt.sign(
-      tokenPayload,
-      process.env.JWT_SECRET || 'tu_clave_secreta_super_segura_aqui_12345_2024',
-      { expiresIn: '7d' }
-    );
+      // Preparar datos del deportista
+      const deportistaData = {
+        user_id: user.id,
+        fecha_nacimiento: fecha_nacimiento || null,
+        ciudad_nacimiento: ciudad_nacimiento || null,
+        direccion: direccion || null,
+        eps: eps || null,
+        talla_camiseta: talla_camiseta || null,
+        contacto_emergencia_nombre: nombre_acudiente || null,
+        contacto_emergencia_telefono: telefono_acudiente || null,
+        contacto_emergencia_parentesco: 'Acudiente',
+        nivel_actual: 'pendiente',
+        estado: 'activo',
+        equipo_competitivo: 'sin_equipo',
+        acepta_terminos: terminos_aceptados === 'true' || false,
+        documento_identidad: 'pending_upload', // Por defecto
+        foto_perfil: null
+      };
 
-    // Respuesta exitosa
-    res.status(201).json({
-      success: true,
-      message: '¡Registro completado exitosamente!',
-      token,
-      user: {
+      // 🔥 MANEJO DE ARCHIVOS CON CLOUDINARY (OPCIONAL)
+      if (req.files?.documento?.[0]) {
+        deportistaData.documento_identidad = req.files.documento[0].path;
+      }
+
+      if (req.files?.foto?.[0]) {
+        deportistaData.foto_perfil = req.files.foto[0].path;
+        await user.update({ foto_perfil: req.files.foto[0].path });
+      }
+
+      console.log('🏃 Creando deportista con datos...');
+
+      // Crear deportista
+      const deportista = await Deportista.create(deportistaData);
+
+      console.log('✅ Deportista creado ID:', deportista.id);
+
+      // Generar token JWT
+      const tokenPayload = {
         id: user.id,
-        nombre: user.nombre,
         email: user.email,
-        role: user.role,
-        telefono: user.telefono,
-        foto_perfil: user.foto_perfil
-      },
-      deportista: {
-        id: deportista.id,
-        direccion: deportista.direccion,
-        eps: deportista.eps,
-        talla_camiseta: deportista.talla_camiseta,
-        contacto_emergencia_nombre: deportista.contacto_emergencia_nombre,
-        contacto_emergencia_telefono: deportista.contacto_emergencia_telefono,
-        ciudad_nacimiento: deportista.ciudad_nacimiento,
-        fecha_nacimiento: deportista.fecha_nacimiento,
-        documento_identidad: deportista.documento_identidad,
-        foto_perfil: deportista.foto_perfil,
-        nivel_actual: deportista.nivel_actual,
-        estado: deportista.estado
-      }
-    });
+        role: user.role
+      };
 
-  } catch (error) {
-    console.error('❌ Error en registroDeportista:', error);
-    console.error('Stack:', error.stack);
-    res.status(500).json({
-      success: false,
-      message: 'Error en el servidor durante el registro',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+      const token = jwt.sign(
+        tokenPayload,
+        process.env.JWT_SECRET || 'tu_clave_secreta_super_segura_aqui_12345_2024',
+        { expiresIn: '7d' }
+      );
+
+      // Respuesta exitosa
+      res.status(201).json({
+        success: true,
+        message: '¡Registro completado exitosamente!',
+        token,
+        user: {
+          id: user.id,
+          nombre: user.nombre,
+          email: user.email,
+          role: user.role,
+          telefono: user.telefono,
+          foto_perfil: user.foto_perfil
+        },
+        deportista: {
+          id: deportista.id,
+          direccion: deportista.direccion,
+          eps: deportista.eps,
+          talla_camiseta: deportista.talla_camiseta,
+          contacto_emergencia_nombre: deportista.contacto_emergencia_nombre,
+          contacto_emergencia_telefono: deportista.contacto_emergencia_telefono,
+          ciudad_nacimiento: deportista.ciudad_nacimiento,
+          fecha_nacimiento: deportista.fecha_nacimiento,
+          documento_identidad: deportista.documento_identidad,
+          foto_perfil: deportista.foto_perfil,
+          nivel_actual: deportista.nivel_actual,
+          estado: deportista.estado
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Error en registroDeportista:', error);
+      console.error('Stack:', error.stack);
+      res.status(500).json({
+        success: false,
+        message: 'Error en el servidor durante el registro',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
   }
-}
 
   // Perfil del usuario
   static async getProfile(req, res) {
