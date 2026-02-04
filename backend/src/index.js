@@ -87,23 +87,6 @@ app.use(cors(corsOptions));
 // IMPORTANTE: Manejar OPTIONS requests para CORS preflight
 app.options('*', cors(corsOptions));
 
-// Middleware adicional para headers CORS
-app.use((req, res, next) => {
-  // Si la petición es OPTIONS, responder inmediatamente
-  if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    return res.status(200).end();
-  }
-
-  // Para otras peticiones, agregar headers
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Credentials', 'true');
-
-  next();
-});
-
 // Middleware de logging mejorado
 app.use((req, res, next) => {
   const start = Date.now();
