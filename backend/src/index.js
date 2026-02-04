@@ -12,7 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ====================
-// MIDDLEWARE GLOBAL
+// MIDDLEWARE GLO
 // ====================
 app.use(helmet({
   contentSecurityPolicy: false,
