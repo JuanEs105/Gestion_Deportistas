@@ -16,7 +16,7 @@ const initDatabase = async () => {
                 apellido: 'Sistema',
                 email: 'admin@deportes.com',
                 password: hashedPassword,
-                rol: 'admin',
+                role: 'admin',
                 activo: true
             });
             console.log('✅ Usuario admin creado: admin@deportes.com / admin123');
@@ -32,7 +32,7 @@ const initDatabase = async () => {
                 apellido: 'Pérez',
                 email: 'entrenador@deportes.com',
                 password: hashedPassword,
-                rol: 'entrenador',
+                role: 'entrenador',
                 activo: true
             });
             console.log('✅ Usuario entrenador creado: entrenador@deportes.com / entrenador123');
