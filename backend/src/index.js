@@ -23,43 +23,22 @@ app.use(helmet({
 // ====================
 // CONFIGURACIÓN CORS CORREGIDA
 // ====================
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'http://localhost:5173',
-  'http://localhost:8080',
-  'http://127.0.0.1:3000',
-  'http://127.0.0.1:5173',
-  'http://127.0.0.1:8080',
-  'http://0.0.0.0:8080',
-  'http://localhost:5500',
-  'http://127.0.0.1:5500',
-  'https://grey-goldfish-729112.hostingersite.com',
-  'http://grey-goldfish-729112.hostingersite.com',
-  process.env.FRONTEND_URL
-].filter(Boolean);
+app.use(cors({
+  origin: (origin, callback) => {
+    // permitir Postman / curl
+    if (!origin) return callback(null, true);
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Permitir peticiones sin origen (Postman, curl, apps móviles)
-    if (!origin) {
-      console.log('✅ CORS: Petición sin origen (permitida)');
+    // permitir localhost y Hostinger
+    if (
+      origin.includes('localhost') ||
+      origin.includes('127.0.0.1') ||
+      origin.includes('hostingersite.com')
+    ) {
       return callback(null, true);
     }
 
-    // Verificar si el origen está en la lista permitida O contiene hostingersite.com
-    const isAllowed = allowedOrigins.some(allowedOrigin => 
-      origin === allowedOrigin
-    ) || origin.includes('hostingersite.com');
-
-    if (isAllowed) {
-      console.log(`✅ CORS permitido para: ${origin}`);
-      return callback(null, true);
-    }
-
-    // SIEMPRE PERMITIR EN DESARROLLO
-    console.log(`🌐 CORS permitido para: ${origin} (desarrollo o dominio permitido)`);
-    return callback(null, true); // ← CAMBIAR ESTA LÍNEA
+    console.log('❌ CORS bloqueado para:', origin);
+    return callback(new Error('CORS no permitido'), false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -68,44 +47,10 @@ const corsOptions = {
     'Authorization',
     'X-Requested-With',
     'Accept',
-    'Origin',
-    'multipart/form-data',  // ← CRÍTICO PARA ARCHIVOS
-    'enctype'               // ← TAMBIÉN IMPORTANTE
-  ],
-  exposedHeaders: ['Content-Disposition', 'Content-Length'],
-  maxAge: 600, // 10 minutos
-  optionsSuccessStatus: 200
-};
-
-// Aplicar CORS
-app.use(cors({
-  origin: true, // ← permite Hostinger, localhost, etc
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: [
-    'Authorization',
-    'X-Requested-With',
-    'Accept',
     'Origin'
   ],
-  exposedHeaders: ['Content-Disposition']
+  exposedHeaders: ['Authorization']
 }));
-
-app.options('*', cors());
-
-// Middleware de logging mejorado
-app.use((req, res, next) => {
-  const start = Date.now();
-
-  res.on('finish', () => {
-    const duration = Date.now() - start;
-    const statusColor = res.statusCode >= 400 ? '❌' : res.statusCode >= 300 ? '⚠️ ' : '✅';
-    const origin = req.headers.origin || 'Sin origen';
-    console.log(`${statusColor} [${new Date().toLocaleTimeString()}] ${req.method} ${req.originalUrl} - ${res.statusCode} (${duration}ms) - Origen: ${origin}`);
-  });
-
-  next();
-});
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
