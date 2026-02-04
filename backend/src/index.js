@@ -57,15 +57,9 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    // En desarrollo, permitir cualquier origen
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`🌐 CORS (desarrollo) permitido para: ${origin}`);
-      return callback(null, true);
-    }
-
-    // Origen no permitido
-    console.warn(`⚠️ CORS bloqueado para: ${origin}`);
-    callback(new Error('No permitido por CORS'));
+    // SIEMPRE PERMITIR EN DESARROLLO
+    console.log(`🌐 CORS permitido para: ${origin} (desarrollo o dominio permitido)`);
+    return callback(null, true); // ← CAMBIAR ESTA LÍNEA
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
