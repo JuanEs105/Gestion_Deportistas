@@ -5,22 +5,27 @@ class EmailService {
   constructor() {
     console.log('📧 Inicializando EmailService...');
     console.log('📤 EMAIL_USER:', process.env.EMAIL_USER ? 'Configurado' : 'NO CONFIGURADO');
-    
+
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       console.error('❌ ERROR: Credenciales de email no configuradas en .env');
       console.error('   Revisa tu archivo .env y asegúrate de tener:');
       console.error('   EMAIL_USER=juanes1052u@gmail.com');
       console.error('   EMAIL_PASS=skllbhujeodcurcz (Contraseña de aplicación de 16 caracteres)');
     }
-    
+
     this.transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false, // ← CRÍTICO
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+      },
+      tls: {
+        rejectUnauthorized: false
       }
     });
-    
+
     // Verificar conexión
     this.verifyConnection();
   }
@@ -143,17 +148,17 @@ class EmailService {
       console.log('📨 Destinatario:', info.envelope.to);
       console.log('🔗 Enlace de registro:', registroUrl);
       console.log('📧 === EMAIL ENVIADO ===\n');
-      
-      return { 
-        success: true, 
+
+      return {
+        success: true,
         messageId: info.messageId,
-        registroUrl: registroUrl 
+        registroUrl: registroUrl
       };
     } catch (error) {
       console.error('❌ ERROR ENVIANDO EMAIL DE REGISTRO:');
       console.error('🔍 Código de error:', error.code);
       console.error('📝 Mensaje:', error.message);
-      
+
       if (error.code === 'EAUTH') {
         console.error('\n⚠️ PROBLEMA DE AUTENTICACIÓN CON GMAIL:');
         console.error('1. Verifica que tu cuenta de Google tenga "Verificación en 2 pasos" ACTIVADA');
@@ -162,7 +167,7 @@ class EmailService {
         console.error('3. La contraseña debe ser de 16 caracteres SIN ESPACIOS');
         console.error('4. Actualiza tu archivo .env con la nueva contraseña');
       }
-      
+
       throw error;
     }
   }
@@ -256,10 +261,10 @@ class EmailService {
       const info = await this.transporter.sendMail(mailOptions);
       console.log('✅ RECORDATORIO ENVIADO EXITOSAMENTE');
       console.log('📧 Message ID:', info.messageId);
-      
-      return { 
-        success: true, 
-        messageId: info.messageId 
+
+      return {
+        success: true,
+        messageId: info.messageId
       };
     } catch (error) {
       console.error('❌ ERROR ENVIANDO RECORDATORIO:', error.message);
@@ -373,22 +378,22 @@ class EmailService {
       console.log('✅ CÓDIGO DE ACTIVACIÓN ENVIADO EXITOSAMENTE');
       console.log('📧 Message ID:', info.messageId);
       console.log('📧 === ACTIVACIÓN ENVIADA ===\n');
-      
-      return { 
-        success: true, 
-        messageId: info.messageId 
+
+      return {
+        success: true,
+        messageId: info.messageId
       };
     } catch (error) {
       console.error('❌ ERROR ENVIANDO CÓDIGO DE ACTIVACIÓN:');
       console.error('🔍 Código de error:', error.code);
       console.error('📝 Mensaje:', error.message);
-      
+
       if (error.code === 'EAUTH') {
         console.error('\n⚠️ PROBLEMA DE AUTENTICACIÓN CON GMAIL');
         console.error('1. Revisa que EMAIL_PASS en .env sea correcta');
         console.error('2. Verifica que la cuenta tenga acceso a apps menos seguras');
       }
-      
+
       throw error;
     }
   }
@@ -405,7 +410,7 @@ class EmailService {
   async sendRecoveryCode(email, code, userName) {
     try {
       console.log('\n📧 === ENVIANDO CÓDIGO DE RECUPERACIÓN ===');
-      
+
       const mailOptions = {
         from: {
           name: 'Titanes Cheer Evolution',
@@ -459,7 +464,7 @@ class EmailService {
       const info = await this.transporter.sendMail(mailOptions);
       console.log('✅ CÓDIGO DE RECUPERACIÓN ENVIADO');
       console.log('📧 Message ID:', info.messageId);
-      
+
       return { success: true, messageId: info.messageId };
     } catch (error) {
       console.error('❌ ERROR ENVIANDO CÓDIGO DE RECUPERACIÓN:', error);
