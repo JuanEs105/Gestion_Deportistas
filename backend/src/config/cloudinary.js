@@ -1,6 +1,7 @@
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
+const streamifier = require('streamifier');
 
 // Configurar Cloudinary
 cloudinary.config({
@@ -98,10 +99,17 @@ const uploadRegistro = multer({
 const uploadToCloudinary = (buffer, options) => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(options, (error, result) => {
-      if (error) reject(error);
-      else resolve(result);
+      if (error) {
+        console.error('❌ Error en Cloudinary:', error);
+        reject(error);
+      } else {
+        console.log('✅ Archivo subido a Cloudinary:', result.secure_url);
+        resolve(result);
+      }
     });
-    uploadStream.end(buffer);
+    
+    // Usar streamifier para convertir buffer a stream
+    streamifier.createReadStream(buffer).pipe(uploadStream);
   });
 };
 
