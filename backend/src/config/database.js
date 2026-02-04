@@ -29,8 +29,8 @@ const connectDB = async () => {
     
     // Sincronizar modelos con opciones seguras
     await sequelize.sync({ 
-      force: false,  // NO elimina tablas existentes
-      alter: true    // Modifica tablas existentes para coincidir con modelos
+      force: true,  // NO elimina tablas existentes
+      alter: false    // Modifica tablas existentes para coincidir con modelos
     });
     
     console.log('📊 Base de datos sincronizada y lista');
