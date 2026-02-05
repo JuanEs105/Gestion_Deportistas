@@ -98,17 +98,16 @@ const Notificacion = sequelize.define('Notificacion', {
     { fields: ['evento_id'], name: 'notificaciones_evento_id' },
     { fields: ['tipo'], name: 'notificaciones_tipo' },
     { fields: ['leida'], name: 'notificaciones_leida' },
-    { fields: ['prioridad'], name: 'notificaciones_prioridad' },
-    { fields: ['created_at'], name: 'notificaciones_created_at' }  // ⬅️ CAMBIO CRÍTICO: usar created_at en lugar de createdAt
+    { fields: ['prioridad'], name: 'notificaciones_prioridad' }
   ]
 });
 
-Notificacion.associate = function(models) {
+Notificacion.associate = function (models) {
   Notificacion.belongsTo(models.User, {
     foreignKey: 'user_id',
     as: 'usuario'
   });
-  
+
   if (models.CalendarioEvento) {
     Notificacion.belongsTo(models.CalendarioEvento, {
       foreignKey: 'evento_id',

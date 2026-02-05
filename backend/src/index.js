@@ -9,7 +9,7 @@ dotenv.config();
 const { connectDB } = require('./config/database');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 80;
 
 // ====================
 // MIDDLEWARE GLO
@@ -34,17 +34,14 @@ app.use(cors({
       'http://127.0.0.1:3000',
       'http://localhost:5173',
       'http://localhost:5500',
-      
-      // Hostinger - tu dominio temporal
-      'https://grey-goldfish-729112.hostingersite.com', // ✅ SIN /index.html
-      
-      // Si tienes dominio personalizado
-      'https://titanescheerevolution.com',
-      'https://www.titanescheerevolution.com',
-      
+
+      // ✅ Dominio temporal de Hostinger (el que SÍ funciona)
+      'https://grey-goldfish-729112.hostingersite.com',
+
       // Railway (el propio backend)
       'https://gestiondeportistas-production.up.railway.app'
     ];
+
 
     // Permitir requests sin origin (Postman, curl, apps móviles)
     if (!origin) {

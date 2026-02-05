@@ -1,4 +1,4 @@
-// backend/src/routes/deportistaRoutes.js - VERSIÓN COMPLETA CORREGIDA
+// backend/src/routes/deportistaRoutes.js - VERSIÓN CORREGIDA PARA SEENODE
 const express = require('express');
 const router = express.Router();
 const { Deportista, User } = require('../models');
@@ -32,70 +32,11 @@ const extractPublicId = (cloudinaryUrl) => {
 };
 
 // ====================
-// RUTAS PÚBLICAS (con autenticación)
+// ⚠️ ORDEN CRÍTICO: RUTAS FIJAS PRIMERO, LUEGO PARÁMETROS DINÁMICOS
 // ====================
 
-// GET /api/deportistas - Todos los deportistas (entrenador/admin)
-router.get('/', async (req, res) => {
-  try {
-    console.log('📥 GET /api/deportistas - Usuario:', req.user?.email);
-    
-    const deportistas = await Deportista.findAll({
-      include: [{
-        model: User,
-        as: 'user',
-        attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
-      }],
-      order: [['created_at', 'DESC']]
-    });
-
-    console.log(`✅ ${deportistas.length} deportistas encontrados`);
-
-    // Formatear respuesta para el frontend
-    const deportistasFormateados = deportistas.map(d => {
-      const deportistaObj = d.toJSON();
-      const user = deportistaObj.user || {};
-      
-      return {
-        id: deportistaObj.id,
-        user_id: deportistaObj.user_id,
-        nombre: user.nombre || 'Sin nombre',
-        email: user.email || 'Sin email',
-        telefono: user.telefono || null,
-        documento_identidad: user.documento_identidad || null,
-        activo: user.activo ?? true,
-        nivel_actual: deportistaObj.nivel_actual || 'pendiente',
-        estado: deportistaObj.estado || 'pendiente',
-        altura: deportistaObj.altura,
-        peso: deportistaObj.peso,
-        foto_perfil: deportistaObj.foto_perfil,
-        equipo_competitivo: deportistaObj.equipo_competitivo || 'sin_equipo',
-        contacto_emergencia_nombre: deportistaObj.contacto_emergencia_nombre,
-        contacto_emergencia_telefono: deportistaObj.contacto_emergencia_telefono,
-        contacto_emergencia_parentesco: deportistaObj.contacto_emergencia_parentesco,
-        direccion: deportistaObj.direccion || null,
-        eps: deportistaObj.eps || null,
-        talla_camiseta: deportistaObj.talla_camiseta || null,
-        fecha_nacimiento: deportistaObj.fecha_nacimiento,
-        created_at: deportistaObj.created_at,
-        updated_at: deportistaObj.updated_at,
-        User: user,
-        user: user
-      };
-    });
-
-    res.status(200).json(deportistasFormateados);
-
-  } catch (error) {
-    console.error('❌ Error en GET /api/deportistas:', error);
-    res.status(500).json({
-      error: 'Error obteniendo deportistas',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-});
-
 // GET /api/deportistas/me - Perfil del deportista autenticado
+// ✅ DEBE IR ANTES DE /:id
 router.get('/me', async (req, res) => {
   try {
     console.log('👤 GET /api/deportistas/me - Usuario:', req.user?.email);
@@ -162,36 +103,62 @@ router.get('/me', async (req, res) => {
   }
 });
 
-// GET /api/deportistas/:id - Obtener un deportista específico
-router.get('/:id', async (req, res) => {
+// GET /api/deportistas - Todos los deportistas (entrenador/admin)
+router.get('/', async (req, res) => {
   try {
-    const { id } = req.params;
+    console.log('📥 GET /api/deportistas - Usuario:', req.user?.email);
     
-    const deportista = await Deportista.findByPk(id, {
+    const deportistas = await Deportista.findAll({
       include: [{
         model: User,
         as: 'user',
         attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
-      }]
+      }],
+      order: [['created_at', 'DESC']]
     });
 
-    if (!deportista) {
-      return res.status(404).json({ 
-        success: false,
-        error: 'Deportista no encontrado' 
-      });
-    }
+    console.log(`✅ ${deportistas.length} deportistas encontrados`);
 
-    res.json({ 
-      success: true, 
-      deportista 
+    // Formatear respuesta para el frontend
+    const deportistasFormateados = deportistas.map(d => {
+      const deportistaObj = d.toJSON();
+      const user = deportistaObj.user || {};
+      
+      return {
+        id: deportistaObj.id,
+        user_id: deportistaObj.user_id,
+        nombre: user.nombre || 'Sin nombre',
+        email: user.email || 'Sin email',
+        telefono: user.telefono || null,
+        documento_identidad: user.documento_identidad || null,
+        activo: user.activo ?? true,
+        nivel_actual: deportistaObj.nivel_actual || 'pendiente',
+        estado: deportistaObj.estado || 'pendiente',
+        altura: deportistaObj.altura,
+        peso: deportistaObj.peso,
+        foto_perfil: deportistaObj.foto_perfil,
+        equipo_competitivo: deportistaObj.equipo_competitivo || 'sin_equipo',
+        contacto_emergencia_nombre: deportistaObj.contacto_emergencia_nombre,
+        contacto_emergencia_telefono: deportistaObj.contacto_emergencia_telefono,
+        contacto_emergencia_parentesco: deportistaObj.contacto_emergencia_parentesco,
+        direccion: deportistaObj.direccion || null,
+        eps: deportistaObj.eps || null,
+        talla_camiseta: deportistaObj.talla_camiseta || null,
+        fecha_nacimiento: deportistaObj.fecha_nacimiento,
+        created_at: deportistaObj.created_at,
+        updated_at: deportistaObj.updated_at,
+        User: user,
+        user: user
+      };
     });
+
+    res.status(200).json(deportistasFormateados);
 
   } catch (error) {
-    console.error('❌ Error obteniendo deportista:', error);
-    res.status(500).json({ 
-      success: false,
-      error: 'Error en el servidor' 
+    console.error('❌ Error en GET /api/deportistas:', error);
+    res.status(500).json({
+      error: 'Error obteniendo deportistas',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -492,6 +459,45 @@ router.post('/me/photo', uploadFoto.single('foto_perfil'), async (req, res) => {
       success: false,
       error: errorMessage,
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// ====================
+// ⚠️ RUTAS CON PARÁMETROS DINÁMICOS - SIEMPRE AL FINAL
+// ====================
+
+// GET /api/deportistas/:id - Obtener un deportista específico
+// ✅ DEBE IR DESPUÉS DE TODAS LAS RUTAS FIJAS
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const deportista = await Deportista.findByPk(id, {
+      include: [{
+        model: User,
+        as: 'user',
+        attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
+      }]
+    });
+
+    if (!deportista) {
+      return res.status(404).json({ 
+        success: false,
+        error: 'Deportista no encontrado' 
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      deportista 
+    });
+
+  } catch (error) {
+    console.error('❌ Error obteniendo deportista:', error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Error en el servidor' 
     });
   }
 });
