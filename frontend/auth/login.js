@@ -4,7 +4,7 @@
 
 // Configuración
 const CONFIG = {
-    API_URL: 'http://localhost:5000/api/auth/login',
+    API_URL: 'https://gestiondeportistas-production.up.railway.app/api/auth/login',  // ✅ CORRECTO
     ROLES: ['deportista', 'entrenador', 'admin'],
     DEFAULT_ROLE: 'deportista'
 };
