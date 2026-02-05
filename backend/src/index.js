@@ -81,7 +81,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // ====================
 // INICIALIZACIÓN
 // ====================
-
+const initDatabase = require('./scripts/initDatabase');
 
 const initializeServer = async () => {
   try {
