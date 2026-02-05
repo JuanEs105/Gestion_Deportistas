@@ -4,7 +4,7 @@
 
 // Configuración
 const CONFIG = {
-    API_URL: 'https://gestiondeportistas-production.up.railway.app/api/auth/login',  // ✅ CORRECTO
+    API_URL: 'https://gestiondeportistas-production.up.railway.app/api/auth/login', // ✅ CAMBIAR AQUÍ
     ROLES: ['deportista', 'entrenador', 'admin'],
     DEFAULT_ROLE: 'deportista'
 };

@@ -145,7 +145,7 @@ if (typeof window.ReportesApp === 'undefined') {
                 }
                 
                 // 6. CONSTRUIR URL COMPLETA
-                const baseURL = 'http://localhost:5000/api/reportes/excel/grupal';
+                const baseURL = 'https://gestiondeportistas-production.up.railway.app/api/reportes/excel/grupal';
                 const queryString = params.toString();
                 const url = queryString ? `${baseURL}?${queryString}` : baseURL;
                 
@@ -207,7 +207,7 @@ if (typeof window.ReportesApp === 'undefined') {
                 let mensajeError = 'Error al generar Excel';
                 
                 if (error.message.includes('Failed to fetch')) {
-                    mensajeError = '❌ No se pudo conectar con el servidor\n\nVerifica que:\n1. El backend esté corriendo en http://localhost:5000\n2. El servidor esté activo\n3. No haya errores de CORS';
+                    mensajeError = '❌ No se pudo conectar con el servidor\n\nVerifica que:\n1. El backend esté corriendo en https://gestiondeportistas-production.up.railway.app\n2. El servidor esté activo\n3. No haya errores de CORS';
                 } else if (error.message.includes('401') || error.message.includes('403')) {
                     mensajeError = '🔒 Sesión expirada o sin permisos\n\nPor favor, inicia sesión nuevamente';
                 } else if (error.message.includes('500')) {
@@ -381,7 +381,7 @@ if (typeof window.ReportesApp === 'undefined') {
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
                 
                 // 4. Construir URL
-                const baseURL = 'http://localhost:5000/api/reportes/excel/grupal';
+                const baseURL = 'https://gestiondeportistas-production.up.railway.app/api/reportes/excel/grupal';
                 const queryString = params.toString();
                 const url = queryString ? `${baseURL}?${queryString}` : baseURL;
                 
@@ -424,7 +424,7 @@ if (typeof window.ReportesApp === 'undefined') {
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
                 
                 // 4. Construir URL
-                const baseURL = 'http://localhost:5000/api/reportes/excel/documentos';
+                const baseURL = 'https://gestiondeportistas-production.up.railway.app/api/reportes/excel/documentos';
                 const url = `${baseURL}?${params.toString()}`;
                 
                 console.log('🔗 URL documentos:', url);
@@ -463,7 +463,7 @@ if (typeof window.ReportesApp === 'undefined') {
                     'Content-Type': 'application/json'
                 };
                 
-                const response = await fetch('http://localhost:5000/api/reportes/estadisticas', {
+                const response = await fetch('https://gestiondeportistas-production.up.railway.app/api/reportes/estadisticas', {
                     headers: headers
                 });
                 
@@ -495,7 +495,7 @@ if (typeof window.ReportesApp === 'undefined') {
                     'Content-Type': 'application/json'
                 };
                 
-                const response = await fetch('http://localhost:5000/api/reportes/opciones-filtros', {
+                const response = await fetch('https://gestiondeportistas-production.up.railway.app/api/reportes/opciones-filtros', {
                     headers: headers
                 });
                 
@@ -531,7 +531,7 @@ if (typeof window.ReportesApp === 'undefined') {
                     'Content-Type': 'application/json'
                 };
                 
-                const response = await fetch('http://localhost:5000/api/reportes/deportistas', {
+                const response = await fetch('https://gestiondeportistas-production.up.railway.app/api/reportes/deportistas', {
                     headers: headers
                 });
                 
@@ -595,7 +595,7 @@ if (typeof window.ReportesApp === 'undefined') {
                     'Content-Type': 'application/json'
                 };
                 
-                const url = `http://localhost:5000/api/reportes/deportistas?${params.toString()}`;
+                const url = `https://gestiondeportistas-production.up.railway.app/api/reportes/deportistas?${params.toString()}`;
                 
                 const response = await fetch(url, {
                     headers: headers
@@ -662,7 +662,7 @@ if (typeof window.ReportesApp === 'undefined') {
                     'Content-Type': 'application/json'
                 };
                 
-                const url = `http://localhost:5000/api/reportes/deportistas?${params.toString()}`;
+                const url = `https://gestiondeportistas-production.up.railway.app/api/reportes/deportistas?${params.toString()}`;
                 
                 const response = await fetch(url, {
                     headers: headers
@@ -693,7 +693,7 @@ if (typeof window.ReportesApp === 'undefined') {
                 console.log(`📄 Descargando documento para deportista ${deportistaId}`);
                 
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-                const url = `http://localhost:5000/api/reportes/documento/${deportistaId}`;
+                const url = `https://gestiondeportistas-production.up.railway.app/api/reportes/documento/${deportistaId}`;
                 window.open(url, '_blank');
                 
             } catch (error) {

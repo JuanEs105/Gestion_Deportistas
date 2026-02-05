@@ -12,7 +12,7 @@ async function testRecuperacionCompleta() {
     // Simular la llamada al endpoint
     const fetch = (await import('node-fetch')).default;
     
-    const response = await fetch('http://localhost:5000/api/auth/forgot-password', {
+    const response = await fetch('https://gestiondeportistas-production.up.railway.app/api/auth/forgot-password', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ async function testRecuperacionCompleta() {
       // 3. Probar cambio de contraseña
       console.log('\n3. 🔐 PROBANDO CAMBIO DE CONTRASEÑA...');
       
-      const resetResponse = await fetch('http://localhost:5000/api/auth/reset-password', {
+      const resetResponse = await fetch('https://gestiondeportistas-production.up.railway.app/api/auth/reset-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -4,7 +4,7 @@
 
 // Configuración
 const CONFIG = {
-    RESET_PASSWORD_URL: 'http://localhost:5000/api/auth/reset-password'
+    RESET_PASSWORD_URL: 'https://gestiondeportistas-production.up.railway.app/api/auth/reset-password'
 };
 
 document.addEventListener('DOMContentLoaded', function() {

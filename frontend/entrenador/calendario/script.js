@@ -6,7 +6,7 @@
 console.log('📂 Archivo calendario.js (entrenador) cargado - VERSIÓN FINAL');
 
 // CONFIGURACIÓN GLOBAL
-const API_BASE_URL = window.EntrenadorAPI ? window.EntrenadorAPI.baseURL : 'http://localhost:5000/api';
+const API_BASE_URL = window.EntrenadorAPI ? window.EntrenadorAPI.baseURL : 'https://gestiondeportistas-production.up.railway.app/api';
 
 console.log('⚙️ Configuración inicial:');
 console.log('  - API_BASE_URL:', API_BASE_URL);
@@ -1714,7 +1714,7 @@ AYUDA - CALENDARIO TITANES EVOLUTION
 • ACTUALIZAR: Los cambios se reflejan inmediatamente
 
 ¿Problemas?
-Verifica que tu backend esté corriendo en http://localhost:5000
+Verifica que tu backend esté corriendo en https://gestiondeportistas-production.up.railway.app
     `;
     
     mostrarExito(ayuda);

@@ -338,7 +338,7 @@ const initializeServer = async () => {
       console.log('\n💡 PARA PROBAR PERFIL ENTRENADOR:');
       console.log('   1. Inicia sesión como entrenador');
       console.log('   2. Ve a la consola del navegador (F12)');
-      console.log('   3. Ejecuta: fetch("http://localhost:5000/api/entrenador/perfil", {');
+      console.log('   3. Ejecuta: fetch("https://gestiondeportistas-production.up.railway.app/api/entrenador/perfil", {');
       console.log('        headers: { "Authorization": "Bearer TU_TOKEN_AQUÍ" }');
       console.log('      })');
       console.log('   4. Deberías ver los datos del entrenador');

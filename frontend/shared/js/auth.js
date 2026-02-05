@@ -5,7 +5,7 @@
 const AuthAPI = {
     // Configuración
     config: {
-        apiBaseUrl: 'http://localhost:5000/api',
+        apiBaseUrl: 'https://gestiondeportistas-production.up.railway.app/api',
         tokenKey: 'titanes_token',
         userKey: 'titanes_user',
         tokenExpiryKey: 'titanes_token_expiry'

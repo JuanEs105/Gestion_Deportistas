@@ -1,6 +1,6 @@
 // frontend/api.js - VERSIÓN DEFINITIVA Y COMPLETA
 window.AdminAPI = {
-    baseURL: 'http://localhost:5000/api',
+    baseURL: 'https://gestiondeportistas-production.up.railway.app/api',
 
     // ==========================================
     // CONFIGURACIÓN
@@ -1551,7 +1551,7 @@ window.AdminAPI = {
         
         // Mensajes de error más específicos
         if (error.message.includes('Failed to fetch')) {
-            errorMessage = 'No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose en http://localhost:5000';
+            errorMessage = 'No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose en https://gestiondeportistas-production.up.railway.app';
         } else if (error.message.includes('404')) {
             errorMessage = 'Ruta del API no encontrada. Verifica que el endpoint /api/calendario exista en el backend';
         } else if (error.message.includes('500')) {

@@ -110,7 +110,7 @@ async function verifyTokenWithBackend(token) {
             return true;
         }
 
-        const response = await fetch(`http://localhost:5000/api/auth/verificar-token-registro/${token}`);
+        const response = await fetch(`https://gestiondeportistas-production.up.railway.app/api/auth/verificar-token-registro/${token}`);
 
         if (!response.ok) {
             console.warn('⚠️  Token no verificado por backend, continuando de todos modos');
@@ -334,9 +334,10 @@ async function handlePasswordSubmit(event) {
         let endpointUsed = '';
 
         // Primero intentar con el endpoint principal
+       // Primero intentar con el endpoint principal
         try {
             endpointUsed = '/completar-registro-contrasena';
-            response = await fetch('http://localhost:5000/api/auth/completar-registro-contrasena', {
+            response = await fetch('https://gestiondeportistas-production.up.railway.app/api/auth/completar-registro-contrasena', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -352,7 +353,7 @@ async function handlePasswordSubmit(event) {
             console.log('⚠️  Error con primer endpoint, intentando con alias...');
             // Si falla, intentar con el alias
             endpointUsed = '/activar-cuenta-entrenador';
-            response = await fetch('http://localhost:5000/api/auth/activar-cuenta-entrenador', {
+            response = await fetch('https://gestiondeportistas-production.up.railway.app/api/auth/activar-cuenta-entrenador', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -427,7 +428,7 @@ async function handlePasswordSubmit(event) {
         } else if (errorMessage.includes('inválido')) {
             errorMessage = 'Token inválido. Vuelve al paso 2 para verificar tu código nuevamente.';
         } else if (errorMessage.includes('network') || errorMessage.includes('Failed to fetch')) {
-            errorMessage = 'Error de conexión. Verifica que el servidor backend esté corriendo en http://localhost:5000';
+            errorMessage = 'Error de conexión. Verifica que el servidor backend esté corriendo en https://gestiondeportistas-production.up.railway.app';
         }
 
         showError(errorMessage);
