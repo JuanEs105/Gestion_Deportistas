@@ -2,11 +2,8 @@
   "name": "titanes-evolution-frontend",
   "version": "1.0.0",
   "description": "Sistema de gestión deportiva Titanes Evolution",
-  "main": "index.html",
   "scripts": {
-    "start": "live-server --port=3000 --open=index.html",
-    "dev": "live-server --port=3000 --watch=.",
-    "test": "echo \"No test specified\" && exit 1"
+    "start": "serve -s . -l 80"
   },
   "keywords": [
     "deportes",
@@ -16,11 +13,7 @@
   ],
   "author": "Titanes Evolution",
   "license": "MIT",
-  "devDependencies": {
-    "live-server": "^1.2.2"
-  },
   "dependencies": {
-    "exceljs": "^4.4.0",
-    "sequelize": "^6.37.7"
+    "serve": "^14.2.0"
   }
 }
