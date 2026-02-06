@@ -46,15 +46,18 @@ class EmailService {
     }
   }
 
-  _getSenderEmail() {
-    const emailFrom = process.env.EMAIL_FROM;
-    if (emailFrom && emailFrom.includes('<')) {
-      const match = emailFrom.match(/<(.+)>/);
-      return match ? match[1] : 'juanes1052u@gmail.com';
-    }
-    return emailFrom || 'juanes1052u@gmail.com';
+ _getSenderEmail() {
+  const emailFrom = process.env.EMAIL_FROM;
+  
+  // Si EMAIL_FROM tiene el formato "Nombre <email>", extraer solo el email
+  if (emailFrom && emailFrom.includes('<')) {
+    const match = emailFrom.match(/<(.+)>/);
+    return match ? match[1] : emailFrom;
   }
-
+  
+  // Retornar directamente EMAIL_FROM (ya configurado en Railway)
+  return emailFrom;
+}
   // ====================
   // REGISTRO DE ENTRENADOR
   // ====================
