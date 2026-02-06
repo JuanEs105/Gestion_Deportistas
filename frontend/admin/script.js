@@ -633,20 +633,14 @@ const DashboardApp = {
                                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
                                     ${habilidad}
                                 </p>
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <span class="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                                            <span class="material-symbols-outlined text-xs">person</span>
-                                            ${entrenador}
-                                        </span>
-                                        <span class="text-xs ${scoreText} font-semibold">
-                                            Puntuación: ${puntuacion}
-                                        </span>
-                                    </div>
-                                    <button onclick="DashboardApp.viewEvaluation('${act.id || ''}')" 
-                                            class="text-xs text-primary hover:text-red-700 dark:hover:text-red-400 font-medium">
-                                        Ver detalles →
-                                    </button>
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                                        <span class="material-symbols-outlined text-xs">person</span>
+                                        ${entrenador}
+                                    </span>
+                                    <span class="text-xs ${scoreText} font-semibold">
+                                        Puntuación: ${puntuacion}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -849,14 +843,6 @@ const DashboardApp = {
                     <p class="text-sm mt-2">Los datos se cargarán automáticamente</p>
                 </div>
             `;
-        }
-    },
-
-    viewEvaluation(evaluationId) {
-        if (evaluationId) {
-            window.location.href = `evaluaciones/detalle.html?id=${evaluationId}`;
-        } else {
-            AdminAPI.showNotification('No se pudo cargar la evaluación', 'warning');
         }
     },
 
