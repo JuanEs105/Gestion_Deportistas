@@ -1,4 +1,4 @@
-// backend/src/config/emailService.js - VERSIÓN DEFINITIVA
+// backend/src/config/emailService.js - VERSIÓN CON REPLY-TO
 const SibApiV3Sdk = require('@getbrevo/brevo');
 
 class EmailService {
@@ -46,18 +46,19 @@ class EmailService {
     }
   }
 
- _getSenderEmail() {
-  const emailFrom = process.env.EMAIL_FROM;
-  
-  // Si EMAIL_FROM tiene el formato "Nombre <email>", extraer solo el email
-  if (emailFrom && emailFrom.includes('<')) {
-    const match = emailFrom.match(/<(.+)>/);
-    return match ? match[1] : emailFrom;
+  _getSenderEmail() {
+    const emailFrom = process.env.EMAIL_FROM;
+    
+    // Si EMAIL_FROM tiene el formato "Nombre <email>", extraer solo el email
+    if (emailFrom && emailFrom.includes('<')) {
+      const match = emailFrom.match(/<(.+)>/);
+      return match ? match[1] : emailFrom;
+    }
+    
+    // Retornar directamente EMAIL_FROM (ya configurado en Railway)
+    return emailFrom;
   }
-  
-  // Retornar directamente EMAIL_FROM (ya configurado en Railway)
-  return emailFrom;
-}
+
   // ====================
   // REGISTRO DE ENTRENADOR
   // ====================
@@ -82,6 +83,12 @@ class EmailService {
       sendSmtpEmail.sender = {
         name: 'Titanes Cheer Evolution',
         email: this._getSenderEmail()
+      };
+
+      // AGREGAR REPLY-TO para mejorar entregabilidad
+      sendSmtpEmail.replyTo = {
+        email: 'juanes1052@gmail.com',
+        name: 'Titanes Evolution'
       };
       
       sendSmtpEmail.to = [{ email: email, name: nombre }];
@@ -188,6 +195,13 @@ class EmailService {
 
       const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
       sendSmtpEmail.sender = { name: 'Titanes Evolution', email: this._getSenderEmail() };
+      
+      // AGREGAR REPLY-TO
+      sendSmtpEmail.replyTo = {
+        email: 'juanes1052@gmail.com',
+        name: 'Titanes Evolution'
+      };
+      
       sendSmtpEmail.to = [{ email: email, name: nombre }];
       sendSmtpEmail.subject = '⏰ Recordatorio - Completa tu Registro';
       sendSmtpEmail.htmlContent = `<!DOCTYPE html>
@@ -227,6 +241,13 @@ class EmailService {
 
       const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
       sendSmtpEmail.sender = { name: 'Titanes Evolution', email: this._getSenderEmail() };
+      
+      // AGREGAR REPLY-TO
+      sendSmtpEmail.replyTo = {
+        email: 'juanes1052@gmail.com',
+        name: 'Titanes Evolution'
+      };
+      
       sendSmtpEmail.to = [{ email: email, name: userName }];
       sendSmtpEmail.subject = '🎯 Código de Activación - Titanes Evolution';
       sendSmtpEmail.htmlContent = `<!DOCTYPE html>
@@ -274,6 +295,13 @@ class EmailService {
 
       const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
       sendSmtpEmail.sender = { name: 'Titanes Evolution', email: this._getSenderEmail() };
+      
+      // AGREGAR REPLY-TO
+      sendSmtpEmail.replyTo = {
+        email: 'juanes1052@gmail.com',
+        name: 'Titanes Evolution'
+      };
+      
       sendSmtpEmail.to = [{ email: email, name: userName }];
       sendSmtpEmail.subject = '🔐 Código de Recuperación de Contraseña';
       sendSmtpEmail.htmlContent = `<!DOCTYPE html>
