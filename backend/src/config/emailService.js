@@ -1,10 +1,9 @@
-// backend/src/services/emailService.js - VERSIÓN CON BREVO API (HTTP)
+// backend/src/services/emailService.js - VERSIÓN CON BREVO API v3
 const brevo = require('@getbrevo/brevo');
-const defaultClient = brevo.ApiClient.instance;
 
 class EmailService {
   constructor() {
-    console.log('📧 Inicializando EmailService con Brevo API...');
+    console.log('📧 Inicializando EmailService con Brevo API v3...');
     console.log('📤 BREVO_API_KEY:', process.env.BREVO_API_KEY ? 'Configurado ✅' : 'NO CONFIGURADO ❌');
 
     if (!process.env.BREVO_API_KEY) {
@@ -14,13 +13,13 @@ class EmailService {
       return;
     }
 
-    // Configurar cliente de Brevo API
-    const apiKey = defaultClient.authentications['api-key'];
-    apiKey.apiKey = process.env.BREVO_API_KEY;
-
-    this.apiInstance = new brevo.TransactionalEmailsApi();
+    // Configurar API Key para Brevo v3
+    const apiInstance = new brevo.TransactionalEmailsApi();
+    apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
     
-    console.log('✅ Cliente de Brevo API configurado correctamente');
+    this.apiInstance = apiInstance;
+    
+    console.log('✅ Cliente de Brevo API v3 configurado correctamente');
     console.log('📧 Servidor de email listo para enviar vía API HTTP');
   }
 
