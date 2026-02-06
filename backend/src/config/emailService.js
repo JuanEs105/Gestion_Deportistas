@@ -1,36 +1,27 @@
-// backend/src/services/emailService.js - VERSIÓN CON BREVO SMTP
-const nodemailer = require('nodemailer');
+// backend/src/services/emailService.js - VERSIÓN CON BREVO API (HTTP)
+const SibApiV3Sdk = require('@getbrevo/brevo');
 
 class EmailService {
   constructor() {
-    console.log('📧 Inicializando EmailService...');
-    console.log('📤 BREVO_SMTP_USER:', process.env.BREVO_SMTP_USER ? 'Configurado' : 'NO CONFIGURADO');
+    console.log('📧 Inicializando EmailService con Brevo API...');
+    console.log('📤 BREVO_API_KEY:', process.env.BREVO_API_KEY ? 'Configurado ✅' : 'NO CONFIGURADO ❌');
 
-    if (!process.env.BREVO_SMTP_USER || !process.env.BREVO_SMTP_PASS) {
-      console.error('❌ ERROR: Credenciales de Brevo SMTP no configuradas');
-      console.error('   Revisa tus variables de entorno y asegúrate de tener:');
-      console.error('   BREVO_SMTP_HOST=smtp-relay.brevo.com');
-      console.error('   BREVO_SMTP_PORT=587');
-      console.error('   BREVO_SMTP_USER=a1b275001@smtp-brevo.com');
-      console.error('   BREVO_SMTP_PASS=2bCGpqXmdMQEy1nr');
+    if (!process.env.BREVO_API_KEY) {
+      console.error('❌ ERROR: BREVO_API_KEY no configurada');
+      console.error('   Agrega esta variable en Railway:');
+      console.error('   BREVO_API_KEY=xkeysib-tu-api-key-aqui');
+      return;
     }
 
-    // Configuración de Brevo SMTP
-    this.transporter = nodemailer.createTransport({
-      host: process.env.BREVO_SMTP_HOST || 'smtp-relay.brevo.com',
-      port: parseInt(process.env.BREVO_SMTP_PORT) || 587,
-      secure: false, // false para puerto 587 (STARTTLS)
-      auth: {
-        user: process.env.BREVO_SMTP_USER,
-        pass: process.env.BREVO_SMTP_PASS
-      },
-      tls: {
-        rejectUnauthorized: false
-      }
-    });
+    // Configurar cliente de Brevo API
+    const defaultClient = SibApiV3Sdk.ApiClient.instance;
+    const apiKey = defaultClient.authentications['api-key'];
+    apiKey.apiKey = process.env.BREVO_API_KEY;
 
-    // Verificar conexión al iniciar
-    this.verifyConnection();
+    this.apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+    
+    console.log('✅ Cliente de Brevo API configurado correctamente');
+    console.log('📧 Servidor de email listo para enviar vía API HTTP');
   }
 
   // ====================
@@ -46,14 +37,16 @@ class EmailService {
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
       const registroUrl = `${frontendUrl}/auth/registro-entrenador/${tokenRegistro}`;
 
-      const mailOptions = {
-        from: {
-          name: 'Titanes Cheer Evolution - Administración',
-          address: process.env.EMAIL_FROM || 'juanes1052u@gmail.com'
-        },
-        to: email,
-        subject: '🏋️‍♂️ ¡Bienvenido a Titanes Evolution - Completa tu Registro!',
-        html: `<!DOCTYPE html>
+      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      
+      sendSmtpEmail.sender = {
+        name: 'Titanes Cheer Evolution - Administración',
+        email: process.env.EMAIL_FROM?.match(/<(.+)>/)?.[1] || 'juanes1052u@gmail.com'
+      };
+      
+      sendSmtpEmail.to = [{ email: email, name: nombre }];
+      sendSmtpEmail.subject = '🏋️‍♂️ ¡Bienvenido a Titanes Evolution - Completa tu Registro!';
+      sendSmtpEmail.htmlContent = `<!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -142,33 +135,24 @@ class EmailService {
     </div>
   </div>
 </body>
-</html>`
-      };
+</html>`;
 
-      const info = await this.transporter.sendMail(mailOptions);
-      console.log('✅ EMAIL DE REGISTRO ENVIADO EXITOSAMENTE VÍA BREVO');
-      console.log('📧 Message ID:', info.messageId);
-      console.log('📨 Destinatario:', info.envelope?.to || email);
+      const result = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+      
+      console.log('✅ EMAIL DE REGISTRO ENVIADO EXITOSAMENTE VÍA BREVO API');
+      console.log('📧 Message ID:', result.messageId);
+      console.log('📨 Destinatario:', email);
       console.log('🔗 Enlace de registro:', registroUrl);
       console.log('📧 === EMAIL ENVIADO ===\n');
 
       return {
         success: true,
-        messageId: info.messageId,
+        messageId: result.messageId,
         registroUrl: registroUrl
       };
     } catch (error) {
       console.error('❌ ERROR ENVIANDO EMAIL DE REGISTRO:');
-      console.error('🔍 Código de error:', error.code);
-      console.error('📝 Mensaje:', error.message);
-
-      if (error.code === 'EAUTH') {
-        console.error('\n⚠️ PROBLEMA DE AUTENTICACIÓN CON BREVO SMTP:');
-        console.error('1. Verifica que BREVO_SMTP_USER sea correcto');
-        console.error('2. Verifica que BREVO_SMTP_PASS sea correcto');
-        console.error('3. Genera una nueva clave SMTP en Brevo si es necesario');
-      }
-
+      console.error('🔍 Error:', error.response?.body || error.message);
       throw error;
     }
   }
@@ -185,14 +169,16 @@ class EmailService {
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
       const registroUrl = `${frontendUrl}/auth/registro-entrenador/${tokenRegistro}`;
 
-      const mailOptions = {
-        from: {
-          name: 'Titanes Cheer Evolution - Recordatorio',
-          address: process.env.EMAIL_FROM || 'juanes1052u@gmail.com'
-        },
-        to: email,
-        subject: '⏰ Recordatorio - Completa tu Registro en Titanes Evolution',
-        html: `<!DOCTYPE html>
+      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      
+      sendSmtpEmail.sender = {
+        name: 'Titanes Cheer Evolution - Recordatorio',
+        email: process.env.EMAIL_FROM?.match(/<(.+)>/)?.[1] || 'juanes1052u@gmail.com'
+      };
+      
+      sendSmtpEmail.to = [{ email: email, name: nombre }];
+      sendSmtpEmail.subject = '⏰ Recordatorio - Completa tu Registro en Titanes Evolution';
+      sendSmtpEmail.htmlContent = `<!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -256,19 +242,19 @@ class EmailService {
     </div>
   </div>
 </body>
-</html>`
-      };
+</html>`;
 
-      const info = await this.transporter.sendMail(mailOptions);
-      console.log('✅ RECORDATORIO ENVIADO EXITOSAMENTE VÍA BREVO');
-      console.log('📧 Message ID:', info.messageId);
+      const result = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+      
+      console.log('✅ RECORDATORIO ENVIADO EXITOSAMENTE VÍA BREVO API');
+      console.log('📧 Message ID:', result.messageId);
 
       return {
         success: true,
-        messageId: info.messageId
+        messageId: result.messageId
       };
     } catch (error) {
-      console.error('❌ ERROR ENVIANDO RECORDATORIO:', error.message);
+      console.error('❌ ERROR ENVIANDO RECORDATORIO:', error.response?.body || error.message);
       throw error;
     }
   }
@@ -283,14 +269,16 @@ class EmailService {
       console.log('📛 Nombre:', userName);
       console.log('🔢 Código:', code);
 
-      const mailOptions = {
-        from: {
-          name: 'Titanes Evolution - Activación de Cuenta',
-          address: process.env.EMAIL_FROM || 'juanes1052u@gmail.com'
-        },
-        to: email,
-        subject: '🎯 Código de Activación - Titanes Evolution',
-        html: `<!DOCTYPE html>
+      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      
+      sendSmtpEmail.sender = {
+        name: 'Titanes Evolution - Activación de Cuenta',
+        email: process.env.EMAIL_FROM?.match(/<(.+)>/)?.[1] || 'juanes1052u@gmail.com'
+      };
+      
+      sendSmtpEmail.to = [{ email: email, name: userName }];
+      sendSmtpEmail.subject = '🎯 Código de Activación - Titanes Evolution';
+      sendSmtpEmail.htmlContent = `<!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -372,35 +360,27 @@ class EmailService {
     </div>
   </div>
 </body>
-</html>`
-      };
+</html>`;
 
-      const info = await this.transporter.sendMail(mailOptions);
-      console.log('✅ CÓDIGO DE ACTIVACIÓN ENVIADO EXITOSAMENTE VÍA BREVO');
-      console.log('📧 Message ID:', info.messageId);
+      const result = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+      
+      console.log('✅ CÓDIGO DE ACTIVACIÓN ENVIADO EXITOSAMENTE VÍA BREVO API');
+      console.log('📧 Message ID:', result.messageId);
       console.log('📧 === ACTIVACIÓN ENVIADA ===\n');
 
       return {
         success: true,
-        messageId: info.messageId
+        messageId: result.messageId
       };
     } catch (error) {
       console.error('❌ ERROR ENVIANDO CÓDIGO DE ACTIVACIÓN:');
-      console.error('🔍 Código de error:', error.code);
-      console.error('📝 Mensaje:', error.message);
-
-      if (error.code === 'EAUTH') {
-        console.error('\n⚠️ PROBLEMA DE AUTENTICACIÓN CON BREVO SMTP');
-        console.error('1. Revisa que BREVO_SMTP_USER y BREVO_SMTP_PASS sean correctos');
-        console.error('2. Verifica que las credenciales estén activas en Brevo');
-      }
-
+      console.error('🔍 Error:', error.response?.body || error.message);
       throw error;
     }
   }
 
   // ====================
-  // CÓDIGO DE RECUPERACIÓN (existente)
+  // CÓDIGO DE RECUPERACIÓN
   // ====================
   generateCode() {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -412,14 +392,16 @@ class EmailService {
     try {
       console.log('\n📧 === ENVIANDO CÓDIGO DE RECUPERACIÓN ===');
 
-      const mailOptions = {
-        from: {
-          name: 'Titanes Cheer Evolution',
-          address: process.env.EMAIL_FROM || 'juanes1052u@gmail.com'
-        },
-        to: email,
-        subject: '🔐 Código de Recuperación de Contraseña',
-        html: `<!DOCTYPE html>
+      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      
+      sendSmtpEmail.sender = {
+        name: 'Titanes Cheer Evolution',
+        email: process.env.EMAIL_FROM?.match(/<(.+)>/)?.[1] || 'juanes1052u@gmail.com'
+      };
+      
+      sendSmtpEmail.to = [{ email: email, name: userName }];
+      sendSmtpEmail.subject = '🔐 Código de Recuperación de Contraseña';
+      sendSmtpEmail.htmlContent = `<!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -459,41 +441,26 @@ class EmailService {
     </div>
   </div>
 </body>
-</html>`
-      };
+</html>`;
 
-      const info = await this.transporter.sendMail(mailOptions);
-      console.log('✅ CÓDIGO DE RECUPERACIÓN ENVIADO VÍA BREVO');
-      console.log('📧 Message ID:', info.messageId);
+      const result = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+      
+      console.log('✅ CÓDIGO DE RECUPERACIÓN ENVIADO VÍA BREVO API');
+      console.log('📧 Message ID:', result.messageId);
 
-      return { success: true, messageId: info.messageId };
+      return { success: true, messageId: result.messageId };
     } catch (error) {
-      console.error('❌ ERROR ENVIANDO CÓDIGO DE RECUPERACIÓN:', error);
+      console.error('❌ ERROR ENVIANDO CÓDIGO DE RECUPERACIÓN:', error.response?.body || error.message);
       throw error;
     }
   }
 
   // ====================
-  // VERIFICACIÓN DE CONEXIÓN
+  // VERIFICACIÓN DE CONEXIÓN (no es necesaria con API)
   // ====================
   async verifyConnection() {
-    try {
-      console.log('🔌 Verificando conexión con Brevo SMTP...');
-      await this.transporter.verify();
-      console.log('✅ CONEXIÓN CON BREVO EXITOSA');
-      console.log('📧 Servidor de email listo para enviar');
-      return true;
-    } catch (error) {
-      console.error('❌ ERROR DE CONEXIÓN CON BREVO SMTP:');
-      console.error('🔍 Código:', error.code);
-      console.error('📝 Mensaje:', error.message);
-      console.error('🔧 Solución:');
-      console.error('   1. Verifica BREVO_SMTP_HOST=smtp-relay.brevo.com');
-      console.error('   2. Verifica BREVO_SMTP_PORT=587');
-      console.error('   3. Verifica BREVO_SMTP_USER (tu identificador de Brevo)');
-      console.error('   4. Verifica BREVO_SMTP_PASS (tu contraseña SMTP de Brevo)');
-      return false;
-    }
+    // La API no requiere verificación previa
+    return true;
   }
 }
 
