@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { User, Habilidad } = require('../models');
+const { User, Habilidad, Evaluacion } = require('../models');
 
 const initDatabase = async () => {
     try {
@@ -42,7 +42,18 @@ const initDatabase = async () => {
         // 2. Verificar si ya existen habilidades
         const habilidadesCount = await Habilidad.count();
 
+        // TEMPORAL: Forzar recarga de habilidades de porrismo
+        console.log(`ℹ️  Encontradas ${habilidadesCount} habilidades antiguas en la base de datos`);
+        console.log('🔄 Borrando datos antiguos para cargar las nuevas habilidades de porrismo...');
+        
+        // IMPORTANTE: Borrar primero las evaluaciones (tienen foreign key a habilidades)
+        await Evaluacion.destroy({ where: {}, truncate: true });
+        console.log('✅ Evaluaciones borradas');
+        
+        // Luego borrar las habilidades
         await Habilidad.destroy({ where: {}, truncate: true });
+        console.log('✅ Habilidades antiguas borradas');
+        
         if (true) {
             // Importar habilidades de PORRISMO Y GIMNASIA - TITANES EVOLUTION
             const habilidades = [
