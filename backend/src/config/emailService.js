@@ -1,32 +1,35 @@
-// backend/src/services/emailService.js - VERSIÓN COMPLETA ACTUALIZADA
+// backend/src/services/emailService.js - VERSIÓN CON BREVO SMTP
 const nodemailer = require('nodemailer');
 
 class EmailService {
   constructor() {
     console.log('📧 Inicializando EmailService...');
-    console.log('📤 EMAIL_USER:', process.env.EMAIL_USER ? 'Configurado' : 'NO CONFIGURADO');
+    console.log('📤 BREVO_SMTP_USER:', process.env.BREVO_SMTP_USER ? 'Configurado' : 'NO CONFIGURADO');
 
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.error('❌ ERROR: Credenciales de email no configuradas en .env');
-      console.error('   Revisa tu archivo .env y asegúrate de tener:');
-      console.error('   EMAIL_USER=juanes1052u@gmail.com');
-      console.error('   EMAIL_PASS=skllbhujeodcurcz (Contraseña de aplicación de 16 caracteres)');
+    if (!process.env.BREVO_SMTP_USER || !process.env.BREVO_SMTP_PASS) {
+      console.error('❌ ERROR: Credenciales de Brevo SMTP no configuradas');
+      console.error('   Revisa tus variables de entorno y asegúrate de tener:');
+      console.error('   BREVO_SMTP_HOST=smtp-relay.brevo.com');
+      console.error('   BREVO_SMTP_PORT=587');
+      console.error('   BREVO_SMTP_USER=a1b275001@smtp-brevo.com');
+      console.error('   BREVO_SMTP_PASS=2bCGpqXmdMQEy1nr');
     }
 
+    // Configuración de Brevo SMTP
     this.transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false, // ← CRÍTICO
+      host: process.env.BREVO_SMTP_HOST || 'smtp-relay.brevo.com',
+      port: parseInt(process.env.BREVO_SMTP_PORT) || 587,
+      secure: false, // false para puerto 587 (STARTTLS)
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+        user: process.env.BREVO_SMTP_USER,
+        pass: process.env.BREVO_SMTP_PASS
       },
       tls: {
         rejectUnauthorized: false
       }
     });
 
-    // Verificar conexión
+    // Verificar conexión al iniciar
     this.verifyConnection();
   }
 
@@ -46,7 +49,7 @@ class EmailService {
       const mailOptions = {
         from: {
           name: 'Titanes Cheer Evolution - Administración',
-          address: process.env.EMAIL_USER
+          address: process.env.EMAIL_FROM || 'juanes1052u@gmail.com'
         },
         to: email,
         subject: '🏋️‍♂️ ¡Bienvenido a Titanes Evolution - Completa tu Registro!',
@@ -143,9 +146,9 @@ class EmailService {
       };
 
       const info = await this.transporter.sendMail(mailOptions);
-      console.log('✅ EMAIL DE REGISTRO ENVIADO EXITOSAMENTE');
+      console.log('✅ EMAIL DE REGISTRO ENVIADO EXITOSAMENTE VÍA BREVO');
       console.log('📧 Message ID:', info.messageId);
-      console.log('📨 Destinatario:', info.envelope.to);
+      console.log('📨 Destinatario:', info.envelope?.to || email);
       console.log('🔗 Enlace de registro:', registroUrl);
       console.log('📧 === EMAIL ENVIADO ===\n');
 
@@ -160,12 +163,10 @@ class EmailService {
       console.error('📝 Mensaje:', error.message);
 
       if (error.code === 'EAUTH') {
-        console.error('\n⚠️ PROBLEMA DE AUTENTICACIÓN CON GMAIL:');
-        console.error('1. Verifica que tu cuenta de Google tenga "Verificación en 2 pasos" ACTIVADA');
-        console.error('2. Genera una NUEVA "Contraseña de aplicación" en:');
-        console.error('   https://myaccount.google.com/apppasswords');
-        console.error('3. La contraseña debe ser de 16 caracteres SIN ESPACIOS');
-        console.error('4. Actualiza tu archivo .env con la nueva contraseña');
+        console.error('\n⚠️ PROBLEMA DE AUTENTICACIÓN CON BREVO SMTP:');
+        console.error('1. Verifica que BREVO_SMTP_USER sea correcto');
+        console.error('2. Verifica que BREVO_SMTP_PASS sea correcto');
+        console.error('3. Genera una nueva clave SMTP en Brevo si es necesario');
       }
 
       throw error;
@@ -187,7 +188,7 @@ class EmailService {
       const mailOptions = {
         from: {
           name: 'Titanes Cheer Evolution - Recordatorio',
-          address: process.env.EMAIL_USER
+          address: process.env.EMAIL_FROM || 'juanes1052u@gmail.com'
         },
         to: email,
         subject: '⏰ Recordatorio - Completa tu Registro en Titanes Evolution',
@@ -259,7 +260,7 @@ class EmailService {
       };
 
       const info = await this.transporter.sendMail(mailOptions);
-      console.log('✅ RECORDATORIO ENVIADO EXITOSAMENTE');
+      console.log('✅ RECORDATORIO ENVIADO EXITOSAMENTE VÍA BREVO');
       console.log('📧 Message ID:', info.messageId);
 
       return {
@@ -285,7 +286,7 @@ class EmailService {
       const mailOptions = {
         from: {
           name: 'Titanes Evolution - Activación de Cuenta',
-          address: process.env.EMAIL_USER
+          address: process.env.EMAIL_FROM || 'juanes1052u@gmail.com'
         },
         to: email,
         subject: '🎯 Código de Activación - Titanes Evolution',
@@ -375,7 +376,7 @@ class EmailService {
       };
 
       const info = await this.transporter.sendMail(mailOptions);
-      console.log('✅ CÓDIGO DE ACTIVACIÓN ENVIADO EXITOSAMENTE');
+      console.log('✅ CÓDIGO DE ACTIVACIÓN ENVIADO EXITOSAMENTE VÍA BREVO');
       console.log('📧 Message ID:', info.messageId);
       console.log('📧 === ACTIVACIÓN ENVIADA ===\n');
 
@@ -389,9 +390,9 @@ class EmailService {
       console.error('📝 Mensaje:', error.message);
 
       if (error.code === 'EAUTH') {
-        console.error('\n⚠️ PROBLEMA DE AUTENTICACIÓN CON GMAIL');
-        console.error('1. Revisa que EMAIL_PASS en .env sea correcta');
-        console.error('2. Verifica que la cuenta tenga acceso a apps menos seguras');
+        console.error('\n⚠️ PROBLEMA DE AUTENTICACIÓN CON BREVO SMTP');
+        console.error('1. Revisa que BREVO_SMTP_USER y BREVO_SMTP_PASS sean correctos');
+        console.error('2. Verifica que las credenciales estén activas en Brevo');
       }
 
       throw error;
@@ -414,7 +415,7 @@ class EmailService {
       const mailOptions = {
         from: {
           name: 'Titanes Cheer Evolution',
-          address: process.env.EMAIL_USER
+          address: process.env.EMAIL_FROM || 'juanes1052u@gmail.com'
         },
         to: email,
         subject: '🔐 Código de Recuperación de Contraseña',
@@ -462,7 +463,7 @@ class EmailService {
       };
 
       const info = await this.transporter.sendMail(mailOptions);
-      console.log('✅ CÓDIGO DE RECUPERACIÓN ENVIADO');
+      console.log('✅ CÓDIGO DE RECUPERACIÓN ENVIADO VÍA BREVO');
       console.log('📧 Message ID:', info.messageId);
 
       return { success: true, messageId: info.messageId };
@@ -477,19 +478,20 @@ class EmailService {
   // ====================
   async verifyConnection() {
     try {
-      console.log('🔌 Verificando conexión con Gmail...');
+      console.log('🔌 Verificando conexión con Brevo SMTP...');
       await this.transporter.verify();
-      console.log('✅ CONEXIÓN CON GMAIL EXITOSA');
+      console.log('✅ CONEXIÓN CON BREVO EXITOSA');
       console.log('📧 Servidor de email listo para enviar');
       return true;
     } catch (error) {
-      console.error('❌ ERROR DE CONEXIÓN CON GMAIL:');
+      console.error('❌ ERROR DE CONEXIÓN CON BREVO SMTP:');
       console.error('🔍 Código:', error.code);
       console.error('📝 Mensaje:', error.message);
       console.error('🔧 Solución:');
-      console.error('   1. Activa "Verificación en 2 pasos" en tu cuenta Google');
-      console.error('   2. Genera una "Contraseña de aplicación"');
-      console.error('   3. Actualiza EMAIL_PASS en .env');
+      console.error('   1. Verifica BREVO_SMTP_HOST=smtp-relay.brevo.com');
+      console.error('   2. Verifica BREVO_SMTP_PORT=587');
+      console.error('   3. Verifica BREVO_SMTP_USER (tu identificador de Brevo)');
+      console.error('   4. Verifica BREVO_SMTP_PASS (tu contraseña SMTP de Brevo)');
       return false;
     }
   }
