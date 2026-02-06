@@ -35,8 +35,8 @@ app.use(cors({
       'http://localhost:5173',
       'http://localhost:5500',
 
-      // ✅ Dominio temporal de Hostinger (el que SÍ funciona)
-      'https://grey-goldfish-729112.hostingersite.com',
+      // ✅ Seenode (Frontend desplegado ACTUAL)
+      'https://web-k0bmgijdoire.up-de-fra1-k8s-1.apps.run-on-seenode.com',
 
       // Railway (el propio backend)
       'https://gestiondeportistas-production.up.railway.app'
