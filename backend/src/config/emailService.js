@@ -1,5 +1,6 @@
 // backend/src/services/emailService.js - VERSIÓN CON BREVO API (HTTP)
-const SibApiV3Sdk = require('@getbrevo/brevo');
+const brevo = require('@getbrevo/brevo');
+const defaultClient = brevo.ApiClient.instance;
 
 class EmailService {
   constructor() {
@@ -14,11 +15,10 @@ class EmailService {
     }
 
     // Configurar cliente de Brevo API
-    const defaultClient = SibApiV3Sdk.ApiClient.instance;
     const apiKey = defaultClient.authentications['api-key'];
     apiKey.apiKey = process.env.BREVO_API_KEY;
 
-    this.apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+    this.apiInstance = new brevo.TransactionalEmailsApi();
     
     console.log('✅ Cliente de Brevo API configurado correctamente');
     console.log('📧 Servidor de email listo para enviar vía API HTTP');
@@ -37,7 +37,7 @@ class EmailService {
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
       const registroUrl = `${frontendUrl}/auth/registro-entrenador/${tokenRegistro}`;
 
-      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      const sendSmtpEmail = new brevo.SendSmtpEmail();
       
       sendSmtpEmail.sender = {
         name: 'Titanes Cheer Evolution - Administración',
@@ -169,7 +169,7 @@ class EmailService {
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
       const registroUrl = `${frontendUrl}/auth/registro-entrenador/${tokenRegistro}`;
 
-      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      const sendSmtpEmail = new brevo.SendSmtpEmail();
       
       sendSmtpEmail.sender = {
         name: 'Titanes Cheer Evolution - Recordatorio',
@@ -269,7 +269,7 @@ class EmailService {
       console.log('📛 Nombre:', userName);
       console.log('🔢 Código:', code);
 
-      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      const sendSmtpEmail = new brevo.SendSmtpEmail();
       
       sendSmtpEmail.sender = {
         name: 'Titanes Evolution - Activación de Cuenta',
@@ -392,7 +392,7 @@ class EmailService {
     try {
       console.log('\n📧 === ENVIANDO CÓDIGO DE RECUPERACIÓN ===');
 
-      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      const sendSmtpEmail = new brevo.SendSmtpEmail();
       
       sendSmtpEmail.sender = {
         name: 'Titanes Cheer Evolution',
