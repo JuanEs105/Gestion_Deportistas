@@ -10,6 +10,13 @@ class EmailService {
     
     if (this.useResend) {
       console.log('📮 Usando RESEND para envío de emails');
+      
+      // Polyfill para Headers (necesario en Node.js < 18)
+      if (typeof Headers === 'undefined') {
+        global.fetch = require('node-fetch');
+        global.Headers = global.fetch.Headers;
+      }
+      
       const { Resend } = require('resend');
       this.resend = new Resend(process.env.RESEND_API_KEY);
     } else {
