@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { User, Habilidad, Evaluacion } = require('../models');
+const { User, Habilidad, Evaluacion, sequelize } = require('../models');
 
 const initDatabase = async () => {
     try {
@@ -46,13 +46,9 @@ const initDatabase = async () => {
         console.log(`ℹ️  Encontradas ${habilidadesCount} habilidades antiguas en la base de datos`);
         console.log('🔄 Borrando datos antiguos para cargar las nuevas habilidades de porrismo...');
         
-        // IMPORTANTE: Borrar primero las evaluaciones (tienen foreign key a habilidades)
-        await Evaluacion.destroy({ where: {}, truncate: true });
-        console.log('✅ Evaluaciones borradas');
-        
-        // Luego borrar las habilidades
-        await Habilidad.destroy({ where: {}, truncate: true });
-        console.log('✅ Habilidades antiguas borradas');
+        // SOLUCIÓN DEFINITIVA: Usar TRUNCATE CASCADE con raw SQL
+        await sequelize.query('TRUNCATE TABLE evaluaciones, habilidades RESTART IDENTITY CASCADE');
+        console.log('✅ Evaluaciones y habilidades borradas con CASCADE');
         
         if (true) {
             // Importar habilidades de PORRISMO Y GIMNASIA - TITANES EVOLUTION
