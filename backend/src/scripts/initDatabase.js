@@ -23,7 +23,7 @@ const initDatabase = async () => {
         } else {
             console.log('ℹ️  Usuario admin ya existe');
         }
-        
+
         const entrenadorExists = await User.findOne({ where: { email: 'entrenador@deportes.com' } });
 
         if (!entrenadorExists) {
@@ -42,13 +42,14 @@ const initDatabase = async () => {
         // 2. Verificar si ya existen habilidades
         const habilidadesCount = await Habilidad.count();
 
-        if (habilidadesCount === 0) {
+        await Habilidad.destroy({ where: {}, truncate: true });
+        if (true) {
             // Importar habilidades de PORRISMO Y GIMNASIA - TITANES EVOLUTION
             const habilidades = [
                 // ========================================
                 // NIVEL 1 BÁSICO
                 // ========================================
-                
+
                 // Habilidades Nivel 1 Básico
                 { nombre: 'Rollo adelante', nivel: '1_basico', categoria: 'habilidad', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 1, activa: true },
                 { nombre: 'Arco', nivel: '1_basico', categoria: 'habilidad', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 2, activa: true },
@@ -62,7 +63,7 @@ const initDatabase = async () => {
                 { nombre: 'Salto T y salto touchdown', nivel: '1_basico', categoria: 'habilidad', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 10, activa: true },
                 { nombre: 'Bajada en arco atrás y devuelta a pararse', nivel: '1_basico', categoria: 'habilidad', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 11, activa: true },
                 { nombre: 'Bajar en arco pasada', nivel: '1_basico', categoria: 'habilidad', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 12, activa: true },
-                
+
                 // Ejercicios Accesorios Nivel 1 Básico
                 { nombre: 'Pateo con una sola pierna a la pared', nivel: '1_basico', categoria: 'ejercicio_accesorio', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 13, activa: true },
                 { nombre: 'Pateo a la pared con cambio de pierna', nivel: '1_basico', categoria: 'ejercicio_accesorio', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 14, activa: true },
@@ -71,7 +72,7 @@ const initDatabase = async () => {
                 { nombre: 'Parada de manos desde la pared rollo adelante', nivel: '1_basico', categoria: 'ejercicio_accesorio', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 17, activa: true },
                 { nombre: 'Parada de manos arco hacia adelante', nivel: '1_basico', categoria: 'ejercicio_accesorio', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 18, activa: true },
                 { nombre: 'Parada de manos con pique caída supino', nivel: '1_basico', categoria: 'ejercicio_accesorio', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 19, activa: true },
-                
+
                 // Posturas Nivel 1 Básico
                 { nombre: 'Canoa', nivel: '1_basico', categoria: 'postura', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 20, activa: true },
                 { nombre: 'Posición gimnástica supino', nivel: '1_basico', categoria: 'postura', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 21, activa: true },
@@ -86,7 +87,7 @@ const initDatabase = async () => {
                 // ========================================
                 // NIVEL 1 MEDIO
                 // ========================================
-                
+
                 // Habilidades Nivel 1 Medio
                 { nombre: 'Tercera', nivel: '1_medio', categoria: 'habilidad', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 29, activa: true },
                 { nombre: 'Parada de manos rollo', nivel: '1_medio', categoria: 'habilidad', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 30, activa: true },
@@ -116,7 +117,7 @@ const initDatabase = async () => {
                 // ========================================
                 // NIVEL 1 AVANZADO
                 // ========================================
-                
+
                 // Habilidades Nivel 1 Avanzado
                 { nombre: 'Quinta', nivel: '1_avanzado', categoria: 'habilidad', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 49, activa: true },
                 { nombre: 'Valdez', nivel: '1_avanzado', categoria: 'habilidad', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 50, activa: true },
@@ -137,7 +138,7 @@ const initDatabase = async () => {
                 // ========================================
                 // NIVEL 2
                 // ========================================
-                
+
                 // Habilidades Nivel 2
                 { nombre: 'Flick estático', nivel: '2', categoria: 'habilidad', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 60, activa: true },
                 { nombre: 'Rondada Flick', nivel: '2', categoria: 'habilidad', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 61, activa: true },
@@ -159,7 +160,7 @@ const initDatabase = async () => {
                 // ========================================
                 // NIVEL 3
                 // ========================================
-                
+
                 // Habilidades Nivel 3
                 { nombre: 'Mortal adelante', nivel: '3', categoria: 'habilidad', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 74, activa: true },
                 { nombre: 'Rondada mortal atrás', nivel: '3', categoria: 'habilidad', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 75, activa: true },
@@ -170,7 +171,7 @@ const initDatabase = async () => {
                 // ========================================
                 // NIVEL 4
                 // ========================================
-                
+
                 // Habilidades Nivel 4
                 { nombre: 'Mortal atrás agrupado', nivel: '4', categoria: 'habilidad', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 79, activa: true },
                 { nombre: 'Media luna mortal atrás', nivel: '4', categoria: 'habilidad', obligatoria: true, puntuacion_minima: 4, tipo: 'fisica', orden: 80, activa: true },
