@@ -20,7 +20,7 @@ const Deportista = sequelize.define('Deportista', {
     type: DataTypes.DATE,
     allowNull: true
   },
-  ciudad_nacimiento: {  
+  ciudad_nacimiento: {
     type: DataTypes.STRING,
     allowNull: true,
     comment: 'Ciudad de nacimiento'
@@ -40,7 +40,7 @@ const Deportista = sequelize.define('Deportista', {
     allowNull: true,
     comment: 'Nivel deportivo general (ej: Intermedio)'
   },
-    direccion: {
+  direccion: {
     type: DataTypes.STRING,
     allowNull: true,
     comment: 'Dirección de residencia'
@@ -55,19 +55,19 @@ const Deportista = sequelize.define('Deportista', {
     allowNull: true,
     comment: 'Talla de camiseta (S, M, L, XL, etc)'
   },
-  
+
   // ==========================================
   // NIVELES (SISTEMA ORIGINAL + BABY TITANS)
   // ==========================================
   nivel_actual: {
     type: DataTypes.ENUM(
-      'pendiente', 
+      'pendiente',
       'baby_titans',     // ✅ NUEVO NIVEL
-      '1_basico', 
-      '1_medio', 
-      '1_avanzado', 
-      '2', 
-      '3', 
+      '1_basico',
+      '1_medio',
+      '1_avanzado',
+      '2',
+      '3',
       '4'
     ),
     defaultValue: 'pendiente',
@@ -77,17 +77,17 @@ const Deportista = sequelize.define('Deportista', {
   nivel_sugerido: {
     type: DataTypes.ENUM(
       'baby_titans',     // ✅ NUEVO NIVEL
-      '1_basico', 
-      '1_medio', 
-      '1_avanzado', 
-      '2', 
-      '3', 
+      '1_basico',
+      '1_medio',
+      '1_avanzado',
+      '2',
+      '3',
       '4'
     ),
     allowNull: true,
     comment: 'Siguiente nivel sugerido cuando completa el 100%'
   },
-  
+
   // ==========================================
   // EQUIPOS DE COMPETENCIA (NUEVO SISTEMA)
   // ==========================================
@@ -104,7 +104,7 @@ const Deportista = sequelize.define('Deportista', {
     allowNull: false,
     comment: 'Equipo de competencia asignado (independiente del nivel)'
   },
-  
+
   cambio_nivel_pendiente: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
@@ -115,8 +115,9 @@ const Deportista = sequelize.define('Deportista', {
     allowNull: true,
     comment: 'Fecha del último cambio de nivel aprobado'
   },
+  // ✅ DESPUÉS
   estado: {
-    type: DataTypes.ENUM('activo', 'lesionado', 'descanso', 'inactivo', 'falta de pago'),
+    type: DataTypes.ENUM('activo', 'pendiente', 'pendiente_de_pago', 'inactivo', 'lesionado', 'descanso'),
     defaultValue: 'activo',
     allowNull: false
   },
@@ -141,7 +142,7 @@ const Deportista = sequelize.define('Deportista', {
     type: DataTypes.STRING,
     allowNull: true
   },
-  
+
   acepta_terminos: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,

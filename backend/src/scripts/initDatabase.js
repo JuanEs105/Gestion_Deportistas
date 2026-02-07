@@ -5,11 +5,56 @@ const initDatabase = async () => {
     try {
         console.log('🔧 Iniciando datos de la base de datos...');
 
-        // 1. Verificar si ya existe el usuario admin
-        const adminExists = await User.findOne({ where: { email: 'admin@deportes.com' } });
+        // ==========================================
+        // 🔧 MIGRACIÓN DE ENUM - EJECUTAR UNA SOLA VEZ
+        // ==========================================
+        try {
+            console.log('🔧 Verificando y migrando ENUM de estado...');
+            
+            // Intentar migrar el ENUM
+            await sequelize.query(`ALTER TYPE enum_deportistas_estado RENAME TO enum_deportistas_estado_old;`);
+            
+            await sequelize.query(`
+                CREATE TYPE enum_deportistas_estado AS ENUM (
+                    'activo', 
+                    'pendiente', 
+                    'pendiente_de_pago', 
+                    'inactivo', 
+                    'lesionado', 
+                    'descanso'
+                );
+            `);
+            
+            await sequelize.query(`
+                ALTER TABLE deportistas 
+                ALTER COLUMN estado TYPE enum_deportistas_estado 
+                USING (
+                    CASE estado::text
+                        WHEN 'falta de pago' THEN 'pendiente_de_pago'::enum_deportistas_estado
+                        ELSE estado::text::enum_deportistas_estado
+                    END
+                );
+            `);
+            
+            await sequelize.query(`DROP TYPE enum_deportistas_estado_old;`);
+            
+            console.log('✅ ENUM de estado migrado exitosamente');
+            console.log('   Nuevos valores: activo, pendiente, pendiente_de_pago, inactivo, lesionado, descanso');
+            
+        } catch (enumError) {
+            // Si falla, probablemente ya está migrado
+            console.log('ℹ️  ENUM ya migrado previamente o no necesita migración');
+            console.log('   (Esto es normal después de la primera ejecución)');
+        }
 
+        // ==========================================
+        // 1. VERIFICAR Y CREAR USUARIOS
+        // ==========================================
+        
+        // Usuario Admin
+        const adminExists = await User.findOne({ where: { email: 'admin@deportes.com' } });
+        
         if (!adminExists) {
-            // Crear usuario admin
             const hashedPassword = await bcrypt.hash('admin123', 10);
             await User.create({
                 nombre: 'Administrador',
@@ -24,6 +69,7 @@ const initDatabase = async () => {
             console.log('ℹ️  Usuario admin ya existe');
         }
 
+        // Usuario Entrenador
         const entrenadorExists = await User.findOne({ where: { email: 'entrenador@deportes.com' } });
 
         if (!entrenadorExists) {
@@ -37,20 +83,20 @@ const initDatabase = async () => {
                 activo: true
             });
             console.log('✅ Usuario entrenador creado: entrenador@deportes.com / entrenador123');
+        } else {
+            console.log('ℹ️  Usuario entrenador ya existe');
         }
 
-        // 2. Verificar si ya existen habilidades
+        // ==========================================
+        // 2. VERIFICAR Y CARGAR HABILIDADES
+        // ==========================================
+        
         const habilidadesCount = await Habilidad.count();
 
-        // TEMPORAL: Forzar recarga de habilidades de porrismo
-        console.log(`ℹ️  Encontradas ${habilidadesCount} habilidades antiguas en la base de datos`);
-        console.log('🔄 Borrando datos antiguos para cargar las nuevas habilidades de porrismo...');
-        
-        // SOLUCIÓN DEFINITIVA: Usar TRUNCATE CASCADE con raw SQL
-        await sequelize.query('TRUNCATE TABLE evaluaciones, habilidades RESTART IDENTITY CASCADE');
-        console.log('✅ Evaluaciones y habilidades borradas con CASCADE');
-        
-        if (true) {
+        if (habilidadesCount === 0) {
+            console.log('📥 No hay habilidades en la base de datos');
+            console.log('🔄 Cargando 90 habilidades de PORRISMO Y GIMNASIA - TITANES EVOLUTION...');
+            
             // Importar habilidades de PORRISMO Y GIMNASIA - TITANES EVOLUTION
             const habilidades = [
                 // ========================================
@@ -201,6 +247,7 @@ const initDatabase = async () => {
         }
 
         console.log('✅ Inicialización de base de datos completada');
+        
     } catch (error) {
         console.error('❌ Error en inicialización de base de datos:', error);
         throw error;
