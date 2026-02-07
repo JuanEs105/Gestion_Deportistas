@@ -76,7 +76,7 @@ class EmailService {
       }
 
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
-      const registroUrl = `${frontendUrl}/auth/registro-entrenador/${tokenRegistro}`;
+      const registroUrl = `${frontendUrl}/auth/registro-entrenador-step1.html?token=${tokenRegistro}`;
 
       const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
       
@@ -191,7 +191,7 @@ class EmailService {
       console.log('👤 Para:', email);
 
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
-      const registroUrl = `${frontendUrl}/auth/registro-entrenador/${tokenRegistro}`;
+      const registroUrl = `${frontendUrl}/auth/registro-entrenador-step1.html?token=${tokenRegistro}`;
 
       const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
       sendSmtpEmail.sender = { name: 'Titanes Evolution', email: this._getSenderEmail() };
