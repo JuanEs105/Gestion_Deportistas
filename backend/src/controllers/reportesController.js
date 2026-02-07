@@ -206,7 +206,7 @@ class ReportesController {
       if (edadMin || edadMax) {
         console.log('🔍 Aplicando filtro de edad...');
         deportistasFiltrados = deportistas.filter(deportista => {
-          const edad = this.calcularEdad(deportista.fecha_nacimiento);
+          const edad = ReportesController.calcularEdad(deportista.fecha_nacimiento);
           if (edad === null) return false;
           
           let cumpleFiltro = true;
@@ -288,7 +288,7 @@ class ReportesController {
         const user = deportista.user || {};
         const datos = deportista.dataValues;
         
-        const edad = this.calcularEdad(datos.fecha_nacimiento);
+        const edad = ReportesController.calcularEdad(datos.fecha_nacimiento);
         const alturaFormateada = datos.altura ? `${datos.altura}m` : '';
         const pesoFormateado = datos.peso ? `${datos.peso}kg` : '';
         const tieneDocumento = datos.documento_identidad ? 'SÍ' : 'NO';
@@ -308,7 +308,7 @@ class ReportesController {
           direccion: datos.direccion || user.direccion || '',
           
           // DATOS PERSONALES
-          fecha_nacimiento: this.formatearFecha(datos.fecha_nacimiento),
+          fecha_nacimiento: ReportesController.formatearFecha(datos.fecha_nacimiento),
           edad: edad || '',
           altura: alturaFormateada,
           peso: pesoFormateado,
@@ -316,8 +316,8 @@ class ReportesController {
           eps: datos.eps || '',
           
           // DATOS DEPORTIVOS
-          nivel_actual: this.formatearNivel(datos.nivel_actual),
-          equipo_competitivo: this.formatearEquipo(datos.equipo_competitivo),
+          nivel_actual: ReportesController.formatearNivel(datos.nivel_actual),
+          equipo_competitivo: ReportesController.formatearEquipo(datos.equipo_competitivo),
           estado: datos.estado || '',
           
           // DOCUMENTOS
@@ -330,8 +330,8 @@ class ReportesController {
           contacto_emergencia_parentesco: datos.contacto_emergencia_parentesco || '',
           
           // FECHAS
-          fecha_registro: this.formatearFecha(datos.created_at),
-          fecha_actualizacion: this.formatearFecha(datos.updated_at)
+          fecha_registro: ReportesController.formatearFecha(datos.created_at),
+          fecha_actualizacion: ReportesController.formatearFecha(datos.updated_at)
         };
         
         const row = worksheet.addRow(rowData);
@@ -489,7 +489,7 @@ class ReportesController {
         
         const nombreCompleto = `${user.nombre || ''} ${user.apellidos || ''}`.trim();
         const urlDocumento = datos.documento_identidad || '';
-        const esCloudinary = this.esCloudinary(urlDocumento) ? 'SÍ' : 'NO';
+        const esCloudinary = ReportesController.esCloudinary(urlDocumento) ? 'SÍ' : 'NO';
         
         const rowData = {
           id: datos.id,
@@ -501,8 +501,8 @@ class ReportesController {
           nivel: datos.nivel_actual || '',
           equipo: datos.equipo_competitivo || '',
           estado: datos.estado || '',
-          fecha_nacimiento: this.formatearFecha(datos.fecha_nacimiento),
-          fecha_registro: this.formatearFecha(datos.created_at),
+          fecha_nacimiento: ReportesController.formatearFecha(datos.fecha_nacimiento),
+          fecha_registro: ReportesController.formatearFecha(datos.created_at),
           url_documento: urlDocumento,
           es_cloudinary: esCloudinary
         };
@@ -662,7 +662,7 @@ class ReportesController {
         const user = deportista.user || {};
         const datos = deportista.dataValues;
         
-        const edad = this.calcularEdad(datos.fecha_nacimiento);
+        const edad = ReportesController.calcularEdad(datos.fecha_nacimiento);
         const esCloudinary = datos.documento_identidad && 
           (datos.documento_identidad.includes('cloudinary.com') || 
            datos.documento_identidad.includes('res.cloudinary.com'));

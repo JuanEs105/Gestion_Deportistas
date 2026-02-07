@@ -27,23 +27,7 @@ const initDatabase = async () => {
             console.log('ℹ️  Usuario admin ya existe');
         }
 
-        // Usuario Entrenador
-        const entrenadorExists = await User.findOne({ where: { email: 'entrenador@deportes.com' } });
-
-        if (!entrenadorExists) {
-            const hashedPassword = await bcrypt.hash('entrenador123', 10);
-            await User.create({
-                nombre: 'Juan',
-                apellidos: 'Pérez',
-                email: 'entrenador@deportes.com',
-                password: hashedPassword,
-                role: 'entrenador',
-                activo: true
-            });
-            console.log('✅ Usuario entrenador creado: entrenador@deportes.com / entrenador123');
-        } else {
-            console.log('ℹ️  Usuario entrenador ya existe');
-        }
+        
 
         // ==========================================
         // 2. VERIFICAR Y CARGAR HABILIDADES
