@@ -102,7 +102,6 @@ if (typeof window.ReportesApp === 'undefined') {
                     throw new Error(errorData?.error || `Error ${response.status}`);
                 }
 
-                // 🔥 PARSEAR JSON Y OBTENER LA URL
                 const data = await response.json();
                 console.log('📦 Datos recibidos:', data);
 
@@ -110,21 +109,29 @@ if (typeof window.ReportesApp === 'undefined') {
                     throw new Error('No se pudo obtener la URL del documento');
                 }
 
-                console.log('✅ URL del documento:', data.url);
+                // 🔥 AGREGAR .pdf A LA URL SI NO LO TIENE
+                let pdfUrl = data.url;
+                if (!pdfUrl.toLowerCase().endsWith('.pdf')) {
+                    pdfUrl = pdfUrl + '.pdf';
+                }
+
+                console.log('✅ URL del PDF:', pdfUrl);
 
                 // 🔥 ABRIR EN NUEVA PESTAÑA
-                const newWindow = window.open(data.url, '_blank');
+                const newWindow = window.open(pdfUrl, '_blank');
 
                 if (!newWindow) {
+                    // Fallback si popup bloqueado
                     const link = document.createElement('a');
-                    link.href = data.url;
+                    link.href = pdfUrl;
                     link.target = '_blank';
                     link.rel = 'noopener noreferrer';
+                    link.download = `documento_${deportistaId}.pdf`; // 🔥 AGREGAR NOMBRE
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
 
-                    this.showNotification('⚠️ Popup bloqueado. Intenta permitir popups.', 'warning', 5000);
+                    this.showNotification('⚠️ Popup bloqueado. El documento se descargó.', 'warning', 3000);
                 } else {
                     this.showNotification('✅ Documento abierto correctamente', 'success', 2000);
                 }
