@@ -511,7 +511,7 @@ router.use(isEntrenador);
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { 
+    let {  // ← CAMBIO 1: Cambiar 'const' por 'let'
       nivel_actual, estado, equipo_competitivo, 
       peso, altura
     } = req.body;
@@ -563,17 +563,22 @@ router.put('/:id', async (req, res) => {
       }
     }
 
-    // Validar estado
+    // ✅✅✅ CAMBIO 2: NORMALIZAR Y VALIDAR ESTADO
     if (estado) {
+      // Normalizar: "Pendiente de pago" → "pendiente_de_pago"
+      estado = estado.toLowerCase().trim().replace(/\s+/g, '_');
+      console.log('🔄 Estado normalizado:', estado);
+      
       const estadosValidos = [
         'activo', 'pendiente', 'pendiente_de_pago', 
         'inactivo', 'lesionado', 'descanso'
       ];
       
       if (!estadosValidos.includes(estado)) {
+        console.log('❌ Estado inválido recibido:', estado);
         return res.status(400).json({
           success: false,
-          error: `Estado inválido. Debe ser uno de: ${estadosValidos.join(', ')}`
+          error: `Estado inválido: "${estado}". Debe ser uno de: ${estadosValidos.join(', ')}`
         });
       }
     }
@@ -585,6 +590,8 @@ router.put('/:id', async (req, res) => {
     if (equipo_competitivo !== undefined) updates.equipo_competitivo = equipo_competitivo;
     if (peso !== undefined) updates.peso = peso;
     if (altura !== undefined) updates.altura = altura;
+
+    console.log('📋 Updates a aplicar:', updates); // ← CAMBIO 3: Agregar este log
 
     // Aplicar updates si hay campos para actualizar
     if (Object.keys(updates).length > 0) {
@@ -610,6 +617,8 @@ router.put('/:id', async (req, res) => {
 
   } catch (error) {
     console.error('❌ Error actualizando deportista:', error);
+    console.error('📍 Stack trace:', error.stack); // ← CAMBIO 4: Agregar stack trace
+    
     res.status(500).json({
       success: false,
       error: 'Error actualizando deportista',
