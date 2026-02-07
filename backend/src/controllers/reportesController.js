@@ -570,15 +570,12 @@ class ReportesController {
 
         console.log('\n📄 === DESCARGA DOCUMENTO PDF ===');
         console.log('🆔 Deportista ID:', deportista_id);
-        console.log('👤 Usuario autenticado:', req.user ? 'SÍ' : 'NO');
-        console.log('📧 Email usuario:', req.user?.email);
-        console.log('🔑 Role usuario:', req.user?.role);
 
         const deportista = await Deportista.findByPk(deportista_id, {
             include: [{
                 model: User,
                 as: 'user',
-                attributes: ['nombre', 'apellidos']
+                attributes: ['nombre', 'apellidos', 'numero_documento']
             }]
         });
 
@@ -599,27 +596,50 @@ class ReportesController {
         }
 
         const docUrl = deportista.documento_identidad;
-        console.log('🌐 URL del documento:', docUrl);
+        console.log('🌐 URL original:', docUrl);
 
-        // 🔥 SI ES CLOUDINARY, DEVOLVER LA URL EN JSON (no redirect)
+        // 🔥 SOLUCIÓN: Forzar descarga como PDF
         if (docUrl.includes('cloudinary.com') || docUrl.includes('res.cloudinary.com')) {
-            console.log('☁️  Documento en Cloudinary - Devolviendo URL...');
-            return res.json({
-                success: true,
-                url: docUrl,
-                deportista: {
-                    id: deportista.id,
-                    nombre: deportista.user?.nombre || '',
-                    apellidos: deportista.user?.apellidos || ''
-                }
-            });
+            console.log('☁️  Documento en Cloudinary - Generando URL de descarga...');
+            
+            // Extraer el public_id de la URL
+            const urlParts = docUrl.split('/upload/');
+            if (urlParts.length === 2) {
+                const publicId = urlParts[1].split('.')[0]; // Sin extensión
+                
+                // Generar nombre de archivo seguro
+                const nombreArchivo = `${deportista.user?.nombre || 'documento'}_${deportista.user?.apellidos || ''}_${deportista.user?.numero_documento || deportista.id}.pdf`
+                    .replace(/\s+/g, '_')
+                    .replace(/[^a-zA-Z0-9._-]/g, '');
+                
+                // 🔥 URL CON FLAGS CORRECTOS
+                const downloadUrl = `${urlParts[0]}/upload/fl_attachment:${nombreArchivo}/${publicId}.pdf`;
+                
+                console.log('✅ URL de descarga generada:', downloadUrl);
+                
+                return res.json({
+                    success: true,
+                    url: downloadUrl,
+                    deportista: {
+                        id: deportista.id,
+                        nombre: deportista.user?.nombre || '',
+                        apellidos: deportista.user?.apellidos || '',
+                        numero_documento: deportista.user?.numero_documento || ''
+                    }
+                });
+            }
         }
 
-        // Si es archivo local (no debería pasar)
-        console.log('❌ Documento no disponible (no es Cloudinary)');
-        return res.status(404).json({
-            success: false,
-            error: 'Documento no disponible. Solo se soportan documentos en Cloudinary.'
+        // Si no es Cloudinary, devolver URL original
+        console.log('📁 Documento local');
+        return res.json({
+            success: true,
+            url: docUrl,
+            deportista: {
+                id: deportista.id,
+                nombre: deportista.user?.nombre || '',
+                apellidos: deportista.user?.apellidos || ''
+            }
         });
 
     } catch (error) {
