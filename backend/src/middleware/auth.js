@@ -7,8 +7,14 @@ const { User } = require('../models');
 // ============================================
 const authMiddleware = async (req, res, next) => {
   try {
-    // Obtener token del header
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    // 🔥 INTENTAR DESDE HEADER PRIMERO
+    let token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    // 🔥 SI NO HAY EN HEADER, BUSCAR EN QUERY STRING
+    if (!token && req.query.token) {
+      token = req.query.token;
+      console.log('🔑 Token recibido desde query string');
+    }
     
     if (!token) {
       return res.status(401).json({
@@ -17,10 +23,9 @@ const authMiddleware = async (req, res, next) => {
       });
     }
     
-    // Verificar token
+    // Verificar token (el resto sigue igual)
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'tu_clave_secreta_super_segura_aqui_12345_2024');
     
-    // Buscar usuario
     const user = await User.findByPk(decoded.id, {
       attributes: { exclude: ['password'] }
     });
@@ -39,13 +44,12 @@ const authMiddleware = async (req, res, next) => {
       });
     }
     
-    // Agregar usuario a la request
     req.user = {
       id: user.id,
       email: user.email,
       nombre: user.nombre,
       role: user.role,
-      tipo: user.role // Alias para compatibilidad
+      tipo: user.role
     };
     
     next();

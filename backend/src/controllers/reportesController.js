@@ -564,57 +564,74 @@ class ReportesController {
   // ============================================
   // DESCARGA DE DOCUMENTO INDIVIDUAL
   // ============================================
-  static async descargarDocumentoPDF(req, res) {
+ static async descargarDocumentoPDF(req, res) {
     try {
-      const { deportista_id } = req.params;
+        const { deportista_id } = req.params;
 
-      console.log('📄 DESCARGA DOCUMENTO - ID:', deportista_id);
+        console.log('\n📄 === DESCARGA DOCUMENTO PDF ===');
+        console.log('🆔 Deportista ID:', deportista_id);
+        console.log('👤 Usuario autenticado:', req.user ? 'SÍ' : 'NO');
+        console.log('📧 Email usuario:', req.user?.email);
+        console.log('🔑 Role usuario:', req.user?.role);
 
-      const deportista = await Deportista.findByPk(deportista_id, {
-        include: [{
-          model: User,
-          as: 'user',
-          attributes: ['nombre', 'apellidos']
-        }]
-      });
-
-      if (!deportista) {
-        return res.status(404).json({
-          success: false,
-          error: 'Deportista no encontrado'
+        const deportista = await Deportista.findByPk(deportista_id, {
+            include: [{
+                model: User,
+                as: 'user',
+                attributes: ['nombre', 'apellidos']
+            }]
         });
-      }
 
-      if (!deportista.documento_identidad) {
+        if (!deportista) {
+            console.log('❌ Deportista no encontrado');
+            return res.status(404).json({
+                success: false,
+                error: 'Deportista no encontrado'
+            });
+        }
+
+        if (!deportista.documento_identidad) {
+            console.log('❌ Sin documento cargado');
+            return res.status(404).json({
+                success: false,
+                error: 'Este deportista no tiene documento cargado'
+            });
+        }
+
+        const docUrl = deportista.documento_identidad;
+        console.log('🌐 URL del documento:', docUrl);
+
+        // 🔥 SI ES CLOUDINARY, DEVOLVER LA URL EN JSON (no redirect)
+        if (docUrl.includes('cloudinary.com') || docUrl.includes('res.cloudinary.com')) {
+            console.log('☁️  Documento en Cloudinary - Devolviendo URL...');
+            return res.json({
+                success: true,
+                url: docUrl,
+                deportista: {
+                    id: deportista.id,
+                    nombre: deportista.user?.nombre || '',
+                    apellidos: deportista.user?.apellidos || ''
+                }
+            });
+        }
+
+        // Si es archivo local (no debería pasar)
+        console.log('❌ Documento no disponible (no es Cloudinary)');
         return res.status(404).json({
-          success: false,
-          error: 'Este deportista no tiene documento cargado'
+            success: false,
+            error: 'Documento no disponible. Solo se soportan documentos en Cloudinary.'
         });
-      }
-
-      const docUrl = deportista.documento_identidad;
-      console.log('🌐 URL del documento:', docUrl);
-
-      // Si es Cloudinary, redirigir
-      if (docUrl.includes('cloudinary.com') || docUrl.includes('res.cloudinary.com')) {
-        console.log('☁️  Documento en Cloudinary - Redirigiendo...');
-        return res.redirect(docUrl);
-      }
-
-      // Si es archivo local
-      return res.status(404).json({
-        success: false,
-        error: 'Documento no disponible. Solo se soportan documentos en Cloudinary.'
-      });
 
     } catch (error) {
-      console.error('❌ ERROR descargando documento:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Error al descargar documento'
-      });
+        console.error('❌ ERROR descargando documento:', error);
+        console.error('Stack:', error.stack);
+        res.status(500).json({
+            success: false,
+            error: 'Error al descargar documento',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
-  }
+}
 
   // ============================================
   // OBTENER DEPORTISTAS COMPLETOS

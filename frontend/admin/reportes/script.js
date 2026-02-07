@@ -10,7 +10,7 @@ if (typeof window.ReportesApp === 'undefined') {
             deportistasFiltrados: [],
             documentosFiltrados: [],
             loading: false,
-            
+
             filtros: {
                 nombreCompleto: '',
                 tipoDocumento: '',
@@ -41,14 +41,14 @@ if (typeof window.ReportesApp === 'undefined') {
         // ==========================================
         async init() {
             console.log('🚀 Inicializando ReportesApp...');
-            
+
             if (!this.checkAuth()) return;
-            
+
             await this.cargarEstadisticas();
             await this.cargarDeportistas();
             this.configurarEventos();
             this.updateUserInfo();
-            
+
             console.log('✅ ReportesApp inicializado');
         },
 
@@ -69,30 +69,30 @@ if (typeof window.ReportesApp === 'undefined') {
             try {
                 console.log(`📄 Descargando documento ID: ${deportistaId}`);
                 this.mostrarLoading(true);
-                
+
                 // 1️⃣ OBTENER TOKEN
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-                
+
                 if (!token) {
                     throw new Error('No hay sesión activa');
                 }
-                
+
                 // 2️⃣ HACER PETICIÓN CON TOKEN EN EL HEADER
                 const url = `https://gestiondeportistas-production.up.railway.app/api/reportes/documento/${deportistaId}`;
-                
+
                 console.log('🌐 URL:', url);
                 console.log('🔑 Token presente:', token ? 'SÍ' : 'NO');
-                
+
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${token}`, // ✅ TOKEN EN EL HEADER
-                        'Accept': 'application/pdf'
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
                     }
                 });
-                
+
                 console.log('📡 Response status:', response.status);
-                
+
                 // 3️⃣ VERIFICAR ERRORES
                 if (!response.ok) {
                     if (response.status === 401) {
@@ -101,46 +101,46 @@ if (typeof window.ReportesApp === 'undefined') {
                     if (response.status === 404) {
                         throw new Error('Documento no encontrado');
                     }
-                    
+
                     const errorData = await response.json().catch(() => null);
                     throw new Error(errorData?.error || `Error ${response.status}: ${response.statusText}`);
                 }
-                
-                // 4️⃣ OBTENER EL BLOB DEL PDF
-                const blob = await response.blob();
-                console.log('✅ Blob recibido:', blob.size, 'bytes');
-                
-                // 5️⃣ CREAR URL TEMPORAL
-                const blobUrl = window.URL.createObjectURL(blob);
-                
-                // 6️⃣ ABRIR EN NUEVA PESTAÑA
-                const newWindow = window.open(blobUrl, '_blank');
-                
+
+                // 4️⃣ OBTENER LA URL DEL DOCUMENTO
+                const data = await response.json();
+
+                if (!data.success || !data.url) {
+                    throw new Error('No se pudo obtener la URL del documento');
+                }
+
+                console.log('✅ URL del documento recibida:', data.url);
+
+                // 5️⃣ ABRIR EN NUEVA PESTAÑA DIRECTAMENTE (Cloudinary)
+                const newWindow = window.open(data.url, '_blank');
+
                 if (!newWindow) {
-                    // Si el popup fue bloqueado, intentar descargar
+                    // Si el popup fue bloqueado
+                    this.showNotification('⚠️ Popup bloqueado. Por favor permite popups para este sitio.', 'warning', 5000);
+
+                    // Intentar descargar como alternativa
                     const link = document.createElement('a');
-                    link.href = blobUrl;
+                    link.href = data.url;
                     link.download = `documento_${deportistaId}.pdf`;
-                    link.style.display = 'none';
+                    link.target = '_blank';
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                    
-                    this.showNotification('✅ Documento descargado (popup bloqueado)', 'success', 3000);
+
+                    this.showNotification('✅ Documento descargado', 'success', 3000);
                 } else {
                     this.showNotification('✅ Documento abierto correctamente', 'success', 2000);
                 }
-                
-                // 7️⃣ LIMPIAR URL DESPUÉS DE UN TIEMPO
-                setTimeout(() => {
-                    window.URL.revokeObjectURL(blobUrl);
-                }, 1000);
-                
+
             } catch (error) {
                 console.error('❌ Error descargando documento:', error);
-                
+
                 let mensaje = 'Error abriendo el documento';
-                
+
                 if (error.message.includes('Sesión expirada')) {
                     mensaje = '🔒 Sesión expirada. Redirigiendo al login...';
                     setTimeout(() => {
@@ -153,9 +153,9 @@ if (typeof window.ReportesApp === 'undefined') {
                 } else if (error.message.includes('Failed to fetch')) {
                     mensaje = '❌ No se pudo conectar al servidor';
                 }
-                
+
                 this.showNotification(mensaje, 'error', 5000);
-                
+
             } finally {
                 this.mostrarLoading(false);
             }
@@ -167,11 +167,11 @@ if (typeof window.ReportesApp === 'undefined') {
         async verDocumento(deportistaId) {
             try {
                 console.log(`👁️ Viendo documento ID: ${deportistaId}`);
-                
+
                 // Buscar el deportista en el estado
                 const deportista = this.state.documentosFiltrados.find(d => d.id === deportistaId) ||
-                                 this.state.deportistasFiltrados.find(d => d.id === deportistaId);
-                
+                    this.state.deportistasFiltrados.find(d => d.id === deportistaId);
+
                 if (deportista && deportista.documento_identidad) {
                     // Si tenemos la URL directa, abrir directamente
                     window.open(deportista.documento_identidad, '_blank');
@@ -180,7 +180,7 @@ if (typeof window.ReportesApp === 'undefined') {
                     // Si no, usar el endpoint del backend
                     await this.descargarDocumentoIndividual(deportistaId);
                 }
-                
+
             } catch (error) {
                 console.error('❌ Error:', error);
                 this.showNotification('Error abriendo el documento', 'error');
@@ -194,28 +194,28 @@ if (typeof window.ReportesApp === 'undefined') {
             try {
                 console.log('📊 DESCARGANDO EXCEL COMPLETO...');
                 this.mostrarLoading(true);
-                
+
                 const filtros = this.capturarFiltros();
                 console.log('🔍 Filtros capturados:', filtros);
-                
+
                 const params = new URLSearchParams();
-                
+
                 Object.keys(filtros).forEach(key => {
                     const value = filtros[key];
                     if (value && value !== '' && value !== 'todos') {
                         params.append(key, value);
                     }
                 });
-                
+
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
                 if (!token) throw new Error('No hay sesión activa');
-                
+
                 const baseURL = 'https://gestiondeportistas-production.up.railway.app/api/reportes/excel/grupal';
                 const queryString = params.toString();
                 const url = queryString ? `${baseURL}?${queryString}` : baseURL;
-                
+
                 console.log('🌐 URL:', url);
-                
+
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
@@ -223,44 +223,44 @@ if (typeof window.ReportesApp === 'undefined') {
                         'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                     }
                 });
-                
+
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('❌ Error servidor:', errorText);
                     throw new Error(`Error ${response.status}: ${response.statusText}`);
                 }
-                
+
                 const blob = await response.blob();
                 const blobUrl = window.URL.createObjectURL(blob);
-                
+
                 const link = document.createElement('a');
                 link.href = blobUrl;
                 link.download = `reporte_deportistas_${new Date().toISOString().split('T')[0]}.xlsx`;
                 link.style.display = 'none';
-                
+
                 document.body.appendChild(link);
                 link.click();
-                
+
                 setTimeout(() => {
                     document.body.removeChild(link);
                     window.URL.revokeObjectURL(blobUrl);
                 }, 100);
-                
+
                 const count = this.state.deportistasFiltrados.length || 'todos';
                 this.showNotification(`✅ Excel generado: ${count} registros`, 'success', 3000);
-                
+
             } catch (error) {
                 console.error('❌ Error:', error);
-                
+
                 let mensaje = 'Error al generar Excel';
                 if (error.message.includes('Failed to fetch')) {
                     mensaje = '❌ No se pudo conectar al servidor';
                 } else if (error.message.includes('401') || error.message.includes('403')) {
                     mensaje = '🔒 Sesión expirada. Inicia sesión nuevamente';
                 }
-                
+
                 this.showNotification(mensaje, 'error', 5000);
-                
+
             } finally {
                 this.mostrarLoading(false);
             }
@@ -273,11 +273,11 @@ if (typeof window.ReportesApp === 'undefined') {
             try {
                 console.log('📄 DESCARGANDO EXCEL DE DOCUMENTOS...');
                 this.mostrarLoading(true);
-                
+
                 const filtros = this.capturarFiltros();
-                
+
                 const params = new URLSearchParams();
-                
+
                 if (filtros.nivel && filtros.nivel !== '') {
                     params.append('nivel', filtros.nivel);
                 }
@@ -287,17 +287,17 @@ if (typeof window.ReportesApp === 'undefined') {
                 if (filtros.equipoCompetitivo && filtros.equipoCompetitivo !== '') {
                     params.append('equipoCompetitivo', filtros.equipoCompetitivo);
                 }
-                
+
                 params.append('tieneDocumento', 'true');
-                
+
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
                 if (!token) throw new Error('No hay sesión activa');
-                
+
                 const baseURL = 'https://gestiondeportistas-production.up.railway.app/api/reportes/excel/documentos';
                 const url = `${baseURL}?${params.toString()}`;
-                
+
                 console.log('🔗 URL documentos:', url);
-                
+
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
@@ -305,29 +305,29 @@ if (typeof window.ReportesApp === 'undefined') {
                         'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                     }
                 });
-                
+
                 if (!response.ok) {
                     throw new Error(`Error ${response.status}: ${response.statusText}`);
                 }
-                
+
                 const blob = await response.blob();
                 const blobUrl = window.URL.createObjectURL(blob);
-                
+
                 const link = document.createElement('a');
                 link.href = blobUrl;
                 link.download = `documentos_deportistas_${new Date().toISOString().split('T')[0]}.xlsx`;
                 link.style.display = 'none';
-                
+
                 document.body.appendChild(link);
                 link.click();
-                
+
                 setTimeout(() => {
                     document.body.removeChild(link);
                     window.URL.revokeObjectURL(blobUrl);
                 }, 100);
-                
+
                 this.showNotification('✅ Excel de documentos generado', 'success', 3000);
-                
+
             } catch (error) {
                 console.error('❌ Error:', error);
                 this.showNotification('Error al generar Excel de documentos: ' + error.message, 'error');
@@ -341,7 +341,7 @@ if (typeof window.ReportesApp === 'undefined') {
         // ==========================================
         capturarFiltros() {
             const filtros = {};
-            
+
             filtros.nombreCompleto = document.getElementById('filtroNombreCompleto')?.value?.trim() || '';
             filtros.tipoDocumento = document.getElementById('filtroTipoDocumento')?.value || '';
             filtros.numeroDocumento = document.getElementById('filtroNumeroDocumento')?.value?.trim() || '';
@@ -352,13 +352,13 @@ if (typeof window.ReportesApp === 'undefined') {
             filtros.fechaNacimiento = document.getElementById('filtroFechaNacimiento')?.value || '';
             filtros.eps = document.getElementById('filtroEPS')?.value?.trim() || '';
             filtros.acudiente = document.getElementById('filtroAcudiente')?.value?.trim() || '';
-            
+
             const estadoChip = document.querySelector('.filtro-chip.estado.active');
             filtros.estado = estadoChip?.dataset.estado || '';
-            
+
             const nivelChip = document.querySelector('.filtro-chip.nivel.active');
             filtros.nivel = nivelChip?.dataset.nivel || '';
-            
+
             filtros.tallaCamiseta = document.getElementById('filtroTallaCamiseta')?.value || '';
             filtros.pesoMin = document.getElementById('filtroPesoMin')?.value?.trim() || '';
             filtros.pesoMax = document.getElementById('filtroPesoMax')?.value?.trim() || '';
@@ -366,17 +366,17 @@ if (typeof window.ReportesApp === 'undefined') {
             filtros.alturaMax = document.getElementById('filtroAlturaMax')?.value?.trim() || '';
             filtros.edadMin = document.getElementById('filtroEdadMin')?.value?.trim() || '';
             filtros.edadMax = document.getElementById('filtroEdadMax')?.value?.trim() || '';
-            
+
             filtros.equipoCompetitivo = document.getElementById('filtroGrupoCompetitivo')?.value || '';
-            
+
             const nivelDetallado = document.getElementById('filtroNivelDetallado')?.value;
             if (nivelDetallado && nivelDetallado !== '') {
                 filtros.nivel = nivelDetallado;
             }
-            
+
             const tieneDocumento = document.getElementById('filtroTieneDocumento')?.value;
             filtros.tieneDocumento = tieneDocumento || 'todos';
-            
+
             const estadoDocumento = document.getElementById('filtroEstadoDocumento')?.value;
             if (estadoDocumento && estadoDocumento !== 'todos') {
                 if (estadoDocumento === 'con_documento') {
@@ -385,9 +385,9 @@ if (typeof window.ReportesApp === 'undefined') {
                     filtros.tieneDocumento = 'false';
                 }
             }
-            
+
             this.state.filtros = filtros;
-            
+
             return filtros;
         },
 
@@ -398,39 +398,39 @@ if (typeof window.ReportesApp === 'undefined') {
             try {
                 console.log('🔍 Aplicando filtros...');
                 this.mostrarLoading(true);
-                
+
                 const filtros = this.capturarFiltros();
-                
+
                 const params = new URLSearchParams();
-                
+
                 Object.keys(filtros).forEach(key => {
                     const value = filtros[key];
                     if (value && value !== '' && value !== 'todos') {
                         params.append(key, value);
                     }
                 });
-                
+
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
                 const url = `https://gestiondeportistas-production.up.railway.app/api/reportes/deportistas?${params.toString()}`;
-                
+
                 const response = await fetch(url, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                
+
                 if (!response.ok) throw new Error('Error aplicando filtros');
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     this.state.deportistasFiltrados = data.deportistas || [];
                     this.actualizarVistaPrevia();
                     this.actualizarContadores();
-                    
+
                     document.getElementById('filtrosAplicados')?.classList.remove('hidden');
-                    
+
                     this.showNotification(`✅ ${this.state.deportistasFiltrados.length} deportistas encontrados`, 'success', 2000);
                 }
-                
+
             } catch (error) {
                 console.error('❌ Error:', error);
                 this.showNotification('Error aplicando filtros', 'error');
@@ -446,40 +446,40 @@ if (typeof window.ReportesApp === 'undefined') {
             try {
                 console.log('📄 Buscando documentos...');
                 this.mostrarLoading(true);
-                
+
                 const params = new URLSearchParams();
-                
+
                 const nombre = document.getElementById('filtroPDFNombre')?.value?.trim();
                 const documento = document.getElementById('filtroPDFDocumento')?.value?.trim();
                 const nivel = document.getElementById('filtroPDFNivel')?.value;
                 const conDocumento = document.getElementById('filtroPDFConDocumento')?.value;
-                
+
                 if (nombre) params.append('nombre', nombre);
                 if (documento) params.append('numeroDocumento', documento);
                 if (nivel && nivel !== '') params.append('nivel', nivel);
-                
+
                 if (conDocumento === 'si') {
                     params.append('tieneDocumento', 'true');
                 } else if (conDocumento === 'no') {
                     params.append('tieneDocumento', 'false');
                 }
-                
+
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
                 const url = `https://gestiondeportistas-production.up.railway.app/api/reportes/deportistas?${params.toString()}`;
-                
+
                 const response = await fetch(url, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                
+
                 if (!response.ok) throw new Error('Error buscando documentos');
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     this.state.documentosFiltrados = data.deportistas || [];
                     this.actualizarTablaDocumentos();
                 }
-                
+
             } catch (error) {
                 console.error('❌ Error:', error);
                 this.showNotification('Error buscando documentos', 'error');
@@ -497,9 +497,9 @@ if (typeof window.ReportesApp === 'undefined') {
                 const response = await fetch('https://gestiondeportistas-production.up.railway.app/api/reportes/estadisticas', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                
+
                 if (!response.ok) throw new Error('Error cargando estadísticas');
-                
+
                 const data = await response.json();
                 if (data.success) {
                     this.actualizarEstadisticasUI(data.estadisticas);
@@ -513,13 +513,13 @@ if (typeof window.ReportesApp === 'undefined') {
             try {
                 this.mostrarLoading(true);
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-                
+
                 const response = await fetch('https://gestiondeportistas-production.up.railway.app/api/reportes/deportistas', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                
+
                 if (!response.ok) throw new Error('Error cargando deportistas');
-                
+
                 const data = await response.json();
                 if (data.success) {
                     this.state.deportistas = data.deportistas || [];
@@ -548,31 +548,31 @@ if (typeof window.ReportesApp === 'undefined') {
             const tbody = document.getElementById('tablaResultados');
             const sinResultados = document.getElementById('sinResultados');
             const resultadosTotales = document.getElementById('resultadosTotales');
-            
+
             if (!tbody) return;
-            
+
             tbody.innerHTML = '';
-            
+
             if (this.state.deportistasFiltrados.length === 0) {
                 sinResultados?.classList.remove('hidden');
                 resultadosTotales.textContent = 'Mostrando 0 resultados';
                 return;
             }
-            
+
             sinResultados?.classList.add('hidden');
-            
+
             const resultados = this.state.deportistasFiltrados.slice(0, 10);
-            
+
             resultados.forEach(deportista => {
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-gray-50 dark:hover:bg-zinc-800';
-                
+
                 const nombre = deportista.nombre_completo || '';
                 const documento = deportista.numero_documento || '';
                 const nivel = deportista.nivel_actual || 'Pendiente';
                 const estado = deportista.estado || 'Activo';
                 const tieneDoc = deportista.tiene_documento;
-                
+
                 row.innerHTML = `
                     <td class="px-4 py-3 font-medium">${nombre}</td>
                     <td class="px-4 py-3 text-gray-600 dark:text-gray-400">${documento}</td>
@@ -587,49 +587,49 @@ if (typeof window.ReportesApp === 'undefined') {
                         </span>
                     </td>
                     <td class="px-4 py-3">
-                        ${tieneDoc ? 
-                            '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">✓ Subido</span>' : 
-                            '<span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">✗ Pendiente</span>'
-                        }
+                        ${tieneDoc ?
+                        '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">✓ Subido</span>' :
+                        '<span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">✗ Pendiente</span>'
+                    }
                     </td>
                     <td class="px-4 py-3">
-                        ${tieneDoc ? 
-                            `<button onclick="ReportesApp.descargarDocumentoIndividual('${deportista.id}')" 
+                        ${tieneDoc ?
+                        `<button onclick="ReportesApp.descargarDocumentoIndividual('${deportista.id}')" 
                               class="px-3 py-1 text-xs bg-primary text-white rounded hover:bg-red-700 transition-colors">
                                 Descargar
-                             </button>` : 
-                            '<span class="text-gray-400 text-xs">No disponible</span>'
-                        }
+                             </button>` :
+                        '<span class="text-gray-400 text-xs">No disponible</span>'
+                    }
                     </td>
                 `;
-                
+
                 tbody.appendChild(row);
             });
-            
+
             resultadosTotales.textContent = `Mostrando ${Math.min(resultados.length, 10)} de ${this.state.deportistasFiltrados.length} resultados`;
         },
 
         actualizarTablaDocumentos() {
             const tbody = document.getElementById('tablaDocumentos');
             const mensaje = document.getElementById('mensajeSinDocumentos');
-            
+
             if (!tbody) return;
-            
+
             tbody.innerHTML = '';
-            
+
             const conDocs = this.state.documentosFiltrados.filter(d => d.documento_identidad || d.tiene_documento);
-            
+
             if (conDocs.length === 0) {
                 mensaje?.classList.remove('hidden');
                 return;
             }
-            
+
             mensaje?.classList.add('hidden');
-            
+
             conDocs.forEach(deportista => {
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors';
-                
+
                 const nombre = deportista.nombre_completo || '';
                 const documento = deportista.numero_documento || '';
                 const nivel = deportista.nivel_actual || 'Pendiente';
@@ -637,7 +637,7 @@ if (typeof window.ReportesApp === 'undefined') {
                 const tipoDoc = deportista.user?.tipo_documento || 'No especificado';
                 const estado = deportista.estado || 'Activo';
                 const esCloudinary = deportista.documento_identidad?.includes('cloudinary');
-                
+
                 row.innerHTML = `
                     <td class="px-8 py-4">
                         <div>
@@ -654,10 +654,10 @@ if (typeof window.ReportesApp === 'undefined') {
                         <p class="text-xs text-gray-500">${equipo}</p>
                     </td>
                     <td class="px-6 py-4">
-                        ${esCloudinary ? 
-                            '<span class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800">☁️ Cloudinary</span>' : 
-                            '<span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">📁 Local</span>'
-                        }
+                        ${esCloudinary ?
+                        '<span class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800">☁️ Cloudinary</span>' :
+                        '<span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">📁 Local</span>'
+                    }
                     </td>
                     <td class="px-6 py-4">
                         <span class="px-2 py-1 text-xs rounded-full ${this.getEstadoColor(estado)}">
@@ -677,7 +677,7 @@ if (typeof window.ReportesApp === 'undefined') {
                         </div>
                     </td>
                 `;
-                
+
                 tbody.appendChild(row);
             });
         },
@@ -703,27 +703,27 @@ if (typeof window.ReportesApp === 'undefined') {
             document.querySelectorAll('input[type="text"], input[type="email"], input[type="number"], input[type="date"]').forEach(input => {
                 input.value = '';
             });
-            
+
             document.querySelectorAll('select').forEach(select => {
                 select.value = select.id === 'filtroTieneDocumento' ? 'todos' : '';
             });
-            
+
             document.querySelectorAll('.filtro-chip').forEach(chip => {
                 chip.classList.remove('active', 'bg-primary', 'text-white');
                 chip.classList.add('bg-gray-100', 'text-gray-700');
             });
-            
+
             document.querySelectorAll('.filtro-chip[data-estado=""], .filtro-chip[data-nivel=""]').forEach(chip => {
                 chip.classList.add('active', 'bg-primary', 'text-white');
                 chip.classList.remove('bg-gray-100', 'text-gray-700');
             });
-            
+
             document.getElementById('filtrosAplicados')?.classList.add('hidden');
-            
+
             this.state.deportistasFiltrados = [...this.state.deportistas];
             this.actualizarVistaPrevia();
             this.actualizarContadores();
-            
+
             this.showNotification('✅ Filtros limpiados', 'success');
         },
 
@@ -754,23 +754,23 @@ if (typeof window.ReportesApp === 'undefined') {
             document.getElementById('descargarExcelCompletoBtn')?.addEventListener('click', () => {
                 this.descargarExcelCompleto();
             });
-            
+
             document.getElementById('descargarExcelDocumentosBtn')?.addEventListener('click', () => {
                 this.descargarExcelDocumentos();
             });
-            
+
             document.getElementById('aplicarFiltrosBtn')?.addEventListener('click', () => {
                 this.aplicarFiltros();
             });
-            
+
             document.getElementById('limpiarFiltrosBtn')?.addEventListener('click', () => {
                 this.limpiarFiltros();
             });
-            
+
             document.getElementById('buscarDocumentosBtn')?.addEventListener('click', () => {
                 this.buscarDocumentos();
             });
-            
+
             document.getElementById('limpiarFiltrosPDFBtn')?.addEventListener('click', () => {
                 document.getElementById('filtroPDFNombre').value = '';
                 document.getElementById('filtroPDFDocumento').value = '';
@@ -778,41 +778,41 @@ if (typeof window.ReportesApp === 'undefined') {
                 document.getElementById('filtroPDFConDocumento').value = 'todos';
                 this.buscarDocumentos();
             });
-            
+
             document.querySelectorAll('.filtro-tab').forEach(tab => {
                 tab.addEventListener('click', (e) => {
                     const tabId = e.target.id.replace('tab', '').toLowerCase();
-                    
+
                     document.querySelectorAll('.filtro-tab').forEach(t => {
                         t.classList.remove('active', 'bg-primary', 'text-white');
                         t.classList.add('bg-gray-100', 'text-gray-700');
                     });
-                    
+
                     e.target.classList.add('active', 'bg-primary', 'text-white');
                     e.target.classList.remove('bg-gray-100', 'text-gray-700');
-                    
+
                     document.querySelectorAll('.filtro-contenido').forEach(content => {
                         content.classList.add('hidden');
                     });
-                    
+
                     document.getElementById(`filtros${tabId}`)?.classList.remove('hidden');
                 });
             });
-            
+
             document.querySelectorAll('.filtro-chip').forEach(chip => {
                 chip.addEventListener('click', (e) => {
                     const tipo = e.target.classList.contains('estado') ? 'estado' : 'nivel';
-                    
+
                     document.querySelectorAll(`.filtro-chip.${tipo}`).forEach(c => {
                         c.classList.remove('active', 'bg-primary', 'text-white');
                         c.classList.add('bg-gray-100', 'text-gray-700');
                     });
-                    
+
                     e.target.classList.add('active', 'bg-primary', 'text-white');
                     e.target.classList.remove('bg-gray-100', 'text-gray-700');
                 });
             });
-            
+
             document.querySelectorAll('#filtroNombreCompleto, #filtroNumeroDocumento, #filtroEmail').forEach(input => {
                 input.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.aplicarFiltros();
@@ -882,7 +882,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         document.head.appendChild(style);
     }
-    
+
     if (window.ReportesApp) {
         window.ReportesApp.init();
     }
