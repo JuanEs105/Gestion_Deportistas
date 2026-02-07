@@ -6,48 +6,6 @@ const initDatabase = async () => {
         console.log('🔧 Iniciando datos de la base de datos...');
 
         // ==========================================
-        // 🔧 MIGRACIÓN DE ENUM - EJECUTAR UNA SOLA VEZ
-        // ==========================================
-        try {
-            console.log('🔧 Verificando y migrando ENUM de estado...');
-            
-            // Intentar migrar el ENUM
-            await sequelize.query(`ALTER TYPE enum_deportistas_estado RENAME TO enum_deportistas_estado_old;`);
-            
-            await sequelize.query(`
-                CREATE TYPE enum_deportistas_estado AS ENUM (
-                    'activo', 
-                    'pendiente', 
-                    'pendiente_de_pago', 
-                    'inactivo', 
-                    'lesionado', 
-                    'descanso'
-                );
-            `);
-            
-            await sequelize.query(`
-                ALTER TABLE deportistas 
-                ALTER COLUMN estado TYPE enum_deportistas_estado 
-                USING (
-                    CASE estado::text
-                        WHEN 'falta de pago' THEN 'pendiente_de_pago'::enum_deportistas_estado
-                        ELSE estado::text::enum_deportistas_estado
-                    END
-                );
-            `);
-            
-            await sequelize.query(`DROP TYPE enum_deportistas_estado_old;`);
-            
-            console.log('✅ ENUM de estado migrado exitosamente');
-            console.log('   Nuevos valores: activo, pendiente, pendiente_de_pago, inactivo, lesionado, descanso');
-            
-        } catch (enumError) {
-            // Si falla, probablemente ya está migrado
-            console.log('ℹ️  ENUM ya migrado previamente o no necesita migración');
-            console.log('   (Esto es normal después de la primera ejecución)');
-        }
-
-        // ==========================================
         // 1. VERIFICAR Y CREAR USUARIOS
         // ==========================================
         
