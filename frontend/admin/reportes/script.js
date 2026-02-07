@@ -70,18 +70,15 @@ if (typeof window.ReportesApp === 'undefined') {
                 console.log(`📄 Descargando documento ID: ${deportistaId}`);
                 this.mostrarLoading(true);
 
-                // 1️⃣ OBTENER TOKEN
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
                 if (!token) {
                     throw new Error('No hay sesión activa');
                 }
 
-                // 2️⃣ HACER PETICIÓN CON TOKEN EN EL HEADER
                 const url = `https://gestiondeportistas-production.up.railway.app/api/reportes/documento/${deportistaId}`;
 
                 console.log('🌐 URL:', url);
-                console.log('🔑 Token presente:', token ? 'SÍ' : 'NO');
 
                 const response = await fetch(url, {
                     method: 'GET',
@@ -93,7 +90,6 @@ if (typeof window.ReportesApp === 'undefined') {
 
                 console.log('📡 Response status:', response.status);
 
-                // 3️⃣ VERIFICAR ERRORES
                 if (!response.ok) {
                     if (response.status === 401) {
                         throw new Error('Sesión expirada. Por favor inicia sesión nuevamente.');
@@ -103,41 +99,38 @@ if (typeof window.ReportesApp === 'undefined') {
                     }
 
                     const errorData = await response.json().catch(() => null);
-                    throw new Error(errorData?.error || `Error ${response.status}: ${response.statusText}`);
+                    throw new Error(errorData?.error || `Error ${response.status}`);
                 }
 
-                // 4️⃣ OBTENER LA URL DEL DOCUMENTO
+                // 🔥 PARSEAR JSON Y OBTENER LA URL
                 const data = await response.json();
+                console.log('📦 Datos recibidos:', data);
 
                 if (!data.success || !data.url) {
                     throw new Error('No se pudo obtener la URL del documento');
                 }
 
-                console.log('✅ URL del documento recibida:', data.url);
+                console.log('✅ URL del documento:', data.url);
 
-                // 5️⃣ ABRIR EN NUEVA PESTAÑA DIRECTAMENTE (Cloudinary)
+                // 🔥 ABRIR EN NUEVA PESTAÑA
                 const newWindow = window.open(data.url, '_blank');
 
                 if (!newWindow) {
-                    // Si el popup fue bloqueado
-                    this.showNotification('⚠️ Popup bloqueado. Por favor permite popups para este sitio.', 'warning', 5000);
-
-                    // Intentar descargar como alternativa
                     const link = document.createElement('a');
                     link.href = data.url;
-                    link.download = `documento_${deportistaId}.pdf`;
                     link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
 
-                    this.showNotification('✅ Documento descargado', 'success', 3000);
+                    this.showNotification('⚠️ Popup bloqueado. Intenta permitir popups.', 'warning', 5000);
                 } else {
                     this.showNotification('✅ Documento abierto correctamente', 'success', 2000);
                 }
 
             } catch (error) {
-                console.error('❌ Error descargando documento:', error);
+                console.error('❌ Error:', error);
 
                 let mensaje = 'Error abriendo el documento';
 
@@ -149,9 +142,11 @@ if (typeof window.ReportesApp === 'undefined') {
                         window.location.href = '../auth/login-admin.html';
                     }, 2000);
                 } else if (error.message.includes('Documento no encontrado')) {
-                    mensaje = '❌ Documento no encontrado';
+                    mensaje = '❌ Este deportista no tiene documento subido';
                 } else if (error.message.includes('Failed to fetch')) {
                     mensaje = '❌ No se pudo conectar al servidor';
+                } else {
+                    mensaje = `❌ Error: ${error.message}`;
                 }
 
                 this.showNotification(mensaje, 'error', 5000);
