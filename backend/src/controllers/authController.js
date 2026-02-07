@@ -1,9 +1,10 @@
-// backend/src/controllers/authController.js - VERSIÓN CORREGIDA PARA GUARDAR TODOS LOS CAMPOS
+// backend/src/controllers/authController.js - VERSIÓN CORREGIDA COMPLETA
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { User, Deportista } = require('../models');
 const { validationResult } = require('express-validator');
 const EmailService = require('../config/emailService');
+const { uploadToCloudinary } = require('../config/cloudinary');
 
 class AuthController {
   // Login de usuario
@@ -192,7 +193,7 @@ class AuthController {
     }
   }
 
-  // 🔥🔥🔥 MÉTODO CORREGIDO - GUARDA TODOS LOS CAMPOS 🔥🔥🔥
+  // 🔥🔥🔥 MÉTODO CORREGIDO - GUARDA FOTO EN AMBAS TABLAS Y ACTUALIZA tiene_documento 🔥🔥🔥
   static async registroDeportista(req, res) {
     try {
       console.log('\n📋 === REGISTRO DEPORTISTA CORREGIDO ===');
@@ -201,14 +202,14 @@ class AuthController {
 
       const {
         // 🔥 CAMPOS OBLIGATORIOS EN USER
-        nombre,               // Nombre(s) del deportista
-        apellidos,            // Apellidos del deportista
-        tipo_documento,       // Tipo de documento (registro_civil, tarjeta_identidad, etc.)
-        numero_documento,     // Número de documento
-        email,                // Email
-        password,             // Contraseña
-        ciudad,               // Ciudad (ciudad_nacimiento en el formulario)
-        telefono,             // Celular del deportista (opcional)
+        nombre,
+        apellidos,
+        tipo_documento,
+        numero_documento,
+        email,
+        password,
+        ciudad,
+        telefono,
         
         // CAMPOS DEL DEPORTISTA
         fecha_nacimiento,
@@ -284,17 +285,59 @@ class AuthController {
       console.log('👤 Creando usuario con TODOS los campos...');
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // 🔥 CREAR USER CON TODOS LOS CAMPOS
+      // 🔥 PROCESAR ARCHIVOS ANTES DE CREAR EL USUARIO
+      let fotoPerfilUrl = null;
+      let documentoUrl = null;
+
+      // 📸 SUBIR FOTO DE PERFIL A CLOUDINARY
+      if (req.files?.foto?.[0]) {
+        try {
+          console.log('📸 Subiendo foto de perfil a Cloudinary...');
+          const fotoResult = await uploadToCloudinary(req.files.foto[0].buffer, {
+            folder: 'deportistas/fotos',
+            allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+            transformation: [
+              { width: 500, height: 500, crop: 'limit' },
+              { quality: 'auto' }
+            ]
+          });
+          fotoPerfilUrl = fotoResult.secure_url;
+          console.log('✅ Foto subida:', fotoPerfilUrl);
+        } catch (error) {
+          console.error('❌ Error subiendo foto:', error.message);
+          // Continuar sin foto si falla
+        }
+      }
+
+      // 📄 SUBIR DOCUMENTO PDF A CLOUDINARY
+      if (req.files?.documento?.[0]) {
+        try {
+          console.log('📄 Subiendo documento PDF a Cloudinary...');
+          const documentoResult = await uploadToCloudinary(req.files.documento[0].buffer, {
+            folder: 'deportistas/documentos',
+            allowed_formats: ['pdf'],
+            resource_type: 'raw'
+          });
+          documentoUrl = documentoResult.secure_url;
+          console.log('✅ Documento subido:', documentoUrl);
+        } catch (error) {
+          console.error('❌ Error subiendo documento:', error.message);
+          // Continuar sin documento si falla
+        }
+      }
+
+      // 🔥 CREAR USER CON TODOS LOS CAMPOS (INCLUYENDO FOTO)
       const user = await User.create({
-        nombre,                    // ✅ Nombre
-        apellidos,                 // ✅ Apellidos
-        tipo_documento,            // ✅ Tipo de documento
-        numero_documento,          // ✅ Número de documento
-        ciudad: ciudad || ciudad_nacimiento,  // ✅ Ciudad
+        nombre,
+        apellidos,
+        tipo_documento,
+        numero_documento,
+        ciudad: ciudad || ciudad_nacimiento,
         email,
         password: hashedPassword,
         role: 'deportista',
         telefono: telefono || null,
+        foto_perfil: fotoPerfilUrl,  // ✅ GUARDAMOS LA FOTO EN USERS
         acepta_terminos: terminos_aceptados === 'true' || false
       });
 
@@ -305,6 +348,7 @@ class AuthController {
       console.log('  - tipo_documento:', user.tipo_documento);
       console.log('  - numero_documento:', user.numero_documento);
       console.log('  - ciudad:', user.ciudad);
+      console.log('  - foto_perfil:', user.foto_perfil ? '✅ SÍ' : '❌ NO');
 
       // Preparar datos del deportista
       const deportistaData = {
@@ -321,21 +365,15 @@ class AuthController {
         estado: 'activo',
         equipo_competitivo: 'sin_equipo',
         acepta_terminos: terminos_aceptados === 'true' || false,
-        documento_identidad: 'pending_upload',
-        foto_perfil: null
+        foto_perfil: fotoPerfilUrl,  // ✅ TAMBIÉN EN DEPORTISTAS
+        documento_identidad: documentoUrl || null,  // ✅ URL DEL PDF O NULL
+        tiene_documento: documentoUrl ? 'SI' : 'NO'  // ✅ "SI" o "NO"
       };
 
-      // Manejo de archivos con Cloudinary (si existen)
-      if (req.files?.documento?.[0]) {
-        deportistaData.documento_identidad = req.files.documento[0].path;
-      }
-
-      if (req.files?.foto?.[0]) {
-        deportistaData.foto_perfil = req.files.foto[0].path;
-        await user.update({ foto_perfil: req.files.foto[0].path });
-      }
-
       console.log('🏃 Creando deportista con datos...');
+      console.log('  - foto_perfil:', deportistaData.foto_perfil ? '✅ SÍ' : '❌ NO');
+      console.log('  - documento_identidad:', deportistaData.documento_identidad ? '✅ SÍ' : '❌ NO');
+      console.log('  - tiene_documento:', deportistaData.tiene_documento);
 
       // Crear deportista
       const deportista = await Deportista.create(deportistaData);
@@ -382,6 +420,7 @@ class AuthController {
           ciudad_nacimiento: deportista.ciudad_nacimiento,
           fecha_nacimiento: deportista.fecha_nacimiento,
           documento_identidad: deportista.documento_identidad,
+          tiene_documento: deportista.tiene_documento,
           foto_perfil: deportista.foto_perfil,
           nivel_actual: deportista.nivel_actual,
           estado: deportista.estado
