@@ -83,121 +83,70 @@ window.DeportistaAPI = {
     // ✅✅✅ MÉTODO NUEVO: VERIFICAR ESTADO DE PAGO
     // ==========================================
     async verificarEstadoPago() {
-        try {
-            console.log('💰 Verificando estado de pago del deportista...');
-            
-            const response = await fetch(`${this.baseURL}/deportistas/estado-pago`, {
-                method: 'GET',
-                headers: this.getHeaders()
-            });
-
-        if (!response.ok) {
-                console.warn('⚠️ No se pudo verificar estado de pago. Status:', response.status);
-                
-                // Si no hay endpoint específico, intentar obtener perfil para ver estado
-                const perfil = await this.getMe();
-                if (perfil && perfil.estado === 'pendiente_de_pago') {
-                    return {
-                        estado: 'pendiente_de_pago',
-                        mensaje: 'Tienes un pago pendiente. Por favor, regulariza tu situación para acceder al sistema.',
-                        puedeAcceder: false
-                    };
-                }
-                
-                return {
-                    estado: 'activo',
-                    mensaje: null,
-                    puedeAcceder: true
-                };
-            }
-
-            const data = await response.json();
-            console.log('📊 Datos de estado de pago:', data);
-            
-            if (data.estado === 'pendiente_de_pago') {
-                return {
-                    estado: data.estado,
-                    mensaje: data.mensaje || 'Tienes un pago pendiente. Por favor, contacta con la administración para regularizar tu situación.',
-                    fecha_vencimiento: data.fecha_vencimiento,
-                    monto_pendiente: data.monto_pendiente,
-                    contacto_admin: data.contacto_admin || 'admin@titanesevolution.com',
-                    telefono_admin: data.telefono_admin || '300 123 4567',
-                    puedeAcceder: false
-                };
-            }
-            
+    try {
+        console.log('💰 Verificando estado de pago del deportista...');
+        
+        // ❌ INCORRECTO (esto causa el error):
+        // const response = await fetch(`${this.baseURL}/deportistas/estado-pago`, ...);
+        
+        // ✅ CORRECTO - Usar el perfil del deportista:
+        const perfil = await this.getMe();
+        
+        if (!perfil) {
+            console.warn('⚠️ No se pudo obtener perfil');
             return {
-                estado: data.estado || 'activo',
+                estado: 'activo',
                 mensaje: null,
                 puedeAcceder: true
             };
-            
-        } catch (error) {
-            console.error('❌ Error verificando estado de pago:', error);
-            
-            // En caso de error, intentar obtener estado del perfil
-            try {
-                const perfil = await this.getMe();
-                if (perfil && perfil.estado === 'pendiente_de_pago') {
-                    return {
-                        estado: 'pendiente_de_pago',
-                        mensaje: 'Tienes un pago pendiente. Por favor, regulariza tu situación.',
-                        puedeAcceder: false
-                    };
-                }
-            } catch (perfilError) {
-                console.error('❌ Error obteniendo perfil:', perfilError);
-            }
-            
+        }
+
+        // Verificar el estado directamente del perfil
+        if (perfil.estado === 'pendiente_de_pago') {
             return {
-                estado: 'error',
-                mensaje: 'Error al verificar estado. Contacta con soporte.',
-                puedeAcceder: true // Permitir acceso en caso de error
+                estado: 'pendiente_de_pago',
+                mensaje: 'Tienes un pago pendiente. Por favor, regulariza tu situación para acceder al sistema.',
+                puedeAcceder: false
             };
         }
-    },
+        
+        return {
+            estado: perfil.estado || 'activo',
+            mensaje: null,
+            puedeAcceder: true
+        };
+        
+    } catch (error) {
+        console.error('❌ Error verificando estado de pago:', error);
+        
+        return {
+            estado: 'error',
+            mensaje: 'Error al verificar estado. Contacta con soporte.',
+            puedeAcceder: true // Permitir acceso en caso de error
+        };
+    }
+},
 
     // ==========================================
     // ✅✅✅ MÉTODO NUEVO: MOSTRAR MODAL DE PAGO PENDIENTE
     // ==========================================
     mostrarModalPagoPendiente(datosPago) {
-        // Evitar múltiples modales
-        if (document.getElementById('modalPagoPendiente')) {
-            return;
-        }
-        
-        const modal = document.createElement('div');
-        modal.id = 'modalPagoPendiente';
-        modal.className = 'fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4 animate-fadeIn';
-        
-        // Preparar información de pago
-        const monto = datosPago.monto_pendiente ? 
-            `$${datosPago.monto_pendiente.toLocaleString('es-ES')}` : 
-            'un monto pendiente';
-        
-        const fechaVencimiento = datosPago.fecha_vencimiento ? 
-            new Date(datosPago.fecha_vencimiento).toLocaleDateString('es-ES', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            }) : 
-            'próximamente';
-        
-        const contactoAdmin = datosPago.contacto_admin || 'admin@titanesevolution.com';
-        const telefonoAdmin = datosPago.telefono_admin || '300 123 4567';
-        
-        modal.innerHTML = `
+    // Evitar múltiples modales
+    if (document.getElementById('modalPagoPendiente')) {
+        return;
+    }
+    
+    const modal = document.createElement('div');
+    modal.id = 'modalPagoPendiente';
+    modal.className = 'fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4 animate-fadeIn';
+    
+    // Preparar información
+    const nombreDeportista = this.user?.nombre || 'Deportista';
+    
+    modal.innerHTML = `
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-slideUp max-h-[90vh] overflow-y-auto">
             <!-- Header -->
             <div class="bg-gradient-to-r from-yellow-500 to-orange-500 p-8 text-center relative">
-                <div class="absolute top-4 right-4">
-                    <button onclick="DeportistaAPI.cerrarModalPagoPendiente()" 
-                            class="text-white hover:text-gray-200 transition-colors">
-                        <span class="material-symbols-outlined text-2xl">close</span>
-                    </button>
-                </div>
-                
                 <div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span class="material-symbols-outlined text-5xl text-white">warning</span>
                 </div>
@@ -210,27 +159,12 @@ window.DeportistaAPI = {
                 <div class="space-y-6">
                     <!-- Mensaje principal -->
                     <div class="text-center">
-                        <p class="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
-                            ${datosPago.mensaje || 'Tienes un pago pendiente que debe ser regularizado para continuar utilizando el sistema.'}
+                        <p class="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-4">
+                            Hola <strong class="text-primary">${nombreDeportista}</strong>, 
                         </p>
-                    </div>
-                    
-                    <!-- Información del pago -->
-                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-6">
-                        <h3 class="text-lg font-semibold text-yellow-800 dark:text-yellow-300 mb-4 flex items-center gap-2">
-                            <span class="material-symbols-outlined">info</span>
-                            Detalles del Pago
-                        </h3>
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-400">Monto Pendiente:</span>
-                                <span class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">${monto}</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-400">Fecha Límite:</span>
-                                <span class="font-medium text-gray-800 dark:text-gray-200">${fechaVencimiento}</span>
-                            </div>
-                        </div>
+                        <p class="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
+                            Tienes un pago pendiente. Por favor, regulariza tu situación para acceder al sistema.
+                        </p>
                     </div>
                     
                     <!-- Contacto de administración -->
@@ -242,19 +176,20 @@ window.DeportistaAPI = {
                         <div class="space-y-4">
                             <div class="flex items-center gap-3">
                                 <span class="material-symbols-outlined text-blue-600 dark:text-blue-400">mail</span>
-                                <div>
+                                <div class="flex-1">
                                     <p class="text-sm text-gray-500 dark:text-gray-400">Correo Electrónico</p>
-                                    <a href="mailto:${contactoAdmin}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">
-                                        ${contactoAdmin}
+                                    <a href="mailto:titanesallstarscolombia@gmail.com" class="font-medium text-blue-600 dark:text-blue-400 hover:underline break-all">
+                                        titanesallstarscolombia@gmail.com
                                     </a>
                                 </div>
                             </div>
                             <div class="flex items-center gap-3">
                                 <span class="material-symbols-outlined text-blue-600 dark:text-blue-400">phone</span>
-                                <div>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Teléfono</p>
-                                    <a href="tel:${telefonoAdmin.replace(/\s/g, '')}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">
-                                        ${telefonoAdmin}
+                                <div class="flex-1">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">WhatsApp</p>
+                                    <a href="https://wa.me/573133864382" target="_blank" class="font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+                                        +57 313 386 4382
+                                        <span class="material-symbols-outlined text-green-500 text-xl">chat</span>
                                     </a>
                                 </div>
                             </div>
@@ -267,12 +202,12 @@ window.DeportistaAPI = {
                             <span class="material-symbols-outlined">checklist</span>
                             ¿Cómo Regularizar?
                         </h3>
-                        <ol class="space-y-3 list-decimal list-inside">
-                            <li class="text-gray-700 dark:text-gray-300">Contacta con administración</li>
-                            <li class="text-gray-700 dark:text-gray-300">Realiza el pago correspondiente</li>
-                            <li class="text-gray-700 dark:text-gray-300">Envía el comprobante de pago</li>
-                            <li class="text-gray-700 dark:text-gray-300">Espera la confirmación del administrador</li>
-                            <li class="text-gray-700 dark:text-gray-300">Tu acceso se habilitará automáticamente</li>
+                        <ol class="space-y-3 list-decimal list-inside text-gray-700 dark:text-gray-300">
+                            <li>Contacta con administración</li>
+                            <li>Realiza el pago correspondiente</li>
+                            <li>Envía el comprobante de pago</li>
+                            <li>Espera la confirmación del administrador</li>
+                            <li>Tu acceso se habilitará automáticamente</li>
                         </ol>
                     </div>
                 </div>
