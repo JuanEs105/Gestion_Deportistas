@@ -1,133 +1,471 @@
 /* ==========================================
-   ESTILOS PARA REPORTES - VERSIÓN CLARA
+   ESTILOS ESPECÍFICOS PARA REPORTES
+   Siguiendo la identidad visual del Dashboard
    ========================================== */
 
-/* Animaciones para notificaciones */
-@keyframes slideIn {
-    from { 
-        transform: translateX(100%); 
-        opacity: 0; 
+/* ==========================================
+   VARIABLES (mismos colores del dashboard)
+   ========================================== */
+:root {
+    --primary: #E21B23;
+    --secondary: #1A1A1A;
+    --white: #FFFFFF;
+    --grey-50: #F9FAFB;
+    --grey-100: #F3F4F6;
+    --grey-200: #E5E7EB;
+    --grey-300: #D1D5DB;
+    --grey-500: #6B7280;
+    --grey-700: #374151;
+    --grey-900: #111827;
+}
+
+.dark {
+    --grey-50: #18181B;
+    --grey-100: #27272A;
+    --grey-200: #3F3F46;
+    --grey-300: #52525B;
+    --white: #FAFAFA;
+}
+
+/* ==========================================
+   TARJETAS DE ESTADÍSTICAS
+   ========================================== */
+.stat-card-reportes {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--grey-200);
+    transition: all 0.3s ease;
+}
+
+.dark .stat-card-reportes {
+    background: var(--grey-50);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.stat-card-reportes:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Iconos de las estadísticas */
+.stat-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.stat-icon.blue {
+    background: #DBEAFE;
+    color: #1E40AF;
+}
+
+.dark .stat-icon.blue {
+    background: #1E3A8A;
+    color: #93C5FD;
+}
+
+.stat-icon.green {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.dark .stat-icon.green {
+    background: #064E3B;
+    color: #6EE7B7;
+}
+
+.stat-icon.yellow {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.dark .stat-icon.yellow {
+    background: #78350F;
+    color: #FDE68A;
+}
+
+.stat-icon.purple {
+    background: #EDE9FE;
+    color: #5B21B6;
+}
+
+.dark .stat-icon.purple {
+    background: #4C1D95;
+    color: #C4B5FD;
+}
+
+/* ==========================================
+   SECCIÓN DE FILTROS
+   ========================================== */
+.seccion-filtros {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--grey-200);
+    margin-bottom: 2rem;
+}
+
+.dark .seccion-filtros {
+    background: var(--grey-50);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Tabs de filtros */
+.filtro-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--grey-200);
+}
+
+.dark .filtro-tabs {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.filtro-tab {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    background: var(--grey-100);
+    color: var(--grey-700);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dark .filtro-tab {
+    background: var(--grey-200);
+    color: var(--white);
+}
+
+.filtro-tab:hover {
+    background: var(--grey-200);
+}
+
+.dark .filtro-tab:hover {
+    background: var(--grey-300);
+}
+
+.filtro-tab.active {
+    background: var(--primary) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(226, 27, 35, 0.3);
+}
+
+/* Contenido de filtros */
+.filtro-contenido {
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.filtro-contenido.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
     }
-    to { 
-        transform: translateX(0); 
-        opacity: 1; 
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-@keyframes slideOut {
-    from { 
-        transform: translateX(0); 
-        opacity: 1; 
-    }
-    to { 
-        transform: translateX(100%); 
-        opacity: 0; 
-    }
+/* ==========================================
+   INPUTS Y SELECTS
+   ========================================== */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="date"],
+select {
+    width: 100%;
+    background: var(--grey-50);
+    border: 1px solid var(--grey-300);
+    border-radius: 8px;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    color: var(--grey-900);
 }
 
-/* Sports heading especial para reportes */
-.sports-heading {
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="number"],
+.dark input[type="date"],
+.dark select {
+    background: var(--grey-200);
+    border-color: var(--grey-300);
+    color: var(--white);
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(226, 27, 35, 0.1);
+}
+
+/* Labels */
+label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--grey-700);
+    margin-bottom: 0.5rem;
+}
+
+.dark label {
+    color: var(--grey-300);
+}
+
+/* ==========================================
+   CHIPS DE FILTRO
+   ========================================== */
+.filtros-rapidos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.filtro-chip {
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    background: var(--grey-100);
+    color: var(--grey-700);
+    border: 1px solid var(--grey-200);
+    cursor: pointer;
+}
+
+.dark .filtro-chip {
+    background: var(--grey-200);
+    color: var(--white);
+    border-color: var(--grey-300);
+}
+
+.filtro-chip:hover {
+    background: var(--grey-200);
+    border-color: var(--grey-300);
+    transform: translateY(-1px);
+}
+
+.dark .filtro-chip:hover {
+    background: var(--grey-300);
+}
+
+.filtro-chip.active {
+    background: var(--primary) !important;
+    color: white !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 2px 8px rgba(226, 27, 35, 0.3);
+}
+
+/* ==========================================
+   BOTONES
+   ========================================== */
+.btn-primary,
+#descargarExcelCompletoBtn,
+#aplicarFiltrosBtn {
+    background: var(--primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 700;
     font-family: 'Oswald', sans-serif;
     text-transform: uppercase;
     font-style: italic;
-    letter-spacing: -0.025em;
-    color: #1A1A1A;
-}
-
-/* Scrollbar personalizado */
-.custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: #f3f4f6;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #e21b23;
-    border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #c81a21;
-}
-
-/* Estilos para inputs de filtros */
-.filtro-input {
-    transition: all 0.2s ease;
-    border: 1px solid #d1d5db;
-    background-color: white;
-    color: #1f2937;
-}
-
-.filtro-input:focus {
-    border-color: #e21b23;
-    box-shadow: 0 0 0 3px rgba(226, 27, 35, 0.1);
-    outline: none;
-}
-
-.dark .filtro-input {
-    background-color: #1f2937;
-    border-color: #374151;
-    color: #e5e7eb;
-}
-
-.dark .filtro-input:focus {
-    border-color: #e21b23;
-    box-shadow: 0 0 0 3px rgba(226, 27, 35, 0.2);
-}
-
-/* Estilos para botones */
-.btn-primary {
-    background-color: #e21b23;
-    color: white;
-    transition: all 0.2s ease;
-    font-weight: 600;
-}
-
-.btn-primary:hover {
-    background-color: #c81a21;
-    transform: translateY(-1px);
+    letter-spacing: 0.05em;
     box-shadow: 0 4px 12px rgba(226, 27, 35, 0.3);
-}
-
-.btn-secondary {
-    background-color: #f9fafb;
-    color: #374151;
-    border: 1px solid #d1d5db;
+    border: none;
+    cursor: pointer;
     transition: all 0.2s ease;
-    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.btn-secondary:hover {
-    background-color: #f3f4f6;
-    border-color: #9ca3af;
+.btn-primary:hover,
+#descargarExcelCompletoBtn:hover,
+#aplicarFiltrosBtn:hover {
+    background: #C81A21;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(226, 27, 35, 0.4);
 }
 
-.dark .btn-secondary {
-    background-color: #374151;
-    color: #e5e7eb;
-    border-color: #4b5563;
+.btn-primary:active {
+    transform: translateY(0);
 }
 
-.dark .btn-secondary:hover {
-    background-color: #4b5563;
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
 }
 
-/* Estilos para la tabla de documentos */
-.tabla-documentos {
+.btn-secondary,
+#limpiarFiltrosBtn {
+    background: white;
+    color: var(--grey-700);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    border: 1px solid var(--grey-300);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dark .btn-secondary,
+.dark #limpiarFiltrosBtn {
+    background: var(--grey-200);
+    color: var(--white);
+    border-color: var(--grey-300);
+}
+
+.btn-secondary:hover,
+#limpiarFiltrosBtn:hover {
+    background: var(--grey-100);
+    border-color: var(--grey-500);
+}
+
+.dark .btn-secondary:hover,
+.dark #limpiarFiltrosBtn:hover {
+    background: var(--grey-300);
+}
+
+/* Botón azul para documentos */
+#descargarExcelDocumentosBtn {
+    background: #2563EB;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    font-style: italic;
+    letter-spacing: 0.05em;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#descargarExcelDocumentosBtn:hover {
+    background: #1D4ED8;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+/* ==========================================
+   TABLA DE VISTA PREVIA
+   ========================================== */
+.tabla-vista-previa {
+    background: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--grey-200);
+}
+
+.dark .tabla-vista-previa {
+    background: var(--grey-50);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.tabla-vista-previa table {
     width: 100%;
     border-collapse: collapse;
-    background-color: white;
+}
+
+.tabla-vista-previa thead {
+    background: var(--grey-50);
+}
+
+.dark .tabla-vista-previa thead {
+    background: var(--grey-100);
+}
+
+.tabla-vista-previa th {
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--grey-500);
+}
+
+.tabla-vista-previa td {
+    padding: 1rem;
+    border-top: 1px solid var(--grey-100);
+    color: var(--grey-900);
+    font-size: 0.875rem;
+}
+
+.dark .tabla-vista-previa td {
+    border-top-color: rgba(255, 255, 255, 0.05);
+    color: var(--white);
+}
+
+.tabla-vista-previa tbody tr {
+    transition: background 0.2s ease;
+}
+
+.tabla-vista-previa tbody tr:hover {
+    background: var(--grey-50);
+}
+
+.dark .tabla-vista-previa tbody tr:hover {
+    background: var(--grey-100);
+}
+
+/* ==========================================
+   TABLA DE DOCUMENTOS (Estilo dashboard)
+   ========================================== */
+.tabla-documentos {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.tabla-documentos thead {
+    background: var(--secondary) !important;
 }
 
 .tabla-documentos th {
-    background-color: #1A1A1A;
+    background: var(--secondary);
     color: white;
     font-family: 'Oswald', sans-serif;
     text-transform: uppercase;
     font-style: italic;
-    font-weight: bold;
+    font-weight: 700;
     letter-spacing: 0.05em;
     padding: 1.25rem 2rem;
     text-align: left;
@@ -135,146 +473,131 @@
 
 .tabla-documentos td {
     padding: 1.5rem 2rem;
-    vertical-align: middle;
-    background-color: white;
-    border-bottom: 1px solid #e5e7eb;
-    color: #1f2937;
-}
-
-.tabla-documentos tbody tr {
-    transition: background-color 0.2s ease;
-}
-
-.tabla-documentos tbody tr:hover {
-    background-color: #f9fafb !important;
-}
-
-.tabla-documentos tbody tr:hover td {
-    background-color: #f9fafb !important;
-}
-
-.dark .tabla-documentos {
-    background-color: #1f2937;
+    background: var(--white);
+    border-bottom: 1px solid var(--grey-100);
 }
 
 .dark .tabla-documentos td {
-    background-color: #1f2937;
-    border-bottom-color: #374151;
-    color: #e5e7eb;
+    background: var(--grey-50);
+    border-bottom-color: rgba(255, 255, 255, 0.05);
 }
 
-.dark .tabla-documentos tbody tr:hover {
-    background-color: #374151 !important;
+.tabla-documentos tbody tr {
+    transition: background 0.2s ease;
+}
+
+.tabla-documentos tbody tr:hover td {
+    background: var(--grey-50);
 }
 
 .dark .tabla-documentos tbody tr:hover td {
-    background-color: #374151 !important;
+    background: var(--grey-100);
 }
 
-/* Estilos para las filas de deportistas */
-.deportista-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 4px;
-    background-color: #e21b23;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-family: 'Oswald', sans-serif;
-    font-weight: bold;
-    font-style: italic;
-    flex-shrink: 0;
-}
-
-.detalles-deportista p:first-child {
-    font-weight: 600;
-    color: #1A1A1A;
-    margin-bottom: 0.25rem;
-}
-
-.dark .detalles-deportista p:first-child {
-    color: #f9fafb;
-}
-
-.detalles-deportista p:last-child {
-    font-size: 0.75rem;
-    color: #6b7280;
-}
-
-.dark .detalles-deportista p:last-child {
-    color: #9ca3af;
-}
-
-/* Estilos para badges de nivel y grupo */
+/* ==========================================
+   BADGES
+   ========================================== */
 .badge {
-    display: inline-block;
-    padding: 0.375rem 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
     border-radius: 9999px;
     font-size: 0.75rem;
     font-weight: 600;
+    line-height: 1.5;
 }
 
-.badge-nivel {
-    font-weight: 700;
-    color: #1A1A1A;
-    background-color: #fef3c7;
+/* Badges de estado */
+.badge.success,
+.bg-green-100 {
+    background: #D1FAE5;
+    color: #065F46;
 }
 
-.dark .badge-nivel {
-    color: #fef3c7;
-    background-color: #78350f;
+.dark .badge.success,
+.dark .bg-green-100 {
+    background: #064E3B;
+    color: #6EE7B7;
 }
 
-.badge-grupo {
-    font-size: 0.625rem;
-    color: #e21b23;
-    text-transform: uppercase;
-    font-weight: bold;
-    background-color: #fee2e2;
-    padding: 0.25rem 0.75rem;
+.badge.warning,
+.bg-yellow-100 {
+    background: #FEF3C7;
+    color: #92400E;
 }
 
-.dark .badge-grupo {
-    background-color: #7f1d1d;
-    color: #fecaca;
+.dark .badge.warning,
+.dark .bg-yellow-100 {
+    background: #78350F;
+    color: #FDE68A;
 }
 
-/* Estilos para botones de acción */
-.btn-accion {
-    background-color: #e21b23;
-    color: white;
-    padding: 0.625rem 1.25rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    font-style: italic;
-    letter-spacing: 0.05em;
-    transition: all 0.2s ease;
-    display: inline-flex;
+.badge.error,
+.bg-red-100 {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.dark .badge.error,
+.dark .bg-red-100 {
+    background: #7F1D1D;
+    color: #FCA5A5;
+}
+
+.badge.info,
+.bg-blue-100 {
+    background: #DBEAFE;
+    color: #1E40AF;
+}
+
+.dark .badge.info,
+.dark .bg-blue-100 {
+    background: #1E3A8A;
+    color: #93C5FD;
+}
+
+.bg-purple-100 {
+    background: #EDE9FE;
+    color: #6B21A8;
+}
+
+.dark .bg-purple-100 {
+    background: #581C87;
+    color: #C4B5FD;
+}
+
+.bg-gray-100 {
+    background: var(--grey-100);
+    color: var(--grey-700);
+}
+
+.dark .bg-gray-100 {
+    background: var(--grey-200);
+    color: var(--grey-300);
+}
+
+/* ==========================================
+   CONTADOR DE RESULTADOS
+   ========================================== */
+.contador-resultados {
+    display: flex;
     align-items: center;
-    gap: 0.5rem;
-    border: none;
-    cursor: pointer;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--grey-700);
 }
 
-.btn-accion:hover {
-    background-color: #c81a21;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(226, 27, 35, 0.3);
+.dark .contador-resultados {
+    color: var(--grey-300);
 }
 
-/* Estilos para el loading indicator */
-.loading-indicator {
-    animation: pulse 1.5s infinite;
-    color: #6b7280;
+#filtrosAplicados {
+    width: 0.5rem;
+    height: 0.5rem;
+    background: #10B981;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
@@ -282,95 +605,132 @@
     50% { opacity: 0.5; }
 }
 
-/* Estilos para mensajes vacíos */
-.mensaje-vacio {
+/* ==========================================
+   LOADING INDICATOR
+   ========================================== */
+#loadingIndicator {
+    background: #10B981;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ==========================================
+   MENSAJE SIN RESULTADOS
+   ========================================== */
+#sinResultados {
     text-align: center;
-    padding: 4rem 0;
-    color: #6b7280;
+    padding: 4rem 2rem;
+    color: var(--grey-500);
 }
 
-.mensaje-vacio .icono {
-    width: 5rem;
-    height: 5rem;
+#sinResultados .material-symbols-outlined {
+    font-size: 4rem;
     opacity: 0.4;
-    margin: 0 auto 1rem;
-    color: #9ca3af;
+    margin-bottom: 1rem;
 }
 
-.mensaje-vacio h4 {
+#sinResultados h4 {
     font-size: 1.25rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
-    color: #374151;
+    color: var(--grey-700);
 }
 
-.mensaje-vacio p {
-    color: #6b7280;
-    font-size: 0.875rem;
+.dark #sinResultados h4 {
+    color: var(--grey-300);
 }
 
-.dark .mensaje-vacio h4 {
-    color: #d1d5db;
+/* ==========================================
+   SPORTS HEADING
+   ========================================== */
+.sports-heading {
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    font-style: italic;
+    letter-spacing: -0.025em;
 }
 
-.dark .mensaje-vacio p {
-    color: #9ca3af;
+/* ==========================================
+   SCROLLBAR
+   ========================================== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 }
 
-/* Estilos para contadores */
-.contador {
-    font-size: 0.875rem;
-    color: #4b5563;
-    font-weight: 500;
+::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-.dark .contador {
-    color: #d1d5db;
+::-webkit-scrollbar-thumb {
+    background: var(--grey-300);
+    border-radius: 4px;
 }
 
-/* Estilos para notificaciones */
-.notification {
-    background: #3b82f6;
-    color: white;
-    padding: 16px 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    animation: slideIn 0.3s ease-out;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 500;
-    min-width: 300px;
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
 }
 
-.notification.success {
-    background: #10b981;
+/* ==========================================
+   NOTIFICACIONES
+   ========================================== */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
-.notification.error {
-    background: #ef4444;
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
 }
 
-.notification.warning {
-    background: #f59e0b;
-}
-
-/* Estilos para botones deshabilitados */
-.btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.btn:disabled:hover {
-    transform: none;
-    box-shadow: none;
-}
-
-/* Estilos responsivos */
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
 @media (max-width: 768px) {
-    .sports-heading {
-        font-size: 1.5rem;
+    .filtro-tabs {
+        gap: 0.25rem;
+    }
+    
+    .filtro-tab {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.75rem;
+    }
+    
+    .filtro-chip {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.75rem;
     }
     
     .tabla-documentos th,
@@ -379,146 +739,8 @@
         font-size: 0.875rem;
     }
     
-    .btn-accion {
-        font-size: 0.625rem;
-        padding: 0.5rem 0.875rem;
+    button {
+        padding: 0.625rem 1rem;
+        font-size: 0.875rem;
     }
-}
-
-/* Estilos para el botón de ayuda flotante */
-.floating-help-btn {
-    animation: float 3s ease-in-out infinite;
-    background-color: #e21b23;
-    color: white;
-    border-radius: 50%;
-    padding: 1rem;
-    box-shadow: 0 4px 12px rgba(226, 27, 35, 0.3);
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-/* Estilos para los select personalizados */
-.select-estilizado {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
-    background-color: white;
-    color: #1f2937;
-}
-
-.dark .select-estilizado {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
-    background-color: #1f2937;
-    color: #e5e7eb;
-}
-
-/* Transiciones suaves */
-.transition-all {
-    transition-property: all;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 200ms;
-}
-
-/* Animación de pulso para indicador */
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-
-.animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Estilos para inputs de filtro */
-input:focus, select:focus {
-    outline: none;
-    ring: 2px;
-    ring-color: #e21b23;
-}
-
-/* Estilos para tabla */
-table {
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-th {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-/* Estilos para botones deshabilitados */
-button:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-}
-
-button:disabled:hover {
-    transform: none !important;
-    box-shadow: none !important;
-}
-
-/* 🔥 CORRECCIONES ADICIONALES PARA MODO CLARO */
-
-/* Fondo general en modo claro */
-body:not(.dark) {
-    background-color: #f9fafb;
-    color: #1f2937;
-}
-
-/* Contenedores principales */
-.contenedor-principal {
-    background-color: white;
-    color: #1f2937;
-}
-
-.dark .contenedor-principal {
-    background-color: #1f2937;
-    color: #e5e7eb;
-}
-
-/* Cards */
-.card {
-    background-color: white;
-    border: 1px solid #e5e7eb;
-    color: #1f2937;
-}
-
-.dark .card {
-    background-color: #1f2937;
-    border-color: #374151;
-    color: #e5e7eb;
-}
-
-/* Textos */
-.texto-principal {
-    color: #1f2937;
-}
-
-.texto-secundario {
-    color: #6b7280;
-}
-
-.dark .texto-principal {
-    color: #f9fafb;
-}
-
-.dark .texto-secundario {
-    color: #9ca3af;
-}
-
-/* Títulos y encabezados */
-h1, h2, h3, h4, h5, h6 {
-    color: #1A1A1A;
-}
-
-.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
-    color: #f9fafb;
 }
