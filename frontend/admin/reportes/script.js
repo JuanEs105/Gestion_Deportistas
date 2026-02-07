@@ -66,102 +66,113 @@ if (typeof window.ReportesApp === 'undefined') {
         // 🔥 DESCARGAR DOCUMENTO PDF INDIVIDUAL - CORREGIDO
         // ==========================================
         async descargarDocumentoIndividual(deportistaId) {
-            try {
-                console.log(`📄 Descargando documento ID: ${deportistaId}`);
-                this.mostrarLoading(true);
-
-                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-
-                if (!token) {
-                    throw new Error('No hay sesión activa');
-                }
-
-                const url = `https://gestiondeportistas-production.up.railway.app/api/reportes/documento/${deportistaId}`;
-
-                console.log('🌐 URL:', url);
-
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                console.log('📡 Response status:', response.status);
-
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        throw new Error('Sesión expirada. Por favor inicia sesión nuevamente.');
-                    }
-                    if (response.status === 404) {
-                        throw new Error('Documento no encontrado');
-                    }
-
-                    const errorData = await response.json().catch(() => null);
-                    throw new Error(errorData?.error || `Error ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log('📦 Datos recibidos:', data);
-
-                if (!data.success || !data.url) {
-                    throw new Error('No se pudo obtener la URL del documento');
-                }
-
-                // 🔥 AGREGAR .pdf A LA URL SI NO LO TIENE
-                let pdfUrl = data.url;
-                if (!pdfUrl.toLowerCase().endsWith('.pdf')) {
-                    pdfUrl = pdfUrl + '.pdf';
-                }
-
-                console.log('✅ URL del PDF:', pdfUrl);
-
-                // 🔥 ABRIR EN NUEVA PESTAÑA
-                const newWindow = window.open(pdfUrl, '_blank');
-
-                if (!newWindow) {
-                    // Fallback si popup bloqueado
-                    const link = document.createElement('a');
-                    link.href = pdfUrl;
-                    link.target = '_blank';
-                    link.rel = 'noopener noreferrer';
-                    link.download = `documento_${deportistaId}.pdf`; // 🔥 AGREGAR NOMBRE
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-
-                    this.showNotification('⚠️ Popup bloqueado. El documento se descargó.', 'warning', 3000);
-                } else {
-                    this.showNotification('✅ Documento abierto correctamente', 'success', 2000);
-                }
-
-            } catch (error) {
-                console.error('❌ Error:', error);
-
-                let mensaje = 'Error abriendo el documento';
-
-                if (error.message.includes('Sesión expirada')) {
-                    mensaje = '🔒 Sesión expirada. Redirigiendo al login...';
-                    setTimeout(() => {
-                        localStorage.clear();
-                        sessionStorage.clear();
-                        window.location.href = '../auth/login-admin.html';
-                    }, 2000);
-                } else if (error.message.includes('Documento no encontrado')) {
-                    mensaje = '❌ Este deportista no tiene documento subido';
-                } else if (error.message.includes('Failed to fetch')) {
-                    mensaje = '❌ No se pudo conectar al servidor';
-                } else {
-                    mensaje = `❌ Error: ${error.message}`;
-                }
-
-                this.showNotification(mensaje, 'error', 5000);
-
-            } finally {
-                this.mostrarLoading(false);
+    try {
+        console.log(`📄 Descargando documento ID: ${deportistaId}`);
+        this.mostrarLoading(true);
+        
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        
+        if (!token) {
+            throw new Error('No hay sesión activa');
+        }
+        
+        const url = `https://gestiondeportistas-production.up.railway.app/api/reportes/documento/${deportistaId}`;
+        
+        console.log('🌐 URL:', url);
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             }
-        },
+        });
+        
+        console.log('📡 Response status:', response.status);
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Sesión expirada. Por favor inicia sesión nuevamente.');
+            }
+            if (response.status === 404) {
+                throw new Error('Documento no encontrado');
+            }
+            
+            const errorData = await response.json().catch(() => null);
+            throw new Error(errorData?.error || `Error ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('📦 Datos recibidos:', data);
+        
+        if (!data.success || !data.url) {
+            throw new Error('No se pudo obtener la URL del documento');
+        }
+        
+        // 🔥 DESCARGAR EL PDF DESDE CLOUDINARY CON FETCH
+        console.log('📥 Descargando PDF desde Cloudinary...');
+        
+        const pdfResponse = await fetch(data.url);
+        
+        if (!pdfResponse.ok) {
+            throw new Error('Error descargando el PDF desde Cloudinary');
+        }
+        
+        const pdfBlob = await pdfResponse.blob();
+        console.log('✅ PDF descargado:', pdfBlob.size, 'bytes');
+        
+        // Crear URL temporal del blob
+        const blobUrl = window.URL.createObjectURL(pdfBlob);
+        
+        // Intentar abrir en nueva pestaña
+        const newWindow = window.open(blobUrl, '_blank');
+        
+        if (!newWindow) {
+            // Fallback: Descargar automáticamente
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = `documento_${data.deportista.nombre}_${data.deportista.apellidos}.pdf`;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            this.showNotification('📥 Documento descargado correctamente', 'success', 3000);
+        } else {
+            this.showNotification('✅ Documento abierto correctamente', 'success', 2000);
+        }
+        
+        // Limpiar URL después de 1 segundo
+        setTimeout(() => {
+            window.URL.revokeObjectURL(blobUrl);
+        }, 1000);
+        
+    } catch (error) {
+        console.error('❌ Error:', error);
+        
+        let mensaje = 'Error abriendo el documento';
+        
+        if (error.message.includes('Sesión expirada')) {
+            mensaje = '🔒 Sesión expirada. Redirigiendo al login...';
+            setTimeout(() => {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = '../auth/login-admin.html';
+            }, 2000);
+        } else if (error.message.includes('Documento no encontrado')) {
+            mensaje = '❌ Este deportista no tiene documento subido';
+        } else if (error.message.includes('Failed to fetch')) {
+            mensaje = '❌ No se pudo conectar al servidor';
+        } else {
+            mensaje = `❌ Error: ${error.message}`;
+        }
+        
+        this.showNotification(mensaje, 'error', 5000);
+        
+    } finally {
+        this.mostrarLoading(false);
+    }
+},
 
         // ==========================================
         // 🔥 VER DOCUMENTO EN NUEVA PESTAÑA (ALTERNATIVA)
