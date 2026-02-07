@@ -109,121 +109,118 @@ if (typeof window.ReportesApp === 'undefined') {
         // ==========================================
         // MÉTODO PRINCIPAL: DESCARGAR EXCEL COMPLETO
         // ==========================================
-        async descargarExcelCompleto() {
-            try {
-                console.log('📊 PREPARANDO DESCARGAR EXCEL COMPLETO...');
-                
-                // 1. OBTENER TODOS LOS FILTROS DEL FORMULARIO
-                const filtros = this.obtenerTodosLosFiltrosDelFormulario();
-                console.log('🔍 Filtros obtenidos del formulario:', filtros);
-                
-                // 2. VALIDAR FILTROS
-                const errores = this.validarFiltros(filtros);
-                if (errores.length > 0) {
-                    this.showNotification(`❌ Errores en filtros:\n${errores.join('\n')}`, 'error');
-                    return;
-                }
-                
-                // 3. MOSTRAR LOADING
-                this.mostrarLoading(true);
-                
-                // 4. CONSTRUIR PARÁMETROS DE LA URL
-                const params = new URLSearchParams();
-                
-                // Agregar TODOS los filtros al query string
-                Object.keys(filtros).forEach(key => {
-                    const value = filtros[key];
-                    if (value && value !== '' && value !== 'todos') {
-                        params.append(key, value);
-                    }
-                });
-                
-                // 5. OBTENER TOKEN DE AUTENTICACIÓN
-                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-                if (!token) {
-                    throw new Error('No hay sesión activa');
-                }
-                
-                // 6. CONSTRUIR URL COMPLETA
-                const baseURL = 'https://gestiondeportistas-production.up.railway.app/api/reportes/excel/grupal';
-                const queryString = params.toString();
-                const url = queryString ? `${baseURL}?${queryString}` : baseURL;
-                
-                console.log('🌐 URL generada para descargar Excel:', url);
-                
-                // 7. CREAR ELEMENTO DE ENLACE TEMPORAL
-                const link = document.createElement('a');
-                link.style.display = 'none';
-                
-                // 8. AGREGAR HEADERS DE AUTENTICACIÓN
-                const options = {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                    }
-                };
-                
-                // 9. HACER LA PETICIÓN FETCH
-                const response = await fetch(url, options);
-                
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Error ${response.status}: ${response.statusText}`);
-                }
-                
-                // 10. OBTENER EL BLOB (archivo Excel)
-                const blob = await response.blob();
-                
-                // 11. CREAR URL TEMPORAL PARA EL BLOB
-                const blobUrl = window.URL.createObjectURL(blob);
-                
-                // 12. CONFIGURAR EL ENLACE DE DESCARGA
-                link.href = blobUrl;
-                
-                // Nombre del archivo con timestamp
-                const timestamp = new Date().toISOString().split('T')[0];
-                const hora = new Date().toTimeString().slice(0, 8).replace(/:/g, '-');
-                link.download = `reporte_deportistas_${timestamp}_${hora}.xlsx`;
-                
-                // 13. AGREGAR AL DOM Y HACER CLIC
-                document.body.appendChild(link);
-                link.click();
-                
-                // 14. LIMPIAR
-                setTimeout(() => {
-                    document.body.removeChild(link);
-                    window.URL.revokeObjectURL(blobUrl);
-                }, 100);
-                
-                // 15. MOSTRAR MENSAJE DE ÉXITO
-                const count = this.state.deportistasFiltrados.length || 'todos';
-                this.showNotification(`✅ Excel generado exitosamente\n📊 Exportando ${count} registros`, 'success', 5000);
-                
-            } catch (error) {
-                console.error('❌ ERROR CRÍTICO descargando Excel:', error);
-                
-                // Mostrar error específico
-                let mensajeError = 'Error al generar Excel';
-                
-                if (error.message.includes('Failed to fetch')) {
-                    mensajeError = '❌ No se pudo conectar con el servidor\n\nVerifica que:\n1. El backend esté corriendo en https://gestiondeportistas-production.up.railway.app\n2. El servidor esté activo\n3. No haya errores de CORS';
-                } else if (error.message.includes('401') || error.message.includes('403')) {
-                    mensajeError = '🔒 Sesión expirada o sin permisos\n\nPor favor, inicia sesión nuevamente';
-                } else if (error.message.includes('500')) {
-                    mensajeError = '⚙️ Error interno del servidor\n\nRevisa los logs del backend para más detalles';
-                } else {
-                    mensajeError = error.message;
-                }
-                
-                this.showNotification(mensajeError, 'error', 8000);
-                
-            } finally {
-                // 16. OCULTAR LOADING
-                this.mostrarLoading(false);
+       async descargarExcelCompleto() {
+    try {
+        console.log('📊 PREPARANDO DESCARGAR EXCEL COMPLETO...');
+        
+        // 1. OBTENER TODOS LOS FILTROS DEL FORMULARIO
+        const filtros = this.obtenerTodosLosFiltrosDelFormulario();
+        console.log('🔍 Filtros obtenidos del formulario:', filtros);
+        
+        // 2. VALIDAR FILTROS
+        const errores = this.validarFiltros(filtros);
+        if (errores.length > 0) {
+            this.showNotification(`❌ Errores en filtros:\n${errores.join('\n')}`, 'error');
+            return;
+        }
+        
+        // 3. MOSTRAR LOADING
+        this.mostrarLoading(true);
+        
+        // 4. CONSTRUIR PARÁMETROS DE LA URL
+        const params = new URLSearchParams();
+        
+        // Agregar TODOS los filtros al query string
+        Object.keys(filtros).forEach(key => {
+            const value = filtros[key];
+            if (value && value !== '' && value !== 'todos') {
+                params.append(key, value);
             }
-        },
-
+        });
+        
+        // 5. OBTENER TOKEN DE AUTENTICACIÓN
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (!token) {
+            throw new Error('No hay sesión activa');
+        }
+        
+        // 6. CONSTRUIR URL COMPLETA
+        const baseURL = 'https://gestiondeportistas-production.up.railway.app/api/reportes/excel/grupal';
+        const queryString = params.toString();
+        const url = queryString ? `${baseURL}?${queryString}` : baseURL;
+        
+        console.log('🌐 URL generada para descargar Excel:', url);
+        
+        // 7. HACER LA PETICIÓN CON FETCH (INCLUYE TOKEN)
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            }
+        });
+        
+        console.log('📥 Respuesta HTTP:', response.status, response.statusText);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ Error del servidor:', errorText);
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+        
+        // 8. OBTENER EL BLOB (archivo Excel)
+        const blob = await response.blob();
+        
+        // 9. CREAR URL TEMPORAL PARA EL BLOB
+        const blobUrl = window.URL.createObjectURL(blob);
+        
+        // 10. CREAR ENLACE DE DESCARGA
+        const link = document.createElement('a');
+        link.style.display = 'none';
+        link.href = blobUrl;
+        
+        // Nombre del archivo con timestamp
+        const timestamp = new Date().toISOString().split('T')[0];
+        const hora = new Date().toTimeString().slice(0, 8).replace(/:/g, '-');
+        link.download = `reporte_deportistas_${timestamp}_${hora}.xlsx`;
+        
+        // 11. AGREGAR AL DOM Y HACER CLIC
+        document.body.appendChild(link);
+        link.click();
+        
+        // 12. LIMPIAR
+        setTimeout(() => {
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+        }, 100);
+        
+        // 13. MOSTRAR MENSAJE DE ÉXITO
+        const count = this.state.deportistasFiltrados.length || 'todos';
+        this.showNotification(`✅ Excel generado exitosamente\n📊 Exportando ${count} registros`, 'success', 5000);
+        
+    } catch (error) {
+        console.error('❌ ERROR CRÍTICO descargando Excel:', error);
+        
+        // Mostrar error específico
+        let mensajeError = 'Error al generar Excel';
+        
+        if (error.message.includes('Failed to fetch')) {
+            mensajeError = '❌ No se pudo conectar con el servidor';
+        } else if (error.message.includes('401') || error.message.includes('403')) {
+            mensajeError = '🔒 Sesión expirada o sin permisos\n\nPor favor, inicia sesión nuevamente';
+        } else if (error.message.includes('500')) {
+            mensajeError = '⚙️ Error interno del servidor';
+        } else {
+            mensajeError = error.message;
+        }
+        
+        this.showNotification(mensajeError, 'error', 8000);
+        
+    } finally {
+        // 14. OCULTAR LOADING
+        this.mostrarLoading(false);
+    }
+},
         // ==========================================
         // OBTENER TODOS LOS FILTROS DEL FORMULARIO
         // ==========================================
@@ -402,43 +399,73 @@ if (typeof window.ReportesApp === 'undefined') {
         // DESCARGAR EXCEL DE DOCUMENTOS
         // ==========================================
         async descargarExcelDocumentos() {
-            try {
-                console.log('📄 PREPARANDO EXCEL DE DOCUMENTOS...');
-                
-                // 1. Obtener filtros básicos
-                const filtros = this.obtenerFiltrosBasicosParaDocumentos();
-                
-                // 2. Construir query string
-                const params = new URLSearchParams();
-                
-                Object.keys(filtros).forEach(key => {
-                    if (filtros[key] && filtros[key] !== '' && filtros[key] !== 'todos') {
-                        params.append(key, filtros[key]);
-                    }
-                });
-                
-                // Siempre pedir documentos (true)
-                params.append('tieneDocumento', 'true');
-                
-                // 3. Obtener token
-                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-                
-                // 4. Construir URL
-                const baseURL = 'https://gestiondeportistas-production.up.railway.app/api/reportes/excel/documentos';
-                const url = `${baseURL}?${params.toString()}`;
-                
-                console.log('🔗 URL documentos:', url);
-                
-                // 5. Descargar
-                window.open(url, '_blank');
-                
-                this.showNotification('✅ Generando Excel de documentos...', 'success');
-                
-            } catch (error) {
-                console.error('❌ Error descargando Excel de documentos:', error);
-                this.showNotification('❌ Error al generar Excel de documentos', 'error');
+    try {
+        console.log('📄 PREPARANDO EXCEL DE DOCUMENTOS...');
+        
+        // 1. Obtener filtros básicos
+        const filtros = this.obtenerFiltrosBasicosParaDocumentos();
+        
+        // 2. Construir query string
+        const params = new URLSearchParams();
+        
+        Object.keys(filtros).forEach(key => {
+            if (filtros[key] && filtros[key] !== '' && filtros[key] !== 'todos') {
+                params.append(key, filtros[key]);
             }
-        },
+        });
+        
+        // Siempre pedir documentos (true)
+        params.append('tieneDocumento', 'true');
+        
+        // 3. Obtener token
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (!token) {
+            throw new Error('No hay sesión activa');
+        }
+        
+        // 4. Construir URL
+        const baseURL = 'https://gestiondeportistas-production.up.railway.app/api/reportes/excel/documentos';
+        const url = `${baseURL}?${params.toString()}`;
+        
+        console.log('🔗 URL documentos:', url);
+        
+        // 5. Hacer petición con fetch (incluye token)
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+        
+        // 6. Descargar blob
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = `documentos_deportistas_${new Date().toISOString().split('T')[0]}.xlsx`;
+        link.style.display = 'none';
+        
+        document.body.appendChild(link);
+        link.click();
+        
+        setTimeout(() => {
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+        }, 100);
+        
+        this.showNotification('✅ Excel de documentos generado', 'success');
+        
+    } catch (error) {
+        console.error('❌ Error descargando Excel de documentos:', error);
+        this.showNotification('❌ Error al generar Excel de documentos: ' + error.message, 'error');
+    }
+},
 
         // ==========================================
         // MÉTODOS AUXILIARES
