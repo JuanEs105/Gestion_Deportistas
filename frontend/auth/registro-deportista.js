@@ -1,11 +1,10 @@
 // ==========================================
-// REGISTRO DEPORTISTA - JavaScript
+// REGISTRO DEPORTISTA - JavaScript CORREGIDO
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', function () {
     console.log('✅ Registro Deportista page loaded');
 
-    // Inicializar componentes
     initFormValidation();
     initFileUploads();
     initDatePicker();
@@ -13,12 +12,9 @@ document.addEventListener('DOMContentLoaded', function () {
     initTerminosModal();
     initPasswordToggles();
     setupFormSubmit();
-
-    // Verificar si ya está autenticado
     checkAuthStatus();
 });
 
-// Inicializar botones para mostrar/ocultar contraseña
 function initPasswordToggles() {
     const togglePassword = document.getElementById('togglePassword');
     const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
@@ -29,7 +25,6 @@ function initPasswordToggles() {
         togglePassword.addEventListener('click', function () {
             const type = passwordInput.type === 'password' ? 'text' : 'password';
             passwordInput.type = type;
-
             const icon = this.querySelector('.material-symbols-outlined');
             icon.textContent = type === 'password' ? 'visibility' : 'visibility_off';
         });
@@ -39,14 +34,12 @@ function initPasswordToggles() {
         toggleConfirmPassword.addEventListener('click', function () {
             const type = confirmPasswordInput.type === 'password' ? 'text' : 'password';
             confirmPasswordInput.type = type;
-
             const icon = this.querySelector('.material-symbols-outlined');
             icon.textContent = type === 'password' ? 'visibility' : 'visibility_off';
         });
     }
 }
 
-// Inicializar validación del formulario
 function initFormValidation() {
     const form = document.getElementById('formRegistro');
     const inputs = form.querySelectorAll('input, select, textarea');
@@ -58,15 +51,12 @@ function initFormValidation() {
 
         input.addEventListener('input', function () {
             clearError(this);
-
-            // Validar en tiempo real para contraseñas
             if (this.id === 'password' || this.id === 'confirm_password') {
                 validateField(this);
             }
         });
     });
 
-    // Validar radio buttons
     const radioButtons = form.querySelectorAll('input[type="radio"]');
     radioButtons.forEach(radio => {
         radio.addEventListener('change', function () {
@@ -74,7 +64,6 @@ function initFormValidation() {
         });
     });
 
-    // Validar checkbox de términos y habilitar botón
     const terminosCheckbox = document.getElementById('terminos');
     if (terminosCheckbox) {
         terminosCheckbox.addEventListener('change', function () {
@@ -84,7 +73,6 @@ function initFormValidation() {
     }
 }
 
-// Validar un campo individual
 function validateField(field) {
     const fieldName = field.name || field.id;
     const value = field.type === 'checkbox' ? field.checked : field.value.trim();
@@ -139,7 +127,6 @@ function validateField(field) {
                 errorMessage = 'La contraseña debe tener al menos 6 caracteres';
             }
 
-            // También validar confirmación si ya tiene valor
             const confirmPassword = document.getElementById('confirm_password');
             if (confirmPassword && confirmPassword.value) {
                 validateField(confirmPassword);
@@ -250,9 +237,7 @@ function validateField(field) {
     return isValid;
 }
 
-// Inicializar subida de archivos
 function initFileUploads() {
-    // Documento PDF
     const uploadDocumento = document.getElementById('uploadDocumento');
     const inputDocumento = document.getElementById('documento');
     const fileInfoDocumento = document.getElementById('fileInfoDocumento');
@@ -273,7 +258,6 @@ function initFileUploads() {
         });
     }
 
-    // Foto
     const uploadFoto = document.getElementById('uploadFoto');
     const inputFoto = document.getElementById('foto');
     const fileInfoFoto = document.getElementById('fileInfoFoto');
@@ -292,7 +276,6 @@ function initFileUploads() {
                     fileInfoFoto.textContent = `${file.name} (${formatFileSize(file.size)})`;
                     fileInfoFoto.style.color = '#10B981';
 
-                    // Mostrar preview
                     const reader = new FileReader();
                     reader.onload = function (e) {
                         previewFoto.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
@@ -305,7 +288,6 @@ function initFileUploads() {
     }
 }
 
-// Inicializar date picker
 function initDatePicker() {
     const fechaNacimiento = document.getElementById('fecha_nacimiento');
     if (fechaNacimiento) {
@@ -318,7 +300,6 @@ function initDatePicker() {
     }
 }
 
-// Inicializar EPS selector
 function initEPSSelector() {
     const epsSelect = document.getElementById('eps');
     const epsOtroContainer = document.getElementById('epsOtroContainer');
@@ -349,15 +330,12 @@ function initEPSSelector() {
     }
 }
 
-// Inicializar modal de términos
 function initTerminosModal() {
     const openBtn = document.getElementById('openTerminosBtn');
     const closeBtn = document.getElementById('closeTerminosBtn');
     const cerrarBtn = document.getElementById('cerrarTerminosBtn');
     const modal = document.getElementById('terminosModal');
-    const terminosCheckbox = document.getElementById('terminos');
 
-    // Abrir modal
     if (openBtn) {
         openBtn.addEventListener('click', function (e) {
             e.preventDefault();
@@ -366,7 +344,6 @@ function initTerminosModal() {
         });
     }
 
-    // Cerrar modal con botón X
     if (closeBtn) {
         closeBtn.addEventListener('click', function () {
             modal.classList.add('hidden');
@@ -374,7 +351,6 @@ function initTerminosModal() {
         });
     }
 
-    // Cerrar modal y continuar (NO marca el checkbox automáticamente)
     if (cerrarBtn) {
         cerrarBtn.addEventListener('click', function () {
             modal.classList.add('hidden');
@@ -382,7 +358,6 @@ function initTerminosModal() {
         });
     }
 
-    // Cerrar modal al hacer clic fuera
     if (modal) {
         modal.addEventListener('click', function (e) {
             if (e.target === this) {
@@ -392,7 +367,6 @@ function initTerminosModal() {
         });
     }
 
-    // Cerrar con Escape
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
             modal.classList.add('hidden');
@@ -400,22 +374,19 @@ function initTerminosModal() {
         }
     });
 
-    // Estado inicial del botón
     updateSubmitButton();
 }
 
-// Actualizar estado del botón de submit
 function updateSubmitButton() {
     const terminosCheckbox = document.getElementById('terminos');
     const btnSubmit = document.getElementById('btnSubmit');
 
     if (terminosCheckbox && btnSubmit) {
-        // El botón se habilita solo cuando el checkbox está marcado
         btnSubmit.disabled = !terminosCheckbox.checked;
     }
 }
 
-// Configurar envío del formulario - VERSIÓN CORREGIDA
+// 🔥🔥🔥 FUNCIÓN CORREGIDA - ENVÍA TODOS LOS CAMPOS 🔥🔥🔥
 function setupFormSubmit() {
     const form = document.getElementById('formRegistro');
     const btnSubmit = document.getElementById('btnSubmit');
@@ -425,7 +396,6 @@ function setupFormSubmit() {
         form.addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            // Validar todos los campos
             const isValid = validateForm();
 
             if (!isValid) {
@@ -446,29 +416,36 @@ function setupFormSubmit() {
                 return;
             }
 
-            // Mostrar loading
             btnSubmit.disabled = true;
             loadingSpinner.classList.remove('hidden');
 
             try {
-                // Crear FormData
                 const formData = new FormData(form);
 
-                // 🔥 CORRECCIÓN 1: Combinar apellidos y nombres CORRECTAMENTE
+                // 🔥 CORRECCIÓN: Enviar campos individuales (NO combinar)
                 const apellidos = document.getElementById('apellidos').value.trim();
                 const nombres = document.getElementById('nombres').value.trim();
-                const nombreCompleto = `${apellidos} ${nombres}`;
+                
+                // Enviar nombre Y apellidos por separado
+                formData.set('nombre', nombres);
+                formData.set('apellidos', apellidos);
 
-                // 🔥 CORRECCIÓN 2: Agregar todos los campos que el backend espera
-                formData.set('nombre', nombreCompleto);
+                // 🔥 AGREGAR: tipo_documento, numero_documento, ciudad
+                const tipoDocumento = document.querySelector('input[name="tipo_documento"]:checked');
+                if (tipoDocumento) {
+                    formData.set('tipo_documento', tipoDocumento.value);
+                }
 
-                // 🔥 CORRECCIÓN 3: Enviar teléfono del deportista (opcional)
+                formData.set('numero_documento', document.getElementById('numero_documento').value.trim());
+                formData.set('ciudad', document.getElementById('ciudad_nacimiento').value.trim());
+
+                // Teléfono del deportista (opcional)
                 const celularDeportista = document.getElementById('celular').value.trim();
                 if (celularDeportista) {
                     formData.set('telefono', celularDeportista);
                 }
 
-                // 🔥 CORRECCIÓN 4: Procesar EPS
+                // Procesar EPS
                 const epsSelect = document.getElementById('eps');
                 if (epsSelect.value === 'Otro') {
                     const epsOtro = document.getElementById('eps_otro').value.trim();
@@ -477,28 +454,10 @@ function setupFormSubmit() {
                     formData.set('eps', epsSelect.value);
                 }
 
-                // 🔥 CORRECCIÓN 5: Agregar campos faltantes
-                // El backend espera estos nombres exactos:
-                formData.set('ciudad_nacimiento', document.getElementById('ciudad_nacimiento').value.trim());
-                formData.set('nombre_acudiente', document.getElementById('nombre_acudiente').value.trim());
-                formData.set('telefono_acudiente', document.getElementById('telefono_acudiente').value.trim());
-                formData.set('email_acudiente', document.getElementById('email_acudiente').value.trim());
-
-                // 🔥 CORRECCIÓN 6: Agregar tipo de documento (no está en el backend pero lo agregamos)
-                const tipoDocumento = document.querySelector('input[name="tipo_documento"]:checked');
-                if (tipoDocumento) {
-                    formData.set('tipo_documento', tipoDocumento.value);
-                }
-
-                // 🔥 CORRECCIÓN 7: Asegurar que terminos_aceptados sea string 'true'
+                // Asegurar términos
                 formData.set('terminos_aceptados', 'true');
 
-                // 🔥 CORRECCIÓN 8: Quitar campos que sobran (el backend no los espera)
-                // El backend solo espera 'nombre', no 'apellidos' y 'nombres' por separado
-                formData.delete('apellidos');
-                formData.delete('nombres');
-
-                // 🔥 DEBUG: Verificar qué estamos enviando
+                // 🔥 DEBUG: Ver qué estamos enviando
                 console.log('📤 Enviando datos de registro...');
                 console.log('📋 FormData contenido:');
                 for (let [key, value] of formData.entries()) {
@@ -523,18 +482,15 @@ function setupFormSubmit() {
                 if (data.success) {
                     console.log('✅ Registro exitoso:', data);
 
-                    // Mostrar mensaje de éxito
                     if (typeof Utils !== 'undefined') {
                         Utils.showNotification('¡Registro completado exitosamente! Redirigiendo al login...', 'success');
                     } else {
                         alert('🎉 ¡Registro exitoso!\n\nRedirigiendo al login para que ingreses con tu cuenta...');
                     }
 
-                    // Guardar el email temporalmente para pre-llenarlo en el login
                     const email = document.getElementById('email').value;
                     sessionStorage.setItem('registeredEmail', email);
 
-                    // Redirigir al login después de 2 segundos
                     setTimeout(() => {
                         window.location.href = 'login.html?role=deportista';
                     }, 2000);
@@ -552,7 +508,6 @@ function setupFormSubmit() {
                     alert('Error: ' + error.message);
                 }
 
-                // Rehabilitar botón en caso de error
                 btnSubmit.disabled = false;
                 loadingSpinner.classList.add('hidden');
             }
@@ -560,7 +515,6 @@ function setupFormSubmit() {
     }
 }
 
-// Validar todo el formulario
 function validateForm() {
     const form = document.getElementById('formRegistro');
     const requiredInputs = form.querySelectorAll('input[required], select[required]');
@@ -605,7 +559,6 @@ function validateForm() {
     return isValid;
 }
 
-// Funciones auxiliares
 function showError(input, message, errorElement) {
     if (input) {
         input.style.borderColor = '#E21B23';
@@ -656,7 +609,6 @@ function checkAuthStatus() {
     }
 }
 
-// Manejar errores de imágenes
 document.querySelectorAll('img').forEach(img => {
     img.addEventListener('error', function () {
         const fallback = document.createElement('div');

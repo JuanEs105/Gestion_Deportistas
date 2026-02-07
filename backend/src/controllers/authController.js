@@ -1,13 +1,12 @@
-// backend/src/controllers/authController.js - VERSIÓN CORREGIDA COMPLETA
+// backend/src/controllers/authController.js - VERSIÓN CORREGIDA PARA GUARDAR TODOS LOS CAMPOS
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { User, Deportista } = require('../models');
 const { validationResult } = require('express-validator');
-// ✅ IMPORTAR EMAIL SERVICE DESDE LA RUTA CORRECTA
 const EmailService = require('../config/emailService');
 
 class AuthController {
-  // Login de usuario - JWT OPTIMIZADO
+  // Login de usuario
   static async login(req, res) {
     try {
       console.log('📥 Petición de login recibida:', req.body.email);
@@ -23,7 +22,7 @@ class AuthController {
       console.log('🔍 Buscando usuario en BD...');
       const user = await User.findOne({
         where: { email },
-        attributes: ['id', 'nombre', 'email', 'password', 'role', 'activo', 'telefono', 'niveles_asignados']
+        attributes: ['id', 'nombre', 'apellidos', 'email', 'password', 'role', 'activo', 'telefono', 'niveles_asignados', 'tipo_documento', 'numero_documento', 'ciudad']
       });
 
       if (!user) {
@@ -35,22 +34,10 @@ class AuthController {
 
       console.log('✅ Usuario encontrado:', user.email);
 
-      // 🔥 AGREGAR ESTE DEBUG DETALLADO
-      console.log('\n🔍 === VERIFICACIÓN DE LOGIN ===');
-      console.log('📧 Email:', email);
-      console.log('🔐 Contraseña recibida (length):', password.length);
-      console.log('🔐 Primeros 3 chars:', password.substring(0, 3) + '...');
-      console.log('🔒 Hash en BD:', user.password.substring(0, 20) + '...');
-
       const isPasswordValid = await bcrypt.compare(password, user.password);
-
-      console.log('✅ Resultado comparación:', isPasswordValid ? 'VÁLIDA ✓' : 'INVÁLIDA ✗');
 
       if (!isPasswordValid) {
         console.log('❌ Contraseña incorrecta');
-        console.log('   - Email usado:', email);
-        console.log('   - Password usado:', password);
-        console.log('   - Hash en BD:', user.password);
         return res.status(401).json({
           error: 'Credenciales inválidas'
         });
@@ -65,9 +52,6 @@ class AuthController {
         });
       }
 
-      // ✅ JWT MÍNIMO - Solo datos esenciales
-      console.log('🔑 Generando token optimizado...');
-
       const tokenPayload = {
         id: user.id,
         email: user.email,
@@ -80,20 +64,20 @@ class AuthController {
         { expiresIn: '7d' }
       );
 
-      console.log('📏 Token length:', token.length, 'caracteres');
-
-      // Respuesta completa del usuario
       const userResponse = {
         id: user.id,
         nombre: user.nombre,
+        apellidos: user.apellidos,
         email: user.email,
         role: user.role,
         telefono: user.telefono,
         activo: user.activo,
+        tipo_documento: user.tipo_documento,
+        numero_documento: user.numero_documento,
+        ciudad: user.ciudad,
         niveles_asignados: user.niveles_asignados || []
       };
 
-      // Solo buscar deportista si es necesario
       if (user.role === 'deportista') {
         const deportista = await Deportista.findOne({
           where: { user_id: user.id },
@@ -123,7 +107,7 @@ class AuthController {
     }
   }
 
-  // Registro de usuario
+  // Registro de usuario simple
   static async register(req, res) {
     try {
       console.log('📥 Petición de registro recibida');
@@ -133,7 +117,7 @@ class AuthController {
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const { nombre, email, password, role, telefono } = req.body;
+      const { nombre, apellidos, email, password, role, telefono, tipo_documento, numero_documento, ciudad } = req.body;
 
       const existingUser = await User.findOne({ where: { email } });
       if (existingUser) {
@@ -146,10 +130,14 @@ class AuthController {
 
       const user = await User.create({
         nombre,
+        apellidos,
         email,
         password: hashedPassword,
         role: role || 'deportista',
         telefono,
+        tipo_documento,
+        numero_documento,
+        ciudad,
         activo: true
       });
 
@@ -163,7 +151,6 @@ class AuthController {
         });
       }
 
-      // ✅ JWT optimizado
       const tokenPayload = {
         id: user.id,
         email: user.email,
@@ -179,9 +166,13 @@ class AuthController {
       const userResponse = {
         id: user.id,
         nombre: user.nombre,
+        apellidos: user.apellidos,
         email: user.email,
         role: user.role,
         telefono: user.telefono,
+        tipo_documento: user.tipo_documento,
+        numero_documento: user.numero_documento,
+        ciudad: user.ciudad,
         activo: user.activo
       };
 
@@ -201,18 +192,25 @@ class AuthController {
     }
   }
 
-  // backend/src/controllers/authController.js
+  // 🔥🔥🔥 MÉTODO CORREGIDO - GUARDA TODOS LOS CAMPOS 🔥🔥🔥
   static async registroDeportista(req, res) {
     try {
-      console.log('\n📋 === REGISTRO DEPORTISTA SIMPLIFICADO ===');
+      console.log('\n📋 === REGISTRO DEPORTISTA CORREGIDO ===');
       console.log('📦 Body recibido:', req.body);
       console.log('📁 Archivos recibidos:', req.files);
 
       const {
-        nombre,
-        email,
-        password,
-        telefono,
+        // 🔥 CAMPOS OBLIGATORIOS EN USER
+        nombre,               // Nombre(s) del deportista
+        apellidos,            // Apellidos del deportista
+        tipo_documento,       // Tipo de documento (registro_civil, tarjeta_identidad, etc.)
+        numero_documento,     // Número de documento
+        email,                // Email
+        password,             // Contraseña
+        ciudad,               // Ciudad (ciudad_nacimiento en el formulario)
+        telefono,             // Celular del deportista (opcional)
+        
+        // CAMPOS DEL DEPORTISTA
         fecha_nacimiento,
         ciudad_nacimiento,
         direccion,
@@ -224,11 +222,53 @@ class AuthController {
         terminos_aceptados
       } = req.body;
 
-      // Verificar campos requeridos
-      if (!nombre || !email || !password) {
+      // 🔥 VALIDAR CAMPOS OBLIGATORIOS
+      if (!nombre) {
         return res.status(400).json({
           success: false,
-          message: 'Nombre, email y contraseña son obligatorios'
+          message: 'El nombre es obligatorio'
+        });
+      }
+
+      if (!apellidos) {
+        return res.status(400).json({
+          success: false,
+          message: 'Los apellidos son obligatorios'
+        });
+      }
+
+      if (!tipo_documento) {
+        return res.status(400).json({
+          success: false,
+          message: 'El tipo de documento es obligatorio'
+        });
+      }
+
+      if (!numero_documento) {
+        return res.status(400).json({
+          success: false,
+          message: 'El número de documento es obligatorio'
+        });
+      }
+
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          message: 'El email es obligatorio'
+        });
+      }
+
+      if (!password) {
+        return res.status(400).json({
+          success: false,
+          message: 'La contraseña es obligatoria'
+        });
+      }
+
+      if (!ciudad && !ciudad_nacimiento) {
+        return res.status(400).json({
+          success: false,
+          message: 'La ciudad es obligatoria'
         });
       }
 
@@ -241,12 +281,16 @@ class AuthController {
         });
       }
 
-      console.log('👤 Creando usuario...');
+      console.log('👤 Creando usuario con TODOS los campos...');
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Crear usuario
+      // 🔥 CREAR USER CON TODOS LOS CAMPOS
       const user = await User.create({
-        nombre,
+        nombre,                    // ✅ Nombre
+        apellidos,                 // ✅ Apellidos
+        tipo_documento,            // ✅ Tipo de documento
+        numero_documento,          // ✅ Número de documento
+        ciudad: ciudad || ciudad_nacimiento,  // ✅ Ciudad
         email,
         password: hashedPassword,
         role: 'deportista',
@@ -255,12 +299,18 @@ class AuthController {
       });
 
       console.log('✅ Usuario creado ID:', user.id);
+      console.log('📊 Datos guardados en USER:');
+      console.log('  - nombre:', user.nombre);
+      console.log('  - apellidos:', user.apellidos);
+      console.log('  - tipo_documento:', user.tipo_documento);
+      console.log('  - numero_documento:', user.numero_documento);
+      console.log('  - ciudad:', user.ciudad);
 
       // Preparar datos del deportista
       const deportistaData = {
         user_id: user.id,
         fecha_nacimiento: fecha_nacimiento || null,
-        ciudad_nacimiento: ciudad_nacimiento || null,
+        ciudad_nacimiento: ciudad_nacimiento || ciudad || null,
         direccion: direccion || null,
         eps: eps || null,
         talla_camiseta: talla_camiseta || null,
@@ -271,11 +321,11 @@ class AuthController {
         estado: 'activo',
         equipo_competitivo: 'sin_equipo',
         acepta_terminos: terminos_aceptados === 'true' || false,
-        documento_identidad: 'pending_upload', // Por defecto
+        documento_identidad: 'pending_upload',
         foto_perfil: null
       };
 
-      // 🔥 MANEJO DE ARCHIVOS CON CLOUDINARY (OPCIONAL)
+      // Manejo de archivos con Cloudinary (si existen)
       if (req.files?.documento?.[0]) {
         deportistaData.documento_identidad = req.files.documento[0].path;
       }
@@ -305,7 +355,7 @@ class AuthController {
         { expiresIn: '7d' }
       );
 
-      // Respuesta exitosa
+      // Respuesta exitosa con TODOS los datos
       res.status(201).json({
         success: true,
         message: '¡Registro completado exitosamente!',
@@ -313,6 +363,10 @@ class AuthController {
         user: {
           id: user.id,
           nombre: user.nombre,
+          apellidos: user.apellidos,
+          tipo_documento: user.tipo_documento,
+          numero_documento: user.numero_documento,
+          ciudad: user.ciudad,
           email: user.email,
           role: user.role,
           telefono: user.telefono,
@@ -351,7 +405,7 @@ class AuthController {
       const user = req.user;
 
       const userComplete = await User.findByPk(user.id, {
-        attributes: ['id', 'nombre', 'email', 'role', 'telefono', 'activo', 'niveles_asignados', 'foto_perfil']
+        attributes: ['id', 'nombre', 'apellidos', 'email', 'role', 'telefono', 'activo', 'niveles_asignados', 'foto_perfil', 'tipo_documento', 'numero_documento', 'ciudad']
       });
 
       let deportistaProfile = null;
@@ -369,10 +423,14 @@ class AuthController {
       const userResponse = {
         id: userComplete.id,
         nombre: userComplete.nombre,
+        apellidos: userComplete.apellidos,
         email: userComplete.email,
         role: userComplete.role,
-        telefono: userComplete.telefono,  // ✅ Ahora sí incluye teléfono
+        telefono: userComplete.telefono,
         activo: userComplete.activo,
+        tipo_documento: userComplete.tipo_documento,
+        numero_documento: userComplete.numero_documento,
+        ciudad: userComplete.ciudad,
         niveles_asignados: userComplete.niveles_asignados || [],
         foto_perfil: userComplete.foto_perfil
       };
@@ -394,7 +452,7 @@ class AuthController {
     }
   }
 
-  // ✅✅✅ MÉTODO CORREGIDO: Recuperación de contraseña
+  // Recuperación de contraseña
   static async solicitarRecuperacion(req, res) {
     try {
       const { email } = req.body;
@@ -408,7 +466,6 @@ class AuthController {
 
       const user = await User.findOne({ where: { email } });
 
-      // Por seguridad, siempre devolver éxito incluso si el usuario no existe
       if (!user) {
         console.log('⚠️  Email no encontrado en la base de datos');
         return res.json({
@@ -419,18 +476,15 @@ class AuthController {
 
       console.log('✅ Usuario encontrado:', user.nombre, `(${user.email})`);
 
-      // Generar código de 6 dígitos
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       console.log('🔑 Código generado:', code);
 
-      // Guardar en base de datos con expiración de 15 minutos
       user.reset_password_code = code;
       user.reset_password_expires = new Date(Date.now() + 15 * 60 * 1000);
       await user.save();
 
       console.log('💾 Código guardado en BD para usuario ID:', user.id);
 
-      // ✅✅✅ ENVIAR EL EMAIL - ESTA ES LA PARTE CRÍTICA QUE FALTABA ✅✅✅
       try {
         console.log('📤 Enviando email a través de EmailService...');
         const emailResult = await EmailService.sendRecoveryCode(
@@ -442,7 +496,6 @@ class AuthController {
         console.log('📨 Message ID:', emailResult.messageId);
       } catch (emailError) {
         console.error('❌ Error enviando email:', emailError.message);
-        // Aún así devolver éxito para no revelar información
         return res.json({
           success: true,
           message: 'Si el email existe, recibirás un código'
@@ -585,9 +638,6 @@ class AuthController {
       });
     }
   }
-
-
 }
-
 
 module.exports = AuthController;
