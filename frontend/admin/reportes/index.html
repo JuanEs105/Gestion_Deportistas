@@ -82,7 +82,7 @@
     </div>
 </aside>
 
-<!-- Main FIJO en ml-64 -->
+<!-- Main -->
 <main class="ml-64 p-8">
     <header class="mb-8">
         <h1 class="sports-heading text-4xl font-bold">Reportes y Documentos</h1>
@@ -137,12 +137,13 @@
         </div>
     </div>
 
+    <!-- Loading -->
     <div id="loadingIndicator" class="hidden fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-3">
         <div class="spinner"></div>
         <span>⏳ Procesando...</span>
     </div>
 
-    <!-- Excel -->
+    <!-- Excel + Filtros -->
     <section class="mb-8">
         <div class="flex justify-between items-center mb-6">
             <div>
@@ -155,21 +156,22 @@
             </button>
         </div>
 
-        <!-- Filtros -->
+        <!-- Filtros Avanzados -->
         <div class="filtros-container bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
             <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
                 <span class="material-symbols-outlined text-primary">tune</span>
                 Filtros de Búsqueda
             </h3>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Fila 1: inputs de texto -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div>
                     <label class="label-filtro">👤 Nombre</label>
-                    <input type="text" id="filtroNombreCompleto" class="input-filtro" placeholder="Buscar...">
+                    <input type="text" id="filtroNombreCompleto" class="input-filtro" placeholder="Buscar por nombre...">
                 </div>
                 <div>
                     <label class="label-filtro">🆔 Documento</label>
-                    <input type="text" id="filtroNumeroDocumento" class="input-filtro" placeholder="Número...">
+                    <input type="text" id="filtroNumeroDocumento" class="input-filtro" placeholder="Número de documento...">
                 </div>
                 <div>
                     <label class="label-filtro">✉️ Email</label>
@@ -187,10 +189,14 @@
                     <label class="label-filtro">🏥 EPS</label>
                     <input type="text" id="filtroEPS" class="input-filtro" placeholder="Sura...">
                 </div>
+            </div>
+
+            <!-- Fila 2: selects -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div>
                     <label class="label-filtro">🏆 Grupo Competitivo</label>
                     <select id="filtroGrupoCompetitivo" class="input-filtro">
-                        <option value="">Todos</option>
+                        <option value="">Todos los grupos</option>
                         <option value="sin_equipo">Sin equipo</option>
                         <option value="rocks_titans">Rocks Titans</option>
                         <option value="lightning_titans">Lightning Titans</option>
@@ -200,9 +206,9 @@
                     </select>
                 </div>
                 <div>
-                    <label class="label-filtro">📊 Nivel</label>
+                    <label class="label-filtro">📈 Nivel</label>
                     <select id="filtroNivelDetallado" class="input-filtro">
-                        <option value="">Todos</option>
+                        <option value="">Todos los niveles</option>
                         <option value="baby_titans">Baby Titans</option>
                         <option value="1_basico">1 Básico</option>
                         <option value="1_medio">1 Medio</option>
@@ -213,7 +219,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="label-filtro">📄 Documento</label>
+                    <label class="label-filtro">📄 Tiene Documento</label>
                     <select id="filtroTieneDocumento" class="input-filtro">
                         <option value="todos">Todos</option>
                         <option value="true">Con documento</option>
@@ -222,6 +228,7 @@
                 </div>
             </div>
 
+            <!-- Fila 3: chips -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                     <label class="label-filtro">📊 Estado</label>
@@ -244,6 +251,7 @@
                 </div>
             </div>
 
+            <!-- Footer filtros -->
             <div class="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
                 <div class="flex items-center gap-3">
                     <span class="text-sm font-semibold">
@@ -301,6 +309,7 @@
 
 </main>
 
+<!-- Botón Ayuda -->
 <button id="btnAyuda" class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl hover:scale-110 transition-transform z-50 flex items-center justify-center">
     <span class="material-symbols-outlined">help</span>
 </button>

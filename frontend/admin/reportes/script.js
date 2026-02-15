@@ -16,14 +16,11 @@ if (typeof window.ReportesApp === 'undefined') {
         // ==========================================
         async init() {
             console.log('🚀 Inicializando ReportesApp...');
-
             if (!this.checkAuth()) return;
-
             await this.cargarEstadisticas();
             await this.cargarDeportistas();
             this.configurarEventos();
             this.updateUserInfo();
-
             console.log('✅ ReportesApp inicializado');
         },
 
@@ -47,7 +44,7 @@ if (typeof window.ReportesApp === 'undefined') {
 
                 const params = new URLSearchParams();
 
-                // ✅ FILTRO 1: ESTADO (desde chips)
+                // FILTRO ESTADO (desde chips)
                 const estadoChip = document.querySelector('.filtro-chip.estado.active');
                 const estado = estadoChip?.dataset.estado || '';
                 if (estado && estado !== '') {
@@ -55,7 +52,7 @@ if (typeof window.ReportesApp === 'undefined') {
                     console.log('📊 Filtro Estado:', estado);
                 }
 
-                // ✅ FILTRO 2: NIVEL (desde select o chips)
+                // FILTRO NIVEL (select detallado tiene prioridad, luego chip)
                 const nivelSelect = document.getElementById('filtroNivelDetallado')?.value;
                 const nivelChip = document.querySelector('.filtro-chip.nivel.active')?.dataset.nivel || '';
                 const nivel = nivelSelect || nivelChip;
@@ -64,11 +61,35 @@ if (typeof window.ReportesApp === 'undefined') {
                     console.log('📈 Filtro Nivel:', nivel);
                 }
 
-                // ✅ FILTRO 3: GRUPO COMPETITIVO (desde select)
+                // FILTRO GRUPO COMPETITIVO
                 const grupoCompetitivo = document.getElementById('filtroGrupoCompetitivo')?.value;
                 if (grupoCompetitivo && grupoCompetitivo !== '') {
                     params.append('equipoCompetitivo', grupoCompetitivo);
                     console.log('🏆 Filtro Grupo:', grupoCompetitivo);
+                }
+
+                // FILTROS ADICIONALES DE TEXTO
+                const nombreCompleto = document.getElementById('filtroNombreCompleto')?.value?.trim();
+                if (nombreCompleto) params.append('nombreCompleto', nombreCompleto);
+
+                const numeroDocumento = document.getElementById('filtroNumeroDocumento')?.value?.trim();
+                if (numeroDocumento) params.append('numeroDocumento', numeroDocumento);
+
+                const email = document.getElementById('filtroEmail')?.value?.trim();
+                if (email) params.append('email', email);
+
+                const ciudad = document.getElementById('filtroCiudad')?.value?.trim();
+                if (ciudad) params.append('ciudad', ciudad);
+
+                const telefono = document.getElementById('filtroTelefono')?.value?.trim();
+                if (telefono) params.append('telefono', telefono);
+
+                const eps = document.getElementById('filtroEPS')?.value?.trim();
+                if (eps) params.append('eps', eps);
+
+                const tieneDocumento = document.getElementById('filtroTieneDocumento')?.value;
+                if (tieneDocumento && tieneDocumento !== 'todos') {
+                    params.append('tieneDocumento', tieneDocumento);
                 }
 
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -86,26 +107,22 @@ if (typeof window.ReportesApp === 'undefined') {
                     }
                 });
 
-                if (!response.ok) {
-                    throw new Error(`Error ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`Error ${response.status}`);
 
                 const blob = await response.blob();
                 const blobUrl = window.URL.createObjectURL(blob);
 
                 const link = document.createElement('a');
                 link.href = blobUrl;
-                
-                // Nombre descriptivo del archivo según filtros
+
                 let nombreArchivo = 'reporte_deportistas';
                 if (estado) nombreArchivo += `_${estado}`;
                 if (nivel) nombreArchivo += `_${nivel}`;
                 if (grupoCompetitivo) nombreArchivo += `_${grupoCompetitivo.replace('_titans', '')}`;
                 nombreArchivo += `_${new Date().toISOString().split('T')[0]}.xlsx`;
-                
+
                 link.download = nombreArchivo;
                 link.style.display = 'none';
-
                 document.body.appendChild(link);
                 link.click();
 
@@ -115,9 +132,7 @@ if (typeof window.ReportesApp === 'undefined') {
                 }, 100);
 
                 let mensaje = '✅ Excel descargado';
-                if (estado || nivel || grupoCompetitivo) {
-                    mensaje += ' con filtros aplicados';
-                }
+                if (estado || nivel || grupoCompetitivo) mensaje += ' con filtros aplicados';
                 this.showNotification(mensaje, 'success', 3000);
 
             } catch (error) {
@@ -137,10 +152,7 @@ if (typeof window.ReportesApp === 'undefined') {
                 this.mostrarLoading(true);
 
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-
-                if (!token) {
-                    throw new Error('No hay sesión activa');
-                }
+                if (!token) throw new Error('No hay sesión activa');
 
                 const url = `https://gestiondeportistas-production.up.railway.app/api/reportes/documento/${deportistaId}`;
 
@@ -153,9 +165,7 @@ if (typeof window.ReportesApp === 'undefined') {
                 });
 
                 if (!response.ok) {
-                    if (response.status === 401) {
-                        throw new Error('Sesión expirada');
-                    }
+                    if (response.status === 401) throw new Error('Sesión expirada');
                     throw new Error('Error descargando documento');
                 }
 
@@ -166,7 +176,6 @@ if (typeof window.ReportesApp === 'undefined') {
                 }
 
                 const pdfUrl = data.url;
-
                 const nombreArchivo = data.deportista?.nombre
                     ? `${data.deportista.nombre.replace(/\s+/g, '_')}_documento.pdf`
                     : `documento_${deportistaId}.pdf`;
@@ -179,7 +188,6 @@ if (typeof window.ReportesApp === 'undefined') {
                 link.href = blobUrl;
                 link.download = nombreArchivo;
                 link.style.display = 'none';
-
                 document.body.appendChild(link);
                 link.click();
 
@@ -192,7 +200,6 @@ if (typeof window.ReportesApp === 'undefined') {
 
             } catch (error) {
                 console.error('❌ Error:', error);
-
                 let mensaje = 'Error descargando el documento';
 
                 if (error.message.includes('Sesión expirada')) {
@@ -205,14 +212,13 @@ if (typeof window.ReportesApp === 'undefined') {
                 }
 
                 this.showNotification(mensaje, 'error', 5000);
-
             } finally {
                 this.mostrarLoading(false);
             }
         },
 
         // ==========================================
-        // APLICAR FILTROS (VISTA PREVIA CON LOS 3 FILTROS)
+        // APLICAR FILTROS (VISTA PREVIA)
         // ==========================================
         async aplicarFiltros() {
             try {
@@ -221,7 +227,7 @@ if (typeof window.ReportesApp === 'undefined') {
 
                 const params = new URLSearchParams();
 
-                // ✅ FILTRO 1: ESTADO (desde chips)
+                // FILTRO ESTADO (desde chips)
                 const estadoChip = document.querySelector('.filtro-chip.estado.active');
                 const estado = estadoChip?.dataset.estado || '';
                 if (estado && estado !== '') {
@@ -229,7 +235,7 @@ if (typeof window.ReportesApp === 'undefined') {
                     console.log('📊 Filtro Estado:', estado);
                 }
 
-                // ✅ FILTRO 2: NIVEL (desde select o chips)
+                // FILTRO NIVEL (select detallado tiene prioridad, luego chip)
                 const nivelSelect = document.getElementById('filtroNivelDetallado')?.value;
                 const nivelChip = document.querySelector('.filtro-chip.nivel.active')?.dataset.nivel || '';
                 const nivel = nivelSelect || nivelChip;
@@ -238,14 +244,14 @@ if (typeof window.ReportesApp === 'undefined') {
                     console.log('📈 Filtro Nivel:', nivel);
                 }
 
-                // ✅ FILTRO 3: GRUPO COMPETITIVO (desde select)
+                // FILTRO GRUPO COMPETITIVO
                 const grupoCompetitivo = document.getElementById('filtroGrupoCompetitivo')?.value;
                 if (grupoCompetitivo && grupoCompetitivo !== '') {
                     params.append('equipoCompetitivo', grupoCompetitivo);
                     console.log('🏆 Filtro Grupo:', grupoCompetitivo);
                 }
 
-                // Agregar otros filtros opcionales
+                // FILTROS ADICIONALES DE TEXTO
                 const nombreCompleto = document.getElementById('filtroNombreCompleto')?.value?.trim();
                 if (nombreCompleto) params.append('nombreCompleto', nombreCompleto);
 
@@ -286,9 +292,7 @@ if (typeof window.ReportesApp === 'undefined') {
                     this.state.deportistasFiltrados = data.deportistas || [];
                     this.actualizarVistaPrevia();
                     this.actualizarContadores();
-
                     document.getElementById('filtrosAplicados')?.classList.remove('hidden');
-
                     this.showNotification(`✅ ${this.state.deportistasFiltrados.length} deportistas encontrados`, 'success', 2000);
                 }
 
@@ -301,7 +305,7 @@ if (typeof window.ReportesApp === 'undefined') {
         },
 
         // ==========================================
-        // CARGAR DATOS
+        // CARGAR DATOS INICIALES
         // ==========================================
         async cargarEstadisticas() {
             try {
@@ -317,7 +321,7 @@ if (typeof window.ReportesApp === 'undefined') {
                     }
                 }
             } catch (error) {
-                console.error('❌ Error:', error);
+                console.error('❌ Error estadísticas:', error);
             }
         },
 
@@ -340,14 +344,14 @@ if (typeof window.ReportesApp === 'undefined') {
                     }
                 }
             } catch (error) {
-                console.error('❌ Error:', error);
+                console.error('❌ Error deportistas:', error);
             } finally {
                 this.mostrarLoading(false);
             }
         },
 
         // ==========================================
-        // UI HELPERS - TABLA CORREGIDA
+        // UI HELPERS
         // ==========================================
         actualizarEstadisticasUI(stats) {
             document.getElementById('totalDeportistas').textContent = stats.total_deportistas || 0;
@@ -356,7 +360,6 @@ if (typeof window.ReportesApp === 'undefined') {
             document.getElementById('cloudinaryDocs').textContent = stats.cloudinary || 0;
         },
 
-        // 🔥 TABLA CORREGIDA - MUESTRA LOS DATOS CORRECTAMENTE
         actualizarVistaPrevia() {
             const tbody = document.getElementById('tablaResultados');
             const sinResultados = document.getElementById('sinResultados');
@@ -368,7 +371,7 @@ if (typeof window.ReportesApp === 'undefined') {
 
             if (this.state.deportistasFiltrados.length === 0) {
                 sinResultados?.classList.remove('hidden');
-                resultadosTotales.textContent = 'Mostrando 0 resultados';
+                if (resultadosTotales) resultadosTotales.textContent = 'Mostrando 0 resultados';
                 return;
             }
 
@@ -379,7 +382,6 @@ if (typeof window.ReportesApp === 'undefined') {
             resultados.forEach(deportista => {
                 const row = document.createElement('tr');
 
-                // 🔥 CORRECCIÓN: EXTRAER DATOS CORRECTAMENTE
                 const nombre = deportista.nombre_completo || '';
                 const documento = deportista.numero_documento || '';
                 const nivel = deportista.nivel_actual || 'Pendiente';
@@ -396,31 +398,33 @@ if (typeof window.ReportesApp === 'undefined') {
                         <span class="badge ${this.getEstadoColor(estado)}">${estado}</span>
                     </td>
                     <td class="px-6 py-4">
-                        ${tieneDoc ?
-                        '<span class="badge bg-green-100">✓ Subido</span>' :
-                        '<span class="badge bg-gray-100">✗ Pendiente</span>'}
+                        ${tieneDoc
+                            ? '<span class="badge bg-green-100">✓ Subido</span>'
+                            : '<span class="badge bg-gray-100">✗ Pendiente</span>'
+                        }
                     </td>
                     <td class="px-6 py-4 text-right">
-                        ${tieneDoc ?
-                        `<button onclick="ReportesApp.descargarDocumentoIndividual('${deportista.id}')" 
-                              class="px-3 py-1 text-xs bg-primary text-white rounded hover:bg-red-700 transition-colors">
-                                Descargar
-                             </button>` :
-                        '<span class="text-gray-400 text-xs">No disponible</span>'}
+                        ${tieneDoc
+                            ? `<button onclick="ReportesApp.descargarDocumentoIndividual('${deportista.id}')"
+                                class="px-3 py-1 text-xs bg-primary text-white rounded hover:bg-red-700 transition-colors">
+                                    Descargar
+                               </button>`
+                            : '<span class="text-gray-400 text-xs">No disponible</span>'
+                        }
                     </td>
                 `;
 
                 tbody.appendChild(row);
             });
 
-            resultadosTotales.textContent = `Mostrando ${Math.min(resultados.length, 10)} de ${this.state.deportistasFiltrados.length} resultados`;
+            if (resultadosTotales) {
+                resultadosTotales.textContent = `Mostrando ${Math.min(resultados.length, 10)} de ${this.state.deportistasFiltrados.length} resultados`;
+            }
         },
 
         actualizarContadores() {
             const contador = document.getElementById('contadorResultados');
-            if (contador) {
-                contador.textContent = this.state.deportistasFiltrados.length;
-            }
+            if (contador) contador.textContent = this.state.deportistasFiltrados.length;
         },
 
         getEstadoColor(estado) {
@@ -434,7 +438,7 @@ if (typeof window.ReportesApp === 'undefined') {
         },
 
         limpiarFiltros() {
-            // Limpiar inputs
+            // Limpiar inputs de texto
             document.querySelectorAll('input[type="text"], input[type="email"]').forEach(input => {
                 input.value = '';
             });
@@ -444,11 +448,8 @@ if (typeof window.ReportesApp === 'undefined') {
                 select.value = select.id === 'filtroTieneDocumento' ? 'todos' : '';
             });
 
-            // Resetear chips
-            document.querySelectorAll('.filtro-chip').forEach(chip => {
-                chip.classList.remove('active');
-            });
-            
+            // Resetear chips: quitar active de todos, poner active en "Todos"
+            document.querySelectorAll('.filtro-chip').forEach(chip => chip.classList.remove('active'));
             document.querySelectorAll('.filtro-chip[data-estado=""], .filtro-chip[data-nivel=""]').forEach(chip => {
                 chip.classList.add('active');
             });
@@ -464,9 +465,7 @@ if (typeof window.ReportesApp === 'undefined') {
 
         mostrarLoading(mostrar) {
             const loading = document.getElementById('loadingIndicator');
-            if (loading) {
-                loading.classList.toggle('hidden', !mostrar);
-            }
+            if (loading) loading.classList.toggle('hidden', !mostrar);
         },
 
         updateUserInfo() {
@@ -477,7 +476,7 @@ if (typeof window.ReportesApp === 'undefined') {
                     const user = userStr ? JSON.parse(userStr) : null;
                     if (user?.email) userEmail.textContent = user.email;
                 } catch (e) {
-                    console.error('Error:', e);
+                    console.error('Error updateUserInfo:', e);
                 }
             }
         },
@@ -486,21 +485,22 @@ if (typeof window.ReportesApp === 'undefined') {
         // CONFIGURAR EVENTOS
         // ==========================================
         configurarEventos() {
-            // Botón de descarga Excel
+            // Descargar Excel
             document.getElementById('descargarExcelCompletoBtn')?.addEventListener('click', () => {
                 this.descargarExcelCompleto();
             });
 
-            // Botones de filtros
+            // Aplicar filtros
             document.getElementById('aplicarFiltrosBtn')?.addEventListener('click', () => {
                 this.aplicarFiltros();
             });
 
+            // Limpiar filtros
             document.getElementById('limpiarFiltrosBtn')?.addEventListener('click', () => {
                 this.limpiarFiltros();
             });
 
-            // Chips de filtro
+            // Chips de estado y nivel
             document.querySelectorAll('.filtro-chip').forEach(chip => {
                 chip.addEventListener('click', (e) => {
                     const tipo = e.target.classList.contains('estado') ? 'estado' : 'nivel';
@@ -509,21 +509,24 @@ if (typeof window.ReportesApp === 'undefined') {
                 });
             });
 
-            // Enter en campos de texto
-            document.querySelectorAll('#filtroNombreCompleto, #filtroNumeroDocumento, #filtroEmail').forEach(input => {
+            // Enter en campos de texto dispara búsqueda
+            document.querySelectorAll('#filtroNombreCompleto, #filtroNumeroDocumento, #filtroEmail, #filtroCiudad, #filtroTelefono, #filtroEPS').forEach(input => {
                 input.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.aplicarFiltros();
                 });
             });
 
-            // Ayuda
+            // Botón de ayuda
             document.getElementById('btnAyuda')?.addEventListener('click', () => {
-                alert('📋 GUÍA DE USO\n\n' +
-                      '1️⃣ Selecciona Estado, Nivel y/o Grupo Competitivo\n' +
-                      '2️⃣ Haz clic en "Aplicar" para buscar\n' +
-                      '3️⃣ Los deportistas encontrados aparecen en la tabla\n' +
-                      '4️⃣ Descarga sus PDFs con el botón "Descargar"\n' +
-                      '5️⃣ O descarga el Excel completo con "Descargar Excel"');
+                alert(
+                    '📋 GUÍA DE USO\n\n' +
+                    '1️⃣ Completa los filtros que necesites (nombre, documento, email, etc.)\n' +
+                    '2️⃣ Selecciona Estado, Nivel y/o Grupo Competitivo\n' +
+                    '3️⃣ Haz clic en "Aplicar" para buscar\n' +
+                    '4️⃣ Los deportistas encontrados aparecen en la tabla\n' +
+                    '5️⃣ Descarga PDFs individuales con el botón "Descargar"\n' +
+                    '6️⃣ O descarga el Excel completo con "Descargar Excel"'
+                );
             });
         },
 
@@ -543,9 +546,10 @@ if (typeof window.ReportesApp === 'undefined') {
             }
 
             const notification = document.createElement('div');
-            const bgColor = type === 'error' ? '#EF4444' :
-                type === 'success' ? '#10B981' :
-                    type === 'warning' ? '#F59E0B' : '#3B82F6';
+            const bgColor = type === 'error' ? '#EF4444'
+                : type === 'success' ? '#10B981'
+                : type === 'warning' ? '#F59E0B'
+                : '#3B82F6';
 
             notification.style.cssText = `
                 background: ${bgColor};
@@ -559,7 +563,7 @@ if (typeof window.ReportesApp === 'undefined') {
 
             notification.innerHTML = `
                 <span>${message}</span>
-                <button onclick="this.parentElement.remove()" style="background: none; border: none; color: white; margin-left: 10px; cursor: pointer;">✕</button>
+                <button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;margin-left:10px;cursor:pointer;">✕</button>
             `;
 
             container.appendChild(notification);
@@ -572,7 +576,9 @@ if (typeof window.ReportesApp === 'undefined') {
     };
 }
 
-// Inicializar
+// ==========================================
+// INICIALIZAR AL CARGAR DOM
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     if (!document.querySelector('#notification-styles')) {
         const style = document.createElement('style');
@@ -590,12 +596,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(style);
     }
 
-    if (window.ReportesApp) {
-        window.ReportesApp.init();
-    }
+    if (window.ReportesApp) window.ReportesApp.init();
 });
 
-// Función para cambiar tema
+// ==========================================
+// TEMA OSCURO
+// ==========================================
 function toggleTheme() {
     const html = document.documentElement;
     if (html.classList.contains('dark')) {
@@ -607,7 +613,6 @@ function toggleTheme() {
     }
 }
 
-// Cargar tema guardado
 if (localStorage.getItem('theme') === 'dark') {
     document.documentElement.classList.add('dark');
 }
