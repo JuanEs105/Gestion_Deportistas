@@ -95,14 +95,14 @@ if (typeof window.ReportesApp === 'undefined') {
 
                 const link = document.createElement('a');
                 link.href = blobUrl;
-
+                
                 // Nombre descriptivo del archivo según filtros
                 let nombreArchivo = 'reporte_deportistas';
                 if (estado) nombreArchivo += `_${estado}`;
                 if (nivel) nombreArchivo += `_${nivel}`;
                 if (grupoCompetitivo) nombreArchivo += `_${grupoCompetitivo.replace('_titans', '')}`;
                 nombreArchivo += `_${new Date().toISOString().split('T')[0]}.xlsx`;
-
+                
                 link.download = nombreArchivo;
                 link.style.display = 'none';
 
@@ -210,7 +210,7 @@ if (typeof window.ReportesApp === 'undefined') {
             // Nivel desde chips O select
             const nivelChip = document.querySelector('.filtro-chip.nivel.active');
             const nivelSelect = document.getElementById('filtroNivelDetallado')?.value;
-
+            
             // Prioridad al select si tiene valor
             if (nivelSelect && nivelSelect !== '') {
                 filtros.nivel = nivelSelect;
@@ -231,22 +231,62 @@ if (typeof window.ReportesApp === 'undefined') {
         },
 
         // ==========================================
-        // APLICAR FILTROS
+        // APLICAR FILTROS (VISTA PREVIA)
         // ==========================================
         async aplicarFiltros() {
             try {
                 console.log('🔍 Aplicando filtros...');
                 this.mostrarLoading(true);
 
-                const filtros = this.capturarFiltros();
                 const params = new URLSearchParams();
 
-                Object.keys(filtros).forEach(key => {
-                    const value = filtros[key];
-                    if (value && value !== '' && value !== 'todos') {
-                        params.append(key, value);
-                    }
-                });
+                // ✅ FILTRO 1: ESTADO (desde chips)
+                const estadoChip = document.querySelector('.filtro-chip.estado.active');
+                const estado = estadoChip?.dataset.estado || '';
+                if (estado && estado !== '') {
+                    params.append('estado', estado);
+                    console.log('📊 Filtro Estado:', estado);
+                }
+
+                // ✅ FILTRO 2: NIVEL (desde select o chips)
+                const nivelSelect = document.getElementById('filtroNivelDetallado')?.value;
+                const nivelChip = document.querySelector('.filtro-chip.nivel.active')?.dataset.nivel || '';
+                const nivel = nivelSelect || nivelChip;
+                if (nivel && nivel !== '') {
+                    params.append('nivel', nivel);
+                    console.log('📈 Filtro Nivel:', nivel);
+                }
+
+                // ✅ FILTRO 3: GRUPO COMPETITIVO (desde select)
+                const grupoCompetitivo = document.getElementById('filtroGrupoCompetitivo')?.value;
+                if (grupoCompetitivo && grupoCompetitivo !== '') {
+                    params.append('equipoCompetitivo', grupoCompetitivo);
+                    console.log('🏆 Filtro Grupo:', grupoCompetitivo);
+                }
+
+                // Agregar otros filtros opcionales
+                const nombreCompleto = document.getElementById('filtroNombreCompleto')?.value?.trim();
+                if (nombreCompleto) params.append('nombreCompleto', nombreCompleto);
+
+                const numeroDocumento = document.getElementById('filtroNumeroDocumento')?.value?.trim();
+                if (numeroDocumento) params.append('numeroDocumento', numeroDocumento);
+
+                const email = document.getElementById('filtroEmail')?.value?.trim();
+                if (email) params.append('email', email);
+
+                const ciudad = document.getElementById('filtroCiudad')?.value?.trim();
+                if (ciudad) params.append('ciudad', ciudad);
+
+                const telefono = document.getElementById('filtroTelefono')?.value?.trim();
+                if (telefono) params.append('telefono', telefono);
+
+                const eps = document.getElementById('filtroEPS')?.value?.trim();
+                if (eps) params.append('eps', eps);
+
+                const tieneDocumento = document.getElementById('filtroTieneDocumento')?.value;
+                if (tieneDocumento && tieneDocumento !== 'todos') {
+                    params.append('tieneDocumento', tieneDocumento);
+                }
 
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
                 const url = `https://gestiondeportistas-production.up.railway.app/api/reportes/deportistas?${params.toString()}`;
@@ -425,7 +465,7 @@ if (typeof window.ReportesApp === 'undefined') {
             document.querySelectorAll('.filtro-chip').forEach(chip => {
                 chip.classList.remove('active');
             });
-
+            
             document.querySelectorAll('.filtro-chip[data-estado=""], .filtro-chip[data-nivel=""]').forEach(chip => {
                 chip.classList.add('active');
             });
@@ -501,11 +541,11 @@ if (typeof window.ReportesApp === 'undefined') {
 
         mostrarAyuda() {
             alert('📋 GUÍA DE USO DE REPORTES\n\n' +
-                '1️⃣ Usa los filtros para buscar deportistas específicos\n' +
-                '2️⃣ Haz clic en "Aplicar Filtros" para ver resultados\n' +
-                '3️⃣ El botón "Descargar Excel" exporta los resultados filtrados\n' +
-                '4️⃣ Los filtros más importantes son: Nivel, Grupo Competitivo y Estado\n\n' +
-                '💡 Consejo: Combina varios filtros para búsquedas más precisas');
+                  '1️⃣ Usa los filtros para buscar deportistas específicos\n' +
+                  '2️⃣ Haz clic en "Aplicar Filtros" para ver resultados\n' +
+                  '3️⃣ El botón "Descargar Excel" exporta los resultados filtrados\n' +
+                  '4️⃣ Los filtros más importantes son: Nivel, Grupo Competitivo y Estado\n\n' +
+                  '💡 Consejo: Combina varios filtros para búsquedas más precisas');
         },
 
         logout() {
