@@ -38,32 +38,45 @@ if (typeof window.ReportesApp === 'undefined') {
         },
 
         // ==========================================
-        // DESCARGAR EXCEL CON FILTROS
+        // DESCARGAR EXCEL CON FILTROS (SOLO LOS 3 PRINCIPALES)
         // ==========================================
         async descargarExcelCompleto() {
             try {
                 console.log('📊 DESCARGANDO EXCEL...');
                 this.mostrarLoading(true);
 
-                const filtros = this.capturarFiltros();
-                console.log('🔍 Filtros capturados:', filtros);
-
                 const params = new URLSearchParams();
 
-                // Agregar solo filtros con valores
-                Object.keys(filtros).forEach(key => {
-                    const value = filtros[key];
-                    if (value && value !== '' && value !== 'todos') {
-                        params.append(key, value);
-                    }
-                });
+                // ✅ FILTRO 1: ESTADO (desde chips)
+                const estadoChip = document.querySelector('.filtro-chip.estado.active');
+                const estado = estadoChip?.dataset.estado || '';
+                if (estado && estado !== '') {
+                    params.append('estado', estado);
+                    console.log('📊 Filtro Estado:', estado);
+                }
+
+                // ✅ FILTRO 2: NIVEL (desde select o chips)
+                const nivelSelect = document.getElementById('filtroNivelDetallado')?.value;
+                const nivelChip = document.querySelector('.filtro-chip.nivel.active')?.dataset.nivel || '';
+                const nivel = nivelSelect || nivelChip;
+                if (nivel && nivel !== '') {
+                    params.append('nivel', nivel);
+                    console.log('📈 Filtro Nivel:', nivel);
+                }
+
+                // ✅ FILTRO 3: GRUPO COMPETITIVO (desde select)
+                const grupoCompetitivo = document.getElementById('filtroGrupoCompetitivo')?.value;
+                if (grupoCompetitivo && grupoCompetitivo !== '') {
+                    params.append('equipoCompetitivo', grupoCompetitivo);
+                    console.log('🏆 Filtro Grupo:', grupoCompetitivo);
+                }
 
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
                 const baseURL = 'https://gestiondeportistas-production.up.railway.app/api/reportes/excel/grupal';
                 const queryString = params.toString();
                 const url = queryString ? `${baseURL}?${queryString}` : baseURL;
 
-                console.log('🌐 URL:', url);
+                console.log('🌐 URL final:', url);
 
                 const response = await fetch(url, {
                     method: 'GET',
@@ -82,7 +95,15 @@ if (typeof window.ReportesApp === 'undefined') {
 
                 const link = document.createElement('a');
                 link.href = blobUrl;
-                link.download = `reporte_deportistas_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+                // Nombre descriptivo del archivo según filtros
+                let nombreArchivo = 'reporte_deportistas';
+                if (estado) nombreArchivo += `_${estado}`;
+                if (nivel) nombreArchivo += `_${nivel}`;
+                if (grupoCompetitivo) nombreArchivo += `_${grupoCompetitivo.replace('_titans', '')}`;
+                nombreArchivo += `_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+                link.download = nombreArchivo;
                 link.style.display = 'none';
 
                 document.body.appendChild(link);
@@ -93,12 +114,15 @@ if (typeof window.ReportesApp === 'undefined') {
                     window.URL.revokeObjectURL(blobUrl);
                 }, 100);
 
-                const count = this.state.deportistasFiltrados.length || 'todos';
-                this.showNotification(`✅ Excel generado: ${count} registros`, 'success', 3000);
+                let mensaje = '✅ Excel descargado';
+                if (estado || nivel || grupoCompetitivo) {
+                    mensaje += ' con filtros aplicados';
+                }
+                this.showNotification(mensaje, 'success', 3000);
 
             } catch (error) {
                 console.error('❌ Error:', error);
-                this.showNotification('Error al generar Excel', 'error', 5000);
+                this.showNotification('❌ Error al generar Excel', 'error', 5000);
             } finally {
                 this.mostrarLoading(false);
             }
@@ -186,7 +210,7 @@ if (typeof window.ReportesApp === 'undefined') {
             // Nivel desde chips O select
             const nivelChip = document.querySelector('.filtro-chip.nivel.active');
             const nivelSelect = document.getElementById('filtroNivelDetallado')?.value;
-            
+
             // Prioridad al select si tiene valor
             if (nivelSelect && nivelSelect !== '') {
                 filtros.nivel = nivelSelect;
@@ -401,7 +425,7 @@ if (typeof window.ReportesApp === 'undefined') {
             document.querySelectorAll('.filtro-chip').forEach(chip => {
                 chip.classList.remove('active');
             });
-            
+
             document.querySelectorAll('.filtro-chip[data-estado=""], .filtro-chip[data-nivel=""]').forEach(chip => {
                 chip.classList.add('active');
             });
@@ -477,11 +501,11 @@ if (typeof window.ReportesApp === 'undefined') {
 
         mostrarAyuda() {
             alert('📋 GUÍA DE USO DE REPORTES\n\n' +
-                  '1️⃣ Usa los filtros para buscar deportistas específicos\n' +
-                  '2️⃣ Haz clic en "Aplicar Filtros" para ver resultados\n' +
-                  '3️⃣ El botón "Descargar Excel" exporta los resultados filtrados\n' +
-                  '4️⃣ Los filtros más importantes son: Nivel, Grupo Competitivo y Estado\n\n' +
-                  '💡 Consejo: Combina varios filtros para búsquedas más precisas');
+                '1️⃣ Usa los filtros para buscar deportistas específicos\n' +
+                '2️⃣ Haz clic en "Aplicar Filtros" para ver resultados\n' +
+                '3️⃣ El botón "Descargar Excel" exporta los resultados filtrados\n' +
+                '4️⃣ Los filtros más importantes son: Nivel, Grupo Competitivo y Estado\n\n' +
+                '💡 Consejo: Combina varios filtros para búsquedas más precisas');
         },
 
         logout() {
