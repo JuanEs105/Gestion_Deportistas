@@ -155,27 +155,54 @@
             </button>
         </div>
 
-        <!-- 🔥 FILTROS SIMPLIFICADOS - SOLO 3 -->
+        <!-- Filtros -->
         <div class="filtros-container bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
             <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
                 <span class="material-symbols-outlined text-primary">tune</span>
                 Filtros de Búsqueda
             </h3>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div>
-                    <label class="label-filtro">📊 Estado</label>
-                    <select id="filtroEstado" class="input-filtro">
-                        <option value="">Todos los estados</option>
-                        <option value="activo">Activos</option>
-                        <option value="inactivo">Inactivos</option>
-                        <option value="lesionado">Lesionados</option>
+                    <label class="label-filtro">👤 Nombre</label>
+                    <input type="text" id="filtroNombreCompleto" class="input-filtro" placeholder="Buscar...">
+                </div>
+                <div>
+                    <label class="label-filtro">🆔 Documento</label>
+                    <input type="text" id="filtroNumeroDocumento" class="input-filtro" placeholder="Número...">
+                </div>
+                <div>
+                    <label class="label-filtro">✉️ Email</label>
+                    <input type="email" id="filtroEmail" class="input-filtro" placeholder="email@ejemplo.com">
+                </div>
+                <div>
+                    <label class="label-filtro">🏙️ Ciudad</label>
+                    <input type="text" id="filtroCiudad" class="input-filtro" placeholder="Bogotá...">
+                </div>
+                <div>
+                    <label class="label-filtro">📞 Teléfono</label>
+                    <input type="text" id="filtroTelefono" class="input-filtro" placeholder="300 123 4567">
+                </div>
+                <div>
+                    <label class="label-filtro">🏥 EPS</label>
+                    <input type="text" id="filtroEPS" class="input-filtro" placeholder="Sura...">
+                </div>
+                <div>
+                    <label class="label-filtro">🏆 Grupo Competitivo</label>
+                    <select id="filtroGrupoCompetitivo" class="input-filtro">
+                        <option value="">Todos</option>
+                        <option value="sin_equipo">Sin equipo</option>
+                        <option value="rocks_titans">Rocks Titans</option>
+                        <option value="lightning_titans">Lightning Titans</option>
+                        <option value="storm_titans">Storm Titans</option>
+                        <option value="fire_titans">Fire Titans</option>
+                        <option value="electric_titans">Electric Titans</option>
                     </select>
                 </div>
                 <div>
-                    <label class="label-filtro">📈 Nivel</label>
-                    <select id="filtroNivel" class="input-filtro">
-                        <option value="">Todos los niveles</option>
+                    <label class="label-filtro">📊 Nivel</label>
+                    <select id="filtroNivelDetallado" class="input-filtro">
+                        <option value="">Todos</option>
                         <option value="baby_titans">Baby Titans</option>
                         <option value="1_basico">1 Básico</option>
                         <option value="1_medio">1 Medio</option>
@@ -186,16 +213,34 @@
                     </select>
                 </div>
                 <div>
-                    <label class="label-filtro">🏆 Grupo Competitivo</label>
-                    <select id="filtroGrupoCompetitivo" class="input-filtro">
-                        <option value="">Todos los grupos</option>
-                        <option value="sin_equipo">Sin equipo</option>
-                        <option value="rocks_titans">Rocks Titans</option>
-                        <option value="lightning_titans">Lightning Titans</option>
-                        <option value="storm_titans">Storm Titans</option>
-                        <option value="fire_titans">Fire Titans</option>
-                        <option value="electric_titans">Electric Titans</option>
+                    <label class="label-filtro">📄 Documento</label>
+                    <select id="filtroTieneDocumento" class="input-filtro">
+                        <option value="todos">Todos</option>
+                        <option value="true">Con documento</option>
+                        <option value="false">Sin documento</option>
                     </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="label-filtro">📊 Estado</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="filtro-chip estado active" data-estado="">Todos</button>
+                        <button class="filtro-chip estado" data-estado="activo">Activos</button>
+                        <button class="filtro-chip estado" data-estado="inactivo">Inactivos</button>
+                        <button class="filtro-chip estado" data-estado="lesionado">Lesionados</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="label-filtro">📈 Nivel Rápido</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="filtro-chip nivel active" data-nivel="">Todos</button>
+                        <button class="filtro-chip nivel" data-nivel="baby_titans">Baby Titans</button>
+                        <button class="filtro-chip nivel" data-nivel="1_basico">1 Básico</button>
+                        <button class="filtro-chip nivel" data-nivel="1_medio">1 Medio</button>
+                        <button class="filtro-chip nivel" data-nivel="1_avanzado">1 Avanzado</button>
+                    </div>
                 </div>
             </div>
 
@@ -213,7 +258,7 @@
                     </button>
                     <button id="aplicarFiltrosBtn" class="btn-primary px-6 py-2 rounded-lg flex items-center gap-2">
                         <span class="material-symbols-outlined">search</span>
-                        Buscar
+                        Aplicar
                     </button>
                 </div>
             </div>
