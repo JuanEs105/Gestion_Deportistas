@@ -10,9 +10,9 @@ let evaluacionActual = {
 };
 let chartRadar = null;
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('✅ DOM cargado - Evaluación SOLO HABILIDADES (Escala 1-5)');
-    
+
     if (window.EntrenadorAPI && EntrenadorAPI.checkAuth) {
         if (!EntrenadorAPI.checkAuth()) {
             return;
@@ -22,27 +22,27 @@ document.addEventListener('DOMContentLoaded', function() {
             sidebarName.textContent = EntrenadorAPI.user.nombre || EntrenadorAPI.user.email || 'Entrenador';
         }
     }
-    
+
     const urlParams = new URLSearchParams(window.location.search);
     const deportistaId = urlParams.get('deportista');
-    
+
     console.log('🔍 Deportista ID:', deportistaId);
-    
+
     if (!deportistaId) {
         console.error('❌ No se especificó deportista');
         mostrarError('No se especificó deportista para evaluar');
         setTimeout(() => volverASeleccion(), 2000);
         return;
     }
-    
+
     document.getElementById('toggleTheme')?.addEventListener('click', toggleTheme);
     document.getElementById('logoutBtn')?.addEventListener('click', logout);
-    
+
     const savedTheme = localStorage.getItem('theme') || 'light';
     if (savedTheme === 'dark') {
         document.documentElement.classList.add('dark');
     }
-    
+
     const fechaElement = document.getElementById('fechaEvaluacion');
     if (fechaElement) {
         const fecha = new Date().toLocaleDateString('es-ES', {
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         fechaElement.textContent = fecha;
     }
-    
+
     cargarDatosDeportista(deportistaId);
 });
 
@@ -61,16 +61,16 @@ async function cargarDatosDeportista(deportistaId) {
     try {
         mostrarLoading(true);
         console.log(`📋 Cargando datos del deportista ${deportistaId}...`);
-        
+
         const deportistaGuardado = localStorage.getItem('deportistaParaEvaluar');
-        
+
         if (deportistaGuardado) {
             try {
                 const deportistaData = JSON.parse(deportistaGuardado);
-                
+
                 if (deportistaData.id === deportistaId) {
                     console.log('✅ Datos obtenidos de localStorage');
-                    
+
                     deportista = {
                         id: deportistaData.id,
                         nombre: deportistaData.nombre || 'Deportista Sin Nombre',
@@ -82,30 +82,30 @@ async function cargarDatosDeportista(deportistaId) {
                         fecha_nacimiento: deportistaData.fecha_nacimiento,
                         posicion: deportistaData.posicion || null
                     };
-                    
+
                     console.log('✅ Deportista:', deportista.nombre, '| Nivel:', deportista.nivel_actual);
-                    
+
                     evaluacionActual.deportista_id = deportistaId;
-                    
+
                     actualizarInfoDeportista();
-                    
+
                     await cargarHabilidadesYEvaluaciones(deportistaId);
-                    
+
                     return;
                 }
             } catch (e) {
                 console.warn('⚠️ Error parseando localStorage:', e);
             }
         }
-        
+
         console.log('⚠️ Llamando a la API...');
-        
+
         const deportistaData = await EntrenadorAPI.getDeportistaById(deportistaId);
-        
+
         if (!deportistaData) {
             throw new Error('Deportista no encontrado en la base de datos');
         }
-        
+
         deportista = {
             id: deportistaData.id,
             nombre: deportistaData.nombre || 'Deportista Sin Nombre',
@@ -117,13 +117,13 @@ async function cargarDatosDeportista(deportistaId) {
             fecha_nacimiento: deportistaData.fecha_nacimiento,
             posicion: deportistaData.posicion || null
         };
-        
+
         evaluacionActual.deportista_id = deportistaId;
-        
+
         actualizarInfoDeportista();
-        
+
         await cargarHabilidadesYEvaluaciones(deportistaId);
-        
+
     } catch (error) {
         console.error('❌ Error cargando datos:', error);
         EntrenadorAPI.showNotification(`Error: ${error.message}`, 'error');
@@ -135,37 +135,37 @@ async function cargarDatosDeportista(deportistaId) {
 
 async function cargarHabilidadesYEvaluaciones(deportistaId) {
     console.log(`📚 Obteniendo SOLO HABILIDADES para nivel: ${deportista.nivel_actual}`);
-    
+
     let nivelParaHabilidades = deportista.nivel_actual;
-    
+
     if (!nivelParaHabilidades || nivelParaHabilidades === 'pendiente') {
         nivelParaHabilidades = '1_basico';
         console.log(`⚠️ Nivel no definido, usando: ${nivelParaHabilidades}`);
     }
-    
+
     const habilidadesData = await EntrenadorAPI.getHabilidadesPorNivel(nivelParaHabilidades, deportista.id);
-    
+
     // 🔥 FILTRAR SOLO HABILIDADES (categoría = 'habilidad')
     const todasLasHabilidades = habilidadesData.habilidades || habilidadesData || [];
     habilidades = todasLasHabilidades.filter(h => h.categoria === 'habilidad');
-    
+
     console.log(`📊 ${habilidades.length} HABILIDADES cargadas (de ${todasLasHabilidades.length} totales)`);
-    
+
     console.log('📜 Obteniendo historial de evaluaciones...');
     const evaluacionesData = await EntrenadorAPI.getEvaluacionesDeportista(deportistaId);
     evaluacionesHistorial = evaluacionesData || [];
-    
+
     const habilidadesIds = habilidades.map(h => h.id);
-    evaluacionesHistorial = evaluacionesHistorial.filter(e => 
+    evaluacionesHistorial = evaluacionesHistorial.filter(e =>
         habilidadesIds.includes(e.habilidad_id)
     );
-    
+
     console.log(`📋 ${evaluacionesHistorial.length} evaluaciones históricas de HABILIDADES`);
-    
+
     evaluacionActual.habilidades = {};
     habilidades.forEach(habilidad => {
         const evalPrevia = evaluacionesHistorial.find(e => e.habilidad_id === habilidad.id);
-        
+
         if (evalPrevia && evalPrevia.puntuacion) {
             evaluacionActual.habilidades[habilidad.id] = {
                 puntuacion: parseInt(evalPrevia.puntuacion) || 0,
@@ -182,57 +182,57 @@ async function cargarHabilidadesYEvaluaciones(deportistaId) {
             };
         }
     });
-    
+
     console.log(`🔄 ${Object.keys(evaluacionActual.habilidades).length} habilidades inicializadas`);
-    
+
     mostrarHabilidades();
     calcularEstadisticas();
     calcularProgresoNivel();
     inicializarGraficas();
-    
+
     console.log('✅ Datos cargados exitosamente');
 }
 
 function actualizarInfoDeportista() {
     if (!deportista) return;
-    
+
     console.log('🔄 Actualizando UI del deportista');
-    
+
     const nombreElement = document.getElementById('deportistaNombre');
     if (nombreElement) {
         nombreElement.textContent = deportista.nombre;
     }
-    
+
     const fotoElement = document.getElementById('deportistaFoto');
     if (fotoElement) {
         fotoElement.src = deportista.foto_perfil;
         fotoElement.alt = deportista.nombre;
-        fotoElement.onerror = function() {
+        fotoElement.onerror = function () {
             this.src = 'https://via.placeholder.com/200';
         };
     }
-    
+
     const nivelBadge = document.getElementById('deportistaNivelBadge');
     if (nivelBadge) {
         const nivel = deportista.nivel_actual;
         const nivelEsValido = nivel && nivel !== 'pendiente' && nivel !== '';
-        
+
         if (!nivelEsValido) {
             nivelBadge.textContent = 'SIN DEF';
             nivelBadge.className = 'absolute -bottom-2 -right-2 px-2 py-1 text-xs font-bold uppercase italic bg-red-600 text-white';
         } else {
             const abreviatura = getNivelAbreviatura(nivel);
             nivelBadge.textContent = abreviatura;
-            nivelBadge.className = 'absolute -bottom-2 -right-2 px-2 py-1 text-xs font-bold uppercase italic ' + 
+            nivelBadge.className = 'absolute -bottom-2 -right-2 px-2 py-1 text-xs font-bold uppercase italic ' +
                 getNivelBadgeColor(nivel) + ' text-white';
         }
     }
-    
+
     const nombreNivel = document.getElementById('nombreNivelActual');
     if (nombreNivel) {
         const nivel = deportista.nivel_actual;
         const nivelEsValido = nivel && nivel !== 'pendiente' && nivel !== '';
-        
+
         if (!nivelEsValido) {
             nombreNivel.textContent = 'SIN DEFINIR';
             nombreNivel.className = 'text-red-600 dark:text-red-400 font-bold';
@@ -242,12 +242,12 @@ function actualizarInfoDeportista() {
             nombreNivel.className = 'text-primary font-bold';
         }
     }
-    
+
     const equipoElement = document.getElementById('deportistaEquipo');
     if (equipoElement) {
         equipoElement.textContent = getNombreEquipo(deportista.equipo_competitivo);
     }
-    
+
     const posicionElement = document.getElementById('deportistaPosicion');
     if (posicionElement) {
         const posicionTexto = deportista.posicion || getNivelNombreCompleto(deportista.nivel_actual);
@@ -261,7 +261,7 @@ function actualizarInfoDeportista() {
 
 function getNivelNombreCompleto(nivel) {
     if (!nivel || nivel === 'pendiente') return 'SIN DEFINIR';
-    
+
     const niveles = {
         'baby_titans': 'Baby Titans',
         '1_basico': '1 Básico',
@@ -271,13 +271,13 @@ function getNivelNombreCompleto(nivel) {
         '3': 'Nivel 3',
         '4': 'Nivel 4'
     };
-    
+
     return niveles[nivel] || nivel;
 }
 
 function getNivelAbreviatura(nivel) {
     if (!nivel || nivel === 'pendiente') return 'SIN DEF';
-    
+
     const abreviaturas = {
         'baby_titans': 'BABY',
         '1_basico': 'L1B',
@@ -287,13 +287,13 @@ function getNivelAbreviatura(nivel) {
         '3': 'L3',
         '4': 'L4'
     };
-    
+
     return abreviaturas[nivel] || nivel.substring(0, 3).toUpperCase();
 }
 
 function getNivelBadgeColor(nivel) {
     if (!nivel || nivel === 'pendiente') return 'bg-red-600';
-    
+
     const colores = {
         'baby_titans': 'bg-yellow-600',
         '1_basico': 'bg-blue-600',
@@ -303,13 +303,13 @@ function getNivelBadgeColor(nivel) {
         '3': 'bg-purple-600',
         '4': 'bg-red-600'
     };
-    
+
     return colores[nivel] || 'bg-gray-600';
 }
 
 function getSiguienteNivel(nivelActual) {
     if (!nivelActual || nivelActual === 'pendiente') return 'baby_titans';
-    
+
     const orden = ['baby_titans', '1_basico', '1_medio', '1_avanzado', '2', '3', '4'];
     const index = orden.indexOf(nivelActual);
     return index >= 0 && index < orden.length - 1 ? orden[index + 1] : null;
@@ -352,7 +352,7 @@ function getClaseCalificacion(puntuacion) {
 function mostrarHabilidades() {
     const container = document.getElementById('listaHabilidades');
     if (!container) return;
-    
+
     // Ya tenemos solo habilidades filtradas
     if (habilidades.length === 0) {
         container.innerHTML = `
@@ -364,11 +364,11 @@ function mostrarHabilidades() {
         `;
         return;
     }
-    
+
     container.innerHTML = habilidades.map(habilidad => {
         const evaluacion = evaluacionActual.habilidades[habilidad.id] || { puntuacion: 0, observaciones: '' };
         const evaluacionPrevia = evaluacionesHistorial.find(e => e.habilidad_id === habilidad.id);
-        
+
         let fechaFormateada = '';
         if (evaluacionPrevia && evaluacionPrevia.fecha_evaluacion) {
             try {
@@ -377,7 +377,7 @@ function mostrarHabilidades() {
                 fechaFormateada = 'Fecha no disponible';
             }
         }
-        
+
         return `
             <div class="evaluation-form fade-in mb-6">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
@@ -456,19 +456,19 @@ function mostrarHabilidades() {
 
 function calificarHabilidad(habilidadId, puntuacion) {
     if (puntuacion < 0 || puntuacion > 5) return;
-    
+
     evaluacionActual.habilidades[habilidadId] = {
         ...(evaluacionActual.habilidades[habilidadId] || {}),
         puntuacion: parseInt(puntuacion),
         evaluacion_id: evaluacionActual.habilidades[habilidadId]?.evaluacion_id || null
     };
-    
+
     const starButtons = document.querySelectorAll(`button[onclick*="calificarHabilidad('${habilidadId}'"]`);
-    
+
     starButtons.forEach((button, index) => {
         const starNum = index + 1;
         const starIcon = button.querySelector('.material-symbols-outlined');
-        
+
         if (starIcon) {
             if (starNum <= puntuacion) {
                 button.classList.add('filled');
@@ -481,25 +481,25 @@ function calificarHabilidad(habilidadId, puntuacion) {
             }
         }
     });
-    
+
     const valorElement = document.getElementById(`valor_${habilidadId}`);
     if (valorElement) {
         valorElement.textContent = puntuacion;
         valorElement.className = `valor-puntuacion text-3xl font-bold ${getClaseCalificacion(puntuacion)}-text`;
     }
-    
+
     const textoElement = document.getElementById(`texto_${habilidadId}`);
     if (textoElement) {
         textoElement.textContent = puntuacion > 0 ? getTextoCalificacion(puntuacion) : 'Sin calificar';
         textoElement.className = `text-sm font-semibold ${getClaseCalificacion(puntuacion)}-text`;
     }
-    
+
     const badgeElement = document.getElementById(`badge_${habilidadId}`);
     if (badgeElement) {
         badgeElement.textContent = puntuacion > 0 ? getTextoCalificacion(puntuacion) : 'Sin calificar';
         badgeElement.className = `rating-badge ${getClaseCalificacion(puntuacion)} px-3 py-1`;
     }
-    
+
     setTimeout(() => {
         calcularEstadisticas();
         calcularProgresoNivel();
@@ -519,32 +519,32 @@ async function guardarEvaluacion() {
     try {
         const btnGuardar = document.getElementById('btnGuardarEvaluacion');
         if (btnGuardar.disabled) return;
-        
+
         btnGuardar.disabled = true;
         btnGuardar.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Guardando...';
-        
+
         const obsGenerales = document.getElementById('observacionesGenerales');
         if (obsGenerales) {
             evaluacionActual.observaciones_generales = obsGenerales.value;
         }
-        
+
         const habilidadesAEvaluar = Object.entries(evaluacionActual.habilidades)
             .filter(([_, datos]) => datos.puntuacion > 0);
-        
+
         if (habilidadesAEvaluar.length === 0) {
             EntrenadorAPI.showNotification('⚠️ No hay habilidades calificadas para guardar', 'warning');
             btnGuardar.disabled = false;
             btnGuardar.innerHTML = '<span class="material-symbols-outlined">save</span> Guardar Evaluación';
             return;
         }
-        
+
         const promesas = [];
         const fechaActual = new Date().toISOString();
-        
+
         for (const [habilidadId, datos] of habilidadesAEvaluar) {
             const habilidad = habilidades.find(h => h.id === habilidadId);
             const puntuacionMinima = habilidad?.puntuacion_minima || 3;
-            
+
             const payload = {
                 deportista_id: evaluacionActual.deportista_id,
                 habilidad_id: habilidadId,
@@ -554,7 +554,7 @@ async function guardarEvaluacion() {
                 completado: datos.puntuacion >= puntuacionMinima,
                 fecha_evaluacion: fechaActual
             };
-            
+
             promesas.push(
                 EntrenadorAPI.createEvaluacion(payload).catch(err => {
                     if (datos.evaluacion_id) {
@@ -564,29 +564,29 @@ async function guardarEvaluacion() {
                 })
             );
         }
-        
+
         await Promise.all(promesas);
-        
+
         const mensaje = document.getElementById('mensajeGuardado');
         if (mensaje) {
             mensaje.classList.remove('hidden');
             setTimeout(() => mensaje.classList.add('hidden'), 3000);
         }
-        
+
         EntrenadorAPI.showNotification('✅ Evaluación guardada exitosamente', 'success');
-        
+
         const evaluacionesData = await EntrenadorAPI.getEvaluacionesDeportista(deportista.id);
         evaluacionesHistorial = evaluacionesData || [];
-        
+
         const habilidadesIds = habilidades.map(h => h.id);
-        evaluacionesHistorial = evaluacionesHistorial.filter(e => 
+        evaluacionesHistorial = evaluacionesHistorial.filter(e =>
             habilidadesIds.includes(e.habilidad_id)
         );
-        
+
         calcularEstadisticas();
         calcularProgresoNivel();
         actualizarGraficas();
-        
+
     } catch (error) {
         console.error('❌ Error guardando evaluación:', error);
         EntrenadorAPI.showNotification(`Error: ${error.message}`, 'error');
@@ -604,28 +604,28 @@ function calcularProgresoNivel() {
         actualizarProgresoUI(0, 0, 0);
         return;
     }
-    
+
     let habilidadesCompletadas = 0;
-    
+
     for (const habilidad of habilidades) {
         const evaluacion = evaluacionActual.habilidades[habilidad.id];
         const puntuacionMinima = habilidad.puntuacion_minima || 3;
-        
+
         if (evaluacion && evaluacion.puntuacion >= puntuacionMinima) {
             habilidadesCompletadas++;
         }
     }
-    
+
     const totalHabilidades = habilidades.length;
     let porcentaje = 0;
-    
+
     if (totalHabilidades > 0) {
         porcentaje = Math.round((habilidadesCompletadas / totalHabilidades) * 100);
     }
-    
+
     if (porcentaje > 100) porcentaje = 100;
     if (porcentaje < 0) porcentaje = 0;
-    
+
     actualizarProgresoUI(porcentaje, habilidadesCompletadas, totalHabilidades);
 }
 
@@ -634,21 +634,21 @@ function actualizarProgresoUI(porcentaje, completadas, total) {
     if (barraProgreso) {
         barraProgreso.style.width = `${porcentaje}%`;
     }
-    
+
     const porcentajeElement = document.getElementById('porcentajeNivel');
     if (porcentajeElement) {
         porcentajeElement.textContent = `${porcentaje}%`;
     }
-    
+
     const habilidadesTexto = document.getElementById('habilidadesCompletadasTexto');
     if (habilidadesTexto) {
         habilidadesTexto.textContent = `${completadas} de ${total} habilidades completadas`;
     }
-    
+
     const btnAvanzar = document.getElementById('btnAvanzarNivel');
     if (btnAvanzar) {
         const mostrarBoton = (porcentaje >= 100 && completadas === total);
-        
+
         if (mostrarBoton) {
             btnAvanzar.style.display = 'flex';
             btnAvanzar.style.opacity = '1';
@@ -671,41 +671,41 @@ function actualizarProgresoUI(porcentaje, completadas, total) {
 async function avanzarAlSiguienteNivel() {
     try {
         console.log('🎯 Iniciando proceso de avance de nivel...');
-        
+
         // Verificar que TODAS las habilidades estén completadas
         let habilidadesCompletadas = 0;
         for (const habilidad of habilidades) {
             const evaluacion = evaluacionActual.habilidades[habilidad.id];
             const puntuacionMinima = habilidad.puntuacion_minima || 3;
-            
+
             if (evaluacion && evaluacion.puntuacion >= puntuacionMinima) {
                 habilidadesCompletadas++;
             }
         }
-        
+
         if (habilidadesCompletadas < habilidades.length) {
             EntrenadorAPI.showNotification('⚠️ El deportista no ha completado todas las habilidades', 'warning');
             return;
         }
-        
+
         const nivelActual = deportista.nivel_actual;
         const siguienteNivel = getSiguienteNivel(nivelActual);
-        
+
         if (!siguienteNivel) {
             EntrenadorAPI.showNotification('Este deportista ya está en el nivel máximo', 'warning');
             return;
         }
-        
+
         const confirmar = confirm(
             `¿Estás seguro de avanzar a ${deportista.nombre} de "${getNivelNombreCompleto(nivelActual)}" a "${getNivelNombreCompleto(siguienteNivel)}"?\n\n` +
             `✅ El deportista ha completado ${habilidadesCompletadas}/${habilidades.length} habilidades.\n` +
             `🎯 En el nuevo nivel, el progreso empezará en 0%.`
         );
-        
+
         if (!confirmar) return;
-        
+
         console.log(`📤 Actualizando nivel de ${nivelActual} a ${siguienteNivel}...`);
-        
+
         // 🔥 LLAMADA AL BACKEND PARA ACTUALIZAR EL NIVEL
         const response = await fetch(`${EntrenadorAPI.baseURL}/deportistas/${deportista.id}`, {
             method: 'PUT',
@@ -714,30 +714,34 @@ async function avanzarAlSiguienteNivel() {
                 nivel_actual: siguienteNivel
             })
         });
-        
+
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || `HTTP ${response.status}`);
         }
-        
+
         const data = await response.json();
         console.log('✅ Respuesta del servidor:', data);
-        
+
         // Actualizar variable local
         deportista.nivel_actual = siguienteNivel;
-        
+
+        // 🔥 ACTUALIZAR TAMBIÉN LOCALSTORAGE
+        const deportistaGuardado = JSON.parse(localStorage.getItem('deportistaParaEvaluar') || '{}');
+        deportistaGuardado.nivel_actual = siguienteNivel;
+        localStorage.setItem('deportistaParaEvaluar', JSON.stringify(deportistaGuardado));
+
+        // 🔄 Actualizar UI inmediatamente
+        actualizarInfoDeportista();
+
+        // 🔄 Volver a cargar habilidades del nuevo nivel
+        await cargarHabilidadesYEvaluaciones(deportista.id);
+
         EntrenadorAPI.showNotification(
             `🎉 ¡${deportista.nombre} avanzó a ${getNivelNombreCompleto(siguienteNivel)}!`,
             'success'
         );
-        
-        console.log('🔄 Recargando página en 2 segundos...');
-        
-        // Recargar la página para mostrar el nuevo nivel (con progreso en 0%)
-        setTimeout(() => {
-            window.location.reload();
-        }, 2000);
-        
+
     } catch (error) {
         console.error('❌ Error avanzando nivel:', error);
         EntrenadorAPI.showNotification(`Error: ${error.message}`, 'error');
@@ -746,41 +750,41 @@ async function avanzarAlSiguienteNivel() {
 
 function calcularEstadisticas() {
     if (!deportista || !habilidades) return;
-    
+
     const puntuaciones = [];
-    const conteoPorPuntuacion = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
-    
+    const conteoPorPuntuacion = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
     Object.values(evaluacionActual.habilidades).forEach(evalu => {
         const puntuacion = evalu.puntuacion || 0;
         puntuaciones.push(puntuacion);
         conteoPorPuntuacion[puntuacion] = (conteoPorPuntuacion[puntuacion] || 0) + 1;
     });
-    
+
     const totalEvaluaciones = puntuaciones.filter(p => p > 0).length;
     const totalElement = document.getElementById('totalEvaluaciones');
     if (totalElement) {
         totalElement.textContent = totalEvaluaciones;
     }
-    
+
     const puntuacionesPositivas = puntuaciones.filter(p => p > 0);
-    const promedio = puntuacionesPositivas.length > 0 
+    const promedio = puntuacionesPositivas.length > 0
         ? (puntuacionesPositivas.reduce((a, b) => a + b, 0) / puntuacionesPositivas.length).toFixed(1)
         : '0.0';
-    
+
     const promedioElement = document.getElementById('promedioGeneral');
     if (promedioElement) {
         promedioElement.textContent = `${promedio} / 5.0`;
     }
-    
+
     const total = puntuacionesPositivas.length;
     for (let i = 1; i <= 5; i++) {
         const countElement = document.getElementById(`count${getTextoCalificacion(i)}`);
         const progressElement = document.getElementById(`progress${getTextoCalificacion(i)}`);
-        
+
         if (countElement && progressElement) {
             const count = conteoPorPuntuacion[i] || 0;
             const porcentaje = total > 0 ? (count / total * 100) : 0;
-            
+
             countElement.textContent = count;
             progressElement.style.width = `${porcentaje}%`;
         }
@@ -817,21 +821,21 @@ function inicializarGraficas() {
             }
         });
     }
-    
+
     actualizarGraficas();
 }
 
 function actualizarGraficas() {
     if (!chartRadar) return;
-    
+
     const puntuacionesActuales = Object.values(evaluacionActual.habilidades)
         .map(e => e.puntuacion || 0)
         .filter(p => p > 0);
-    
-    const promedioActual = puntuacionesActuales.length > 0 
+
+    const promedioActual = puntuacionesActuales.length > 0
         ? puntuacionesActuales.reduce((a, b) => a + b, 0) / puntuacionesActuales.length
         : 0;
-    
+
     const datosRadarActual = [
         promedioActual * 0.9,
         promedioActual * 1.1,
@@ -840,7 +844,7 @@ function actualizarGraficas() {
         promedioActual * 1.2,
         promedioActual * 0.7
     ].map(v => Math.min(Math.max(v, 0), 5));
-    
+
     chartRadar.data.datasets[0].data = datosRadarActual;
     chartRadar.update();
 }
@@ -852,7 +856,7 @@ function volverASeleccion() {
 function mostrarLoading(mostrar) {
     const container = document.getElementById('listaHabilidades');
     if (!container) return;
-    
+
     if (mostrar) {
         container.innerHTML = `
             <div class="text-center py-12">
