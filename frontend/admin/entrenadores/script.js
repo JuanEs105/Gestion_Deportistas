@@ -1,5 +1,5 @@
 // ==========================================
-// GESTIÓN DE ENTRENADORES - VERSIÓN CORREGIDA (SIN CONTRASEÑA)
+// GESTIÓN DE ENTRENADORES - VERSIÓN CORREGIDA (SIN CONTRASEÑA Y SIN BOTÓN DE RECORDATORIO)
 // ==========================================
 console.log('👨‍🏫 Inicializando Gestión de Entrenadores - SIN CONTRASEÑA');
 
@@ -217,7 +217,6 @@ const EntrenadoresManager = {
 
             const idSeguro = this.escapeForJavaScript(String(entrenadorId));
             const nombreSeguro = this.escapeForJavaScript(entrenadorNombre);
-            const emailSeguro = this.escapeForJavaScript(entrenadorEmail);
 
             return `
                 <tr class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
@@ -267,13 +266,6 @@ const EntrenadoresManager = {
                                     title="Editar">
                                 <span class="material-symbols-outlined text-sm">edit</span>
                             </button>
-                            ${entrenador.requiere_registro ? `
-                                <button onclick="window.EntrenadoresManager.enviarRecordatorio('${idSeguro}', '${emailSeguro}')" 
-                                        class="p-2 text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-lg transition-colors"
-                                        title="Enviar recordatorio">
-                                    <span class="material-symbols-outlined text-sm">mail</span>
-                                </button>
-                            ` : ''}
                             <button onclick="window.EntrenadoresManager.toggleEstadoEntrenador('${idSeguro}', '${nombreSeguro}')" 
                                     class="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
                                     title="${estado === 'Activo' || estado === 'Pendiente Registro' ? 'Desactivar' : 'Activar'}">
@@ -721,10 +713,10 @@ const EntrenadoresManager = {
                 AdminAPI.showNotification('✅ Entrenador actualizado exitosamente', 'success');
 
             } else {
-                console.log('➕ Creando nuevo entrenador (PENDIENTE DE REGISTRO)');
+                console.log('➕ Creando nuevo entrenador (EMAIL SE ENVIARÁ AUTOMÁTICAMENTE)');
                 await AdminAPI.createEntrenador(formData);
 
-                AdminAPI.showNotification('✅ Entrenador creado exitosamente. Se enviará un correo para completar el registro.', 'success');
+                AdminAPI.showNotification('✅ Entrenador creado exitosamente. Se ha enviado un correo de activación automáticamente.', 'success');
             }
 
             this.cerrarModal();
@@ -753,6 +745,7 @@ const EntrenadoresManager = {
         this.state.equiposSeleccionados = [];
         this.state.entrenadorEditando = null;
     },
+
     mostrarConfirmacionEliminar(id, nombre) {
         // Guardar referencia
         this.state.entrenadorAEliminar = {
@@ -851,6 +844,7 @@ const EntrenadoresManager = {
             confirmBtn.disabled = true;
         }
     },
+
     cerrarConfirmacion() {
         const confirmModal = document.getElementById('confirmModal');
         if (confirmModal) confirmModal.classList.add('hidden');
@@ -982,27 +976,6 @@ const EntrenadoresManager = {
         }
     },
 
-    async enviarRecordatorio(id, email) {
-        console.log('📧 Enviando recordatorio a:', email);
-
-        if (confirm(`¿Enviar recordatorio de registro a ${email}?`)) {
-            try {
-                this.setLoading(true);
-
-                // Aquí deberías llamar a un endpoint del backend para reenviar el código
-                // Por ahora solo mostramos una notificación
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                AdminAPI.showNotification(`📧 Recordatorio enviado a ${email} exitosamente`, 'success');
-
-            } catch (error) {
-                console.error('❌ Error enviando recordatorio:', error);
-                AdminAPI.showNotification('❌ Error al enviar recordatorio', 'error');
-            } finally {
-                this.setLoading(false);
-            }
-        }
-    },
-
     cambiarPagina(direction) {
         const totalPages = Math.ceil(this.state.entrenadoresFiltrados.length / this.state.itemsPerPage);
         const newPage = this.state.currentPage + direction;
@@ -1116,4 +1089,4 @@ window.EntrenadoresManager = EntrenadoresManager;
 window.toggleTheme = toggleTheme;
 window.logout = logout;
 
-console.log('✅ Script de entrenadores CORREGIDO (SIN CONTRASEÑA) cargado correctamente');
+console.log('✅ Script de entrenadores CORREGIDO (SIN CONTRASEÑA Y SIN BOTÓN DE RECORDATORIO) cargado correctamente');

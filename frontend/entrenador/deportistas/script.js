@@ -42,11 +42,6 @@ const opcionesTalla = [
     { value: 'XXXL', label: 'XXXL (3X Large)' }
 ];
 
-// Configuración Cloudinary
-const CLOUDINARY_UPLOAD_PRESET = 'deportistas_fotos';
-const CLOUDINARY_CLOUD_NAME = 'drch2xmrk';
-const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
-
 // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ DOM cargado - Inicializando sistema de deportistas (Entrenador)');
@@ -138,7 +133,7 @@ function procesarDatosDeportistas(data) {
         email: d.email || '',
         telefono: d.telefono || '',
         nivel_actual: d.nivel_actual || 'pendiente',
-        estado: d.estado || 'activo', // Mantener para verificaciones internas
+        estado: d.estado || 'activo',
         equipo_competitivo: d.equipo_competitivo || 'sin_equipo',
         peso: d.peso || null,
         altura: d.altura || null,
@@ -191,11 +186,9 @@ function mostrarDeportistas() {
         return;
     }
     
-    // Remover fila de carga si existe
     const loadingRow = document.getElementById('loadingRow');
     if (loadingRow) loadingRow.remove();
     
-    // Calcular índices para paginación
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, deportistasFiltrados.length);
     const deportistasParaMostrar = deportistasFiltrados.slice(startIndex, endIndex);
@@ -306,7 +299,6 @@ function abrirMenuNivel(deportistaId) {
     const deportista = deportistas.find(d => d.id === deportistaId);
     if (!deportista) return;
     
-    // Verificar si está bloqueado por pago
     if (deportista.estado === 'pendiente_de_pago') {
         mostrarMensaje('⚠️ No se puede cambiar el nivel. Contacta con administración.', 'warning');
         return;
@@ -324,7 +316,6 @@ function abrirMenuEquipo(deportistaId) {
     const deportista = deportistas.find(d => d.id === deportistaId);
     if (!deportista) return;
     
-    // Verificar si está bloqueado por pago
     if (deportista.estado === 'pendiente_de_pago') {
         mostrarMensaje('⚠️ No se puede cambiar el equipo. Contacta con administración.', 'warning');
         return;
@@ -339,29 +330,23 @@ function abrirMenuEquipo(deportistaId) {
 }
 
 function mostrarMenuSeleccion(tipo, deportistaId, nombreDeportista, opciones, titulo) {
-    // Cerrar menús existentes
     cerrarMenuSeleccion();
     
-    // Evitar abrir múltiples menús
     if (menuAbierto) return;
     menuAbierto = true;
     
-    // Obtener botón clickeado
     const target = event.target.closest('.dropdown-btn') || event.target;
     const rect = target.getBoundingClientRect();
     
-    // Crear overlay para cerrar al hacer clic fuera
     const overlay = document.createElement('div');
     overlay.id = 'dropdownOverlay';
     overlay.className = 'fixed inset-0 z-40 cursor-default';
     overlay.onclick = cerrarMenuSeleccion;
     
-    // Crear contenedor del menú
     const menu = document.createElement('div');
     menu.id = 'dropdownMenu';
     menu.className = 'fixed z-50 bg-white dark:bg-zinc-900 rounded-xl shadow-2xl border border-gray-200 dark:border-white/10 w-80 max-h-96 overflow-y-auto';
     
-    // Calcular posición
     let left = rect.left;
     let top = rect.bottom + 5;
     
@@ -382,7 +367,6 @@ function mostrarMenuSeleccion(tipo, deportistaId, nombreDeportista, opciones, ti
     menu.style.top = `${top}px`;
     menu.style.maxHeight = `${menuHeight}px`;
     
-    // Contenido del menú
     menu.innerHTML = `
         <div class="sticky top-0 bg-white dark:bg-zinc-900 p-4 border-b border-gray-200 dark:border-white/10 z-10">
             <div class="flex items-center justify-between">
@@ -406,11 +390,9 @@ function mostrarMenuSeleccion(tipo, deportistaId, nombreDeportista, opciones, ti
         </div>
     `;
     
-    // Añadir al DOM
     document.body.appendChild(overlay);
     document.body.appendChild(menu);
     
-    // Animar entrada
     menu.style.opacity = '0';
     menu.style.transform = 'translateY(-10px)';
     setTimeout(() => {
@@ -470,13 +452,11 @@ async function seleccionarOpcion(tipo, deportistaId, valor) {
         
         await EntrenadorAPI.updateDeportistaCampo(deportistaId, campo, valor);
         
-        // Actualizar localmente
         const index = deportistas.findIndex(d => d.id === deportistaId);
         if (index !== -1) {
             deportistas[index][campo] = valor;
         }
         
-        // Actualizar vista
         mostrarDeportistas();
         actualizarEstadisticas();
         cerrarMenuSeleccion();
@@ -489,7 +469,7 @@ async function seleccionarOpcion(tipo, deportistaId, valor) {
     }
 }
 
-// Ver detalles completos (SIN MOSTRAR ESTADO)
+// Ver detalles completos
 function verDetallesCompletos(deportistaId) {
     deportistaSeleccionado = deportistas.find(d => d.id === deportistaId);
     if (!deportistaSeleccionado) {
@@ -517,7 +497,6 @@ function verDetallesCompletos(deportistaId) {
             </div>
             
             <div class="p-6">
-                <!-- Información Principal -->
                 <div class="flex flex-col md:flex-row gap-6 mb-8">
                     <div class="flex-shrink-0">
                         <div class="relative">
@@ -538,12 +517,6 @@ function verDetallesCompletos(deportistaId) {
                                 <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">${escapeHTML(deportistaSeleccionado.nombre)}</h2>
                                 <p class="text-gray-600 dark:text-gray-400 mb-4">${escapeHTML(deportistaSeleccionado.email)}</p>
                             </div>
-                            ${deportistaSeleccionado.estado === 'pendiente_de_pago' ? `
-                                <div class="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-sm">warning</span>
-                                    Pago Pendiente
-                                </div>
-                            ` : ''}
                         </div>
                         
                         <div class="flex flex-wrap gap-3 mb-4">
@@ -572,7 +545,6 @@ function verDetallesCompletos(deportistaId) {
                     </div>
                 </div>
                 
-                <!-- Datos Físicos -->
                 <div class="bg-gray-50 dark:bg-zinc-800 rounded-xl p-6 mb-6">
                     <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">📊 Datos Físicos</h4>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -594,52 +566,11 @@ function verDetallesCompletos(deportistaId) {
                         </div>
                     </div>
                 </div>
-                
-                <!-- Información Adicional -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div class="bg-gray-50 dark:bg-zinc-800 rounded-xl p-6">
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">📝 Información Personal</h4>
-                        <div class="space-y-3">
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Fecha de Nacimiento</p>
-                                <p class="font-medium">${deportistaSeleccionado.fecha_nacimiento ? new Date(deportistaSeleccionado.fecha_nacimiento).toLocaleDateString('es-ES') : 'No registrada'}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Fecha de Ingreso</p>
-                                <p class="font-medium">${deportistaSeleccionado.fecha_ingreso ? new Date(deportistaSeleccionado.fecha_ingreso).toLocaleDateString('es-ES') : 'No registrada'}</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-gray-50 dark:bg-zinc-800 rounded-xl p-6">
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">🏥 Información Médica y Contacto</h4>
-                        <div class="space-y-3">
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">EPS / Seguro Médico</p>
-                                <p class="font-medium">${escapeHTML(deportistaSeleccionado.eps || 'No registrada')}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Dirección</p>
-                                <p class="font-medium">${escapeHTML(deportistaSeleccionado.direccion || 'No registrada')}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Contacto de Emergencia</p>
-                                <p class="font-medium">${escapeHTML(deportistaSeleccionado.contacto_emergencia_nombre || 'No registrado')}</p>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">${escapeHTML(deportistaSeleccionado.contacto_emergencia_telefono || '')}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Parentesco</p>
-                                <p class="font-medium">${escapeHTML(deportistaSeleccionado.parentesco || 'No especificado')}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
             
             <div class="p-6 border-t border-gray-200 dark:border-white/5 flex flex-col sm:flex-row gap-3">
                 <button onclick="editarDeportistaCompleto('${escapeJS(deportistaSeleccionado.id)}')" 
-                        class="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors ${deportistaSeleccionado.estado === 'pendiente_de_pago' ? 'opacity-50 cursor-not-allowed' : ''}" 
-                        ${deportistaSeleccionado.estado === 'pendiente_de_pago' ? 'disabled' : ''}>
+                        class="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
                     <span class="material-symbols-outlined">edit</span>
                     Editar Datos
                 </button>
@@ -655,8 +586,10 @@ function verDetallesCompletos(deportistaId) {
     document.body.appendChild(modal);
 }
 
-// ✅✅✅ MEJORA 1: Editar deportista CON FOTO VISIBLE (solo peso, altura, talla)
+// ✅✅✅ FUNCIÓN CORREGIDA: Editar deportista
 function editarDeportistaCompleto(deportistaId) {
+    console.log('✏️ Abriendo modal de edición para deportista:', deportistaId);
+    
     deportistaSeleccionado = deportistas.find(d => d.id === deportistaId);
     if (!deportistaSeleccionado) {
         mostrarError('Deportista no encontrado');
@@ -684,7 +617,6 @@ function editarDeportistaCompleto(deportistaId) {
             </div>
             
             <form id="formEditarDeportista" class="p-6">
-                <!-- ✅✅✅ FOTO Y NOMBRE DEL DEPORTISTA (NUEVO) -->
                 <div class="mb-6 flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
                     <div class="flex-shrink-0">
                         <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-white dark:border-zinc-800 shadow-lg">
@@ -703,39 +635,14 @@ function editarDeportistaCompleto(deportistaId) {
                         <p class="text-sm text-gray-600 dark:text-gray-400">
                             ${escapeHTML(deportistaSeleccionado.email)}
                         </p>
-                        <div class="flex gap-2 mt-2">
-                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getNivelClaseCSS(deportistaSeleccionado.nivel_actual)}">
-                                ${getNivelNombre(deportistaSeleccionado.nivel_actual)}
-                            </span>
-                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getEquipoClaseCSS(deportistaSeleccionado.equipo_competitivo)}">
-                                ${getEquipoNombre(deportistaSeleccionado.equipo_competitivo)}
-                            </span>
-                        </div>
                     </div>
                 </div>
                 
-                <!-- Información de solo lectura -->
-                <div class="mb-6 p-4 bg-gray-50 dark:bg-zinc-800 rounded-lg">
-                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">📋 Información del Deportista</h4>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Teléfono</p>
-                            <p class="font-medium">${escapeHTML(deportistaSeleccionado.telefono || 'No registrado')}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Fecha Nacimiento</p>
-                            <p class="font-medium">${deportistaSeleccionado.fecha_nacimiento ? new Date(deportistaSeleccionado.fecha_nacimiento).toLocaleDateString('es-ES') : 'No registrada'}</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Campos editables: PESO, ALTURA, TALLA -->
                 <div class="space-y-6">
                     <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800">
                         <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">📊 Datos Físicos Editables</h4>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <!-- Peso -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     Peso (kg)
@@ -746,7 +653,6 @@ function editarDeportistaCompleto(deportistaId) {
                                        placeholder="70.5">
                             </div>
                             
-                            <!-- Altura -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     Altura (m)
@@ -757,7 +663,6 @@ function editarDeportistaCompleto(deportistaId) {
                                        placeholder="1.75">
                             </div>
                             
-                            <!-- Talla -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     Talla
@@ -772,13 +677,6 @@ function editarDeportistaCompleto(deportistaId) {
                                     `).join('')}
                                 </select>
                             </div>
-                        </div>
-                        
-                        <div class="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                            <p class="text-sm text-yellow-800 dark:text-yellow-300 flex items-center gap-2">
-                                <span class="material-symbols-outlined text-sm">info</span>
-                                <span>Solo puedes editar el peso, altura y talla. Los demás datos son gestionados por administración.</span>
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -800,15 +698,31 @@ function editarDeportistaCompleto(deportistaId) {
     
     document.body.appendChild(modal);
     
-    document.getElementById('formEditarDeportista').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        await guardarCambiosDeportista();
-    });
+    // ✅✅✅ CORRECCIÓN CRÍTICA: Configurar el evento submit DESPUÉS de agregar el modal al DOM
+    setTimeout(() => {
+        const form = document.getElementById('formEditarDeportista');
+        if (form) {
+            console.log('✅ Formulario encontrado, configurando evento submit...');
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                console.log('📤 Formulario enviado, ejecutando guardarCambiosDeportista()...');
+                await guardarCambiosDeportista();
+            });
+        } else {
+            console.error('❌ No se encontró el formulario formEditarDeportista');
+        }
+    }, 100);
 }
 
-// ✅✅✅ MEJORA 2: Guardar cambios CON MENSAJE DE "CAMBIOS GUARDADOS"
+// ✅✅✅ FUNCIÓN CORREGIDA: Guardar cambios
 async function guardarCambiosDeportista() {
-    if (!deportistaSeleccionado) return;
+    console.log('💾 Guardando cambios del deportista...');
+    
+    if (!deportistaSeleccionado) {
+        console.error('❌ No hay deportista seleccionado');
+        mostrarError('No hay deportista seleccionado');
+        return;
+    }
     
     try {
         setLoading(true);
@@ -818,6 +732,7 @@ async function guardarCambiosDeportista() {
         const tallaInput = document.getElementById('editTalla');
         
         if (!pesoInput || !alturaInput || !tallaInput) {
+            console.error('❌ No se encontraron los campos de edición');
             mostrarError('Error: No se encontraron los campos de edición');
             setLoading(false);
             return;
@@ -826,6 +741,8 @@ async function guardarCambiosDeportista() {
         const peso = pesoInput.value;
         const altura = alturaInput.value;
         const talla = tallaInput.value;
+        
+        console.log('📋 Valores capturados:', { peso, altura, talla });
         
         const cambios = {};
         
@@ -859,7 +776,11 @@ async function guardarCambiosDeportista() {
             return;
         }
         
+        console.log('📤 Enviando cambios al backend:', cambios);
+        
         await EntrenadorAPI.updateDeportista(deportistaSeleccionado.id, cambios);
+        
+        console.log('✅ Cambios guardados exitosamente');
         
         const index = deportistas.findIndex(d => d.id === deportistaSeleccionado.id);
         if (index !== -1) {
@@ -869,18 +790,17 @@ async function guardarCambiosDeportista() {
         mostrarDeportistas();
         cerrarModal();
         
-        // ✅✅✅ MENSAJE DE ÉXITO MEJORADO
         mostrarMensajeGuardado(deportistaSeleccionado.nombre);
         
     } catch (error) {
-        console.error('Error:', error);
+        console.error('❌ Error:', error);
         mostrarError('Error al guardar los cambios: ' + error.message);
     } finally {
         setLoading(false);
     }
 }
 
-// ✅✅✅ NUEVA FUNCIÓN: Mensaje de éxito personalizado
+// Mensaje de éxito personalizado
 function mostrarMensajeGuardado(nombreDeportista) {
     let container = document.getElementById('notificationContainer');
     if (!container) {
@@ -947,7 +867,7 @@ function mostrarMensajeGuardado(nombreDeportista) {
     }, 5000);
 }
 
-// FILTRADO (SIN FILTRO DE ESTADO)
+// FILTRADO
 function filtrarDeportistas() {
     currentPage = 1;
     mostrarDeportistas();
@@ -979,7 +899,7 @@ function limpiarFiltros() {
     filtrarDeportistas();
 }
 
-// ESTADÍSTICAS (SIN PENDIENTES DE PAGO NI LESIONADOS)
+// ESTADÍSTICAS
 function actualizarEstadisticas() {
     const total = deportistas.length;
     const activos = deportistas.filter(d => d.estado === 'activo').length;
@@ -1140,9 +1060,9 @@ window.abrirMenuEquipo = abrirMenuEquipo;
 window.cerrarMenuSeleccion = cerrarMenuSeleccion;
 window.seleccionarOpcion = seleccionarOpcion;
 
-console.log('✅ Script de deportistas (Entrenador) cargado - CON MEJORAS: Foto en edición + Mensaje de éxito');
+console.log('✅ Script de deportistas (Entrenador) cargado - VERSIÓN CORREGIDA CON LOGS DE DEBUG');
 
-// ✅✅✅ ESTILOS ADICIONALES PARA ANIMACIONES
+// ESTILOS ADICIONALES PARA ANIMACIONES
 if (!document.querySelector('#animations-styles')) {
     const style = document.createElement('style');
     style.id = 'animations-styles';
