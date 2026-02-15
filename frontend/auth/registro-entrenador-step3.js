@@ -329,17 +329,18 @@ async function handlePasswordSubmit(event) {
     try {
         console.log('📤 Enviando solicitud de activación...');
 
-        // ✅✅✅ LLAMADA AL BACKEND PARA ACTIVAR LA CUENTA (ENDPOINT CORRECTO)
-        // Intentar con ambos endpoints para mayor compatibilidad
+        // ✅ URL CORRECTA DE RAILWAY
+        const API_BASE_URL = 'https://gestiondeportistas-production.up.railway.app';
 
         let response;
         let endpointUsed = '';
 
         // Primero intentar con el endpoint principal
-        // Primero intentar con el endpoint principal
         try {
-            endpointUsed = '/completar-registro-contrasena';
-            response = await fetch('http://localhost:5000ntrasena', {
+            endpointUsed = '/api/auth/completar-registro-contrasena';
+            console.log('🌐 Intentando con:', API_BASE_URL + endpointUsed);
+
+            response = await fetch(API_BASE_URL + endpointUsed, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -351,11 +352,18 @@ async function handlePasswordSubmit(event) {
                     confirmPassword: confirmPassword
                 })
             });
+
+            console.log('📥 Respuesta del primer endpoint:', response.status);
+
         } catch (error1) {
             console.log('⚠️  Error con primer endpoint, intentando con alias...');
+            console.error('Error detallado:', error1);
+
             // Si falla, intentar con el alias
-            endpointUsed = '/activar-cuenta-entrenador';
-            response = await fetch('http://localhost:5000ador', {
+            endpointUsed = '/api/auth/activar-cuenta-entrenador';
+            console.log('🌐 Intentando con:', API_BASE_URL + endpointUsed);
+
+            response = await fetch(API_BASE_URL + endpointUsed, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -367,6 +375,8 @@ async function handlePasswordSubmit(event) {
                     confirmPassword: confirmPassword
                 })
             });
+
+            console.log('📥 Respuesta del segundo endpoint:', response.status);
         }
 
         console.log('📥 Respuesta recibida:', response.status, response.statusText);
@@ -374,7 +384,6 @@ async function handlePasswordSubmit(event) {
 
         const data = await response.json();
         console.log('📦 Datos de respuesta:', data);
-
         if (!response.ok) {
             throw new Error(data.error || `Error ${response.status} al activar la cuenta`);
         }
