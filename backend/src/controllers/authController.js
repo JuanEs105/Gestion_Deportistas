@@ -1,4 +1,4 @@
-// backend/src/controllers/authController.js - VERSIÓN CORREGIDA COMPLETA
+// backend/src/controllers/authController.js - ✅ CON EMAIL DE BIENVENIDA
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { User, Deportista } = require('../models');
@@ -193,15 +193,14 @@ class AuthController {
     }
   }
 
-  // 🔥🔥🔥 MÉTODO CORREGIDO - GUARDA FOTO EN AMBAS TABLAS Y ACTUALIZA tiene_documento 🔥🔥🔥
+  // ✅✅✅ REGISTRO DEPORTISTA CON EMAIL DE BIENVENIDA ✅✅✅
   static async registroDeportista(req, res) {
     try {
-      console.log('\n📋 === REGISTRO DEPORTISTA CORREGIDO ===');
+      console.log('\n📋 === REGISTRO DEPORTISTA CON EMAIL DE BIENVENIDA ===');
       console.log('📦 Body recibido:', req.body);
       console.log('📁 Archivos recibidos:', req.files);
 
       const {
-        // 🔥 CAMPOS OBLIGATORIOS EN USER
         nombre,
         apellidos,
         tipo_documento,
@@ -210,8 +209,6 @@ class AuthController {
         password,
         ciudad,
         telefono,
-        
-        // CAMPOS DEL DEPORTISTA
         fecha_nacimiento,
         ciudad_nacimiento,
         direccion,
@@ -223,53 +220,11 @@ class AuthController {
         terminos_aceptados
       } = req.body;
 
-      // 🔥 VALIDAR CAMPOS OBLIGATORIOS
-      if (!nombre) {
+      // Validaciones
+      if (!nombre || !apellidos || !tipo_documento || !numero_documento || !email || !password) {
         return res.status(400).json({
           success: false,
-          message: 'El nombre es obligatorio'
-        });
-      }
-
-      if (!apellidos) {
-        return res.status(400).json({
-          success: false,
-          message: 'Los apellidos son obligatorios'
-        });
-      }
-
-      if (!tipo_documento) {
-        return res.status(400).json({
-          success: false,
-          message: 'El tipo de documento es obligatorio'
-        });
-      }
-
-      if (!numero_documento) {
-        return res.status(400).json({
-          success: false,
-          message: 'El número de documento es obligatorio'
-        });
-      }
-
-      if (!email) {
-        return res.status(400).json({
-          success: false,
-          message: 'El email es obligatorio'
-        });
-      }
-
-      if (!password) {
-        return res.status(400).json({
-          success: false,
-          message: 'La contraseña es obligatoria'
-        });
-      }
-
-      if (!ciudad && !ciudad_nacimiento) {
-        return res.status(400).json({
-          success: false,
-          message: 'La ciudad es obligatoria'
+          message: 'Faltan campos obligatorios'
         });
       }
 
@@ -282,17 +237,16 @@ class AuthController {
         });
       }
 
-      console.log('👤 Creando usuario con TODOS los campos...');
+      console.log('👤 Creando usuario...');
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // 🔥 PROCESAR ARCHIVOS ANTES DE CREAR EL USUARIO
+      // Procesar archivos
       let fotoPerfilUrl = null;
       let documentoUrl = null;
 
-      // 📸 SUBIR FOTO DE PERFIL A CLOUDINARY
       if (req.files?.foto?.[0]) {
         try {
-          console.log('📸 Subiendo foto de perfil a Cloudinary...');
+          console.log('📸 Subiendo foto...');
           const fotoResult = await uploadToCloudinary(req.files.foto[0].buffer, {
             folder: 'deportistas/fotos',
             allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
@@ -302,31 +256,28 @@ class AuthController {
             ]
           });
           fotoPerfilUrl = fotoResult.secure_url;
-          console.log('✅ Foto subida:', fotoPerfilUrl);
+          console.log('✅ Foto subida');
         } catch (error) {
-          console.error('❌ Error subiendo foto:', error.message);
-          // Continuar sin foto si falla
+          console.error('⚠️ Error subiendo foto:', error.message);
         }
       }
 
-      // 📄 SUBIR DOCUMENTO PDF A CLOUDINARY
       if (req.files?.documento?.[0]) {
         try {
-          console.log('📄 Subiendo documento PDF a Cloudinary...');
+          console.log('📄 Subiendo documento...');
           const documentoResult = await uploadToCloudinary(req.files.documento[0].buffer, {
             folder: 'deportistas/documentos',
             allowed_formats: ['pdf'],
             resource_type: 'raw'
           });
           documentoUrl = documentoResult.secure_url;
-          console.log('✅ Documento subido:', documentoUrl);
+          console.log('✅ Documento subido');
         } catch (error) {
-          console.error('❌ Error subiendo documento:', error.message);
-          // Continuar sin documento si falla
+          console.error('⚠️ Error subiendo documento:', error.message);
         }
       }
 
-      // 🔥 CREAR USER CON TODOS LOS CAMPOS (INCLUYENDO FOTO)
+      // Crear usuario
       const user = await User.create({
         nombre,
         apellidos,
@@ -337,21 +288,14 @@ class AuthController {
         password: hashedPassword,
         role: 'deportista',
         telefono: telefono || null,
-        foto_perfil: fotoPerfilUrl,  // ✅ GUARDAMOS LA FOTO EN USERS
+        foto_perfil: fotoPerfilUrl,
         acepta_terminos: terminos_aceptados === 'true' || false
       });
 
       console.log('✅ Usuario creado ID:', user.id);
-      console.log('📊 Datos guardados en USER:');
-      console.log('  - nombre:', user.nombre);
-      console.log('  - apellidos:', user.apellidos);
-      console.log('  - tipo_documento:', user.tipo_documento);
-      console.log('  - numero_documento:', user.numero_documento);
-      console.log('  - ciudad:', user.ciudad);
-      console.log('  - foto_perfil:', user.foto_perfil ? '✅ SÍ' : '❌ NO');
 
-      // Preparar datos del deportista
-      const deportistaData = {
+      // Crear deportista
+      const deportista = await Deportista.create({
         user_id: user.id,
         fecha_nacimiento: fecha_nacimiento || null,
         ciudad_nacimiento: ciudad_nacimiento || ciudad || null,
@@ -365,20 +309,28 @@ class AuthController {
         estado: 'activo',
         equipo_competitivo: 'sin_equipo',
         acepta_terminos: terminos_aceptados === 'true' || false,
-        foto_perfil: fotoPerfilUrl,  // ✅ TAMBIÉN EN DEPORTISTAS
-        documento_identidad: documentoUrl || null,  // ✅ URL DEL PDF O NULL
-        tiene_documento: documentoUrl ? 'SI' : 'NO'  // ✅ "SI" o "NO"
-      };
-
-      console.log('🏃 Creando deportista con datos...');
-      console.log('  - foto_perfil:', deportistaData.foto_perfil ? '✅ SÍ' : '❌ NO');
-      console.log('  - documento_identidad:', deportistaData.documento_identidad ? '✅ SÍ' : '❌ NO');
-      console.log('  - tiene_documento:', deportistaData.tiene_documento);
-
-      // Crear deportista
-      const deportista = await Deportista.create(deportistaData);
+        foto_perfil: fotoPerfilUrl,
+        documento_identidad: documentoUrl || null,
+        tiene_documento: documentoUrl ? 'SI' : 'NO'
+      });
 
       console.log('✅ Deportista creado ID:', deportista.id);
+
+      // ✅✅✅ ENVIAR EMAIL DE BIENVENIDA ✅✅✅
+      try {
+        console.log('📧 Enviando email de bienvenida a:', user.email);
+        
+        await EmailService.enviarEmailBienvenidaDeportista(
+          user.email,
+          user.nombre,
+          user.apellidos || ''
+        );
+        
+        console.log('✅ Email de bienvenida enviado exitosamente');
+      } catch (emailError) {
+        console.error('⚠️ Error enviando email de bienvenida (no crítico):', emailError.message);
+        // NO lanzar error - el registro ya fue exitoso
+      }
 
       // Generar token JWT
       const tokenPayload = {
@@ -393,10 +345,10 @@ class AuthController {
         { expiresIn: '7d' }
       );
 
-      // Respuesta exitosa con TODOS los datos
+      // Respuesta exitosa
       res.status(201).json({
         success: true,
-        message: '¡Registro completado exitosamente!',
+        message: '¡Registro completado exitosamente! Revisa tu email para más información.',
         token,
         user: {
           id: user.id,

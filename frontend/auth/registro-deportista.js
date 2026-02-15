@@ -127,7 +127,6 @@ function validateField(field) {
         case 'apellidos':
         case 'nombres':
         case 'ciudad_nacimiento':
-        case 'direccion':
         case 'nombre_acudiente':
             if (!value) {
                 isValid = false;
@@ -135,6 +134,25 @@ function validateField(field) {
             } else if (value.length < 2) {
                 isValid = false;
                 errorMessage = '❌ Mínimo 2 caracteres';
+            }
+            break;
+
+        // ✅✅✅ VALIDACIÓN DE DIRECCIÓN CORREGIDA ✅✅✅
+        case 'direccion':
+            const numeroDocDireccion = document.getElementById('numero_documento')?.value.trim();
+            
+            if (!value) {
+                isValid = false;
+                errorMessage = '❌ La dirección es obligatoria';
+            } else if (value.length < 5) {
+                isValid = false;
+                errorMessage = '❌ La dirección debe tener al menos 5 caracteres';
+            } else if (numeroDocDireccion && value === numeroDocDireccion) {
+                isValid = false;
+                errorMessage = '⚠️ La dirección no puede ser igual al número de documento';
+            } else if (/^\d+$/.test(value)) {
+                isValid = false;
+                errorMessage = '❌ La dirección debe contener letras, no solo números';
             }
             break;
 
