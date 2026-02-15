@@ -1,5 +1,5 @@
 // ==========================================
-// REPORTES APP - VERSIÓN MEJORADA Y CORREGIDA
+// REPORTES APP - VERSIÓN FINAL Y COMPLETA
 // ==========================================
 
 if (typeof window.ReportesApp === 'undefined') {
@@ -15,7 +15,7 @@ if (typeof window.ReportesApp === 'undefined') {
         // INICIALIZACIÓN
         // ==========================================
         async init() {
-            console.log('🚀 Inicializando ReportesApp Mejorado...');
+            console.log('🚀 Inicializando ReportesApp...');
 
             if (!this.checkAuth()) return;
 
@@ -24,7 +24,7 @@ if (typeof window.ReportesApp === 'undefined') {
             this.configurarEventos();
             this.updateUserInfo();
 
-            console.log('✅ ReportesApp Mejorado inicializado');
+            console.log('✅ ReportesApp inicializado');
         },
 
         checkAuth() {
@@ -42,26 +42,29 @@ if (typeof window.ReportesApp === 'undefined') {
         // ==========================================
         async descargarExcelCompleto() {
             try {
-                console.log('📊 DESCARGANDO EXCEL CON FILTROS...');
+                console.log('📊 DESCARGANDO EXCEL...');
                 this.mostrarLoading(true);
 
                 const params = new URLSearchParams();
 
-                // ✅ FILTRO 1: ESTADO
-                const estado = document.getElementById('filtroEstado')?.value;
+                // ✅ FILTRO 1: ESTADO (desde chips)
+                const estadoChip = document.querySelector('.filtro-chip.estado.active');
+                const estado = estadoChip?.dataset.estado || '';
                 if (estado && estado !== '') {
                     params.append('estado', estado);
                     console.log('📊 Filtro Estado:', estado);
                 }
 
-                // ✅ FILTRO 2: NIVEL
-                const nivel = document.getElementById('filtroNivel')?.value;
+                // ✅ FILTRO 2: NIVEL (desde select o chips)
+                const nivelSelect = document.getElementById('filtroNivelDetallado')?.value;
+                const nivelChip = document.querySelector('.filtro-chip.nivel.active')?.dataset.nivel || '';
+                const nivel = nivelSelect || nivelChip;
                 if (nivel && nivel !== '') {
                     params.append('nivel', nivel);
                     console.log('📈 Filtro Nivel:', nivel);
                 }
 
-                // ✅ FILTRO 3: GRUPO COMPETITIVO
+                // ✅ FILTRO 3: GRUPO COMPETITIVO (desde select)
                 const grupoCompetitivo = document.getElementById('filtroGrupoCompetitivo')?.value;
                 if (grupoCompetitivo && grupoCompetitivo !== '') {
                     params.append('equipoCompetitivo', grupoCompetitivo);
@@ -111,7 +114,7 @@ if (typeof window.ReportesApp === 'undefined') {
                     window.URL.revokeObjectURL(blobUrl);
                 }, 100);
 
-                let mensaje = '✅ Excel descargado exitosamente';
+                let mensaje = '✅ Excel descargado';
                 if (estado || nivel || grupoCompetitivo) {
                     mensaje += ' con filtros aplicados';
                 }
@@ -209,7 +212,7 @@ if (typeof window.ReportesApp === 'undefined') {
         },
 
         // ==========================================
-        // APLICAR FILTROS (VISTA PREVIA)
+        // APLICAR FILTROS (VISTA PREVIA CON LOS 3 FILTROS)
         // ==========================================
         async aplicarFiltros() {
             try {
@@ -218,21 +221,24 @@ if (typeof window.ReportesApp === 'undefined') {
 
                 const params = new URLSearchParams();
 
-                // ✅ FILTRO 1: ESTADO
-                const estado = document.getElementById('filtroEstado')?.value;
+                // ✅ FILTRO 1: ESTADO (desde chips)
+                const estadoChip = document.querySelector('.filtro-chip.estado.active');
+                const estado = estadoChip?.dataset.estado || '';
                 if (estado && estado !== '') {
                     params.append('estado', estado);
                     console.log('📊 Filtro Estado:', estado);
                 }
 
-                // ✅ FILTRO 2: NIVEL
-                const nivel = document.getElementById('filtroNivel')?.value;
+                // ✅ FILTRO 2: NIVEL (desde select o chips)
+                const nivelSelect = document.getElementById('filtroNivelDetallado')?.value;
+                const nivelChip = document.querySelector('.filtro-chip.nivel.active')?.dataset.nivel || '';
+                const nivel = nivelSelect || nivelChip;
                 if (nivel && nivel !== '') {
                     params.append('nivel', nivel);
                     console.log('📈 Filtro Nivel:', nivel);
                 }
 
-                // ✅ FILTRO 3: GRUPO COMPETITIVO
+                // ✅ FILTRO 3: GRUPO COMPETITIVO (desde select)
                 const grupoCompetitivo = document.getElementById('filtroGrupoCompetitivo')?.value;
                 if (grupoCompetitivo && grupoCompetitivo !== '') {
                     params.append('equipoCompetitivo', grupoCompetitivo);
@@ -350,6 +356,7 @@ if (typeof window.ReportesApp === 'undefined') {
             document.getElementById('cloudinaryDocs').textContent = stats.cloudinary || 0;
         },
 
+        // 🔥 TABLA CORREGIDA - MUESTRA LOS DATOS CORRECTAMENTE
         actualizarVistaPrevia() {
             const tbody = document.getElementById('tablaResultados');
             const sinResultados = document.getElementById('sinResultados');
@@ -369,51 +376,37 @@ if (typeof window.ReportesApp === 'undefined') {
 
             const resultados = this.state.deportistasFiltrados.slice(0, 10);
 
-            resultados.forEach((deportista, index) => {
+            resultados.forEach(deportista => {
                 const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors';
 
-                // 🔥 CORRECCIÓN: Extraer datos correctamente
-                const nombre = deportista.nombre_completo || deportista.nombre || 'Sin nombre';
-                const documento = deportista.numero_documento || deportista.documento || 'Sin documento';
-                const nivel = this.formatearNivel(deportista.nivel_actual || 'Pendiente');
-                const estado = deportista.estado || 'activo';
+                // 🔥 CORRECCIÓN: EXTRAER DATOS CORRECTAMENTE
+                const nombre = deportista.nombre_completo || '';
+                const documento = deportista.numero_documento || '';
+                const nivel = deportista.nivel_actual || 'Pendiente';
+                const estado = deportista.estado || 'Activo';
                 const tieneDoc = deportista.tiene_documento;
 
                 row.innerHTML = `
+                    <td class="px-6 py-4 font-medium">${nombre}</td>
+                    <td class="px-6 py-4">${documento}</td>
                     <td class="px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
-                                ${nombre.charAt(0).toUpperCase()}
-                            </div>
-                            <div>
-                                <p class="font-semibold text-gray-900 dark:text-white">${nombre}</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">ID: ${deportista.id || 'N/A'}</p>
-                            </div>
-                        </div>
+                        <span class="badge bg-blue-100">${nivel}</span>
                     </td>
                     <td class="px-6 py-4">
-                        <span class="font-mono text-sm font-medium text-gray-700 dark:text-gray-300">${documento}</span>
+                        <span class="badge ${this.getEstadoColor(estado)}">${estado}</span>
                     </td>
                     <td class="px-6 py-4">
-                        <span class="px-3 py-1.5 rounded-full text-xs font-bold ${this.getNivelColor(deportista.nivel_actual)}">${nivel}</span>
-                    </td>
-                    <td class="px-6 py-4">
-                        <span class="px-3 py-1.5 rounded-full text-xs font-bold ${this.getEstadoColor(estado)}">${this.formatearEstado(estado)}</span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
                         ${tieneDoc ?
-                        '<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"><span class="material-symbols-outlined text-base">check_circle</span>Subido</span>' :
-                        '<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400"><span class="material-symbols-outlined text-base">cancel</span>Pendiente</span>'}
+                        '<span class="badge bg-green-100">✓ Subido</span>' :
+                        '<span class="badge bg-gray-100">✗ Pendiente</span>'}
                     </td>
                     <td class="px-6 py-4 text-right">
                         ${tieneDoc ?
                         `<button onclick="ReportesApp.descargarDocumentoIndividual('${deportista.id}')" 
-                              class="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all hover:scale-105 shadow-lg hover:shadow-xl">
-                                <span class="material-symbols-outlined text-base">download</span>
-                                Descargar PDF
+                              class="px-3 py-1 text-xs bg-primary text-white rounded hover:bg-red-700 transition-colors">
+                                Descargar
                              </button>` :
-                        '<span class="text-gray-400 dark:text-gray-500 text-xs font-medium">Sin documento</span>'}
+                        '<span class="text-gray-400 text-xs">No disponible</span>'}
                     </td>
                 `;
 
@@ -430,55 +423,14 @@ if (typeof window.ReportesApp === 'undefined') {
             }
         },
 
-        // ==========================================
-        // FORMATEO Y COLORES
-        // ==========================================
-        formatearNivel(nivel) {
-            const niveles = {
-                'baby_titans': 'Baby Titans',
-                '1_basico': '1 Básico',
-                '1_medio': '1 Medio',
-                '1_avanzado': '1 Avanzado',
-                '2': 'Nivel 2',
-                '3': 'Nivel 3',
-                '4': 'Nivel 4'
-            };
-            return niveles[nivel] || nivel || 'Pendiente';
-        },
-
-        formatearEstado(estado) {
-            const estados = {
-                'activo': 'Activo',
-                'inactivo': 'Inactivo',
-                'lesionado': 'Lesionado',
-                'descanso': 'En Descanso',
-                'pendiente': 'Pendiente'
-            };
-            return estados[estado?.toLowerCase()] || estado || 'Activo';
-        },
-
-        getNivelColor(nivel) {
-            const colores = {
-                'baby_titans': 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400',
-                '1_basico': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-                '1_medio': 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400',
-                '1_avanzado': 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400',
-                '2': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-                '3': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-                '4': 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
-            };
-            return colores[nivel] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
-        },
-
         getEstadoColor(estado) {
             const colores = {
-                'activo': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-                'inactivo': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-                'lesionado': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-                'descanso': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-                'pendiente': 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+                'activo': 'bg-green-100',
+                'inactivo': 'bg-red-100',
+                'lesionado': 'bg-yellow-100',
+                'pendiente': 'bg-gray-100'
             };
-            return colores[estado?.toLowerCase()] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+            return colores[estado?.toLowerCase()] || 'bg-gray-100';
         },
 
         limpiarFiltros() {
@@ -489,12 +441,17 @@ if (typeof window.ReportesApp === 'undefined') {
 
             // Limpiar selects
             document.querySelectorAll('select').forEach(select => {
-                select.value = '';
+                select.value = select.id === 'filtroTieneDocumento' ? 'todos' : '';
             });
 
-            // Reset documento select
-            const docSelect = document.getElementById('filtroTieneDocumento');
-            if (docSelect) docSelect.value = 'todos';
+            // Resetear chips
+            document.querySelectorAll('.filtro-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.filtro-chip[data-estado=""], .filtro-chip[data-nivel=""]').forEach(chip => {
+                chip.classList.add('active');
+            });
 
             document.getElementById('filtrosAplicados')?.classList.add('hidden');
 
@@ -543,6 +500,15 @@ if (typeof window.ReportesApp === 'undefined') {
                 this.limpiarFiltros();
             });
 
+            // Chips de filtro
+            document.querySelectorAll('.filtro-chip').forEach(chip => {
+                chip.addEventListener('click', (e) => {
+                    const tipo = e.target.classList.contains('estado') ? 'estado' : 'nivel';
+                    document.querySelectorAll(`.filtro-chip.${tipo}`).forEach(c => c.classList.remove('active'));
+                    e.target.classList.add('active');
+                });
+            });
+
             // Enter en campos de texto
             document.querySelectorAll('#filtroNombreCompleto, #filtroNumeroDocumento, #filtroEmail').forEach(input => {
                 input.addEventListener('keypress', (e) => {
@@ -550,23 +516,14 @@ if (typeof window.ReportesApp === 'undefined') {
                 });
             });
 
-            // Cambio en selects principales (aplicar automáticamente)
-            ['filtroEstado', 'filtroNivel', 'filtroGrupoCompetitivo'].forEach(id => {
-                document.getElementById(id)?.addEventListener('change', () => {
-                    // Mostrar indicador de filtros activos
-                    document.getElementById('filtrosAplicados')?.classList.remove('hidden');
-                });
-            });
-
             // Ayuda
             document.getElementById('btnAyuda')?.addEventListener('click', () => {
-                alert('📋 GUÍA DE USO MEJORADA\n\n' +
-                      '1️⃣ Usa los filtros principales (Estado, Nivel, Grupo Competitivo)\n' +
-                      '2️⃣ Si necesitas más filtros, abre "Filtros Adicionales"\n' +
-                      '3️⃣ Haz clic en "Buscar" para ver resultados\n' +
-                      '4️⃣ Descarga PDFs individuales desde la tabla\n' +
-                      '5️⃣ Descarga Excel con los filtros aplicados\n\n' +
-                      '💡 TIP: Los filtros principales se aplican tanto al Excel como a la búsqueda');
+                alert('📋 GUÍA DE USO\n\n' +
+                      '1️⃣ Selecciona Estado, Nivel y/o Grupo Competitivo\n' +
+                      '2️⃣ Haz clic en "Aplicar" para buscar\n' +
+                      '3️⃣ Los deportistas encontrados aparecen en la tabla\n' +
+                      '4️⃣ Descarga sus PDFs con el botón "Descargar"\n' +
+                      '5️⃣ O descarga el Excel completo con "Descargar Excel"');
             });
         },
 
@@ -598,17 +555,9 @@ if (typeof window.ReportesApp === 'undefined') {
                 box-shadow: 0 4px 12px rgba(0,0,0,0.15);
                 margin-bottom: 10px;
                 animation: slideIn 0.3s ease-out;
-                display: flex;
-                align-items: center;
-                gap: 12px;
             `;
 
-            const icon = type === 'success' ? 'check_circle' :
-                type === 'error' ? 'error' :
-                    type === 'warning' ? 'warning' : 'info';
-
             notification.innerHTML = `
-                <span class="material-symbols-outlined">${icon}</span>
                 <span>${message}</span>
                 <button onclick="this.parentElement.remove()" style="background: none; border: none; color: white; margin-left: 10px; cursor: pointer;">✕</button>
             `;

@@ -254,7 +254,6 @@ class ReportesController {
         
         // DOCUMENTOS
         { header: 'TIENE DOCUMENTO', key: 'tiene_documento', width: 15 },
-        { header: 'URL DOCUMENTO', key: 'url_documento', width: 50 },
         
         // CONTACTO EMERGENCIA
         { header: 'CONTACTO EMERGENCIA', key: 'contacto_emergencia_nombre', width: 25 },
@@ -322,7 +321,6 @@ class ReportesController {
           
           // DOCUMENTOS
           tiene_documento: tieneDocumento,
-          url_documento: datos.documento_identidad || '',
           
           // CONTACTO EMERGENCIA
           contacto_emergencia_nombre: datos.contacto_emergencia_nombre || '',
@@ -463,7 +461,6 @@ class ReportesController {
         { header: 'ESTADO', key: 'estado', width: 15 },
         { header: 'FECHA NACIMIENTO', key: 'fecha_nacimiento', width: 15 },
         { header: 'FECHA REGISTRO', key: 'fecha_registro', width: 15 },
-        { header: 'URL DOCUMENTO', key: 'url_documento', width: 60 },
         { header: '¿ES CLOUDINARY?', key: 'es_cloudinary', width: 15 }
       ];
 
@@ -503,7 +500,6 @@ class ReportesController {
           estado: datos.estado || '',
           fecha_nacimiento: ReportesController.formatearFecha(datos.fecha_nacimiento),
           fecha_registro: ReportesController.formatearFecha(datos.created_at),
-          url_documento: urlDocumento,
           es_cloudinary: esCloudinary
         };
         
@@ -566,55 +562,70 @@ class ReportesController {
   // ============================================
 static async descargarDocumentoPDF(req, res) {
     try {
-        const { deportista_id } = req.params;
+      const { deportista_id } = req.params;
+      
+      const deportista = await Deportista.findByPk(deportista_id, {
+        include: [{ model: User, as: 'user', attributes: ['nombre', 'apellidos'] }]
+      });
 
-        console.log('\n📄 === DESCARGA DOCUMENTO PDF ===');
-        console.log('🆔 Deportista ID:', deportista_id);
+      if (!deportista) {
+        return res.status(404).json({ success: false, error: 'Deportista no encontrado' });
+      }
 
-        const deportista = await Deportista.findByPk(deportista_id, {
-            include: [{
-                model: User,
-                as: 'user',
-                attributes: ['nombre', 'apellidos']
-            }]
-        });
+      if (!deportista.documento_identidad) {
+        return res.status(404).json({ success: false, error: 'Sin documento' });
+      }
 
-        if (!deportista) {
-            return res.status(404).json({
-                success: false,
-                error: 'Deportista no encontrado'
-            });
-        }
-
-        if (!deportista.documento_identidad) {
-            return res.status(404).json({
-                success: false,
-                error: 'Este deportista no tiene documento cargado'
-            });
-        }
-
-        const docUrl = deportista.documento_identidad;
-        console.log('🌐 URL original:', docUrl);
-        console.log('✅ Devolviendo URL sin modificar');
-
-        // 🔥 SOLUCIÓN: URL sin modificar
-        return res.json({
-            success: true,
-            url: docUrl,
-            deportista: {
-                id: deportista.id,
-                nombre: deportista.user?.nombre || ''
-            }
-        });
+      return res.json({
+        success: true,
+        url: deportista.documento_identidad,
+        deportista: { id: deportista.id, nombre: deportista.user?.nombre || '' }
+      });
 
     } catch (error) {
-        console.error('❌ ERROR:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Error al obtener documento'
-        });
+      console.error('❌ ERROR:', error);
+      res.status(500).json({ success: false, error: 'Error obteniendo documento' });
     }
-}
+  }
+
+  static async getDeportistasCompletos(req, res) {
+    try {
+      const { nivel, estado, equipoCompetitivo } = req.query;
+      
+      const whereClause = {};
+      if (nivel && nivel !== '') whereClause.nivel_actual = nivel;
+      if (estado && estado !== '') whereClause.estado = estado;
+      if (equipoCompetitivo && equipoCompetitivo !== '') {
+        whereClause.equipo_competitivo = equipoCompetitivo;
+      }
+      
+      const deportistas = await Deportista.findAll({
+        where: whereClause,
+        include: [{ model: User, as: 'user', required: true }],
+        order: [['created_at', 'DESC']]
+      });
+      
+      const deportistasFormateados = deportistas.map(deportista => {
+        const user = deportista.user || {};
+        const datos = deportista.dataValues;
+        
+        return {
+          id: datos.id,
+          nombre_completo: `${user.nombre || ''} ${user.apellidos || ''}`.trim(),
+          numero_documento: user.numero_documento || '',
+          nivel_actual: datos.nivel_actual,
+          estado: datos.estado,
+          tiene_documento: !!datos.documento_identidad
+        };
+      });
+      
+      res.json({ success: true, deportistas: deportistasFormateados });
+      
+    } catch (error) {
+      console.error('❌ ERROR:', error);
+      res.status(500).json({ success: false, error: 'Error obteniendo deportistas' });
+    }
+  }
   // ============================================
   // OBTENER DEPORTISTAS COMPLETOS
   // ============================================

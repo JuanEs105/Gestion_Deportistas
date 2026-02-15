@@ -1,5 +1,5 @@
 /* ==========================================
-   ESTILOS MEJORADOS PARA REPORTES
+   ESTILOS COMPLETOS PARA REPORTES Y DESCARGAS
    Titanes Evolution - Sistema de Gestión Deportiva
    ========================================== */
 
@@ -9,7 +9,6 @@
 :root {
     --primary: #E21B23;
     --primary-dark: #B8151B;
-    --primary-light: #FF2E36;
     --secondary: #1A1A1A;
     --dark-grey: #333333;
     --background-light: #F8F9FA;
@@ -33,18 +32,12 @@
     --error: #EF4444;
     --info: #3B82F6;
     
-    /* Sombras mejoradas */
+    /* Sombras */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    
-    /* Bordes redondeados */
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --radius-xl: 20px;
 }
 
 .dark {
@@ -97,7 +90,7 @@ body {
 }
 
 /* ==========================================
-   TARJETAS DE ESTADÍSTICAS MEJORADAS
+   TARJETAS DE ESTADÍSTICAS
    ========================================== */
 .stat-card {
     position: relative;
@@ -105,7 +98,7 @@ body {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid var(--grey-200);
     background: white;
-    border-radius: var(--radius-lg);
+    border-radius: 12px;
 }
 
 .dark .stat-card {
@@ -129,22 +122,36 @@ body {
 }
 
 .stat-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 25px 50px rgba(226, 27, 35, 0.2);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .dark .stat-card:hover {
-    box-shadow: 0 25px 50px rgba(226, 27, 35, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.stat-card .icon-container {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover .icon-container {
+    transform: scale(1.1) rotate(5deg);
 }
 
 /* ==========================================
-   CONTENEDOR DE FILTROS MEJORADO
+   CONTENEDOR DE FILTROS
    ========================================== */
 .filtros-container {
     background: white;
-    border-radius: var(--radius-lg);
+    border-radius: 16px;
     padding: 2rem;
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     border: 1px solid var(--grey-200);
     margin-bottom: 2rem;
     position: relative;
@@ -154,10 +161,10 @@ body {
 .dark .filtros-container {
     background: var(--grey-100);
     border-color: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* Barra superior decorativa con animación */
+/* Barra superior decorativa */
 .filtros-container::before {
     content: '';
     position: absolute;
@@ -165,7 +172,7 @@ body {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #E21B23 0%, #FF2E36 25%, #E21B23 50%, #B8151B 75%, #E21B23 100%);
+    background: linear-gradient(90deg, #E21B23 0%, #B8151B 50%, #E21B23 100%);
     background-size: 200% 100%;
     animation: gradientShift 4s ease infinite;
 }
@@ -176,9 +183,105 @@ body {
 }
 
 /* ==========================================
-   INPUTS Y SELECTS MEJORADOS
+   TABS DE FILTROS
    ========================================== */
-.input-filtro,
+.filtro-tab {
+    position: relative;
+    padding: 0.875rem 1.75rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--grey-100);
+    color: var(--grey-700);
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    overflow: hidden;
+}
+
+.dark .filtro-tab {
+    background: var(--grey-200);
+    color: var(--grey-300);
+}
+
+.filtro-tab::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(226, 27, 35, 0.1);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.5s ease, height 0.5s ease;
+}
+
+.filtro-tab:hover:not(.active)::before {
+    width: 300px;
+    height: 300px;
+}
+
+.filtro-tab:hover:not(.active) {
+    background: var(--grey-200);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dark .filtro-tab:hover:not(.active) {
+    background: var(--grey-300);
+}
+
+.filtro-tab.active {
+    background: linear-gradient(135deg, #E21B23 0%, #B8151B 100%);
+    color: white !important;
+    border-color: transparent;
+    box-shadow: 0 6px 20px rgba(226, 27, 35, 0.4);
+    transform: translateY(-3px);
+}
+
+.filtro-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    height: 3px;
+    background: white;
+    border-radius: 2px;
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.5);
+}
+
+/* ==========================================
+   CONTENIDO DE FILTROS
+   ========================================== */
+.filtro-contenido {
+    display: none;
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.filtro-contenido.active {
+    display: block;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================
+   INPUTS Y SELECTS
+   ========================================== */
 input[type="text"],
 input[type="email"],
 input[type="number"],
@@ -187,7 +290,7 @@ select {
     width: 100%;
     background: white;
     border: 2px solid var(--grey-300);
-    border-radius: var(--radius-md);
+    border-radius: 10px;
     padding: 0.875rem 1rem;
     font-size: 0.875rem;
     font-weight: 500;
@@ -196,7 +299,6 @@ select {
     outline: none;
 }
 
-.dark .input-filtro,
 .dark input[type="text"],
 .dark input[type="email"],
 .dark input[type="number"],
@@ -207,7 +309,6 @@ select {
     color: white;
 }
 
-.input-filtro:focus,
 input:focus,
 select:focus {
     border-color: var(--primary);
@@ -216,11 +317,9 @@ select:focus {
     background: white;
 }
 
-.dark .input-filtro:focus,
 .dark input:focus,
 .dark select:focus {
     background: var(--grey-200);
-    box-shadow: 0 0 0 4px rgba(226, 27, 35, 0.25);
 }
 
 input::placeholder {
@@ -233,7 +332,6 @@ input::placeholder {
 }
 
 /* Labels mejorados */
-.label-filtro,
 label {
     display: flex;
     align-items: center;
@@ -246,13 +344,83 @@ label {
     margin-bottom: 0.5rem;
 }
 
-.dark .label-filtro,
 .dark label {
     color: var(--grey-300);
 }
 
 /* ==========================================
-   BOTONES MEJORADOS
+   CHIPS DE FILTRO
+   ========================================== */
+.filtro-chip {
+    position: relative;
+    padding: 0.625rem 1.25rem;
+    border-radius: 9999px;
+    font-size: 0.813rem;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+    color: var(--grey-700);
+    border: 2px solid var(--grey-300);
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+}
+
+.dark .filtro-chip {
+    background: var(--grey-200);
+    color: white;
+    border-color: var(--grey-400);
+}
+
+.filtro-chip::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(226, 27, 35, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+}
+
+.filtro-chip:hover:not(.active)::before {
+    width: 200px;
+    height: 200px;
+}
+
+.filtro-chip:hover:not(.active) {
+    background: var(--grey-100);
+    border-color: var(--grey-400);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.dark .filtro-chip:hover:not(.active) {
+    background: var(--grey-300);
+}
+
+.filtro-chip.active {
+    background: linear-gradient(135deg, #E21B23 0%, #B8151B 100%);
+    color: white !important;
+    border-color: transparent;
+    box-shadow: 0 6px 20px rgba(226, 27, 35, 0.4);
+    transform: translateY(-3px) scale(1.08);
+}
+
+.filtro-chip.active::after {
+    content: '✓';
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* ==========================================
+   BOTONES
    ========================================== */
 .btn-primary,
 button[id*="descargar"],
@@ -261,13 +429,13 @@ button[id*="aplicar"] {
     background: linear-gradient(135deg, #E21B23 0%, #B8151B 100%);
     color: white;
     padding: 0.875rem 2rem;
-    border-radius: var(--radius-md);
+    border-radius: 12px;
     font-weight: 700;
     font-family: 'Oswald', sans-serif;
     text-transform: uppercase;
     font-style: italic;
     letter-spacing: 0.05em;
-    box-shadow: 0 8px 25px rgba(226, 27, 35, 0.4);
+    box-shadow: 0 6px 20px rgba(226, 27, 35, 0.35);
     border: none;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -303,14 +471,15 @@ button[id*="aplicar"]:hover::before {
 .btn-primary:hover,
 button[id*="descargar"]:hover,
 button[id*="aplicar"]:hover {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 15px 40px rgba(226, 27, 35, 0.5);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(226, 27, 35, 0.45);
 }
 
 .btn-primary:active,
 button[id*="descargar"]:active,
 button[id*="aplicar"]:active {
-    transform: translateY(-2px) scale(1.02);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(226, 27, 35, 0.35);
 }
 
 /* Botón secundario */
@@ -319,7 +488,7 @@ button[id*="limpiar"] {
     background: white;
     color: var(--grey-700);
     padding: 0.875rem 2rem;
-    border-radius: var(--radius-md);
+    border-radius: 12px;
     font-weight: 600;
     border: 2px solid var(--grey-300);
     cursor: pointer;
@@ -342,7 +511,7 @@ button[id*="limpiar"]:hover {
     background: var(--grey-100);
     border-color: var(--grey-500);
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .dark .btn-secondary:hover,
@@ -351,12 +520,26 @@ button[id*="limpiar"]:hover {
 }
 
 /* ==========================================
-   TABLA DE RESULTADOS CORREGIDA Y MEJORADA
+   TABLA DE RESULTADOS
    ========================================== */
+.tabla-resultados,
+.bg-white.dark\\:bg-zinc-900.shadow-xl {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--grey-200);
+}
+
+.dark .tabla-resultados,
+.dark .bg-white.dark\\:bg-zinc-900.shadow-xl {
+    background: var(--grey-100);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed; /* 🔥 IMPORTANTE: Fija el ancho de las columnas */
 }
 
 thead {
@@ -371,7 +554,7 @@ thead::after {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #E21B23, #FF2E36, #E21B23);
+    background: linear-gradient(90deg, #E21B23, #B8151B, #E21B23);
     background-size: 200% 100%;
     animation: gradientShift 3s ease infinite;
 }
@@ -386,7 +569,6 @@ th {
     color: white;
     font-family: 'Oswald', sans-serif;
     font-style: italic;
-    white-space: nowrap; /* 🔥 Evita que el texto se rompa */
 }
 
 td {
@@ -396,7 +578,6 @@ td {
     font-size: 0.875rem;
     font-weight: 500;
     transition: all 0.2s ease;
-    vertical-align: middle; /* 🔥 Alinea verticalmente el contenido */
 }
 
 .dark td {
@@ -416,54 +597,122 @@ tbody tr::before {
     top: 0;
     height: 100%;
     width: 4px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    background: var(--primary);
     transform: scaleY(0);
     transition: transform 0.3s ease;
     transform-origin: center;
 }
 
 tbody tr:hover {
-    background: linear-gradient(90deg, rgba(226, 27, 35, 0.05), transparent);
+    background: var(--grey-50);
     transform: translateX(6px);
 }
 
 .dark tbody tr:hover {
-    background: linear-gradient(90deg, rgba(226, 27, 35, 0.1), transparent);
+    background: var(--grey-200);
 }
 
 tbody tr:hover::before {
     transform: scaleY(1);
 }
 
-/* 🔥 BADGES MEJORADOS CON ICONOS */
+/* ==========================================
+   BADGES Y ESTADOS
+   ========================================== */
 .badge {
     display: inline-flex;
     align-items: center;
     padding: 0.375rem 0.875rem;
     border-radius: 9999px;
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    gap: 0.25rem;
+}
+
+/* Estados de color */
+.bg-blue-100 {
+    background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+    color: #1E40AF;
+    border-color: #93C5FD;
+}
+
+.dark .bg-blue-100 {
+    background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%);
+    color: #DBEAFE;
+}
+
+.bg-green-100 {
+    background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+    color: #065F46;
+    border-color: #6EE7B7;
+}
+
+.dark .bg-green-100 {
+    background: linear-gradient(135deg, #064E3B 0%, #065F46 100%);
+    color: #D1FAE5;
+}
+
+.bg-yellow-100 {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    color: #92400E;
+    border-color: #FCD34D;
+}
+
+.dark .bg-yellow-100 {
+    background: linear-gradient(135deg, #78350F 0%, #92400E 100%);
+    color: #FEF3C7;
+}
+
+.bg-red-100 {
+    background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+    color: #991B1B;
+    border-color: #FCA5A5;
+}
+
+.dark .bg-red-100 {
+    background: linear-gradient(135deg, #7F1D1D 0%, #991B1B 100%);
+    color: #FEE2E2;
+}
+
+.bg-gray-100 {
+    background: linear-gradient(135deg, var(--grey-100) 0%, var(--grey-200) 100%);
+    color: var(--grey-700);
+    border-color: var(--grey-300);
+}
+
+.dark .bg-gray-100 {
+    background: linear-gradient(135deg, var(--grey-200) 0%, var(--grey-300) 100%);
+    color: white;
+}
+
+.bg-purple-100 {
+    background: linear-gradient(135deg, #F3E8FF 0%, #E9D5FF 100%);
+    color: #6B21A8;
+    border-color: #D8B4FE;
+}
+
+.dark .bg-purple-100 {
+    background: linear-gradient(135deg, #581C87 0%, #6B21A8 100%);
+    color: #F3E8FF;
 }
 
 /* ==========================================
-   LOADING INDICATOR MEJORADO
+   LOADING INDICATOR
    ========================================== */
 #loadingIndicator {
     background: linear-gradient(135deg, #10B981 0%, #059669 100%);
     color: white;
     padding: 1.25rem 2rem;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 10px 40px rgba(16, 185, 129, 0.5);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
     display: flex;
     align-items: center;
     gap: 1rem;
-    font-weight: 700;
+    font-weight: 600;
     backdrop-filter: blur(10px);
-    animation: slideInRight 0.4s ease-out, pulse 2s ease-in-out infinite;
+    animation: slideInRight 0.4s ease-out;
 }
 
 @keyframes slideInRight {
@@ -489,52 +738,6 @@ tbody tr:hover::before {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
-}
-
-/* ==========================================
-   DETALLES COLAPSABLES
-   ========================================== */
-details {
-    border: 2px solid var(--grey-200);
-    border-radius: var(--radius-md);
-    padding: 1rem;
-    transition: all 0.3s ease;
-}
-
-.dark details {
-    border-color: var(--grey-400);
-}
-
-details[open] {
-    border-color: var(--primary);
-    box-shadow: 0 4px 15px rgba(226, 27, 35, 0.2);
-}
-
-details summary {
-    cursor: pointer;
-    user-select: none;
-    padding: 0.5rem;
-    border-radius: var(--radius-sm);
-    transition: all 0.2s ease;
-}
-
-details summary:hover {
-    background: var(--grey-50);
-    color: var(--primary);
-}
-
-.dark details summary:hover {
-    background: var(--grey-200);
-}
-
-details[open] summary {
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--grey-200);
-}
-
-.dark details[open] summary {
-    border-bottom-color: var(--grey-400);
 }
 
 /* ==========================================
@@ -595,8 +798,8 @@ details[open] summary {
         transform: scale(1);
     }
     50% { 
-        opacity: 0.9;
-        transform: scale(0.98);
+        opacity: 0.8;
+        transform: scale(0.95);
     }
 }
 
@@ -619,13 +822,48 @@ details[open] summary {
 /* ==========================================
    CONTADOR DE RESULTADOS
    ========================================== */
-#contadorResultados {
-    font-family: 'Oswald', sans-serif;
-    font-style: italic;
+#contadorResultados,
+#resultadosTotales {
+    font-weight: 700;
+    color: var(--primary);
 }
 
 #filtrosAplicados {
     animation: pulse 2s ease-in-out infinite;
+}
+
+/* ==========================================
+   VISTA MODO OSCURO - FIXES
+   ========================================== */
+.dark input,
+.dark select,
+.dark textarea {
+    background: var(--grey-200) !important;
+    color: white !important;
+    border-color: var(--grey-400) !important;
+}
+
+.dark input::placeholder {
+    color: var(--grey-400) !important;
+}
+
+/* ==========================================
+   VISTA MODO CLARO - FIXES
+   ========================================== */
+body:not(.dark) input,
+body:not(.dark) select,
+body:not(.dark) textarea {
+    background: white !important;
+    color: #111827 !important;
+    border-color: var(--grey-300) !important;
+}
+
+body:not(.dark) input::placeholder {
+    color: #9CA3AF !important;
+}
+
+body:not(.dark) td {
+    color: #111827 !important;
 }
 
 /* ==========================================
@@ -636,8 +874,8 @@ details[open] summary {
         padding: 1.5rem;
     }
     
-    th, td {
-        padding: 1rem;
+    .filtro-tab {
+        padding: 0.75rem 1.25rem;
         font-size: 0.813rem;
     }
 }
@@ -647,9 +885,19 @@ details[open] summary {
         padding: 1rem;
     }
     
-    th, td {
-        padding: 0.75rem;
+    .filtro-tab {
+        padding: 0.625rem 1rem;
         font-size: 0.75rem;
+    }
+    
+    .filtro-chip {
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+    }
+    
+    th, td {
+        padding: 1rem;
+        font-size: 0.813rem;
     }
     
     button {
@@ -668,16 +916,13 @@ details[open] summary {
         font-size: 1.75rem !important;
     }
     
+    .filtro-tab {
+        width: 100%;
+        justify-content: center;
+    }
+    
     .stat-card {
         padding: 1rem;
-    }
-    
-    table {
-        font-size: 0.7rem;
-    }
-    
-    th, td {
-        padding: 0.5rem;
     }
 }
 
@@ -706,22 +951,18 @@ details[open] summary {
 @media print {
     .filtros-container,
     button,
-    aside,
+    .sidebar,
     header,
     footer {
         display: none !important;
     }
     
-    table {
+    .tabla-resultados {
         box-shadow: none !important;
         border: 1px solid #ddd !important;
-    }
-    
-    main {
-        margin-left: 0 !important;
     }
 }
 
 /* ==========================================
-   FIN DEL CSS MEJORADO
+   FIN DEL CSS
    ========================================== */
