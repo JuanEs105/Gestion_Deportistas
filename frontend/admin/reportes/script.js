@@ -1,5 +1,5 @@
 // ==========================================
-// REPORTES APP - VERSIÓN FINAL CORREGIDA
+// REPORTES APP - VERSIÓN COMPLETA Y FUNCIONAL
 // ==========================================
 
 if (typeof window.ReportesApp === 'undefined') {
@@ -38,7 +38,7 @@ if (typeof window.ReportesApp === 'undefined') {
         },
 
         // ==========================================
-        // DESCARGAR EXCEL CON FILTROS (SOLO LOS 3 PRINCIPALES)
+        // DESCARGAR EXCEL CON LOS 3 FILTROS PRINCIPALES
         // ==========================================
         async descargarExcelCompleto() {
             try {
@@ -129,7 +129,7 @@ if (typeof window.ReportesApp === 'undefined') {
         },
 
         // ==========================================
-        // DESCARGAR DOCUMENTO PDF
+        // DESCARGAR DOCUMENTO PDF INDIVIDUAL
         // ==========================================
         async descargarDocumentoIndividual(deportistaId) {
             try {
@@ -137,6 +137,11 @@ if (typeof window.ReportesApp === 'undefined') {
                 this.mostrarLoading(true);
 
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+                if (!token) {
+                    throw new Error('No hay sesión activa');
+                }
+
                 const url = `https://gestiondeportistas-production.up.railway.app/api/reportes/documento/${deportistaId}`;
 
                 const response = await fetch(url, {
@@ -148,6 +153,9 @@ if (typeof window.ReportesApp === 'undefined') {
                 });
 
                 if (!response.ok) {
+                    if (response.status === 401) {
+                        throw new Error('Sesión expirada');
+                    }
                     throw new Error('Error descargando documento');
                 }
 
@@ -158,6 +166,7 @@ if (typeof window.ReportesApp === 'undefined') {
                 }
 
                 const pdfUrl = data.url;
+
                 const nombreArchivo = data.deportista?.nombre
                     ? `${data.deportista.nombre.replace(/\s+/g, '_')}_documento.pdf`
                     : `documento_${deportistaId}.pdf`;
@@ -179,11 +188,24 @@ if (typeof window.ReportesApp === 'undefined') {
                     window.URL.revokeObjectURL(blobUrl);
                 }, 100);
 
-                this.showNotification('✅ Documento descargado', 'success', 2000);
+                this.showNotification('✅ Documento descargado correctamente', 'success', 2000);
 
             } catch (error) {
                 console.error('❌ Error:', error);
-                this.showNotification('Error descargando documento', 'error');
+
+                let mensaje = 'Error descargando el documento';
+
+                if (error.message.includes('Sesión expirada')) {
+                    mensaje = '🔒 Sesión expirada. Redirigiendo...';
+                    setTimeout(() => {
+                        localStorage.clear();
+                        sessionStorage.clear();
+                        window.location.href = '../auth/login-admin.html';
+                    }, 2000);
+                }
+
+                this.showNotification(mensaje, 'error', 5000);
+
             } finally {
                 this.mostrarLoading(false);
             }
@@ -231,7 +253,7 @@ if (typeof window.ReportesApp === 'undefined') {
         },
 
         // ==========================================
-        // APLICAR FILTROS (VISTA PREVIA)
+        // APLICAR FILTROS (VISTA PREVIA CON LOS 3 FILTROS)
         // ==========================================
         async aplicarFiltros() {
             try {
@@ -366,7 +388,7 @@ if (typeof window.ReportesApp === 'undefined') {
         },
 
         // ==========================================
-        // UI
+        // UI HELPERS
         // ==========================================
         actualizarEstadisticasUI(stats) {
             document.getElementById('totalDeportistas').textContent = stats.total_deportistas || 0;
@@ -404,20 +426,20 @@ if (typeof window.ReportesApp === 'undefined') {
                 const tieneDoc = deportista.tiene_documento;
 
                 row.innerHTML = `
-                    <td class="px-4 py-3 font-medium">${nombre}</td>
-                    <td class="px-4 py-3">${documento}</td>
-                    <td class="px-4 py-3">
+                    <td class="px-6 py-4 font-medium">${nombre}</td>
+                    <td class="px-6 py-4">${documento}</td>
+                    <td class="px-6 py-4">
                         <span class="badge bg-blue-100">${nivel}</span>
                     </td>
-                    <td class="px-4 py-3">
+                    <td class="px-6 py-4">
                         <span class="badge ${this.getEstadoColor(estado)}">${estado}</span>
                     </td>
-                    <td class="px-4 py-3">
+                    <td class="px-6 py-4">
                         ${tieneDoc ?
                         '<span class="badge bg-green-100">✓ Subido</span>' :
                         '<span class="badge bg-gray-100">✗ Pendiente</span>'}
                     </td>
-                    <td class="px-4 py-3 text-right">
+                    <td class="px-6 py-4 text-right">
                         ${tieneDoc ?
                         `<button onclick="ReportesApp.descargarDocumentoIndividual('${deportista.id}')" 
                               class="px-3 py-1 text-xs bg-primary text-white rounded hover:bg-red-700 transition-colors">
@@ -500,15 +522,15 @@ if (typeof window.ReportesApp === 'undefined') {
         },
 
         // ==========================================
-        // EVENTOS
+        // CONFIGURAR EVENTOS
         // ==========================================
         configurarEventos() {
-            // Excel
+            // Botón de descarga Excel
             document.getElementById('descargarExcelCompletoBtn')?.addEventListener('click', () => {
                 this.descargarExcelCompleto();
             });
 
-            // Filtros
+            // Botones de filtros
             document.getElementById('aplicarFiltrosBtn')?.addEventListener('click', () => {
                 this.aplicarFiltros();
             });
@@ -517,7 +539,7 @@ if (typeof window.ReportesApp === 'undefined') {
                 this.limpiarFiltros();
             });
 
-            // Chips
+            // Chips de filtro
             document.querySelectorAll('.filtro-chip').forEach(chip => {
                 chip.addEventListener('click', (e) => {
                     const tipo = e.target.classList.contains('estado') ? 'estado' : 'nivel';
@@ -526,7 +548,7 @@ if (typeof window.ReportesApp === 'undefined') {
                 });
             });
 
-            // Enter
+            // Enter en campos de texto
             document.querySelectorAll('#filtroNombreCompleto, #filtroNumeroDocumento, #filtroEmail').forEach(input => {
                 input.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.aplicarFiltros();
@@ -535,17 +557,13 @@ if (typeof window.ReportesApp === 'undefined') {
 
             // Ayuda
             document.getElementById('btnAyuda')?.addEventListener('click', () => {
-                this.mostrarAyuda();
+                alert('📋 GUÍA DE USO\n\n' +
+                      '1️⃣ Selecciona Estado, Nivel y/o Grupo Competitivo\n' +
+                      '2️⃣ Haz clic en "Aplicar" para buscar\n' +
+                      '3️⃣ Los deportistas encontrados aparecen en la tabla\n' +
+                      '4️⃣ Descarga sus PDFs con el botón "Descargar"\n' +
+                      '5️⃣ O descarga el Excel completo con "Descargar Excel"');
             });
-        },
-
-        mostrarAyuda() {
-            alert('📋 GUÍA DE USO DE REPORTES\n\n' +
-                  '1️⃣ Usa los filtros para buscar deportistas específicos\n' +
-                  '2️⃣ Haz clic en "Aplicar Filtros" para ver resultados\n' +
-                  '3️⃣ El botón "Descargar Excel" exporta los resultados filtrados\n' +
-                  '4️⃣ Los filtros más importantes son: Nivel, Grupo Competitivo y Estado\n\n' +
-                  '💡 Consejo: Combina varios filtros para búsquedas más precisas');
         },
 
         logout() {
@@ -616,7 +634,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Tema
+// Función para cambiar tema
 function toggleTheme() {
     const html = document.documentElement;
     if (html.classList.contains('dark')) {
@@ -628,6 +646,7 @@ function toggleTheme() {
     }
 }
 
+// Cargar tema guardado
 if (localStorage.getItem('theme') === 'dark') {
     document.documentElement.classList.add('dark');
 }
