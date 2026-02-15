@@ -113,12 +113,24 @@ window.AdminAPI = {
 
     // ✅ LOGOUT CORREGIDO - AHORA REDIRIGE A LA RAÍZ
     logout() {
-        console.log('👋 Cerrando sesión...');
-        this.showNotification('Sesión cerrada', 'info');
+        console.log('👋 CERRANDO SESIÓN MANUALMENTE (solicitado por usuario)...');
+
+        // Mostrar notificación
+        this.showNotification('Sesión cerrada exitosamente', 'info');
+
+        // Limpiar storage
         localStorage.clear();
         sessionStorage.clear();
-        // Redirigir a la raíz de la aplicación (donde esté tu login)
-        window.location.href = '/';
+
+        // Redirigir después de un delay
+        setTimeout(() => {
+            const currentPath = window.location.pathname;
+            if (currentPath.includes('/admin/')) {
+                window.location.href = '../../auth/login-admin.html';
+            } else {
+                window.location.href = '../auth/login-admin.html';
+            }
+        }, 1500);
     },
 
     updateUserInfo() {
