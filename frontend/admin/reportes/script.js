@@ -77,8 +77,6 @@ if (typeof window.ReportesApp === 'undefined') {
 
                 const url = `https://gestiondeportistas-production.up.railway.app/api/reportes/documento/${deportistaId}`;
 
-                console.log('🌐 URL:', url);
-
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
@@ -87,53 +85,63 @@ if (typeof window.ReportesApp === 'undefined') {
                     }
                 });
 
-                console.log('📡 Response status:', response.status);
-
                 if (!response.ok) {
                     if (response.status === 401) {
-                        throw new Error('Sesión expirada. Por favor inicia sesión nuevamente.');
+                        throw new Error('Sesión expirada');
                     }
-                    if (response.status === 404) {
-                        throw new Error('Documento no encontrado');
-                    }
-
-                    const errorData = await response.json().catch(() => null);
-                    throw new Error(errorData?.error || `Error ${response.status}`);
+                    throw new Error('Error descargando documento');
                 }
 
                 const data = await response.json();
-                console.log('📦 Datos recibidos:', data);
 
                 if (!data.success || !data.url) {
                     throw new Error('No se pudo obtener la URL del documento');
                 }
 
-                // 🔥 AHORA LA URL YA TIENE fl_attachment, SOLO ABRIRLA
-                console.log('✅ URL de descarga lista:', data.url);
+                console.log('✅ URL recibida:', data.url);
 
-                // Abrir en nueva pestaña (el navegador descargará automáticamente)
-                window.open(data.url, '_blank');
+                // 🔥 SOLUCIÓN: Descargar el archivo y forzar nombre .pdf
+                const pdfUrl = data.url;
 
-                this.showNotification('✅ Descargando documento...', 'success', 2000);
+                // Obtener nombre del deportista o usar genérico
+                const nombreArchivo = data.deportista?.nombre
+                    ? `${data.deportista.nombre}_documento.pdf`.replace(/\s+/g, '_')
+                    : `documento_${deportistaId}.pdf`;
+
+                // Descargar el archivo
+                const pdfResponse = await fetch(pdfUrl);
+                const blob = await pdfResponse.blob();
+
+                // Crear link de descarga
+                const blobUrl = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = nombreArchivo; // ← Nombre con extensión .pdf
+                link.style.display = 'none';
+
+                document.body.appendChild(link);
+                link.click();
+
+                // Limpiar
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(blobUrl);
+                }, 100);
+
+                this.showNotification('✅ Documento descargado', 'success', 2000);
 
             } catch (error) {
                 console.error('❌ Error:', error);
 
-                let mensaje = 'Error abriendo el documento';
+                let mensaje = 'Error descargando el documento';
 
                 if (error.message.includes('Sesión expirada')) {
-                    mensaje = '🔒 Sesión expirada. Redirigiendo al login...';
+                    mensaje = '🔒 Sesión expirada. Redirigiendo...';
                     setTimeout(() => {
                         localStorage.clear();
                         sessionStorage.clear();
                         window.location.href = '../auth/login-admin.html';
                     }, 2000);
-                } else if (error.message.includes('Documento no encontrado')) {
-                    mensaje = '❌ Este deportista no tiene documento subido';
-                } else if (error.message.includes('Failed to fetch')) {
-                    mensaje = '❌ No se pudo conectar al servidor';
-                } else {
-                    mensaje = `❌ Error: ${error.message}`;
                 }
 
                 this.showNotification(mensaje, 'error', 5000);
