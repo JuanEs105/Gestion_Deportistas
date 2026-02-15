@@ -15,8 +15,8 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- CSS Personalizado Mejorado -->
-    <link rel="stylesheet" href="./reportes-style.css">
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="./style.css">
 
     <!-- Tailwind Config -->
     <script>
@@ -27,38 +27,25 @@
                     colors: {
                         primary: "#E21B23",
                         secondary: "#1A1A1A",
-                        "dark-grey": "#333333",
-                        "background-light": "#F8F9FA",
-                        "background-dark": "#0A0A0A",
-                    },
-                    fontFamily: {
-                        display: ["Oswald", "sans-serif"],
-                        body: ["Montserrat", "sans-serif"],
                     },
                 },
             },
         };
     </script>
-
-    <!-- API Script -->
-    <script src="../api.js"></script>
 </head>
 
-<body class="font-body bg-gray-50 dark:bg-background-dark text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen">
+<body class="font-body bg-gray-50 dark:bg-background-dark text-gray-900 dark:text-gray-100 min-h-screen">
 
     <!-- Sidebar -->
     <aside class="fixed left-0 top-0 h-full w-20 lg:w-64 bg-secondary text-white z-50 transition-all duration-300">
         <div class="flex flex-col h-full">
-            <!-- Logo -->
             <div class="p-6 flex items-center gap-3">
-                <div class="w-10 h-10 bg-primary rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden">
-                    <img alt="Logo" class="w-full h-full object-cover scale-110"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcw5Zw_VZ5QoFPk9QYIT89zW1mZesKOh5HIHLL41Mtd6HKuExl984TKKSHxE2FqiuFkaUeaMHfO-dutvPmOFiuT4xa0bJGzfv5ohyPe9Vgl7BroW_NqKwKJ-OCWoB0jQxk8nvXMo_BVwY1WqezyMIKcth1GPpIosmGURpSBe3Eac8HR9iSTJdTqRgnz3CTJCIFlrnxyl7afGX8iitVgkEYrseFRx9EIjWZuQGeoIL71DWubp-u6atx_t8w79rEnwBRufn6xLryzNq8" />
+                <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center overflow-hidden">
+                    <img alt="Logo" class="w-full h-full object-cover scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcw5Zw_VZ5QoFPk9QYIT89zW1mZesKOh5HIHLL41Mtd6HKuExl984TKKSHxE2FqiuFkaUeaMHfO-dutvPmOFiuT4xa0bJGzfv5ohyPe9Vgl7BroW_NqKwKJ-OCWoB0jQxk8nvXMo_BVwY1WqezyMIKcth1GPpIosmGURpSBe3Eac8HR9iSTJdTqRgnz3CTJCIFlrnxyl7afGX8iitVgkEYrseFRx9EIjWZuQGeoIL71DWubp-u6atx_t8w79rEnwBRufn6xLryzNq8" />
                 </div>
                 <span class="font-display text-xl font-bold tracking-tighter uppercase italic hidden lg:inline">Titanes<span class="text-primary">Evolution</span></span>
             </div>
 
-            <!-- Navegación -->
             <nav class="flex-1 mt-6 px-4 space-y-1">
                 <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../dashboard.html">
                     <span class="material-symbols-outlined text-gray-400 group-hover:text-white">dashboard</span>
@@ -94,7 +81,6 @@
                 </a>
             </nav>
 
-            <!-- Usuario -->
             <div class="mt-auto p-4 space-y-2 border-t border-white/10">
                 <div class="flex items-center gap-3 px-4 py-3">
                     <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
@@ -106,13 +92,11 @@
                     </div>
                 </div>
 
-                <!-- Tema Oscuro -->
                 <button class="flex items-center gap-4 px-4 py-3 w-full hover:bg-white/10 rounded-lg transition-all group" onclick="toggleTheme()">
                     <span class="material-symbols-outlined text-gray-400 group-hover:text-white">dark_mode</span>
                     <span class="font-semibold hidden lg:inline">Modo Oscuro</span>
                 </button>
 
-                <!-- Cerrar Sesión -->
                 <button class="flex items-center gap-4 px-4 py-3 w-full bg-red-950/30 hover:bg-red-900/40 text-red-400 rounded-lg transition-all group" onclick="ReportesApp.logout()">
                     <span class="material-symbols-outlined">logout</span>
                     <span class="font-semibold hidden lg:inline">Cerrar Sesión</span>
@@ -122,367 +106,213 @@
     </aside>
 
     <!-- Contenido Principal -->
-    <main class="ml-20 lg:ml-64 p-4 lg:p-8 transition-all duration-300">
+    <main class="ml-20 lg:ml-64 p-4 lg:p-8">
         
         <!-- Header -->
-        <header class="mb-10">
+        <header class="mb-8">
             <h1 class="sports-heading text-4xl font-bold text-secondary dark:text-white">Reportes y Documentos</h1>
             <p class="text-gray-600 dark:text-gray-400 font-medium mt-2">Exporta datos y gestiona documentos de deportistas</p>
         </header>
 
-        <!-- Estadísticas rápidas -->
+        <!-- Estadísticas -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <!-- Total Deportistas -->
-            <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm">
+            <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
                 <div class="flex items-center gap-3">
-                    <div class="icon-container w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                    <div class="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
                         <span class="material-symbols-outlined text-2xl text-blue-600 dark:text-blue-400">group</span>
                     </div>
                     <div>
-                        <p class="text-3xl font-bold text-gray-900 dark:text-white" id="totalDeportistas">0</p>
+                        <p class="text-3xl font-bold" id="totalDeportistas">0</p>
                         <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Total Deportistas</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Con Documentos -->
-            <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm">
+            <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
                 <div class="flex items-center gap-3">
-                    <div class="icon-container w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                    <div class="w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
                         <span class="material-symbols-outlined text-2xl text-green-600 dark:text-green-400">description</span>
                     </div>
                     <div>
-                        <p class="text-3xl font-bold text-gray-900 dark:text-white" id="conDocumento">0</p>
+                        <p class="text-3xl font-bold" id="conDocumento">0</p>
                         <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Con Documentos</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Sin Documentos -->
-            <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm">
+            <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
                 <div class="flex items-center gap-3">
-                    <div class="icon-container w-14 h-14 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
+                    <div class="w-14 h-14 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
                         <span class="material-symbols-outlined text-2xl text-yellow-600 dark:text-yellow-400">warning</span>
                     </div>
                     <div>
-                        <p class="text-3xl font-bold text-gray-900 dark:text-white" id="sinDocumento">0</p>
+                        <p class="text-3xl font-bold" id="sinDocumento">0</p>
                         <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Sin Documentos</p>
                     </div>
                 </div>
             </div>
 
-            <!-- En Cloudinary -->
-            <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm">
+            <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
                 <div class="flex items-center gap-3">
-                    <div class="icon-container w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                    <div class="w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
                         <span class="material-symbols-outlined text-2xl text-purple-600 dark:text-purple-400">cloud</span>
                     </div>
                     <div>
-                        <p class="text-3xl font-bold text-gray-900 dark:text-white" id="cloudinaryDocs">0</p>
+                        <p class="text-3xl font-bold" id="cloudinaryDocs">0</p>
                         <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">En Cloudinary</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Loading Indicator -->
+        <!-- Loading -->
         <div id="loadingIndicator" class="hidden fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-3">
             <div class="spinner"></div>
             <span class="font-semibold">⏳ Procesando...</span>
         </div>
 
-        <!-- Sección: Exportar Datos en Excel -->
-        <section class="mb-12">
+        <!-- Sección Excel -->
+        <section class="mb-8">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h2 class="sports-heading text-2xl font-bold text-secondary dark:text-white">Exportar Datos en Excel</h2>
+                    <h2 class="sports-heading text-2xl font-bold">Exportar Datos en Excel</h2>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Filtra y descarga información completa de deportistas</p>
                 </div>
-                <button id="descargarExcelCompletoBtn" class="bg-primary text-white px-8 py-3 rounded-lg shadow-lg font-display font-bold text-sm hover:bg-red-700 transition-all flex items-center gap-2">
+                <button id="descargarExcelCompletoBtn" class="btn-primary px-8 py-3 rounded-lg font-bold flex items-center gap-2">
                     <span class="material-symbols-outlined">download</span>
                     <span>DESCARGAR EXCEL</span>
                 </button>
             </div>
 
-            <!-- Contenedor de Filtros -->
-            <div class="filtros-container">
+            <!-- Filtros en UNA sola sección -->
+            <div class="filtros-container bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
+                
+                <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">tune</span>
+                    Filtros de Búsqueda
+                </h3>
 
-                <!-- Pestañas de filtros -->
-                <div class="flex flex-wrap gap-3 mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
-                    <button id="tabFiltrosBasicos" class="filtro-tab active">
-                        <span class="text-lg">👤</span>
-                        <span>Datos Personales</span>
-                    </button>
-                    <button id="tabFiltrosMedicos" class="filtro-tab">
-                        <span class="text-lg">🏥</span>
-                        <span>Datos Médicos</span>
-                    </button>
-                    <button id="tabFiltrosDeportivos" class="filtro-tab">
-                        <span class="text-lg">🏆</span>
-                        <span>Datos Deportivos</span>
-                    </button>
-                </div>
-
-                <!-- Contenido de pestañas -->
-                <div id="contenidoFiltros">
-
-                    <!-- Pestaña 1: Datos Personales -->
-                    <div id="filtrosbasicos" class="filtro-contenido active">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                            <!-- Nombre completo -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">👤</span> Nombre Completo
-                                </label>
-                                <input type="text" id="filtroNombreCompleto"
-                                    class="w-full bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
-                                    placeholder="Buscar por nombre o apellidos">
-                            </div>
-
-                            <!-- Documento de identidad -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">🆔</span> Documento de Identidad
-                                </label>
-                                <div class="flex gap-2">
-                                    <select id="filtroTipoDocumento"
-                                        class="flex-1 bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:ring-2 focus:ring-primary outline-none">
-                                        <option value="">Tipo</option>
-                                        <option value="CC">Cédula Ciudadanía</option>
-                                        <option value="TI">Tarjeta Identidad</option>
-                                        <option value="CE">Cédula Extranjería</option>
-                                        <option value="RC">Registro Civil</option>
-                                        <option value="PAS">Pasaporte</option>
-                                    </select>
-                                    <input type="text" id="filtroNumeroDocumento"
-                                        class="flex-1 bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
-                                        placeholder="Número">
-                                </div>
-                            </div>
-
-                            <!-- Ciudad -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">🏙️</span> Ciudad
-                                </label>
-                                <input type="text" id="filtroCiudad"
-                                    class="w-full bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
-                                    placeholder="Ej: Bogotá, Medellín...">
-                            </div>
-
-                            <!-- Teléfono -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">📞</span> Teléfono
-                                </label>
-                                <input type="text" id="filtroTelefono"
-                                    class="w-full bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
-                                    placeholder="300 123 4567">
-                            </div>
-
-                            <!-- Email -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">✉️</span> Correo Electrónico
-                                </label>
-                                <input type="email" id="filtroEmail"
-                                    class="w-full bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
-                                    placeholder="ejemplo@email.com">
-                            </div>
-
-                            <!-- EPS -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">🏥</span> EPS / ARS
-                                </label>
-                                <input type="text" id="filtroEPS"
-                                    class="w-full bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
-                                    placeholder="Ej: Sura, Coomeva, etc.">
-                            </div>
-
-                        </div>
-
-                        <!-- Filtros rápidos -->
-                        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <!-- Estado -->
-                            <div class="space-y-3">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">📊</span> Estado del Deportista
-                                </label>
-                                <div class="flex flex-wrap gap-3">
-                                    <button class="filtro-chip estado active" data-estado="">Todos</button>
-                                    <button class="filtro-chip estado" data-estado="activo">Activos</button>
-                                    <button class="filtro-chip estado" data-estado="inactivo">Inactivos</button>
-                                    <button class="filtro-chip estado" data-estado="lesionado">Lesionados</button>
-                                </div>
-                            </div>
-
-                            <!-- Nivel -->
-                            <div class="space-y-3">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">📈</span> Nivel Principal
-                                </label>
-                                <div class="flex flex-wrap gap-3">
-                                    <button class="filtro-chip nivel active" data-nivel="">Todos</button>
-                                    <button class="filtro-chip nivel" data-nivel="baby_titans">Baby Titans</button>
-                                    <button class="filtro-chip nivel" data-nivel="1_basico">1 Básico</button>
-                                    <button class="filtro-chip nivel" data-nivel="1_medio">1 Medio</button>
-                                    <button class="filtro-chip nivel" data-nivel="1_avanzado">1 Avanzado</button>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Grid de filtros -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    
+                    <!-- Nombre -->
+                    <div>
+                        <label class="label-filtro">👤 Nombre Completo</label>
+                        <input type="text" id="filtroNombreCompleto" class="input-filtro" placeholder="Buscar por nombre...">
                     </div>
 
-                    <!-- Pestaña 2: Datos Médicos -->
-                    <div id="filtrosmedicos" class="filtro-contenido hidden">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                            <!-- Talla de uniforme -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">👕</span> Talla de Uniforme
-                                </label>
-                                <select id="filtroTallaCamiseta"
-                                    class="w-full bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none">
-                                    <option value="">Todas las tallas</option>
-                                    <option value="10">10 (niños)</option>
-                                    <option value="12">12 (niños)</option>
-                                    <option value="14">14 (niños)</option>
-                                    <option value="16">16 (niños)</option>
-                                    <option value="S">S (Small)</option>
-                                    <option value="M">M (Medium)</option>
-                                    <option value="L">L (Large)</option>
-                                    <option value="XL">XL (Extra Large)</option>
-                                </select>
-                            </div>
-
-                            <!-- Peso -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">⚖️</span> Peso (kg)
-                                </label>
-                                <div class="flex gap-2 items-center">
-                                    <input type="number" id="filtroPesoMin"
-                                        class="flex-1 bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
-                                        placeholder="Mínimo">
-                                    <span class="text-gray-500 font-semibold">-</span>
-                                    <input type="number" id="filtroPesoMax"
-                                        class="flex-1 bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
-                                        placeholder="Máximo">
-                                </div>
-                            </div>
-
-                            <!-- Altura -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">📏</span> Altura (cm)
-                                </label>
-                                <div class="flex gap-2 items-center">
-                                    <input type="number" id="filtroAlturaMin"
-                                        class="flex-1 bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
-                                        placeholder="Mínimo">
-                                    <span class="text-gray-500 font-semibold">-</span>
-                                    <input type="number" id="filtroAlturaMax"
-                                        class="flex-1 bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
-                                        placeholder="Máximo">
-                                </div>
-                            </div>
-
-                            <!-- Edad -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">🎯</span> Rango de Edad
-                                </label>
-                                <div class="flex gap-2 items-center">
-                                    <input type="number" id="filtroEdadMin"
-                                        class="flex-1 bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
-                                        placeholder="Mínima">
-                                    <span class="text-gray-500 font-semibold">-</span>
-                                    <input type="number" id="filtroEdadMax"
-                                        class="flex-1 bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-3 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
-                                        placeholder="Máxima">
-                                </div>
-                            </div>
-
-                        </div>
+                    <!-- Documento -->
+                    <div>
+                        <label class="label-filtro">🆔 Número de Documento</label>
+                        <input type="text" id="filtroNumeroDocumento" class="input-filtro" placeholder="Número de documento">
                     </div>
 
-                    <!-- Pestaña 3: Datos Deportivos -->
-                    <div id="filtrosdeportivos" class="filtro-contenido hidden">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Email -->
+                    <div>
+                        <label class="label-filtro">✉️ Correo Electrónico</label>
+                        <input type="email" id="filtroEmail" class="input-filtro" placeholder="email@ejemplo.com">
+                    </div>
 
-                            <!-- Grupo competitivo -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">🏆</span> Grupo Competitivo
-                                </label>
-                                <select id="filtroGrupoCompetitivo"
-                                    class="w-full bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none">
-                                    <option value="">Todos los grupos</option>
-                                    <option value="sin_equipo">Sin equipo asignado</option>
-                                    <option value="rocks_titans">Rocks Titans</option>
-                                    <option value="lightning_titans">Lightning Titans</option>
-                                    <option value="storm_titans">Storm Titans</option>
-                                    <option value="fire_titans">Fire Titans</option>
-                                    <option value="electric_titans">Electric Titans</option>
-                                </select>
-                            </div>
+                    <!-- Ciudad -->
+                    <div>
+                        <label class="label-filtro">🏙️ Ciudad</label>
+                        <input type="text" id="filtroCiudad" class="input-filtro" placeholder="Ej: Bogotá">
+                    </div>
 
-                            <!-- Nivel detallado -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">📊</span> Nivel Específico
-                                </label>
-                                <select id="filtroNivelDetallado"
-                                    class="w-full bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none">
-                                    <option value="">Todos los niveles</option>
-                                    <option value="pendiente">Pendiente de evaluación</option>
-                                    <option value="baby_titans">Baby Titans</option>
-                                    <option value="1_basico">1 Básico</option>
-                                    <option value="1_medio">1 Medio</option>
-                                    <option value="1_avanzado">1 Avanzado</option>
-                                    <option value="2">Nivel 2</option>
-                                    <option value="3">Nivel 3</option>
-                                    <option value="4">Nivel 4</option>
-                                </select>
-                            </div>
+                    <!-- Teléfono -->
+                    <div>
+                        <label class="label-filtro">📞 Teléfono</label>
+                        <input type="text" id="filtroTelefono" class="input-filtro" placeholder="300 123 4567">
+                    </div>
 
-                            <!-- Filtro de documentos -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">📄</span> Documento Subido
-                                </label>
-                                <select id="filtroTieneDocumento"
-                                    class="w-full bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none">
-                                    <option value="todos">Todos</option>
-                                    <option value="true">Con documento</option>
-                                    <option value="false">Sin documento</option>
-                                </select>
-                            </div>
+                    <!-- EPS -->
+                    <div>
+                        <label class="label-filtro">🏥 EPS / ARS</label>
+                        <input type="text" id="filtroEPS" class="input-filtro" placeholder="Ej: Sura">
+                    </div>
 
-                        </div>
+                    <!-- Grupo Competitivo -->
+                    <div>
+                        <label class="label-filtro">🏆 Grupo Competitivo</label>
+                        <select id="filtroGrupoCompetitivo" class="input-filtro">
+                            <option value="">Todos los grupos</option>
+                            <option value="sin_equipo">Sin equipo</option>
+                            <option value="rocks_titans">Rocks Titans</option>
+                            <option value="lightning_titans">Lightning Titans</option>
+                            <option value="storm_titans">Storm Titans</option>
+                            <option value="fire_titans">Fire Titans</option>
+                            <option value="electric_titans">Electric Titans</option>
+                        </select>
+                    </div>
+
+                    <!-- Nivel -->
+                    <div>
+                        <label class="label-filtro">📊 Nivel</label>
+                        <select id="filtroNivelDetallado" class="input-filtro">
+                            <option value="">Todos los niveles</option>
+                            <option value="baby_titans">Baby Titans</option>
+                            <option value="1_basico">1 Básico</option>
+                            <option value="1_medio">1 Medio</option>
+                            <option value="1_avanzado">1 Avanzado</option>
+                            <option value="2">Nivel 2</option>
+                            <option value="3">Nivel 3</option>
+                            <option value="4">Nivel 4</option>
+                        </select>
+                    </div>
+
+                    <!-- Documento -->
+                    <div>
+                        <label class="label-filtro">📄 Documento Subido</label>
+                        <select id="filtroTieneDocumento" class="input-filtro">
+                            <option value="todos">Todos</option>
+                            <option value="true">Con documento</option>
+                            <option value="false">Sin documento</option>
+                        </select>
                     </div>
 
                 </div>
 
-                <!-- Contador y botones de acción -->
-                <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div class="flex items-center gap-4">
-                        <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <!-- Filtros rápidos con CHIPS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <!-- Estado -->
+                    <div>
+                        <label class="label-filtro">📊 Estado</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="filtro-chip estado active" data-estado="">Todos</button>
+                            <button class="filtro-chip estado" data-estado="activo">Activos</button>
+                            <button class="filtro-chip estado" data-estado="inactivo">Inactivos</button>
+                            <button class="filtro-chip estado" data-estado="lesionado">Lesionados</button>
+                        </div>
+                    </div>
+
+                    <!-- Nivel rápido -->
+                    <div>
+                        <label class="label-filtro">📈 Nivel Rápido</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="filtro-chip nivel active" data-nivel="">Todos</button>
+                            <button class="filtro-chip nivel" data-nivel="baby_titans">Baby Titans</button>
+                            <button class="filtro-chip nivel" data-nivel="1_basico">1 Básico</button>
+                            <button class="filtro-chip nivel" data-nivel="1_medio">1 Medio</button>
+                            <button class="filtro-chip nivel" data-nivel="1_avanzado">1 Avanzado</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contador y botones -->
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-semibold">
                             🔍 <span id="contadorResultados" class="text-primary">0</span> deportistas encontrados
                         </span>
-                        <div class="w-3 h-3 rounded-full bg-green-500 hidden" id="filtrosAplicados"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500 hidden animate-pulse" id="filtrosAplicados"></div>
                     </div>
 
                     <div class="flex gap-3">
-                        <button id="limpiarFiltrosBtn"
-                            class="btn-secondary px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-800 rounded-lg text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-2">
+                        <button id="limpiarFiltrosBtn" class="btn-secondary px-6 py-2 rounded-lg flex items-center gap-2">
                             <span class="material-symbols-outlined text-lg">delete</span>
-                            <span>Limpiar Todo</span>
+                            <span>Limpiar</span>
                         </button>
-                        <button id="aplicarFiltrosBtn"
-                            class="btn-primary px-6 py-3 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition-all flex items-center gap-2">
+                        <button id="aplicarFiltrosBtn" class="btn-primary px-6 py-2 rounded-lg flex items-center gap-2">
                             <span class="material-symbols-outlined text-lg">search</span>
                             <span>Aplicar Filtros</span>
                         </button>
@@ -491,14 +321,14 @@
             </div>
         </section>
 
-        <!-- Vista previa de resultados -->
-        <div class="tabla-resultados bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-gray-200 dark:border-white/5 p-6 mb-8">
+        <!-- Vista Previa -->
+        <div class="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-gray-200 dark:border-white/5 p-6">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-secondary dark:text-white flex items-center gap-2">
+                <h3 class="text-xl font-bold flex items-center gap-2">
                     <span class="material-symbols-outlined text-primary">preview</span>
                     Vista Previa de Resultados
                 </h3>
-                <span class="text-sm text-gray-600 dark:text-gray-400 font-medium" id="resultadosTotales">Mostrando 0 resultados</span>
+                <span class="text-sm text-gray-600 dark:text-gray-400" id="resultadosTotales">Mostrando 0 resultados</span>
             </div>
 
             <div class="overflow-x-auto">
@@ -514,44 +344,37 @@
                         </tr>
                     </thead>
                     <tbody id="tablaResultados" class="divide-y divide-gray-200 dark:divide-gray-700">
-                        <!-- Los resultados se cargarán aquí dinámicamente -->
+                        <!-- Dinámico -->
                     </tbody>
                 </table>
             </div>
 
-            <!-- Sin resultados -->
             <div id="sinResultados" class="hidden text-center py-16">
                 <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 dark:bg-zinc-800 flex items-center justify-center">
                     <span class="material-symbols-outlined text-4xl text-gray-400">search_off</span>
                 </div>
                 <h4 class="text-xl font-bold text-gray-600 dark:text-gray-300 mb-3">No se encontraron resultados</h4>
-                <p class="text-gray-500 dark:text-gray-400">Intenta ajustar tus filtros de búsqueda</p>
+                <p class="text-gray-500 dark:text-gray-400">Intenta con otros filtros de búsqueda</p>
             </div>
         </div>
 
     </main>
 
     <!-- Footer -->
-    <footer class="ml-20 lg:ml-64 p-8 border-t border-gray-200 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-600 dark:text-gray-500 font-bold uppercase tracking-widest">
-        <p>© 2026 TITANES EVOLUTION - DATA REPORTING UNIT</p>
-        <div class="flex items-center gap-6">
-            <span class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> SISTEMA ONLINE
-            </span>
-        </div>
+    <footer class="ml-20 lg:ml-64 p-8 border-t border-gray-200 dark:border-white/5 text-center text-xs text-gray-500">
+        <p>© 2024 TITANES EVOLUTION</p>
     </footer>
 
-    <!-- Botón de ayuda flotante -->
-    <button class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl hover:scale-110 transition-transform z-50 group flex items-center justify-center">
-        <span class="material-symbols-outlined group-hover:rotate-12 transition-transform">help</span>
+    <!-- Botón Ayuda -->
+    <button id="btnAyuda" class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl hover:scale-110 transition-transform z-50 flex items-center justify-center">
+        <span class="material-symbols-outlined">help</span>
     </button>
 
-    <!-- Container para notificaciones -->
     <div id="notificationContainer"></div>
 
-    <!-- Script funcional con base de datos REAL -->
+    <!-- Scripts -->
+    <script src="../api.js"></script>
     <script src="./script.js"></script>
 
 </body>
-
 </html>
