@@ -390,26 +390,37 @@ if (typeof window.ReportesApp === 'undefined') {
             resultados.forEach(deportista => {
                 const row = document.createElement('tr');
 
-                // El objeto puede venir plano o anidado (deportista.User, deportista.deportista, etc.)
-                // Buscar en todas las posibles estructuras que devuelve este API
+                // Buscar en todas las posibles estructuras
                 const d = deportista;
                 const u = deportista.User || deportista.user || {};
                 const dd = deportista.deportista || {};
 
-                const nombre = d.nombre_completo
-                    || d.nombreCompleto
-                    || d.full_name
-                    || (u.nombre ? u.nombre : null)
-                    || dd.nombre
-                    || d.nombre
-                    || '';
+                // DEBUG por fila - ver exactamente qué tiene cada campo
+                console.log('Deportista raw:', JSON.stringify(d));
 
-                const documento = d.numero_documento
-                    || d.numeroDocumento
-                    || d.cedula
-                    || d.documento
-                    || (u.cedula || u.documento || u.numero_documento || null)
-                    || '';
+                // NOMBRE: buscar campo que tenga letras (no solo números)
+                const esNombre = (val) => val && typeof val === 'string' && isNaN(val.replace(/\s/g,''));
+
+                let nombre = '';
+                const candidatosNombre = [
+                    d.nombre_completo, d.nombreCompleto, d.full_name,
+                    u.nombre, u.name, dd.nombre, d.nombre, d.name
+                ];
+                for (const c of candidatosNombre) {
+                    if (esNombre(c)) { nombre = c; break; }
+                }
+
+                // DOCUMENTO: buscar campo que tenga solo números
+                const esDocumento = (val) => val && typeof val === 'string' && /^\d+$/.test(val.trim());
+
+                let documento = '';
+                const candidatosDoc = [
+                    d.numero_documento, d.numeroDocumento, d.cedula,
+                    d.documento, u.cedula, u.numero_documento, u.documento
+                ];
+                for (const c of candidatosDoc) {
+                    if (esDocumento(c)) { documento = c; break; }
+                }
 
                 const nivel = d.nivel_actual
                     || dd.nivel_actual
