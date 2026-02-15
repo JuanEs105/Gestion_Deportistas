@@ -10,16 +10,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Material Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
     <!-- Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- CSS Personalizado -->
-    <link rel="stylesheet" href="reportes-style.css">
+    <!-- CSS Personalizado Mejorado -->
+    <link rel="stylesheet" href="./reportes-style.css">
 
     <!-- Tailwind Config -->
     <script>
@@ -42,66 +39,56 @@
             },
         };
     </script>
+
+    <!-- API Script -->
+    <script src="../api.js"></script>
 </head>
 
-<body
-    class="font-body bg-gray-50 dark:bg-background-dark text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen">
+<body class="font-body bg-gray-50 dark:bg-background-dark text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen">
 
     <!-- Sidebar -->
     <aside class="fixed left-0 top-0 h-full w-20 lg:w-64 bg-secondary text-white z-50 transition-all duration-300">
         <div class="flex flex-col h-full">
             <!-- Logo -->
             <div class="p-6 flex items-center gap-3">
-                <div
-                    class="w-10 h-10 bg-primary rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden">
+                <div class="w-10 h-10 bg-primary rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden">
                     <img alt="Logo" class="w-full h-full object-cover scale-110"
                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcw5Zw_VZ5QoFPk9QYIT89zW1mZesKOh5HIHLL41Mtd6HKuExl984TKKSHxE2FqiuFkaUeaMHfO-dutvPmOFiuT4xa0bJGzfv5ohyPe9Vgl7BroW_NqKwKJ-OCWoB0jQxk8nvXMo_BVwY1WqezyMIKcth1GPpIosmGURpSBe3Eac8HR9iSTJdTqRgnz3CTJCIFlrnxyl7afGX8iitVgkEYrseFRx9EIjWZuQGeoIL71DWubp-u6atx_t8w79rEnwBRufn6xLryzNq8" />
                 </div>
-                <span
-                    class="font-display text-xl font-bold tracking-tighter uppercase italic hidden lg:inline">Titanes<span
-                        class="text-primary">Evolution</span></span>
+                <span class="font-display text-xl font-bold tracking-tighter uppercase italic hidden lg:inline">Titanes<span class="text-primary">Evolution</span></span>
             </div>
 
             <!-- Navegación -->
             <nav class="flex-1 mt-6 px-4 space-y-1">
-                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group"
-                    href="../dashboard.html">
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../dashboard.html">
                     <span class="material-symbols-outlined text-gray-400 group-hover:text-white">dashboard</span>
                     <span class="font-semibold hidden lg:inline">Dashboard</span>
                 </a>
-                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group"
-                    href="../administradores/index.html">
-                    <span
-                        class="material-symbols-outlined text-gray-400 group-hover:text-white">admin_panel_settings</span>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../administradores/index.html">
+                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">admin_panel_settings</span>
                     <span class="font-semibold hidden lg:inline">Administradores</span>
                 </a>
-                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group"
-                    href="../entrenadores/index.html">
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../entrenadores/index.html">
                     <span class="material-symbols-outlined text-gray-400 group-hover:text-white">groups_3</span>
                     <span class="font-semibold hidden lg:inline">Entrenadores</span>
                 </a>
-                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group"
-                    href="../deportistas/index.html">
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../deportistas/index.html">
                     <span class="material-symbols-outlined text-gray-400 group-hover:text-white">sports_handball</span>
                     <span class="font-semibold hidden lg:inline">Deportistas</span>
                 </a>
-                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group"
-                    href="../evaluaciones/index.html">
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../evaluaciones/index.html">
                     <span class="material-symbols-outlined text-gray-400 group-hover:text-white">assignment</span>
                     <span class="font-semibold hidden lg:inline">Evaluaciones</span>
                 </a>
-                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group"
-                    href="../calendario/index.html">
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../calendario/index.html">
                     <span class="material-symbols-outlined text-gray-400 group-hover:text-white">calendar_month</span>
                     <span class="font-semibold hidden lg:inline">Calendario</span>
                 </a>
-                <a class="flex items-center gap-4 px-4 py-3 bg-primary text-white rounded-lg transition-colors group"
-                    href="./index.html">
+                <a class="flex items-center gap-4 px-4 py-3 bg-primary text-white rounded-lg transition-colors group" href="./index.html">
                     <span class="material-symbols-outlined text-white">bar_chart</span>
                     <span class="font-semibold hidden lg:inline">Reportes</span>
                 </a>
-                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group"
-                    href="../habilidades/index.html">
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../habilidades/index.html">
                     <span class="material-symbols-outlined text-gray-400 group-hover:text-white">sports_kabaddi</span>
                     <span class="font-semibold hidden lg:inline">Habilidades</span>
                 </a>
@@ -114,23 +101,19 @@
                         <span class="material-symbols-outlined">person</span>
                     </div>
                     <div class="hidden lg:block overflow-hidden">
-                        <p class="text-xs font-bold truncate uppercase font-display tracking-tight italic">
-                            Administrador</p>
+                        <p class="text-xs font-bold truncate uppercase font-display tracking-tight italic">Administrador</p>
                         <p id="userEmail" class="text-[10px] text-gray-400 truncate">admin@titanes.com</p>
                     </div>
                 </div>
 
                 <!-- Tema Oscuro -->
-                <button
-                    class="flex items-center gap-4 px-4 py-3 w-full hover:bg-white/10 rounded-lg transition-all group"
-                    onclick="toggleTheme()">
+                <button class="flex items-center gap-4 px-4 py-3 w-full hover:bg-white/10 rounded-lg transition-all group" onclick="toggleTheme()">
                     <span class="material-symbols-outlined text-gray-400 group-hover:text-white">dark_mode</span>
                     <span class="font-semibold hidden lg:inline">Modo Oscuro</span>
                 </button>
 
                 <!-- Cerrar Sesión -->
-                <button
-                    class="flex items-center gap-4 px-4 py-3 w-full bg-red-950/30 hover:bg-red-900/40 text-red-400 rounded-lg transition-all group">
+                <button class="flex items-center gap-4 px-4 py-3 w-full bg-red-950/30 hover:bg-red-900/40 text-red-400 rounded-lg transition-all group" onclick="ReportesApp.logout()">
                     <span class="material-symbols-outlined">logout</span>
                     <span class="font-semibold hidden lg:inline">Cerrar Sesión</span>
                 </button>
@@ -144,8 +127,7 @@
         <!-- Header -->
         <header class="mb-10">
             <h1 class="sports-heading text-4xl font-bold text-secondary dark:text-white">Reportes y Documentos</h1>
-            <p class="text-gray-600 dark:text-gray-400 font-medium mt-2">Exporta datos y gestiona documentos de
-                deportistas</p>
+            <p class="text-gray-600 dark:text-gray-400 font-medium mt-2">Exporta datos y gestiona documentos de deportistas</p>
         </header>
 
         <!-- Estadísticas rápidas -->
@@ -153,8 +135,7 @@
             <!-- Total Deportistas -->
             <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm">
                 <div class="flex items-center gap-3">
-                    <div
-                        class="icon-container w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                    <div class="icon-container w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
                         <span class="material-symbols-outlined text-2xl text-blue-600 dark:text-blue-400">group</span>
                     </div>
                     <div>
@@ -167,10 +148,8 @@
             <!-- Con Documentos -->
             <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm">
                 <div class="flex items-center gap-3">
-                    <div
-                        class="icon-container w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                        <span
-                            class="material-symbols-outlined text-2xl text-green-600 dark:text-green-400">description</span>
+                    <div class="icon-container w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-2xl text-green-600 dark:text-green-400">description</span>
                     </div>
                     <div>
                         <p class="text-3xl font-bold text-gray-900 dark:text-white" id="conDocumento">0</p>
@@ -182,10 +161,8 @@
             <!-- Sin Documentos -->
             <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm">
                 <div class="flex items-center gap-3">
-                    <div
-                        class="icon-container w-14 h-14 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
-                        <span
-                            class="material-symbols-outlined text-2xl text-yellow-600 dark:text-yellow-400">warning</span>
+                    <div class="icon-container w-14 h-14 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-2xl text-yellow-600 dark:text-yellow-400">warning</span>
                     </div>
                     <div>
                         <p class="text-3xl font-bold text-gray-900 dark:text-white" id="sinDocumento">0</p>
@@ -197,8 +174,7 @@
             <!-- En Cloudinary -->
             <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm">
                 <div class="flex items-center gap-3">
-                    <div
-                        class="icon-container w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                    <div class="icon-container w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
                         <span class="material-symbols-outlined text-2xl text-purple-600 dark:text-purple-400">cloud</span>
                     </div>
                     <div>
@@ -210,8 +186,7 @@
         </div>
 
         <!-- Loading Indicator -->
-        <div id="loadingIndicator"
-            class="hidden fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-3">
+        <div id="loadingIndicator" class="hidden fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-3">
             <div class="spinner"></div>
             <span class="font-semibold">⏳ Procesando...</span>
         </div>
@@ -220,13 +195,10 @@
         <section class="mb-12">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h2 class="sports-heading text-2xl font-bold text-secondary dark:text-white">Exportar Datos en
-                        Excel</h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Filtra y descarga información completa de
-                        deportistas</p>
+                    <h2 class="sports-heading text-2xl font-bold text-secondary dark:text-white">Exportar Datos en Excel</h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Filtra y descarga información completa de deportistas</p>
                 </div>
-                <button id="descargarExcelCompletoBtn"
-                    class="bg-primary text-white px-8 py-3 rounded-lg shadow-lg font-display font-bold text-sm hover:bg-red-700 transition-all flex items-center gap-2">
+                <button id="descargarExcelCompletoBtn" class="bg-primary text-white px-8 py-3 rounded-lg shadow-lg font-display font-bold text-sm hover:bg-red-700 transition-all flex items-center gap-2">
                     <span class="material-symbols-outlined">download</span>
                     <span>DESCARGAR EXCEL</span>
                 </button>
@@ -329,35 +301,6 @@
                                     placeholder="Ej: Sura, Coomeva, etc.">
                             </div>
 
-                            <!-- Dirección -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">🏠</span> Dirección
-                                </label>
-                                <input type="text" id="filtroDireccion"
-                                    class="w-full bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
-                                    placeholder="Calle, carrera...">
-                            </div>
-
-                            <!-- Fecha de Nacimiento -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">🎂</span> Fecha de Nacimiento
-                                </label>
-                                <input type="date" id="filtroFechaNacimiento"
-                                    class="w-full bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none">
-                            </div>
-
-                            <!-- Nombre Acudiente -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">👨‍👩‍👧</span> Nombre Acudiente
-                                </label>
-                                <input type="text" id="filtroNombreAcudiente"
-                                    class="w-full bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none"
-                                    placeholder="Ej: María López">
-                            </div>
-
                         </div>
 
                         <!-- Filtros rápidos -->
@@ -392,7 +335,7 @@
                     </div>
 
                     <!-- Pestaña 2: Datos Médicos -->
-                    <div id="filtrosmedicos" class="filtro-contenido">
+                    <div id="filtrosmedicos" class="filtro-contenido hidden">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                             <!-- Talla de uniforme -->
@@ -462,30 +405,11 @@
                                 </div>
                             </div>
 
-                            <!-- Tipo de Sangre -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">🩸</span> Tipo de Sangre
-                                </label>
-                                <select id="filtroTipoSangre"
-                                    class="w-full bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none">
-                                    <option value="">Todos los tipos</option>
-                                    <option value="O+">O+</option>
-                                    <option value="O-">O-</option>
-                                    <option value="A+">A+</option>
-                                    <option value="A-">A-</option>
-                                    <option value="B+">B+</option>
-                                    <option value="B-">B-</option>
-                                    <option value="AB+">AB+</option>
-                                    <option value="AB-">AB-</option>
-                                </select>
-                            </div>
-
                         </div>
                     </div>
 
                     <!-- Pestaña 3: Datos Deportivos -->
-                    <div id="filtrosdeportivos" class="filtro-contenido">
+                    <div id="filtrosdeportivos" class="filtro-contenido hidden">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                             <!-- Grupo competitivo -->
@@ -537,30 +461,13 @@
                                 </select>
                             </div>
 
-                            <!-- Posición en el campo -->
-                            <div class="space-y-2">
-                                <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                    <span class="text-base">⚽</span> Posición Principal
-                                </label>
-                                <select id="filtroPosicion"
-                                    class="w-full bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none">
-                                    <option value="">Todas las posiciones</option>
-                                    <option value="portero">Portero</option>
-                                    <option value="defensa">Defensa</option>
-                                    <option value="mediocampista">Mediocampista</option>
-                                    <option value="delantero">Delantero</option>
-                                    <option value="sin_posicion">Sin posición definida</option>
-                                </select>
-                            </div>
-
                         </div>
                     </div>
 
                 </div>
 
                 <!-- Contador y botones de acción -->
-                <div
-                    class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div class="flex items-center gap-4">
                         <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
                             🔍 <span id="contadorResultados" class="text-primary">0</span> deportistas encontrados
@@ -591,8 +498,7 @@
                     <span class="material-symbols-outlined text-primary">preview</span>
                     Vista Previa de Resultados
                 </h3>
-                <span class="text-sm text-gray-600 dark:text-gray-400 font-medium" id="resultadosTotales">Mostrando 0
-                    resultados</span>
+                <span class="text-sm text-gray-600 dark:text-gray-400 font-medium" id="resultadosTotales">Mostrando 0 resultados</span>
             </div>
 
             <div class="overflow-x-auto">
@@ -615,8 +521,7 @@
 
             <!-- Sin resultados -->
             <div id="sinResultados" class="hidden text-center py-16">
-                <div
-                    class="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 dark:bg-zinc-800 flex items-center justify-center">
+                <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 dark:bg-zinc-800 flex items-center justify-center">
                     <span class="material-symbols-outlined text-4xl text-gray-400">search_off</span>
                 </div>
                 <h4 class="text-xl font-bold text-gray-600 dark:text-gray-300 mb-3">No se encontraron resultados</h4>
@@ -627,9 +532,8 @@
     </main>
 
     <!-- Footer -->
-    <footer
-        class="ml-20 lg:ml-64 p-8 border-t border-gray-200 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-600 dark:text-gray-500 font-bold uppercase tracking-widest">
-        <p>© 2024 TITANES EVOLUTION - DATA REPORTING UNIT</p>
+    <footer class="ml-20 lg:ml-64 p-8 border-t border-gray-200 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-600 dark:text-gray-500 font-bold uppercase tracking-widest">
+        <p>© 2026 TITANES EVOLUTION - DATA REPORTING UNIT</p>
         <div class="flex items-center gap-6">
             <span class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> SISTEMA ONLINE
@@ -638,174 +542,15 @@
     </footer>
 
     <!-- Botón de ayuda flotante -->
-    <button
-        class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl hover:scale-110 transition-transform z-50 group flex items-center justify-center">
+    <button class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl hover:scale-110 transition-transform z-50 group flex items-center justify-center">
         <span class="material-symbols-outlined group-hover:rotate-12 transition-transform">help</span>
     </button>
 
-    <!-- Script de funcionalidad -->
-    <script>
-        // Toggle tema oscuro
-        function toggleTheme() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-        }
+    <!-- Container para notificaciones -->
+    <div id="notificationContainer"></div>
 
-        // Cargar tema guardado
-        if (localStorage.getItem('theme') === 'dark') {
-            document.documentElement.classList.add('dark');
-        }
-
-        // Cambio de tabs
-        document.querySelectorAll('.filtro-tab').forEach(tab => {
-            tab.addEventListener('click', function () {
-                // Remover active de todos
-                document.querySelectorAll('.filtro-tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.filtro-contenido').forEach(c => c.classList.remove('active'));
-
-                // Agregar active al seleccionado
-                this.classList.add('active');
-                const targetId = this.id.replace('tab', '').toLowerCase();
-                document.getElementById(targetId).classList.add('active');
-            });
-        });
-
-        // Chips de filtro
-        document.querySelectorAll('.filtro-chip').forEach(chip => {
-            chip.addEventListener('click', function () {
-                const group = this.classList.contains('estado') ? 'estado' : 'nivel';
-                document.querySelectorAll(`.filtro-chip.${group}`).forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        // Limpiar filtros
-        document.getElementById('limpiarFiltrosBtn').addEventListener('click', function () {
-            // Limpiar todos los inputs
-            document.querySelectorAll('input, select').forEach(input => {
-                if (input.type === 'text' || input.type === 'email' || input.type === 'number' || input.type === 'date') {
-                    input.value = '';
-                } else if (input.tagName === 'SELECT') {
-                    input.selectedIndex = 0;
-                }
-            });
-
-            // Reset chips
-            document.querySelectorAll('.filtro-chip').forEach(chip => chip.classList.remove('active'));
-            document.querySelectorAll('.filtro-chip[data-estado=""], .filtro-chip[data-nivel=""]').forEach(chip => {
-                chip.classList.add('active');
-            });
-
-            // Ocultar indicador de filtros aplicados
-            document.getElementById('filtrosAplicados').classList.add('hidden');
-            document.getElementById('contadorResultados').textContent = '0';
-        });
-
-        // Aplicar filtros
-        document.getElementById('aplicarFiltrosBtn').addEventListener('click', function () {
-            document.getElementById('filtrosAplicados').classList.remove('hidden');
-            // Aquí iría la lógica de filtrado real
-            console.log('Filtros aplicados');
-        });
-
-        // Descargar Excel
-        document.getElementById('descargarExcelCompletoBtn').addEventListener('click', function () {
-            const loading = document.getElementById('loadingIndicator');
-            loading.classList.remove('hidden');
-            
-            // Simular descarga
-            setTimeout(() => {
-                loading.classList.add('hidden');
-                alert('Excel descargado exitosamente');
-            }, 2000);
-        });
-
-        // Datos de ejemplo para la tabla
-        const deportistasEjemplo = [
-            {
-                nombre: 'Carlos Alberto Rodriguez',
-                email: 'carlos.rod@email.com',
-                documento: 'CC 1023456789',
-                nivel: 'Avanzado',
-                grupo: 'Titanes A',
-                estado: 'Activo',
-                tieneDoc: true
-            },
-            {
-                nombre: 'María José Sanchez',
-                email: 'mj.sanchez@email.com',
-                documento: 'TI 1098765432',
-                nivel: 'Intermedio',
-                grupo: 'Semilleros',
-                estado: 'Activo',
-                tieneDoc: true
-            },
-            {
-                nombre: 'Juan Pablo Ortega',
-                email: 'jp.ortega@email.com',
-                documento: 'CC 1087654321',
-                nivel: 'Principiante',
-                grupo: 'Titanes B',
-                estado: 'Activo',
-                tieneDoc: false
-            }
-        ];
-
-        // Cargar datos de ejemplo
-        function cargarDatosEjemplo() {
-            const tbody = document.getElementById('tablaResultados');
-            tbody.innerHTML = deportistasEjemplo.map(d => `
-                <tr class="hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors">
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-dark-grey rounded flex items-center justify-center text-white font-bold text-sm">
-                                ${d.nombre.split(' ').map(n => n[0]).join('').substring(0, 2)}
-                            </div>
-                            <div>
-                                <p class="font-bold text-gray-900 dark:text-white">${d.nombre}</p>
-                                <p class="text-xs text-gray-500">${d.email}</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4">
-                        <span class="text-sm font-medium">${d.documento}</span>
-                    </td>
-                    <td class="px-6 py-4">
-                        <div class="text-sm font-bold">${d.nivel}</div>
-                        <div class="text-xs text-primary uppercase font-bold">${d.grupo}</div>
-                    </td>
-                    <td class="px-6 py-4">
-                        <span class="badge ${d.estado === 'Activo' ? 'bg-green-100' : 'bg-gray-100'}">
-                            ${d.estado}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4">
-                        ${d.tieneDoc ? 
-                            '<span class="badge bg-blue-100">✓ Con documento</span>' : 
-                            '<span class="badge bg-yellow-100">⚠ Sin documento</span>'}
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        <button class="bg-primary hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-2 ml-auto">
-                            <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
-                            DESCARGAR
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-
-            document.getElementById('contadorResultados').textContent = deportistasEjemplo.length;
-            document.getElementById('resultadosTotales').textContent = `Mostrando ${deportistasEjemplo.length} resultados`;
-            
-            // Actualizar stats
-            document.getElementById('totalDeportistas').textContent = deportistasEjemplo.length;
-            document.getElementById('conDocumento').textContent = deportistasEjemplo.filter(d => d.tieneDoc).length;
-            document.getElementById('sinDocumento').textContent = deportistasEjemplo.filter(d => !d.tieneDoc).length;
-            document.getElementById('cloudinaryDocs').textContent = deportistasEjemplo.filter(d => d.tieneDoc).length;
-        }
-
-        // Cargar al iniciar
-        cargarDatosEjemplo();
-    </script>
+    <!-- Script funcional con base de datos REAL -->
+    <script src="./script.js"></script>
 
 </body>
 
