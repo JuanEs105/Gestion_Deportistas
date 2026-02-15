@@ -567,142 +567,33 @@ class ReportesController {
 static async descargarDocumentoPDF(req, res) {
     try {
         const { deportista_id } = req.params;
-
-        console.log('\n📄 === DESCARGA DOCUMENTO PDF ===');
-        console.log('🆔 Deportista ID:', deportista_id);
-
+        
         const deportista = await Deportista.findByPk(deportista_id, {
             include: [{
                 model: User,
                 as: 'user',
-                attributes: ['nombre', 'apellidos', 'numero_documento']
+                attributes: ['nombre', 'apellidos']
             }]
         });
 
-        if (!deportista) {
-            console.log('❌ Deportista no encontrado');
+        if (!deportista || !deportista.documento_identidad) {
             return res.status(404).json({
                 success: false,
-                error: 'Deportista no encontrado'
+                error: 'Documento no encontrado'
             });
         }
 
-        if (!deportista.documento_identidad) {
-            console.log('❌ Sin documento cargado');
-            return res.status(404).json({
-                success: false,
-                error: 'Este deportista no tiene documento cargado'
-            });
-        }
-
-        const docUrl = deportista.documento_identidad;
-        console.log('🌐 URL original:', docUrl);
-
-        // 🔥 SOLUCIÓN CORRECTA: Construir URL de descarga de Cloudinary
-        if (docUrl.includes('cloudinary.com') || docUrl.includes('res.cloudinary.com')) {
-            console.log('☁️  Documento en Cloudinary - Generando URL de descarga...');
-            
-            try {
-                // Extraer partes de la URL
-                // Ejemplo: https://res.cloudinary.com/drch2xmrk/raw/upload/v1234567890/deportistas/documentos/file.pdf
-                const urlParts = docUrl.split('/upload/');
-                
-                if (urlParts.length === 2) {
-                    const baseUrl = urlParts[0]; // https://res.cloudinary.com/drch2xmrk/raw
-                    const pathAfterUpload = urlParts[1]; // v1234567890/deportistas/documentos/file.pdf
-                    
-                    // Remover la versión si existe
-                    const pathWithoutVersion = pathAfterUpload.replace(/^v\d+\//, '');
-                    
-                    // Extraer el public_id (sin extensión)
-                    const publicId = pathWithoutVersion.replace('.pdf', '');
-                    
-                    // Generar nombre de archivo seguro
-                    const nombreArchivo = `${deportista.user?.nombre || 'documento'}_${deportista.user?.apellidos || ''}_${deportista.user?.numero_documento || deportista.id}.pdf`
-                        .replace(/\s+/g, '_')
-                        .replace(/[^a-zA-Z0-9._-]/g, '');
-                    
-                    // 🔥 CONSTRUIR URL CORRECTA PARA CLOUDINARY
-                    // Formato: https://res.cloudinary.com/CLOUD_NAME/raw/upload/fl_attachment:nombre/public_id.pdf
-                    const cloudName = baseUrl.split('/')[3]; // Extraer cloud_name
-                    const downloadUrl = `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment:${nombreArchivo}/${publicId}.pdf`;
-                    
-                    console.log('✅ URL de descarga generada:', downloadUrl);
-                    
-                    return res.json({
-                        success: true,
-                        url: downloadUrl,
-                        tipo: 'cloudinary',
-                        deportista: {
-                            id: deportista.id,
-                            nombre: deportista.user?.nombre || '',
-                            apellidos: deportista.user?.apellidos || '',
-                            numero_documento: deportista.user?.numero_documento || ''
-                        }
-                    });
-                } else {
-                    // Si no se puede parsear la URL, intentar construir directamente
-                    console.warn('⚠️ No se pudo parsear URL de Cloudinary, intentando alternativa...');
-                    
-                    // Alternativa: extraer solo el nombre del archivo y reconstruir
-                    const fileName = docUrl.split('/').pop();
-                    const publicId = fileName.replace('.pdf', '');
-                    
-                    // Usar la URL base de Cloudinary del .env
-                    const cloudName = process.env.CLOUDINARY_CLOUD_NAME || 'drch2xmrk';
-                    const downloadUrl = `https://res.cloudinary.com/${cloudName}/raw/upload/fl_attachment:documento.pdf/deportistas/documentos/${publicId}.pdf`;
-                    
-                    console.log('✅ URL alternativa generada:', downloadUrl);
-                    
-                    return res.json({
-                        success: true,
-                        url: downloadUrl,
-                        tipo: 'cloudinary_alternativo',
-                        deportista: {
-                            id: deportista.id,
-                            nombre: deportista.user?.nombre || '',
-                            apellidos: deportista.user?.apellidos || ''
-                        }
-                    });
-                }
-            } catch (parseError) {
-                console.error('❌ Error parseando URL de Cloudinary:', parseError);
-                
-                // Si todo falla, devolver URL original
-                return res.json({
-                    success: true,
-                    url: docUrl,
-                    tipo: 'original',
-                    warning: 'No se pudo generar URL de descarga optimizada',
-                    deportista: {
-                        id: deportista.id,
-                        nombre: deportista.user?.nombre || '',
-                        apellidos: deportista.user?.apellidos || ''
-                    }
-                });
-            }
-        }
-
-        // Si no es Cloudinary, devolver URL original
-        console.log('📁 Documento no es de Cloudinary');
+        // 🔥 SIMPLE: Solo devolver la URL
         return res.json({
             success: true,
-            url: docUrl,
-            tipo: 'local',
-            deportista: {
-                id: deportista.id,
-                nombre: deportista.user?.nombre || '',
-                apellidos: deportista.user?.apellidos || ''
-            }
+            url: deportista.documento_identidad
         });
 
     } catch (error) {
-        console.error('❌ ERROR descargando documento:', error);
-        console.error('Stack:', error.stack);
+        console.error('❌ ERROR:', error);
         res.status(500).json({
             success: false,
-            error: 'Error al descargar documento',
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+            error: 'Error al obtener documento'
         });
     }
 }
