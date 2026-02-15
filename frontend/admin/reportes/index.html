@@ -1,380 +1,314 @@
 <!DOCTYPE html>
 <html lang="es" class="light">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reportes y Documentos | Titanes Evolution</title>
-
-    <!-- Tailwind CSS -->
+    <title>Reportes | Titanes Evolution</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- CSS Personalizado -->
     <link rel="stylesheet" href="./style.css">
-
-    <!-- Tailwind Config -->
     <script>
         tailwind.config = {
             darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#E21B23",
-                        secondary: "#1A1A1A",
-                    },
-                },
-            },
+            theme: { extend: { colors: { primary: "#E21B23", secondary: "#1A1A1A" } } }
         };
     </script>
 </head>
+<body class="font-body bg-gray-50 dark:bg-zinc-900 text-gray-900 dark:text-gray-100">
 
-<body class="font-body bg-gray-50 dark:bg-background-dark text-gray-900 dark:text-gray-100 min-h-screen">
-
-    <!-- Sidebar -->
-    <aside class="fixed left-0 top-0 h-full w-20 lg:w-64 bg-secondary text-white z-50 transition-all duration-300">
-        <div class="flex flex-col h-full">
-            <div class="p-6 flex items-center gap-3">
-                <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center overflow-hidden">
-                    <img alt="Logo" class="w-full h-full object-cover scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcw5Zw_VZ5QoFPk9QYIT89zW1mZesKOh5HIHLL41Mtd6HKuExl984TKKSHxE2FqiuFkaUeaMHfO-dutvPmOFiuT4xa0bJGzfv5ohyPe9Vgl7BroW_NqKwKJ-OCWoB0jQxk8nvXMo_BVwY1WqezyMIKcth1GPpIosmGURpSBe3Eac8HR9iSTJdTqRgnz3CTJCIFlrnxyl7afGX8iitVgkEYrseFRx9EIjWZuQGeoIL71DWubp-u6atx_t8w79rEnwBRufn6xLryzNq8" />
-                </div>
-                <span class="font-display text-xl font-bold tracking-tighter uppercase italic hidden lg:inline">Titanes<span class="text-primary">Evolution</span></span>
+<!-- Sidebar FIJO -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-secondary text-white z-50">
+    <div class="flex flex-col h-full">
+        <div class="p-6 flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center overflow-hidden">
+                <img alt="Logo" class="w-full h-full object-cover scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcw5Zw_VZ5QoFPk9QYIT89zW1mZesKOh5HIHLL41Mtd6HKuExl984TKKSHxE2FqiuFkaUeaMHfO-dutvPmOFiuT4xa0bJGzfv5ohyPe9Vgl7BroW_NqKwKJ-OCWoB0jQxk8nvXMo_BVwY1WqezyMIKcth1GPpIosmGURpSBe3Eac8HR9iSTJdTqRgnz3CTJCIFlrnxyl7afGX8iitVgkEYrseFRx9EIjWZuQGeoIL71DWubp-u6atx_t8w79rEnwBRufn6xLryzNq8" />
             </div>
-
-            <nav class="flex-1 mt-6 px-4 space-y-1">
-                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../dashboard.html">
-                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">dashboard</span>
-                    <span class="font-semibold hidden lg:inline">Dashboard</span>
-                </a>
-                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../administradores/index.html">
-                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">admin_panel_settings</span>
-                    <span class="font-semibold hidden lg:inline">Administradores</span>
-                </a>
-                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../entrenadores/index.html">
-                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">groups_3</span>
-                    <span class="font-semibold hidden lg:inline">Entrenadores</span>
-                </a>
-                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../deportistas/index.html">
-                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">sports_handball</span>
-                    <span class="font-semibold hidden lg:inline">Deportistas</span>
-                </a>
-                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../evaluaciones/index.html">
-                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">assignment</span>
-                    <span class="font-semibold hidden lg:inline">Evaluaciones</span>
-                </a>
-                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../calendario/index.html">
-                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">calendar_month</span>
-                    <span class="font-semibold hidden lg:inline">Calendario</span>
-                </a>
-                <a class="flex items-center gap-4 px-4 py-3 bg-primary text-white rounded-lg transition-colors group" href="./index.html">
-                    <span class="material-symbols-outlined text-white">bar_chart</span>
-                    <span class="font-semibold hidden lg:inline">Reportes</span>
-                </a>
-                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../habilidades/index.html">
-                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">sports_kabaddi</span>
-                    <span class="font-semibold hidden lg:inline">Habilidades</span>
-                </a>
-            </nav>
-
-            <div class="mt-auto p-4 space-y-2 border-t border-white/10">
-                <div class="flex items-center gap-3 px-4 py-3">
-                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
-                        <span class="material-symbols-outlined">person</span>
-                    </div>
-                    <div class="hidden lg:block overflow-hidden">
-                        <p class="text-xs font-bold truncate uppercase font-display tracking-tight italic">Administrador</p>
-                        <p id="userEmail" class="text-[10px] text-gray-400 truncate">admin@titanes.com</p>
-                    </div>
-                </div>
-
-                <button class="flex items-center gap-4 px-4 py-3 w-full hover:bg-white/10 rounded-lg transition-all group" onclick="toggleTheme()">
-                    <span class="material-symbols-outlined text-gray-400 group-hover:text-white">dark_mode</span>
-                    <span class="font-semibold hidden lg:inline">Modo Oscuro</span>
-                </button>
-
-                <button class="flex items-center gap-4 px-4 py-3 w-full bg-red-950/30 hover:bg-red-900/40 text-red-400 rounded-lg transition-all group" onclick="ReportesApp.logout()">
-                    <span class="material-symbols-outlined">logout</span>
-                    <span class="font-semibold hidden lg:inline">Cerrar Sesión</span>
-                </button>
-            </div>
+            <span class="font-display text-xl font-bold uppercase italic">Titanes<span class="text-primary">Evolution</span></span>
         </div>
-    </aside>
-
-    <!-- Contenido Principal -->
-    <main class="ml-20 lg:ml-64 p-4 lg:p-8">
-        
-        <!-- Header -->
-        <header class="mb-8">
-            <h1 class="sports-heading text-4xl font-bold text-secondary dark:text-white">Reportes y Documentos</h1>
-            <p class="text-gray-600 dark:text-gray-400 font-medium mt-2">Exporta datos y gestiona documentos de deportistas</p>
-        </header>
-
-        <!-- Estadísticas -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
-                <div class="flex items-center gap-3">
-                    <div class="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-                        <span class="material-symbols-outlined text-2xl text-blue-600 dark:text-blue-400">group</span>
-                    </div>
-                    <div>
-                        <p class="text-3xl font-bold" id="totalDeportistas">0</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Total Deportistas</p>
-                    </div>
+        <nav class="flex-1 mt-6 px-4 space-y-1">
+            <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../dashboard.html">
+                <span class="material-symbols-outlined text-gray-400 group-hover:text-white">dashboard</span>
+                <span class="font-semibold">Dashboard</span>
+            </a>
+            <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../administradores/index.html">
+                <span class="material-symbols-outlined text-gray-400 group-hover:text-white">admin_panel_settings</span>
+                <span class="font-semibold">Administradores</span>
+            </a>
+            <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../entrenadores/index.html">
+                <span class="material-symbols-outlined text-gray-400 group-hover:text-white">groups_3</span>
+                <span class="font-semibold">Entrenadores</span>
+            </a>
+            <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../deportistas/index.html">
+                <span class="material-symbols-outlined text-gray-400 group-hover:text-white">sports_handball</span>
+                <span class="font-semibold">Deportistas</span>
+            </a>
+            <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../evaluaciones/index.html">
+                <span class="material-symbols-outlined text-gray-400 group-hover:text-white">assignment</span>
+                <span class="font-semibold">Evaluaciones</span>
+            </a>
+            <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../calendario/index.html">
+                <span class="material-symbols-outlined text-gray-400 group-hover:text-white">calendar_month</span>
+                <span class="font-semibold">Calendario</span>
+            </a>
+            <a class="flex items-center gap-4 px-4 py-3 bg-primary text-white rounded-lg" href="./index.html">
+                <span class="material-symbols-outlined">bar_chart</span>
+                <span class="font-semibold">Reportes</span>
+            </a>
+            <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group" href="../habilidades/index.html">
+                <span class="material-symbols-outlined text-gray-400 group-hover:text-white">sports_kabaddi</span>
+                <span class="font-semibold">Habilidades</span>
+            </a>
+        </nav>
+        <div class="mt-auto p-4 space-y-2 border-t border-white/10">
+            <div class="flex items-center gap-3 px-4 py-3">
+                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined">person</span>
                 </div>
-            </div>
-
-            <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
-                <div class="flex items-center gap-3">
-                    <div class="w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                        <span class="material-symbols-outlined text-2xl text-green-600 dark:text-green-400">description</span>
-                    </div>
-                    <div>
-                        <p class="text-3xl font-bold" id="conDocumento">0</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Con Documentos</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
-                <div class="flex items-center gap-3">
-                    <div class="w-14 h-14 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
-                        <span class="material-symbols-outlined text-2xl text-yellow-600 dark:text-yellow-400">warning</span>
-                    </div>
-                    <div>
-                        <p class="text-3xl font-bold" id="sinDocumento">0</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Sin Documentos</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
-                <div class="flex items-center gap-3">
-                    <div class="w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
-                        <span class="material-symbols-outlined text-2xl text-purple-600 dark:text-purple-400">cloud</span>
-                    </div>
-                    <div>
-                        <p class="text-3xl font-bold" id="cloudinaryDocs">0</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">En Cloudinary</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Loading -->
-        <div id="loadingIndicator" class="hidden fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-3">
-            <div class="spinner"></div>
-            <span class="font-semibold">⏳ Procesando...</span>
-        </div>
-
-        <!-- Sección Excel -->
-        <section class="mb-8">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h2 class="sports-heading text-2xl font-bold">Exportar Datos en Excel</h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Filtra y descarga información completa de deportistas</p>
-                </div>
-                <button id="descargarExcelCompletoBtn" class="btn-primary px-8 py-3 rounded-lg font-bold flex items-center gap-2">
-                    <span class="material-symbols-outlined">download</span>
-                    <span>DESCARGAR EXCEL</span>
-                </button>
-            </div>
-
-            <!-- Filtros en UNA sola sección -->
-            <div class="filtros-container bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
-                
-                <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">tune</span>
-                    Filtros de Búsqueda
-                </h3>
-
-                <!-- Grid de filtros -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    
-                    <!-- Nombre -->
-                    <div>
-                        <label class="label-filtro">👤 Nombre Completo</label>
-                        <input type="text" id="filtroNombreCompleto" class="input-filtro" placeholder="Buscar por nombre...">
-                    </div>
-
-                    <!-- Documento -->
-                    <div>
-                        <label class="label-filtro">🆔 Número de Documento</label>
-                        <input type="text" id="filtroNumeroDocumento" class="input-filtro" placeholder="Número de documento">
-                    </div>
-
-                    <!-- Email -->
-                    <div>
-                        <label class="label-filtro">✉️ Correo Electrónico</label>
-                        <input type="email" id="filtroEmail" class="input-filtro" placeholder="email@ejemplo.com">
-                    </div>
-
-                    <!-- Ciudad -->
-                    <div>
-                        <label class="label-filtro">🏙️ Ciudad</label>
-                        <input type="text" id="filtroCiudad" class="input-filtro" placeholder="Ej: Bogotá">
-                    </div>
-
-                    <!-- Teléfono -->
-                    <div>
-                        <label class="label-filtro">📞 Teléfono</label>
-                        <input type="text" id="filtroTelefono" class="input-filtro" placeholder="300 123 4567">
-                    </div>
-
-                    <!-- EPS -->
-                    <div>
-                        <label class="label-filtro">🏥 EPS / ARS</label>
-                        <input type="text" id="filtroEPS" class="input-filtro" placeholder="Ej: Sura">
-                    </div>
-
-                    <!-- Grupo Competitivo -->
-                    <div>
-                        <label class="label-filtro">🏆 Grupo Competitivo</label>
-                        <select id="filtroGrupoCompetitivo" class="input-filtro">
-                            <option value="">Todos los grupos</option>
-                            <option value="sin_equipo">Sin equipo</option>
-                            <option value="rocks_titans">Rocks Titans</option>
-                            <option value="lightning_titans">Lightning Titans</option>
-                            <option value="storm_titans">Storm Titans</option>
-                            <option value="fire_titans">Fire Titans</option>
-                            <option value="electric_titans">Electric Titans</option>
-                        </select>
-                    </div>
-
-                    <!-- Nivel -->
-                    <div>
-                        <label class="label-filtro">📊 Nivel</label>
-                        <select id="filtroNivelDetallado" class="input-filtro">
-                            <option value="">Todos los niveles</option>
-                            <option value="baby_titans">Baby Titans</option>
-                            <option value="1_basico">1 Básico</option>
-                            <option value="1_medio">1 Medio</option>
-                            <option value="1_avanzado">1 Avanzado</option>
-                            <option value="2">Nivel 2</option>
-                            <option value="3">Nivel 3</option>
-                            <option value="4">Nivel 4</option>
-                        </select>
-                    </div>
-
-                    <!-- Documento -->
-                    <div>
-                        <label class="label-filtro">📄 Documento Subido</label>
-                        <select id="filtroTieneDocumento" class="input-filtro">
-                            <option value="todos">Todos</option>
-                            <option value="true">Con documento</option>
-                            <option value="false">Sin documento</option>
-                        </select>
-                    </div>
-
-                </div>
-
-                <!-- Filtros rápidos con CHIPS -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <!-- Estado -->
-                    <div>
-                        <label class="label-filtro">📊 Estado</label>
-                        <div class="flex flex-wrap gap-2">
-                            <button class="filtro-chip estado active" data-estado="">Todos</button>
-                            <button class="filtro-chip estado" data-estado="activo">Activos</button>
-                            <button class="filtro-chip estado" data-estado="inactivo">Inactivos</button>
-                            <button class="filtro-chip estado" data-estado="lesionado">Lesionados</button>
-                        </div>
-                    </div>
-
-                    <!-- Nivel rápido -->
-                    <div>
-                        <label class="label-filtro">📈 Nivel Rápido</label>
-                        <div class="flex flex-wrap gap-2">
-                            <button class="filtro-chip nivel active" data-nivel="">Todos</button>
-                            <button class="filtro-chip nivel" data-nivel="baby_titans">Baby Titans</button>
-                            <button class="filtro-chip nivel" data-nivel="1_basico">1 Básico</button>
-                            <button class="filtro-chip nivel" data-nivel="1_medio">1 Medio</button>
-                            <button class="filtro-chip nivel" data-nivel="1_avanzado">1 Avanzado</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Contador y botones -->
-                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center gap-3">
-                        <span class="text-sm font-semibold">
-                            🔍 <span id="contadorResultados" class="text-primary">0</span> deportistas encontrados
-                        </span>
-                        <div class="w-3 h-3 rounded-full bg-green-500 hidden animate-pulse" id="filtrosAplicados"></div>
-                    </div>
-
-                    <div class="flex gap-3">
-                        <button id="limpiarFiltrosBtn" class="btn-secondary px-6 py-2 rounded-lg flex items-center gap-2">
-                            <span class="material-symbols-outlined text-lg">delete</span>
-                            <span>Limpiar</span>
-                        </button>
-                        <button id="aplicarFiltrosBtn" class="btn-primary px-6 py-2 rounded-lg flex items-center gap-2">
-                            <span class="material-symbols-outlined text-lg">search</span>
-                            <span>Aplicar Filtros</span>
-                        </button>
-                    </div>
+                    <p class="text-xs font-bold">Administrador</p>
+                    <p id="userEmail" class="text-[10px] text-gray-400">admin@titanes.com</p>
                 </div>
             </div>
-        </section>
+            <button class="flex items-center gap-4 px-4 py-3 w-full hover:bg-white/10 rounded-lg" onclick="toggleTheme()">
+                <span class="material-symbols-outlined text-gray-400">dark_mode</span>
+                <span class="font-semibold">Modo Oscuro</span>
+            </button>
+            <button class="flex items-center gap-4 px-4 py-3 w-full bg-red-950/30 hover:bg-red-900/40 text-red-400 rounded-lg" onclick="ReportesApp.logout()">
+                <span class="material-symbols-outlined">logout</span>
+                <span class="font-semibold">Cerrar Sesión</span>
+            </button>
+        </div>
+    </div>
+</aside>
 
-        <!-- Vista Previa -->
-        <div class="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-gray-200 dark:border-white/5 p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">preview</span>
-                    Vista Previa de Resultados
-                </h3>
-                <span class="text-sm text-gray-600 dark:text-gray-400" id="resultadosTotales">Mostrando 0 resultados</span>
-            </div>
+<!-- Main FIJO en ml-64 -->
+<main class="ml-64 p-8">
+    <header class="mb-8">
+        <h1 class="sports-heading text-4xl font-bold">Reportes y Documentos</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-2">Exporta datos y gestiona documentos de deportistas</p>
+    </header>
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-secondary text-white">
-                        <tr>
-                            <th class="px-6 py-4 text-left">Deportista</th>
-                            <th class="px-6 py-4 text-left">Documento</th>
-                            <th class="px-6 py-4 text-left">Nivel</th>
-                            <th class="px-6 py-4 text-left">Estado</th>
-                            <th class="px-6 py-4 text-left">Documento</th>
-                            <th class="px-6 py-4 text-right">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaResultados" class="divide-y divide-gray-200 dark:divide-gray-700">
-                        <!-- Dinámico -->
-                    </tbody>
-                </table>
-            </div>
-
-            <div id="sinResultados" class="hidden text-center py-16">
-                <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 dark:bg-zinc-800 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-4xl text-gray-400">search_off</span>
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-2xl text-blue-600 dark:text-blue-400">group</span>
                 </div>
-                <h4 class="text-xl font-bold text-gray-600 dark:text-gray-300 mb-3">No se encontraron resultados</h4>
-                <p class="text-gray-500 dark:text-gray-400">Intenta con otros filtros de búsqueda</p>
+                <div>
+                    <p class="text-3xl font-bold" id="totalDeportistas">0</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Total Deportistas</p>
+                </div>
             </div>
         </div>
+        <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-2xl text-green-600 dark:text-green-400">description</span>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold" id="conDocumento">0</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Con Documentos</p>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-14 h-14 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-2xl text-yellow-600 dark:text-yellow-400">warning</span>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold" id="sinDocumento">0</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Sin Documentos</p>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-2xl text-purple-600 dark:text-purple-400">cloud</span>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold" id="cloudinaryDocs">0</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">En Cloudinary</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    </main>
+    <div id="loadingIndicator" class="hidden fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-3">
+        <div class="spinner"></div>
+        <span>⏳ Procesando...</span>
+    </div>
 
-    <!-- Footer -->
-    <footer class="ml-20 lg:ml-64 p-8 border-t border-gray-200 dark:border-white/5 text-center text-xs text-gray-500">
-        <p>© 2024 TITANES EVOLUTION</p>
-    </footer>
+    <!-- Excel -->
+    <section class="mb-8">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="sports-heading text-2xl font-bold">Exportar Datos en Excel</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Filtra y descarga información completa</p>
+            </div>
+            <button id="descargarExcelCompletoBtn" class="btn-primary px-8 py-3 rounded-lg font-bold flex items-center gap-2">
+                <span class="material-symbols-outlined">download</span>
+                DESCARGAR EXCEL
+            </button>
+        </div>
 
-    <!-- Botón Ayuda -->
-    <button id="btnAyuda" class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl hover:scale-110 transition-transform z-50 flex items-center justify-center">
-        <span class="material-symbols-outlined">help</span>
-    </button>
+        <!-- Filtros -->
+        <div class="filtros-container bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
+            <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">tune</span>
+                Filtros de Búsqueda
+            </h3>
 
-    <div id="notificationContainer"></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div>
+                    <label class="label-filtro">👤 Nombre</label>
+                    <input type="text" id="filtroNombreCompleto" class="input-filtro" placeholder="Buscar...">
+                </div>
+                <div>
+                    <label class="label-filtro">🆔 Documento</label>
+                    <input type="text" id="filtroNumeroDocumento" class="input-filtro" placeholder="Número...">
+                </div>
+                <div>
+                    <label class="label-filtro">✉️ Email</label>
+                    <input type="email" id="filtroEmail" class="input-filtro" placeholder="email@ejemplo.com">
+                </div>
+                <div>
+                    <label class="label-filtro">🏙️ Ciudad</label>
+                    <input type="text" id="filtroCiudad" class="input-filtro" placeholder="Bogotá...">
+                </div>
+                <div>
+                    <label class="label-filtro">📞 Teléfono</label>
+                    <input type="text" id="filtroTelefono" class="input-filtro" placeholder="300 123 4567">
+                </div>
+                <div>
+                    <label class="label-filtro">🏥 EPS</label>
+                    <input type="text" id="filtroEPS" class="input-filtro" placeholder="Sura...">
+                </div>
+                <div>
+                    <label class="label-filtro">🏆 Grupo Competitivo</label>
+                    <select id="filtroGrupoCompetitivo" class="input-filtro">
+                        <option value="">Todos</option>
+                        <option value="sin_equipo">Sin equipo</option>
+                        <option value="rocks_titans">Rocks Titans</option>
+                        <option value="lightning_titans">Lightning Titans</option>
+                        <option value="storm_titans">Storm Titans</option>
+                        <option value="fire_titans">Fire Titans</option>
+                        <option value="electric_titans">Electric Titans</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="label-filtro">📊 Nivel</label>
+                    <select id="filtroNivelDetallado" class="input-filtro">
+                        <option value="">Todos</option>
+                        <option value="baby_titans">Baby Titans</option>
+                        <option value="1_basico">1 Básico</option>
+                        <option value="1_medio">1 Medio</option>
+                        <option value="1_avanzado">1 Avanzado</option>
+                        <option value="2">Nivel 2</option>
+                        <option value="3">Nivel 3</option>
+                        <option value="4">Nivel 4</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="label-filtro">📄 Documento</label>
+                    <select id="filtroTieneDocumento" class="input-filtro">
+                        <option value="todos">Todos</option>
+                        <option value="true">Con documento</option>
+                        <option value="false">Sin documento</option>
+                    </select>
+                </div>
+            </div>
 
-    <!-- Scripts -->
-    <script src="../api.js"></script>
-    <script src="./script.js"></script>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="label-filtro">📊 Estado</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="filtro-chip estado active" data-estado="">Todos</button>
+                        <button class="filtro-chip estado" data-estado="activo">Activos</button>
+                        <button class="filtro-chip estado" data-estado="inactivo">Inactivos</button>
+                        <button class="filtro-chip estado" data-estado="lesionado">Lesionados</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="label-filtro">📈 Nivel Rápido</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="filtro-chip nivel active" data-nivel="">Todos</button>
+                        <button class="filtro-chip nivel" data-nivel="baby_titans">Baby Titans</button>
+                        <button class="filtro-chip nivel" data-nivel="1_basico">1 Básico</button>
+                        <button class="filtro-chip nivel" data-nivel="1_medio">1 Medio</button>
+                        <button class="filtro-chip nivel" data-nivel="1_avanzado">1 Avanzado</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-semibold">
+                        🔍 <span id="contadorResultados" class="text-primary">0</span> encontrados
+                    </span>
+                    <div class="w-3 h-3 rounded-full bg-green-500 hidden animate-pulse" id="filtrosAplicados"></div>
+                </div>
+                <div class="flex gap-3">
+                    <button id="limpiarFiltrosBtn" class="btn-secondary px-6 py-2 rounded-lg flex items-center gap-2">
+                        <span class="material-symbols-outlined">delete</span>
+                        Limpiar
+                    </button>
+                    <button id="aplicarFiltrosBtn" class="btn-primary px-6 py-2 rounded-lg flex items-center gap-2">
+                        <span class="material-symbols-outlined">search</span>
+                        Aplicar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tabla -->
+    <div class="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-gray-200 dark:border-white/5 p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">preview</span>
+                Vista Previa
+            </h3>
+            <span class="text-sm text-gray-600 dark:text-gray-400" id="resultadosTotales">0 resultados</span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-secondary text-white">
+                    <tr>
+                        <th class="px-6 py-4 text-left">Deportista</th>
+                        <th class="px-6 py-4 text-left">Documento</th>
+                        <th class="px-6 py-4 text-left">Nivel</th>
+                        <th class="px-6 py-4 text-left">Estado</th>
+                        <th class="px-6 py-4 text-left">Doc</th>
+                        <th class="px-6 py-4 text-right">Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaResultados"></tbody>
+            </table>
+        </div>
+
+        <div id="sinResultados" class="hidden text-center py-16">
+            <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 dark:bg-zinc-800 flex items-center justify-center">
+                <span class="material-symbols-outlined text-4xl text-gray-400">search_off</span>
+            </div>
+            <h4 class="text-xl font-bold text-gray-600 dark:text-gray-300 mb-3">No se encontraron resultados</h4>
+        </div>
+    </div>
+
+</main>
+
+<button id="btnAyuda" class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl hover:scale-110 transition-transform z-50 flex items-center justify-center">
+    <span class="material-symbols-outlined">help</span>
+</button>
+
+<div id="notificationContainer"></div>
+
+<script src="../api.js"></script>
+<script src="./script.js"></script>
 
 </body>
 </html>
