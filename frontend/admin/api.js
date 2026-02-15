@@ -1,4 +1,4 @@
-// frontend/api.js - VERSIÓN DEFINITIVA Y COMPLETA
+// frontend/api.js - VERSIÓN CORREGIDA - LOGOUT ARREGLADO
 window.AdminAPI = {
 
     baseURL: (() => {
@@ -33,7 +33,7 @@ window.AdminAPI = {
     },
 
     // ==========================================
-    // AUTENTICACIÓN
+    // AUTENTICACIÓN - ARREGLADO
     // ==========================================
     async login(email, password) {
         try {
@@ -96,7 +96,7 @@ window.AdminAPI = {
     checkAuth() {
         if (!this.token) {
             console.warn('⚠️ No hay token de autenticación');
-            this.showNotification('Sesión expirada. Redirigiendo al login...', 'warning');
+            this.showNotification('Sesión expirada. Redirigiendo...', 'warning');
             setTimeout(() => this.logout(), 1500);
             return false;
         }
@@ -111,19 +111,14 @@ window.AdminAPI = {
         return true;
     },
 
+    // ✅ LOGOUT CORREGIDO - AHORA REDIRIGE A LA RAÍZ
     logout() {
         console.log('👋 Cerrando sesión...');
-        this.showNotification('Sesión cerrada exitosamente', 'info');
+        this.showNotification('Sesión cerrada', 'info');
         localStorage.clear();
         sessionStorage.clear();
-        setTimeout(() => {
-            const path = window.location.pathname;
-            if (path.includes('/admin/')) {
-                window.location.href = '../../auth/login-admin.html';
-            } else {
-                window.location.href = '../auth/login-admin.html';
-            }
-        }, 1500);
+        // Redirigir a la raíz de la aplicación (donde esté tu login)
+        window.location.href = '/';
     },
 
     updateUserInfo() {
@@ -982,4 +977,4 @@ if (!document.querySelector('#notification-styles')) {
     document.head.appendChild(style);
 }
 
-console.log('✅ AdminAPI inicializado correctamente');
+console.log('✅ AdminAPI CORREGIDO inicializado');

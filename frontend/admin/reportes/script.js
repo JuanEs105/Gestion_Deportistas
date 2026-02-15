@@ -1,5 +1,5 @@
 // ==========================================
-// REPORTES APP - VERSIÓN FINAL Y COMPLETA
+// REPORTES APP - VERSIÓN CORREGIDA - LOGOUT ARREGLADO
 // ==========================================
 
 if (typeof window.ReportesApp === 'undefined') {
@@ -28,7 +28,7 @@ if (typeof window.ReportesApp === 'undefined') {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
             if (!token) {
                 this.showNotification('Sesión expirada', 'warning');
-                setTimeout(() => window.location.href = '../auth/login-admin.html', 1500);
+                setTimeout(() => window.location.href = '/', 1500);
                 return false;
             }
             return true;
@@ -207,7 +207,7 @@ if (typeof window.ReportesApp === 'undefined') {
                     setTimeout(() => {
                         localStorage.clear();
                         sessionStorage.clear();
-                        window.location.href = '../auth/login-admin.html';
+                        window.location.href = '/';
                     }, 2000);
                 }
 
@@ -379,19 +379,9 @@ if (typeof window.ReportesApp === 'undefined') {
 
             const resultados = this.state.deportistasFiltrados.slice(0, 10);
 
-            // 🔍 DEBUG TEMPORAL - ver estructura real del API (borrar cuando funcione)
-            if (resultados.length > 0) {
-                console.log('=== ESTRUCTURA DEL API ===');
-                console.log('Claves del objeto:', Object.keys(resultados[0]));
-                console.log('Objeto completo:', JSON.stringify(resultados[0], null, 2));
-                console.log('=========================');
-            }
-
             resultados.forEach(deportista => {
                 const row = document.createElement('tr');
 
-                // El backend devuelve nombre_completo y numero_documento directamente
-                // Si viene vacio, buscar en el objeto user anidado
                 const u = deportista.user || deportista.User || {};
 
                 const nombre = (deportista.nombre_completo && deportista.nombre_completo.trim())
@@ -540,10 +530,11 @@ if (typeof window.ReportesApp === 'undefined') {
             });
         },
 
+        // ✅ LOGOUT CORREGIDO
         logout() {
             localStorage.clear();
             sessionStorage.clear();
-            window.location.href = '../auth/login-admin.html';
+            window.location.href = '/';
         },
 
         showNotification(message, type = 'info', duration = 5000) {
