@@ -1,43 +1,30 @@
 // ===================================
-// DASHBOARD ENTRENADOR - VERSIÓN CORREGIDA
-// Titanes Evolution
+// DASHBOARD ENTRENADOR - VERSIÓN FINAL
+// Corrige: Flechas funcionando, estadísticas correctas
 // ===================================
 
-console.log('🚀 Inicializando Dashboard Entrenador CORREGIDO');
+console.log('🚀 Dashboard Entrenador FINAL');
 
 const API = window.EntrenadorAPI;
 
-// Alias para compatibilidad
 const getUserData = () => API.user;
 const formatNivel = (nivel) => API.formatNivel(nivel);
 const formatFecha = (fecha) => API.formatFecha(fecha);
 const formatHora = (fecha) => API.formatHora(fecha);
 
-// ===================================
-// VERIFICACIÓN DE AUTENTICACIÓN
-// ===================================
-const verificarAutenticacion = () => {
-    return API.checkAuth();
-};
+const verificarAutenticacion = () => API.checkAuth();
 
-// ===================================
-// CARGAR PERFIL DEL ENTRENADOR
-// ===================================
 const cargarPerfilEntrenador = () => {
     const user = getUserData();
     if (!user) return;
     
-    document.getElementById('coachName').textContent = user.nombre || 'Entrenador';
+    const nameEl = document.getElementById('coachName');
+    const avatarEl = document.getElementById('coachAvatar');
     
-    const avatar = document.getElementById('coachAvatar');
-    if (avatar) {
-        avatar.src = user.foto_perfil || 'https://via.placeholder.com/100';
-    }
+    if (nameEl) nameEl.textContent = user.nombre || 'Entrenador';
+    if (avatarEl) avatarEl.src = user.foto_perfil || 'https://via.placeholder.com/100';
 };
 
-// ===================================
-// CARGAR NIVELES ASIGNADOS
-// ===================================
 const cargarNivelesAsignados = () => {
     const user = getUserData();
     const container = document.getElementById('nivelesAsignados');
@@ -51,19 +38,15 @@ const cargarNivelesAsignados = () => {
         return;
     }
     
-    container.innerHTML = niveles.map(nivel => `
-        <span class="nivel-badge-pill">${formatNivel(nivel)}</span>
-    `).join('');
+    container.innerHTML = niveles.map(nivel => 
+        `<span class="nivel-badge-pill">${formatNivel(nivel)}</span>`
+    ).join('');
 };
 
-// ===================================
-// CARGAR ESTADÍSTICAS
-// ===================================
 const cargarEstadisticas = async () => {
     try {
         console.log('📊 Cargando estadísticas...');
         
-        // 1. OBTENER DEPORTISTAS
         let deportistas = [];
         
         try {
@@ -75,30 +58,24 @@ const cargarEstadisticas = async () => {
             if (response.ok) {
                 const data = await response.json();
                 deportistas = data.deportistas || data || [];
-                console.log(`✅ Obtenidos ${deportistas.length} deportistas`);
             } else {
-                console.warn('⚠️ Usando API.getDeportistas()');
                 deportistas = await API.getDeportistas();
             }
         } catch (error) {
             console.error('❌ Error obteniendo deportistas:', error);
         }
         
-        // 2. OBTENER EVALUACIONES
         let evaluacionesRealizadas = 0;
         
         try {
             const evaluacionesData = await API.getEvaluaciones();
             evaluacionesRealizadas = evaluacionesData.length || 0;
-            console.log(`✅ Evaluaciones realizadas: ${evaluacionesRealizadas}`);
         } catch (error) {
             console.warn('⚠️ No se pudieron obtener evaluaciones');
         }
         
-        // Evalua deportistas pendientes (simplificado)
         const evaluacionesPendientes = Math.max(0, deportistas.length - evaluacionesRealizadas);
         
-        // 3. ACTUALIZAR UI
         const totalEl = document.getElementById('totalDeportistas');
         const pendientesEl = document.getElementById('evaluacionesPendientes');
         const realizadasEl = document.getElementById('evaluacionesRealizadas');
@@ -107,8 +84,6 @@ const cargarEstadisticas = async () => {
         if (pendientesEl) pendientesEl.textContent = evaluacionesPendientes;
         if (realizadasEl) realizadasEl.textContent = evaluacionesRealizadas;
         
-        console.log('📈 Estadísticas actualizadas');
-        
         return deportistas;
     } catch (error) {
         console.error('❌ Error cargando estadísticas:', error);
@@ -116,9 +91,6 @@ const cargarEstadisticas = async () => {
     }
 };
 
-// ===================================
-// CARGAR PRÓXIMO ENTRENAMIENTO
-// ===================================
 const cargarProximoEntrenamiento = async () => {
     const proximoEl = document.getElementById('proximoEntrenamiento');
     const nivelEl = document.getElementById('nivelProximoEntrenamiento');
@@ -127,7 +99,6 @@ const cargarProximoEntrenamiento = async () => {
     
     try {
         const eventos = await API.getEventosCalendario();
-        
         const ahora = new Date();
         const proximosEventos = eventos
             .filter(e => new Date(e.fecha_evento) > ahora)
@@ -136,7 +107,6 @@ const cargarProximoEntrenamiento = async () => {
         if (proximosEventos.length > 0) {
             const proximo = proximosEventos[0];
             const fecha = new Date(proximo.fecha_evento);
-            
             const esHoy = fecha.toDateString() === ahora.toDateString();
             const texto = esHoy ? `Hoy, ${formatHora(proximo.fecha_evento)}` : formatFecha(proximo.fecha_evento);
             
@@ -147,15 +117,11 @@ const cargarProximoEntrenamiento = async () => {
             nivelEl.textContent = 'próximos';
         }
     } catch (error) {
-        console.error('Error cargando próximo entrenamiento:', error);
         proximoEl.textContent = '--';
         nivelEl.textContent = '--';
     }
 };
 
-// ===================================
-// CARGAR DEPORTISTAS POR NIVEL
-// ===================================
 const cargarDeportistasPorNivel = (deportistas) => {
     const container = document.getElementById('nivelesChart');
     if (!container) return;
@@ -163,20 +129,13 @@ const cargarDeportistasPorNivel = (deportistas) => {
     if (deportistas.length === 0) {
         container.innerHTML = `
             <div style="text-align: center; padding: 3rem; color: var(--gray-500);">
-                <span class="material-symbols-outlined" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;">groups</span>
+                <span class="material-symbols-outlined" style="font-size: 3rem; opacity: 0.3;">groups</span>
                 <p>No se encontraron deportistas</p>
-                <p style="font-size: 0.875rem; margin-top: 0.5rem;">
-                    <button onclick="window.location.href='deportistas/registrar.html'" 
-                            style="background: var(--primary-red); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">
-                        Registrar primer deportista
-                    </button>
-                </p>
             </div>
         `;
         return;
     }
     
-    // Agrupar por nivel
     const porNivel = {};
     deportistas.forEach(d => {
         const nivel = d.nivel_actual || 'pendiente';
@@ -205,9 +164,7 @@ const cargarDeportistasPorNivel = (deportistas) => {
     }).join('');
 };
 
-// ===================================
-// CARGAR DEPORTISTAS RECIENTES
-// ===================================
+// 🔥 FUNCIÓN CORREGIDA - Las flechas ahora funcionan
 const cargarDeportistasRecientes = (deportistas) => {
     const tbody = document.getElementById('deportistasRecientes');
     if (!tbody) return;
@@ -215,13 +172,8 @@ const cargarDeportistasRecientes = (deportistas) => {
     if (deportistas.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="4" style="text-align: center; padding: 3rem; color: var(--gray-400);">
-                    <span class="material-symbols-outlined" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;">groups</span>
+                <td colspan="4" style="text-align: center; padding: 3rem;">
                     <p>No hay deportistas registrados</p>
-                    <button onclick="window.location.href='deportistas/registrar.html'" 
-                            style="background: var(--primary-red); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-top: 1rem; font-size: 0.875rem;">
-                        Registrar primer deportista
-                    </button>
                 </td>
             </tr>
         `;
@@ -233,8 +185,11 @@ const cargarDeportistasRecientes = (deportistas) => {
         .slice(0, 5);
     
     tbody.innerHTML = recientes.map(deportista => {
+        // 🔥 CORRECCIÓN: Usar user_id en lugar de id
+        const deportistaId = deportista.user_id || deportista.id;
+        
         return `
-            <tr onclick="verDetalleDeportista('${deportista.id}')" style="cursor: pointer;">
+            <tr style="cursor: pointer;" onclick="verDetalleDeportista('${deportistaId}')">
                 <td>
                     <div class="athlete-cell">
                         <div class="athlete-avatar">
@@ -273,23 +228,18 @@ function formatEquipo(equipo) {
     return equipos[equipo] || 'Atleta';
 }
 
-// ===================================
-// VER DETALLE DE DEPORTISTA
-// ===================================
+// 🔥 CORRECCIÓN: Usar el ID correcto
 const verDetalleDeportista = (id) => {
+    console.log('📍 Navegando a detalle de deportista:', id);
     window.location.href = `deportistas/detalle.html?id=${id}`;
 };
 
-// ===================================
-// CARGAR PRÓXIMAS ACTIVIDADES
-// ===================================
 const cargarProximasActividades = async () => {
     const container = document.getElementById('proximasActividades');
     if (!container) return;
     
     try {
         const eventos = await API.getEventosCalendario();
-        
         const ahora = new Date();
         const enTresDias = new Date();
         enTresDias.setDate(ahora.getDate() + 3);
@@ -308,7 +258,6 @@ const cargarProximasActividades = async () => {
         if (proximas.length === 0) {
             container.innerHTML = `
                 <div style="text-align: center; padding: 1rem; color: var(--gray-500);">
-                    <span class="material-symbols-outlined" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.3;">event</span>
                     <p style="font-size: 0.875rem;">No hay actividades próximas</p>
                 </div>
             `;
@@ -325,24 +274,14 @@ const cargarProximasActividades = async () => {
             </div>
         `).join('');
     } catch (error) {
-        console.error('Error cargando próximas actividades:', error);
-        container.innerHTML = `
-            <div style="text-align: center; padding: 1rem; color: var(--gray-500);">
-                <span class="material-symbols-outlined" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.3;">sync_problem</span>
-                <p style="font-size: 0.875rem;">Error cargando actividades</p>
-            </div>
-        `;
+        container.innerHTML = `<p style="text-align: center; color: var(--gray-500);">Error cargando actividades</p>`;
     }
 };
 
-// ===================================
-// 🔥 CONFIGURAR ACCIONES INMEDIATAS (CORREGIDO)
-// ===================================
 const configurarAccionesInmediatas = () => {
     const container = document.getElementById('accionesInmediatas');
     if (!container) return;
     
-    // 🔥 RUTAS CORREGIDAS
     container.innerHTML = `
         <div class="activity-item" onclick="irAEvaluaciones()" style="cursor: pointer;">
             <div class="activity-text">Crear evaluación rápida</div>
@@ -359,38 +298,28 @@ const configurarAccionesInmediatas = () => {
     `;
 };
 
-// 🔥 Función para ir a evaluaciones
 function irAEvaluaciones() {
     window.location.href = 'evaluaciones/index.html';
 }
 
-// ===================================
-// THEME TOGGLE
-// ===================================
 const initThemeToggle = () => {
     const toggleBtn = document.getElementById('toggleTheme');
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (!toggleBtn) return;
     
+    const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.classList.toggle('dark', savedTheme === 'dark');
     document.body.classList.toggle('dark', savedTheme === 'dark');
     
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-            const isDark = document.body.classList.toggle('dark');
-            document.documentElement.classList.toggle('dark', isDark);
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            
-            const icon = toggleBtn.querySelector('.material-symbols-outlined');
-            if (icon) {
-                icon.textContent = isDark ? 'light_mode' : 'dark_mode';
-            }
-        });
-    }
+    toggleBtn.addEventListener('click', () => {
+        const isDark = document.body.classList.toggle('dark');
+        document.documentElement.classList.toggle('dark', isDark);
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        
+        const icon = toggleBtn.querySelector('.material-symbols-outlined');
+        if (icon) icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+    });
 };
 
-// ===================================
-// LOGOUT
-// ===================================
 const initLogout = () => {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
@@ -402,36 +331,21 @@ const initLogout = () => {
     }
 };
 
-// ===================================
-// INICIALIZACIÓN PRINCIPAL
-// ===================================
 const init = async () => {
-    console.log('🚀 Iniciando dashboard del entrenador...');
+    console.log('🚀 Iniciando dashboard...');
     
-    // Verificar autenticación
     if (!verificarAutenticacion()) {
-        console.warn('⚠️ Usuario no autenticado, redirigiendo...');
-        setTimeout(() => {
-            window.location.href = '../auth/login-entrenador.html';
-        }, 1500);
+        setTimeout(() => window.location.href = '../auth/login-entrenador.html', 1500);
         return;
     }
     
-    // Cargar perfil
     cargarPerfilEntrenador();
-    
-    // Cargar niveles asignados
     cargarNivelesAsignados();
-    
-    // 🔥 Configurar acciones inmediatas con rutas correctas
     configurarAccionesInmediatas();
-    
-    // Inicializar controles
     initThemeToggle();
     initLogout();
     
     try {
-        // Cargar datos
         const deportistas = await cargarEstadisticas();
         
         await Promise.all([
@@ -442,38 +356,19 @@ const init = async () => {
         cargarDeportistasPorNivel(deportistas);
         cargarDeportistasRecientes(deportistas);
         
-        console.log('✅ Dashboard cargado exitosamente');
-        
+        console.log('✅ Dashboard cargado');
     } catch (error) {
-        console.error('❌ Error al cargar el dashboard:', error);
-        
-        const nivelesChart = document.getElementById('nivelesChart');
-        if (nivelesChart) {
-            nivelesChart.innerHTML = `
-                <div style="text-align: center; padding: 3rem; color: var(--danger);">
-                    <span class="material-symbols-outlined" style="font-size: 3rem; margin-bottom: 1rem;">error</span>
-                    <p>Error al cargar los datos</p>
-                    <button onclick="location.reload()" 
-                            style="background: var(--primary-red); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-top: 1rem;">
-                        Reintentar
-                    </button>
-                </div>
-            `;
-        }
+        console.error('❌ Error:', error);
     }
 };
 
-// ===================================
-// EJECUTAR AL CARGAR LA PÁGINA
-// ===================================
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
     init();
 }
 
-// Hacer funciones globales
 window.verDetalleDeportista = verDetalleDeportista;
 window.irAEvaluaciones = irAEvaluaciones;
 
-console.log('✅ Dashboard Entrenador CORREGIDO cargado');
+console.log('✅ Dashboard Entrenador FINAL - Flechas corregidas');

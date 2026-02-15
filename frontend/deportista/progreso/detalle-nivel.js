@@ -1,14 +1,15 @@
 // ===================================
-// DETALLE DE NIVEL - VERSIÓN FINAL CORREGIDA
-// Obtiene TODAS las habilidades del nivel y muestra cuáles faltan
+// DETALLE DE NIVEL - VERSIÓN COMPLETA CON GRÁFICA
+// Incluye gráfica de barras de rendimiento
 // ===================================
 
-console.log('📊 Inicializando Detalle de Nivel (VERSIÓN FINAL)...');
+console.log('📊 Inicializando Detalle de Nivel (CON GRÁFICA)...');
 
 let deportistaData = null;
 let nivelId = null;
-let todasLasHabilidadesDelNivel = []; // TODAS las habilidades (backend)
-let evaluacionesDelNivel = []; // Evaluaciones realizadas
+let todasLasHabilidadesDelNivel = [];
+let evaluacionesDelNivel = [];
+let chartRendimiento = null; // Variable global para la gráfica
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('✅ DOM cargado');
@@ -47,7 +48,6 @@ async function cargarDatos() {
         showLoading();
         console.log('📥 Cargando datos del nivel...');
         
-        // 1. Cargar perfil
         deportistaData = await window.DeportistaAPI.getMe();
         if (!deportistaData) {
             throw new Error('No se pudo cargar el perfil del deportista');
@@ -63,7 +63,7 @@ async function cargarDatos() {
         
         actualizarPerfilSidebar({ ...deportistaData, nombre: nombreFinal, user: user });
         
-        // 2. 🔥 OBTENER TODAS LAS HABILIDADES DEL NIVEL (desde backend)
+        // 🔥 OBTENER TODAS LAS HABILIDADES DEL NIVEL
         console.log(`📚 Obteniendo TODAS las habilidades del nivel ${nivelId}...`);
         
         const response = await fetch(`${window.DeportistaAPI.baseURL}/habilidades/nivel/${nivelId}`, {
@@ -80,7 +80,7 @@ async function cargarDatos() {
         
         console.log(`📊 Total habilidades en el nivel: ${todasLasHabilidadesDelNivel.length}`);
         
-        // 3. Cargar evaluaciones
+        // Cargar evaluaciones
         const todasEvaluaciones = await window.DeportistaAPI.getEvaluaciones();
         
         evaluacionesDelNivel = todasEvaluaciones.filter(e => {
@@ -132,7 +132,7 @@ function renderizarContenido() {
     renderizarHeader();
     renderizarHabilidades();
     renderizarFeedback();
-    renderizarUltimasEvaluaciones();
+    renderizarUltimasEvaluaciones(); // 🔥 AHORA SÍ COMPLETA
 }
 
 function renderizarHeader() {
@@ -154,7 +154,6 @@ function renderizarHeader() {
         estadoTexto.textContent = esNivelActual ? 'En Progreso' : 'Completado';
     }
     
-    // 🔥 Calcular progreso REAL
     const { completadas, total, porcentaje } = calcularProgresoReal();
     
     if (porcentajeNivel) porcentajeNivel.textContent = porcentaje;
@@ -197,7 +196,6 @@ function obtenerNombreNivel(nivelId) {
     return niveles[nivelId] || 'NIVEL DESCONOCIDO';
 }
 
-// 🔥 FUNCIÓN CLAVE: Calcula progreso basándose en TODAS las habilidades
 function calcularProgresoReal() {
     const total = todasLasHabilidadesDelNivel.length;
     
@@ -236,7 +234,6 @@ function renderizarHabilidades() {
     const completadas = [];
     const pendientes = [];
     
-    // 🔥 Clasificar TODAS las habilidades
     todasLasHabilidadesDelNivel.forEach(habilidad => {
         const evaluacion = evaluacionesDelNivel.find(e => 
             e.habilidad_id === habilidad.id || e.habilidad?.id === habilidad.id
@@ -250,7 +247,6 @@ function renderizarHabilidades() {
                 pendientes.push({ habilidad, evaluacion });
             }
         } else {
-            // 🔥 Sin evaluar
             pendientes.push({ habilidad, evaluacion: null });
         }
     });
@@ -388,8 +384,166 @@ function renderizarFeedback() {
     }).join('');
 }
 
+// 🔥 FUNCIÓN COMPLETA CON GRÁFICA DE CHART.JS
 function renderizarUltimasEvaluaciones() {
-    // Similar al anterior - omitido por brevedad
+    const container = document.getElementById('ultimasEvaluacionesContainer');
+    if (!container) {
+        console.warn('⚠️ Container ultimasEvaluacionesContainer no encontrado');
+        return;
+    }
+    
+    console.log(`📅 Renderizando gráfica con ${evaluacionesDelNivel.length} evaluaciones`);
+    
+    if (evaluacionesDelNivel.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-400">
+                <span class="material-symbols-outlined text-4xl mb-2">bar_chart</span>
+                <p class="text-sm">Sin evaluaciones en este nivel</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Ordenar cronológicamente y tomar las últimas 10
+    const evaluacionesRecientes = [...evaluacionesDelNivel]
+        .sort((a, b) => new Date(a.fecha_evaluacion) - new Date(b.fecha_evaluacion))
+        .slice(-10);
+    
+    console.log(`📊 Mostrando ${evaluacionesRecientes.length} evaluaciones en gráfica`);
+    
+    // Crear canvas
+    container.innerHTML = '<canvas id="chartRendimiento" class="w-full" style="max-height: 400px;"></canvas>';
+    
+    // Esperar que el canvas esté en el DOM
+    setTimeout(() => {
+        const canvas = document.getElementById('chartRendimiento');
+        if (!canvas) {
+            console.error('❌ Canvas no encontrado');
+            return;
+        }
+        
+        // Preparar datos
+        const labels = evaluacionesRecientes.map(e => {
+            const habilidad = e.habilidad?.nombre || 'Habilidad';
+            return habilidad.length > 20 ? habilidad.substring(0, 17) + '...' : habilidad;
+        });
+        
+        const puntuaciones = evaluacionesRecientes.map(e => e.puntuacion || 0);
+        
+        // Colores según puntuación
+        const coloresFondo = puntuaciones.map(p => {
+            if (p >= 4.5) return 'rgba(34, 197, 94, 0.8)';
+            if (p >= 4) return 'rgba(59, 130, 246, 0.8)';
+            if (p >= 3) return 'rgba(234, 179, 8, 0.8)';
+            if (p >= 2) return 'rgba(249, 115, 22, 0.8)';
+            return 'rgba(239, 68, 68, 0.8)';
+        });
+        
+        const coloresBorde = puntuaciones.map(p => {
+            if (p >= 4.5) return 'rgb(34, 197, 94)';
+            if (p >= 4) return 'rgb(59, 130, 246)';
+            if (p >= 3) return 'rgb(234, 179, 8)';
+            if (p >= 2) return 'rgb(249, 115, 22)';
+            return 'rgb(239, 68, 68)';
+        });
+        
+        // Destruir gráfica anterior si existe
+        if (chartRendimiento) {
+            chartRendimiento.destroy();
+        }
+        
+        // Crear gráfica con Chart.js
+        const ctx = canvas.getContext('2d');
+        chartRendimiento = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Puntuación',
+                    data: puntuaciones,
+                    backgroundColor: coloresFondo,
+                    borderColor: coloresBorde,
+                    borderWidth: 2,
+                    borderRadius: 4,
+                    barThickness: 'flex',
+                    maxBarThickness: 50
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                        titleFont: {
+                            family: 'Oswald',
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            family: 'Montserrat',
+                            size: 12
+                        },
+                        padding: 12,
+                        cornerRadius: 8,
+                        displayColors: false,
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const index = tooltipItems[0].dataIndex;
+                                return evaluacionesRecientes[index].habilidad?.nombre || 'Habilidad';
+                            },
+                            label: function(context) {
+                                return `Puntuación: ${context.parsed.y.toFixed(1)}/5`;
+                            },
+                            afterLabel: function(context) {
+                                const index = context.dataIndex;
+                                const fecha = new Date(evaluacionesRecientes[index].fecha_evaluacion);
+                                return `Fecha: ${fecha.toLocaleDateString('es-ES')}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 5,
+                        ticks: {
+                            stepSize: 1,
+                            color: '#9CA3AF',
+                            font: {
+                                family: 'Montserrat',
+                                weight: 'bold',
+                                size: 11
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)',
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#9CA3AF',
+                            font: {
+                                family: 'Montserrat',
+                                size: 9
+                            },
+                            maxRotation: 45,
+                            minRotation: 45
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+        
+        console.log('✅ Gráfica renderizada exitosamente');
+    }, 100);
 }
 
 function escapeHTML(text) {
@@ -417,4 +571,4 @@ function showError(message) {
     document.getElementById('errorMessage').textContent = message;
 }
 
-console.log('✅ Detalle de Nivel FINAL - Muestra TODAS las habilidades');
+console.log('✅ Detalle de Nivel COMPLETO - Con gráfica de Chart.js');
