@@ -390,77 +390,37 @@ if (typeof window.ReportesApp === 'undefined') {
             resultados.forEach(deportista => {
                 const row = document.createElement('tr');
 
-                // Buscar en todas las posibles estructuras
-                const d = deportista;
-                const u = deportista.User || deportista.user || {};
-                const dd = deportista.deportista || {};
+                // El backend devuelve nombre_completo y numero_documento directamente
+                // Si viene vacio, buscar en el objeto user anidado
+                const u = deportista.user || deportista.User || {};
 
-                // DEBUG por fila - ver exactamente qué tiene cada campo
-                console.log('Deportista raw:', JSON.stringify(d));
+                const nombre = (deportista.nombre_completo && deportista.nombre_completo.trim())
+                    || ((u.nombre || u.apellidos) ? `${u.nombre || ''} ${u.apellidos || ''}`.trim() : '')
+                    || deportista.nombre
+                    || '';
 
-                // NOMBRE: buscar campo que tenga letras (no solo números)
-                const esNombre = (val) => val && typeof val === 'string' && isNaN(val.replace(/\s/g,''));
+                const documento = deportista.numero_documento
+                    || u.numero_documento
+                    || '';
 
-                let nombre = '';
-                const candidatosNombre = [
-                    d.nombre_completo, d.nombreCompleto, d.full_name,
-                    u.nombre, u.name, dd.nombre, d.nombre, d.name
-                ];
-                for (const c of candidatosNombre) {
-                    if (esNombre(c)) { nombre = c; break; }
-                }
-
-                // DOCUMENTO: buscar campo que tenga solo números
-                const esDocumento = (val) => val && typeof val === 'string' && /^\d+$/.test(val.trim());
-
-                let documento = '';
-                const candidatosDoc = [
-                    d.numero_documento, d.numeroDocumento, d.cedula,
-                    d.documento, u.cedula, u.numero_documento, u.documento
-                ];
-                for (const c of candidatosDoc) {
-                    if (esDocumento(c)) { documento = c; break; }
-                }
-
-                const nivel = d.nivel_actual
-                    || dd.nivel_actual
-                    || d.nivelActual
-                    || d.nivel
-                    || 'Pendiente';
-
-                const estado = d.estado
-                    || dd.estado
-                    || d.status
-                    || 'activo';
-
-                const tieneDoc = d.tiene_documento
-                    ?? d.tieneDocumento
-                    ?? d.has_document
-                    ?? false;
+                const nivel = deportista.nivel_actual || '';
+                const estado = deportista.estado || 'activo';
+                const tieneDoc = deportista.tiene_documento ?? false;
 
                 row.innerHTML = `
                     <td class="px-6 py-4 font-medium">${nombre}</td>
                     <td class="px-6 py-4">${documento}</td>
-                    <td class="px-6 py-4">
-                        <span class="badge bg-blue-100">${nivel}</span>
-                    </td>
-                    <td class="px-6 py-4">
-                        <span class="badge ${this.getEstadoColor(estado)}">${estado}</span>
-                    </td>
+                    <td class="px-6 py-4"><span class="badge bg-blue-100">${nivel}</span></td>
+                    <td class="px-6 py-4"><span class="badge ${this.getEstadoColor(estado)}">${estado}</span></td>
                     <td class="px-6 py-4">
                         ${tieneDoc
                             ? '<span class="badge bg-green-100">✓ Subido</span>'
-                            : '<span class="badge bg-gray-100">✗ Pendiente</span>'
-                        }
+                            : '<span class="badge bg-gray-100">✗ Pendiente</span>'}
                     </td>
                     <td class="px-6 py-4 text-right">
                         ${tieneDoc
-                            ? `<button onclick="ReportesApp.descargarDocumentoIndividual('${deportista.id}')"
-                                class="px-3 py-1 text-xs bg-primary text-white rounded hover:bg-red-700 transition-colors">
-                                    Descargar
-                               </button>`
-                            : '<span class="text-gray-400 text-xs">No disponible</span>'
-                        }
+                            ? `<button onclick="ReportesApp.descargarDocumentoIndividual('${deportista.id}')" class="px-3 py-1 text-xs bg-primary text-white rounded hover:bg-red-700 transition-colors">Descargar</button>`
+                            : '<span class="text-gray-400 text-xs">No disponible</span>'}
                     </td>
                 `;
 
