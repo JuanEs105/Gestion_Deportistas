@@ -129,8 +129,8 @@
             </div>
         </header>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6 mb-8 lg:mb-12">
+        <!-- Stats Cards (sin pendientes de pago ni estados) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8 lg:mb-12">
             <!-- Total Deportistas -->
             <div class="stat-card stat-primary">
                 <div class="stat-header">
@@ -149,26 +149,6 @@
                 </div>
                 <div id="activosDeportistas" class="stat-value">0</div>
                 <div class="stat-subtitle" id="activosPercentage">0%</div>
-            </div>
-
-            <!-- Lesionados -->
-            <div class="stat-card stat-primary">
-                <div class="stat-header">
-                    <span class="stat-label">Lesionados</span>
-                    <span class="material-symbols-outlined text-primary">healing</span>
-                </div>
-                <div id="lesionadosDeportistas" class="stat-value">0</div>
-                <div class="stat-subtitle">En recuperación</div>
-            </div>
-
-            <!-- Pendientes Pago -->
-            <div class="stat-card stat-secondary">
-                <div class="stat-header">
-                    <span class="stat-label">Pendientes</span>
-                    <span class="material-symbols-outlined text-primary">payments</span>
-                </div>
-                <div id="pendientesPagoDeportistas" class="stat-value">0</div>
-                <div class="stat-subtitle">Por cobrar</div>
             </div>
 
             <!-- Sin Equipo -->
@@ -192,9 +172,9 @@
             </div>
         </div>
 
-        <!-- Filtros -->
+        <!-- Filtros (SIN FILTRO DE ESTADO) -->
         <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-lg border border-gray-100 dark:border-white/5 p-6 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <!-- Búsqueda -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -218,21 +198,6 @@
                         <option value="2">⭐ Nivel 2</option>
                         <option value="3">🌟🌟 Nivel 3</option>
                         <option value="4">🌟🌟🌟 Nivel 4</option>
-                    </select>
-                </div>
-
-                <!-- Estado -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Estado</label>
-                    <select id="filtroEstado"
-                        class="w-full bg-gray-50 dark:bg-zinc-800 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all">
-                        <option value="todos">📊 Todos los estados</option>
-                        <option value="activo">✅ Activo</option>
-                        <option value="lesionado">🤕 Lesionado</option>
-                        <option value="descanso">🏝️ Descanso</option>
-                        <option value="inactivo">❌ Inactivo</option>
-                        <option value="pendiente">⏳ Pendiente</option>
-                        <option value="pendiente_de_pago">💰 Pendiente de Pago</option>
                     </select>
                 </div>
 
@@ -261,7 +226,7 @@
             </div>
         </div>
 
-        <!-- Tabla de Deportistas -->
+        <!-- Tabla de Deportistas (SIN COLUMNA DE ESTADO) -->
         <div
             class="bg-white dark:bg-zinc-900 rounded-xl shadow-lg border border-gray-100 dark:border-white/5 overflow-hidden mb-8">
             <!-- Table Header -->
@@ -291,15 +256,13 @@
                             <th class="text-left p-6 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                 Equipo</th>
                             <th class="text-left p-6 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                Estado</th>
-                            <th class="text-left p-6 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                 Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="deportistasTableBody" class="divide-y divide-gray-100 dark:divide-white/5">
                         <!-- Los datos se cargarán aquí -->
                         <tr id="loadingRow">
-                            <td colspan="6" class="text-center p-12">
+                            <td colspan="5" class="text-center p-12">
                                 <div class="flex flex-col items-center justify-center gap-3">
                                     <div
                                         class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent">

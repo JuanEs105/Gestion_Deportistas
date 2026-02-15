@@ -6,7 +6,13 @@
 console.log('📂 Archivo calendario.js (admin) cargado - VERSIÓN ADMIN');
 
 // CONFIGURACIÓN GLOBAL
-const API_BASE_URL = window.AdminAPI ? window.AdminAPI.baseURL : 'https://gestiondeportistas-production.up.railway.app/api';
+const API_BASE_URL = window.AdminAPI ? window.AdminAPI.baseURL : (() => {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:5000/api';
+    }
+    return 'https://gestiondeportistas-production.up.railway.app/api';
+})();
 
 console.log('⚙️ Configuración inicial:');
 console.log('  - API_BASE_URL:', API_BASE_URL);
@@ -1268,7 +1274,7 @@ async function guardarEvento(e, eventoId = null) {
         
         // Mensajes más específicos
         if (error.message.includes('Failed to fetch')) {
-            mensajeError = 'No se pudo conectar con el servidor. Verifica que esté ejecutándose en https://gestiondeportistas-production.up.railway.app';
+            mensajeError = 'No se pudo conectar con el servidor. Verifica que esté ejecutándose en http://localhost:5000';
         } else if (error.message.includes('404')) {
             mensajeError = 'Ruta del API no encontrada (/api/calendario no existe)';
         } else if (error.message.includes('500')) {
@@ -1728,7 +1734,7 @@ AYUDA - CALENDARIO TITANES EVOLUTION (ADMIN)
 📌 Como administrador, puedes ver y editar TODOS los eventos.
 
 ¿Problemas?
-Verifica que tu backend esté corriendo en https://gestiondeportistas-production.up.railway.appistas-production.up.railway.app
+Verifica que tu backend esté corriendo en http://localhost:5000istas-production.up.railway.app
     `;
     
     mostrarExito(ayuda);

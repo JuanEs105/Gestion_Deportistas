@@ -1,6 +1,6 @@
 /* ===================================
    MIS EVALUACIONES - TITANES EVOLUTION
-   Estilo Elite / Neon
+   Estilo Elite / Neon - Escala 1-5
    =================================== */
 
 :root {
@@ -56,18 +56,6 @@
 .custom-scrollbar::-webkit-scrollbar-thumb {
     background: var(--primary-red);
     border-radius: 10px;
-}
-
-/* ===================================
-   RADAR CHART
-   =================================== */
-.radar-grid {
-    stroke: rgba(255,255,255,0.1);
-    stroke-width: 1;
-}
-
-.area-chart-glow {
-    filter: drop-shadow(0 0 8px rgba(226, 27, 35, 0.8));
 }
 
 /* ===================================
@@ -135,15 +123,6 @@
 }
 
 /* ===================================
-   CATEGORY LEGEND
-   =================================== */
-.category-legend-line {
-    height: 3px;
-    width: 20px;
-    border-radius: 2px;
-}
-
-/* ===================================
    CARD DE EVALUACIÓN
    =================================== */
 .evaluation-card {
@@ -165,9 +144,9 @@
 }
 
 /* ===================================
-   PUNTUACIÓN VISUAL
+   PUNTUACIÓN VISUAL - ESCALA 1-5
    =================================== */
-.score-circle {
+.score-circle-5 {
     position: relative;
     width: 80px;
     height: 80px;
@@ -185,7 +164,7 @@
     );
 }
 
-.score-circle::before {
+.score-circle-5::before {
     content: '';
     position: absolute;
     inset: 4px;
@@ -193,7 +172,7 @@
     background: #1A1A1A;
 }
 
-.score-circle span {
+.score-circle-5 span {
     position: relative;
     z-index: 1;
 }
@@ -331,21 +310,11 @@ select:focus {
     color: #000;
 }
 
-.category-badge-ejercicio {
-    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
-    color: #FFF;
-}
-
-.category-badge-postura {
-    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-    color: #FFF;
-}
-
 /* ===================================
    RESPONSIVE
    =================================== */
 @media (max-width: 768px) {
-    .score-circle {
+    .score-circle-5 {
         width: 60px;
         height: 60px;
         font-size: 1.5rem;
@@ -353,11 +322,6 @@ select:focus {
     
     .evaluation-card {
         padding: 1rem;
-    }
-    
-    .radar-chart-container {
-        max-width: 250px;
-        margin: 0 auto;
     }
 }
 

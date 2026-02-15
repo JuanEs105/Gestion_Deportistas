@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { User, Habilidad, Evaluacion, sequelize } = require('../models');
+const { User, Deportista, Habilidad, Evaluacion, sequelize } = require('../models');
 
 const initDatabase = async () => {
     try {
@@ -27,7 +27,77 @@ const initDatabase = async () => {
             console.log('ℹ️  Usuario admin ya existe');
         }
 
+        // Usuario Entrenador
+        const entrenadorExists = await User.findOne({ where: { email: 'entrenador@deportes.com' } });
         
+        if (!entrenadorExists) {
+            const hashedPassword = await bcrypt.hash('entrenador123', 10);
+            await User.create({
+                nombre: 'Carlos',
+                apellidos: 'Rodríguez',
+                email: 'entrenador@deportes.com',
+                password: hashedPassword,
+                role: 'entrenador',
+                activo: true,
+                telefono: '3001234567',
+                niveles_asignados: ['1_basico', '1_medio'],
+                grupos_competitivos: ['rocks_titans']
+            });
+            console.log('✅ Usuario entrenador creado: entrenador@deportes.com / entrenador123');
+        } else {
+            console.log('ℹ️  Usuario entrenador ya existe');
+        }
+
+        // Deportista de Prueba
+        const deportistaUserExists = await User.findOne({ where: { email: 'deportista@test.com' } });
+        
+        if (!deportistaUserExists) {
+            const hashedPassword = await bcrypt.hash('deportista123', 10);
+            
+            // Crear el User primero
+            const deportistaUser = await User.create({
+                nombre: 'María',
+                apellidos: 'Gómez Torres',
+                email: 'deportista@test.com',
+                password: hashedPassword,
+                role: 'deportista',
+                activo: true,
+                telefono: '3109876543',
+                tipo_documento: 'CC',
+                numero_documento: '1234567890',
+                ciudad: 'Duitama',
+                direccion: 'Calle 10 #20-30',
+                fecha_nacimiento: '2008-05-15',
+                acepta_terminos: true
+            });
+
+            // Luego crear el perfil de Deportista
+            await Deportista.create({
+                user_id: deportistaUser.id,
+                documento_identidad: null, // URL del PDF cuando se suba
+                fecha_nacimiento: '2008-05-15',
+                ciudad_nacimiento: 'Duitama',
+                altura: 1.60,
+                peso: 50,
+                nivel_deportivo: 'principiante',
+                direccion: 'Calle 10 #20-30',
+                eps: 'Compensar',
+                talla_camiseta: 'M',
+                nivel_actual: '1_basico',
+                nivel_sugerido: null,
+                equipo_competitivo: 'sin_equipo',
+                cambio_nivel_pendiente: false,
+                estado: 'activo',
+                contacto_emergencia_nombre: 'Ana Torres',
+                contacto_emergencia_telefono: '3201234567',
+                contacto_emergencia_parentesco: 'Madre',
+                acepta_terminos: true
+            });
+            
+            console.log('✅ Deportista de prueba creado: deportista@test.com / deportista123');
+        } else {
+            console.log('ℹ️  Deportista de prueba ya existe');
+        }
 
         // ==========================================
         // 2. VERIFICAR Y CARGAR HABILIDADES

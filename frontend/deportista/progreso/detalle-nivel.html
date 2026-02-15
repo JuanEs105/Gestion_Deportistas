@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Detalle del Nivel | Titanes Evolution</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#E21B23",
+                        secondary: "#1A1A1A",
+                        accent: "#FF0000",
+                        "background-light": "#F8F9FA",
+                        "background-dark": "#0A0A0A",
+                    },
+                    fontFamily: {
+                        display: ["Oswald", "sans-serif"],
+                        body: ["Montserrat", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
+    
+    <!-- Custom Styles -->
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #E21B23;
+            border-radius: 10px;
+        }
+        
+        .neon-border {
+            box-shadow: 0 0 15px rgba(226, 27, 35, 0.4);
+            border: 1px solid rgba(226, 27, 35, 0.3);
+        }
+        
+        @keyframes slide-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .slide-in-up {
+            animation: slide-in-up 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body class="font-body bg-background-dark text-gray-100 transition-colors duration-300 min-h-screen">
+    
+    <!-- SIDEBAR -->
+    <aside class="fixed left-0 top-0 h-full w-20 lg:w-72 bg-secondary text-white z-50 transition-all duration-300 border-r border-white/5">
+        <div class="flex flex-col h-full">
+            <!-- Logo -->
+            <div class="p-6 flex items-center gap-3">
+                <div class="w-10 h-10 bg-primary rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden">
+                    <img alt="Logo" class="w-full h-full object-cover scale-110" src="../../assets/images/logo titanes.jpg"/>
+                </div>
+                <span class="font-display text-2xl font-bold tracking-tighter uppercase italic hidden lg:inline">
+                    Titanes<span class="text-primary">Evolution</span>
+                </span>
+            </div>
+            
+            <!-- Perfil del Deportista -->
+            <div class="px-6 mb-6" onclick="window.location.href='../perfil/perfil.html'" style="cursor: pointer;">
+                <button class="flex items-center gap-3 w-full p-2 rounded-xl hover:bg-white/5 transition-colors text-left group">
+                    <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary" id="profileAvatarContainer">
+                        <div class="w-full h-full bg-primary flex items-center justify-center">
+                            <span class="text-white font-bold text-xl" id="profileInitial">?</span>
+                        </div>
+                    </div>
+                    <div class="hidden lg:block overflow-hidden">
+                        <p class="text-sm font-bold truncate" id="profileName">Cargando...</p>
+                        <p class="text-[10px] uppercase tracking-widest text-primary font-bold">Ver Mi Perfil</p>
+                    </div>
+                </button>
+            </div>
+            
+            <!-- Navegación -->
+            <nav class="flex-1 px-4 space-y-1">
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group text-gray-400 hover:text-white" href="../dashboard.html">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="font-semibold hidden lg:inline">Dashboard</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group text-gray-400 hover:text-white" href="../mis-evaluaciones/index.html">
+                    <span class="material-symbols-outlined">analytics</span>
+                    <span class="font-semibold hidden lg:inline">Mis Evaluaciones</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 bg-primary rounded-lg text-white group" href="index.html">
+                    <span class="material-symbols-outlined">trending_up</span>
+                    <span class="font-semibold hidden lg:inline">Mi Progreso</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3 hover:bg-white/10 rounded-lg transition-colors group text-gray-400 hover:text-white" href="../calendario/index.html">
+                    <span class="material-symbols-outlined">calendar_month</span>
+                    <span class="font-semibold hidden lg:inline">Calendario</span>
+                </a>
+            </nav>
+            
+            <!-- Footer - SIN BOTÓN DE MODO OSCURO -->
+            <div class="p-4 border-t border-white/10">
+                <button class="flex items-center gap-4 px-4 py-3 w-full hover:bg-white/10 rounded-lg transition-colors group text-red-500" id="logoutBtn">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="font-semibold hidden lg:inline">Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="ml-20 lg:ml-72 p-4 lg:p-10 transition-all duration-300">
+        
+        <!-- LOADING STATE -->
+        <div id="loadingState" class="flex justify-center items-center py-20">
+            <div class="text-center">
+                <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto mb-4"></div>
+                <p class="text-gray-400 font-semibold">Cargando detalle del nivel...</p>
+            </div>
+        </div>
+
+        <!-- ERROR STATE -->
+        <div id="errorState" class="hidden bg-red-900/20 border border-red-800 rounded-lg p-6 mb-6">
+            <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-red-500 text-3xl">error</span>
+                <div class="flex-1">
+                    <h3 class="font-bold text-red-300 mb-2">Error al cargar nivel</h3>
+                    <p class="text-red-400 text-sm" id="errorMessage"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div id="mainContent" class="hidden">
+            <!-- Header -->
+            <header class="mb-10">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div class="flex items-center gap-4">
+                        <a class="w-12 h-12 flex items-center justify-center bg-white/5 hover:bg-primary transition-colors border border-white/10 cursor-pointer" 
+                           onclick="window.location.href='index.html'">
+                            <span class="material-symbols-outlined text-white">arrow_back</span>
+                        </a>
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-primary mb-1">Detalle del Nivel</p>
+                            <h1 class="font-display text-4xl md:text-5xl font-black uppercase italic tracking-tighter leading-none" id="nivelTitulo">
+                                CARGANDO...
+                            </h1>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="bg-primary text-white font-display px-6 py-2 italic font-bold skew-x-[-12deg] flex items-center gap-2" id="estadoBadge">
+                            ESTADO: <span class="uppercase" id="estadoTexto">...</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Barra de progreso -->
+                <div class="mt-12 bg-zinc-900/40 p-8 border border-white/10 neon-border">
+                    <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-6">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Progreso General del Nivel</span>
+                            <div class="flex items-baseline gap-2">
+                                <span class="font-display text-7xl font-bold italic tracking-tighter">
+                                    <span id="porcentajeNivel">0</span><span class="text-primary text-4xl">%</span>
+                                </span>
+                                <span class="text-xs font-bold uppercase text-gray-500 mb-2" id="contadorHabilidades">0 de 0 Habilidades</span>
+                            </div>
+                        </div>
+                        <div class="text-right flex flex-col items-end">
+                            <div class="flex gap-4 mb-4">
+                                <div class="text-center px-4 border-r border-white/10">
+                                    <p class="text-[10px] text-gray-400 uppercase font-bold">Promedio</p>
+                                    <p class="font-display text-2xl font-bold text-primary" id="promedioEvaluaciones">0.0</p>
+                                </div>
+                                <div class="text-center px-4">
+                                    <p class="text-[10px] text-gray-400 uppercase font-bold">Evaluaciones</p>
+                                    <p class="font-display text-2xl font-bold" id="totalEvaluaciones">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative h-4 w-full bg-secondary overflow-hidden border border-white/5">
+                        <div class="absolute top-0 left-0 h-full bg-primary shadow-[0_0_10px_#E21B23] transition-all duration-1000" style="width: 0%" id="barraProgreso"></div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Grid Principal -->
+            <div class="grid lg:grid-cols-12 gap-10">
+                <!-- Columna Izquierda -->
+                <div class="lg:col-span-8 space-y-10">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- Completadas -->
+                        <section>
+                            <h3 class="font-display text-xl font-bold uppercase italic tracking-wider mb-6 flex items-center justify-between">
+                                <span class="flex items-center gap-2">
+                                    <span class="w-2 h-6 bg-green-500"></span> Completadas
+                                </span>
+                                <span class="text-xs font-body normal-case font-normal text-gray-400" id="contadorCompletadas">0 items</span>
+                            </h3>
+                            <div class="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar" id="habilidadesCompletadasContainer">
+                                <!-- Se llenará dinámicamente -->
+                            </div>
+                        </section>
+
+                        <!-- Pendientes -->
+                        <section>
+                            <h3 class="font-display text-xl font-bold uppercase italic tracking-wider mb-6 flex items-center justify-between">
+                                <span class="flex items-center gap-2">
+                                    <span class="w-2 h-6 bg-primary"></span> Pendientes
+                                </span>
+                                <span class="text-xs font-body normal-case font-normal text-gray-400" id="contadorPendientes">0 items</span>
+                            </h3>
+                            <div class="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar" id="habilidadesPendientesContainer">
+                                <!-- Se llenará dinámicamente -->
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Panel de Feedback -->
+                    <section class="bg-secondary/50 border border-white/10 p-8 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full"></div>
+                        <h3 class="font-display text-2xl font-bold uppercase italic tracking-tighter mb-8 border-b border-primary/20 pb-4">
+                            PANEL DE <span class="text-primary">FEEDBACK</span>
+                        </h3>
+                        <div class="space-y-6" id="feedbackContainer">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Columna Derecha -->
+                <div class="lg:col-span-4 space-y-8">
+                    <!-- 🔥 GRÁFICA DE RENDIMIENTO -->
+                    <div class="bg-zinc-900/60 p-6 border border-white/5">
+                        <h4 class="font-display text-lg font-bold uppercase italic tracking-wider mb-6 border-b border-primary/40 pb-2 flex justify-between items-center">
+                            <span class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">bar_chart</span>
+                                RENDIMIENTO
+                            </span>
+                        </h4>
+                        <div class="h-[400px]" id="ultimasEvaluacionesContainer">
+                            <!-- Se llenará dinámicamente con gráfica de barras -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="ml-20 lg:ml-72 p-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-medium">
+        <p>© 2026 Titanes Evolution - Gestión de Rendimiento Deportivo.</p>
+        <div class="flex items-center gap-6">
+            <span class="flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_5px_#22c55e]"></span> 
+                Modo Análisis Detallado
+            </span>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../api.js"></script>
+    <script src="detalle-nivel.js"></script>
+</body>
+</html>

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Sistema de gestión deportiva Titanes Evolution",
   "scripts": {
-    "start": "serve -s . -l 80"
+    "start": "http-server . -p 8080 -c-1"
   },
   "keywords": [
     "deportes",
@@ -13,7 +13,7 @@
   ],
   "author": "Titanes Evolution",
   "license": "MIT",
-  "dependencies": {
-    "serve": "^14.2.0"
+  "devDependencies": {
+    "http-server": "^14.1.1"
   }
 }

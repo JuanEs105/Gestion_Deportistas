@@ -13,7 +13,7 @@
     --gray-800: #1F2937;
 }
 
-/* Body */
+/* ✅✅✅ Body - CON SCROLL FUNCIONAL */
 .login-body {
     font-family: 'Montserrat', sans-serif;
     color: white;
@@ -23,7 +23,9 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden; /* ✅ Solo ocultar scroll horizontal */
+    overflow-y: auto;   /* ✅ PERMITIR scroll vertical */
+    padding: 2rem 0;    /* ✅ Padding arriba y abajo para que no se corte */
 }
 
 /* Background Pattern */
@@ -516,8 +518,12 @@
     animation: fadeIn 0.3s ease;
 }
 
-/* Responsive */
+/* ✅✅✅ Responsive - MEJORADO CON SCROLL */
 @media (max-width: 768px) {
+    .login-body {
+        padding: 1rem 0; /* ✅ Menos padding en móvil */
+    }
+    
     .role-options {
         grid-template-columns: 1fr;
         gap: 0.75rem;
@@ -529,8 +535,14 @@
 }
 
 @media (max-width: 640px) {
+    .login-body {
+        padding: 1rem 0; /* ✅ Padding reducido en móviles */
+        align-items: flex-start; /* ✅ Alinear arriba en móviles */
+    }
+    
     .login-container {
         padding: 1rem;
+        margin-top: 4rem; /* ✅ Espacio para el botón de volver */
     }
     
     .login-card {
@@ -556,7 +568,51 @@
         align-items: flex-start;
         gap: 1rem;
     }
+    
+    /* ✅ Botón de volver más pequeño en móvil */
+    .btn-back-login {
+        top: 1rem;
+        left: 1rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+    }
 }
+
+/* ✅✅✅ Pantallas muy pequeñas (altura < 700px) */
+@media (max-height: 700px) {
+    .login-body {
+        align-items: flex-start; /* ✅ Forzar scroll desde arriba */
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    
+    .login-container {
+        margin-top: 4rem;
+        margin-bottom: 2rem;
+    }
+    
+    .logo-header {
+        margin-bottom: 1rem;
+    }
+    
+    .logo-circle {
+        width: 4rem;
+        height: 4rem;
+    }
+    
+    .login-card {
+        padding: 1.5rem;
+    }
+    
+    .login-header {
+        margin-bottom: 1rem;
+    }
+    
+    .login-title {
+        font-size: 1.75rem;
+    }
+}
+
 /* ==========================================
    ESTILOS ESPECÍFICOS PARA LOGIN DINÁMICO
    ========================================== */

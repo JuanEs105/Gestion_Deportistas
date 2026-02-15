@@ -297,18 +297,19 @@ async function handleCodeSubmit(event) {
 // ✅ FUNCIÓN REAL para verificar código en el backend
 async function verificarCodigoRegistro(email, code) {
     try {
-        console.log('📤 Enviando verificación a /verificar-codigo-registro');
-
-        const response = await fetch('https://gestiondeportistas-production.up.railway.app/api/auth/verificar-codigo-registro', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email: email,
-                code: code
-            })
-        });
+        const response = await fetch(
+            'https://gestiondeportistas-production.up.railway.app/api/auth/verificar-codigo-registro',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    code: code
+                })
+            }
+        );
 
         const data = await response.json();
         console.log('📥 Respuesta de verificación:', data);
@@ -445,15 +446,18 @@ async function handleResendCode() {
 // ✅ FUNCIÓN REAL para reenviar código
 async function reenviarCodigoActivacion(email) {
     try {
-        const response = await fetch('https://gestiondeportistas-production.up.railway.app/api/auth/solicitar-codigo-registro', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email: email
-            })
-        });
+        const response = await fetch(
+            'https://gestiondeportistas-production.up.railway.app/api/auth/solicitar-codigo-registro',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email
+                })
+            }
+        );
 
         const data = await response.json();
 

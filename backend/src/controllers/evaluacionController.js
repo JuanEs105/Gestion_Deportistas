@@ -26,7 +26,7 @@ class EvaluacionController {
       if (puntuacion < 1 || puntuacion > 10) {
         console.log('❌ Validación fallida: Puntuación fuera de rango:', puntuacion);
         return res.status(400).json({
-          error: 'La puntuación debe estar entre 1 y 10'
+          error: 'La puntuación debe estar entre 1 y 5'
         });
       }
 

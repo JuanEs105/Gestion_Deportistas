@@ -3,11 +3,15 @@
 // ==========================================
 
 // Configuración
+const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:5000'
+    : 'https://gestiondeportistas-production.up.railway.app';
+
 const CONFIG = {
-    API_URL: 'https://gestiondeportistas-production.up.railway.app/api/auth/forgot-password',
-    RESEND_URL: 'https://gestiondeportistas-production.up.railway.app/api/auth/resend-code',
-    VERIFY_URL: 'https://gestiondeportistas-production.up.railway.app/api/auth/verify-code',
-    RESET_PASSWORD_URL: 'https://gestiondeportistas-production.up.railway.app/api/auth/reset-password'
+    API_URL: `${API_BASE_URL}/api/auth/forgot-password`,
+    RESEND_URL: `${API_BASE_URL}/api/auth/resend-code`,
+    VERIFY_URL: `${API_BASE_URL}/api/auth/verify-code`,
+    RESET_PASSWORD_URL: `${API_BASE_URL}/api/auth/reset-password`
 };
 
 document.addEventListener('DOMContentLoaded', function () {

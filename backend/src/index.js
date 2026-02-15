@@ -9,7 +9,7 @@ dotenv.config();
 const { connectDB } = require('./config/database');
 
 const app = express();
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 5000;
 
 // ====================
 // MIDDLEWARE GLO
@@ -26,21 +26,21 @@ app.use(helmet({
 app.use(cors({
   origin: (origin, callback) => {
     // Lista de orígenes permitidos
-    const allowedOrigins = [
-      // Desarrollo local
-      'http://localhost:8080',
-      'http://127.0.0.1:8080',
-      'http://localhost:3000',
-      'http://127.0.0.1:3000',
-      'http://localhost:5173',
-      'http://localhost:5500',
+   const allowedOrigins = [
+  // Desarrollo local
+  'http://localhost:8080',
+  'http://127.0.0.1:8080',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://localhost:5173',
+  'http://localhost:5500',
 
-      // ✅ Seenode (Frontend desplegado ACTUAL)
-      'https://web-k0bmgijdoire.up-de-fra1-k8s-1.apps.run-on-seenode.com',
+  // ✅ VERCEL (AGREGAR AQUÍ)
+  'https://gestion-deportistas-sandy.vercel.app',
 
-      // Railway (el propio backend)
-      'https://gestiondeportistas-production.up.railway.app'
-    ];
+  // Railway local
+  'http://localhost:5000'
+];
 
 
     // Permitir requests sin origin (Postman, curl, apps móviles)
@@ -338,7 +338,7 @@ const initializeServer = async () => {
       console.log('\n💡 PARA PROBAR PERFIL ENTRENADOR:');
       console.log('   1. Inicia sesión como entrenador');
       console.log('   2. Ve a la consola del navegador (F12)');
-      console.log('   3. Ejecuta: fetch("https://gestiondeportistas-production.up.railway.app/api/entrenador/perfil", {');
+      console.log('   3. Ejecuta: fetch("http://localhost:5000/api/entrenador/perfil", {');
       console.log('        headers: { "Authorization": "Bearer TU_TOKEN_AQUÍ" }');
       console.log('      })');
       console.log('   4. Deberías ver los datos del entrenador');

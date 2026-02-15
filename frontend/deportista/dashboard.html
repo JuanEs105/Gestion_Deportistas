@@ -8,6 +8,9 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
     
+    <!-- Chart.js para gráficas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -56,7 +59,7 @@
             </div>
             
             <!-- Perfil del Deportista -->
-            <div class="px-6 mb-6" onclick="window.location.href='perfil/perfil.html'" style="cursor: default;">
+            <div class="px-6 mb-6" onclick="window.location.href='perfil/perfil.html'" style="cursor: pointer;">
                 <button class="flex items-center gap-3 w-full p-2 rounded-xl hover:bg-white/5 transition-colors text-left group">
                     <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary" id="profileAvatarContainer">
                         <div class="w-full h-full bg-primary flex items-center justify-center">
@@ -182,16 +185,17 @@
             <div class="grid lg:grid-cols-12 gap-10">
                 <!-- Columna Izquierda -->
                 <div class="lg:col-span-8 space-y-10">
-                    <!-- Acceso Rápido -->
+                    <!-- Acceso Rápido - MODIFICADO: Cambiar Habilidades por Calendario -->
                     <section>
                         <h3 class="font-display text-xl font-bold uppercase italic tracking-wider mb-6 flex items-center gap-2">
                             <span class="w-2 h-6 bg-primary"></span>
                             ACCESO RÁPIDO
                         </h3>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <a href="habilidades/index.html" class="bg-secondary text-white p-6 rounded-lg hover:bg-primary transition-all flex flex-col items-center justify-center gap-4 group text-center border-b-4 border-primary">
-                                <span class="material-symbols-outlined text-4xl group-hover:scale-110 transition-transform">sports_kabaddi</span>
-                                <span class="font-display font-bold uppercase tracking-tight text-lg">Mis Habilidades</span>
+                            <!-- ✅ CAMBIADO: Era "Mis Habilidades", ahora es "Calendario" -->
+                            <a href="calendario/index.html" class="bg-secondary text-white p-6 rounded-lg hover:bg-primary transition-all flex flex-col items-center justify-center gap-4 group text-center border-b-4 border-primary">
+                                <span class="material-symbols-outlined text-4xl group-hover:scale-110 transition-transform">calendar_month</span>
+                                <span class="font-display font-bold uppercase tracking-tight text-lg">Mi Calendario</span>
                             </a>
                             <a href="mis-evaluaciones/index.html" class="bg-white dark:bg-zinc-900 p-6 rounded-lg hover:border-primary border-2 border-transparent transition-all flex flex-col items-center justify-center gap-4 text-center shadow-sm">
                                 <span class="material-symbols-outlined text-4xl text-primary">assignment</span>
@@ -204,20 +208,78 @@
                         </div>
                     </section>
 
-                    <!-- Últimas Evaluaciones -->
+                    <!-- ✅ NUEVO: Análisis de Evaluaciones -->
                     <section>
                         <div class="flex items-center justify-between mb-6">
                             <h3 class="font-display text-xl font-bold uppercase italic tracking-wider flex items-center gap-2">
                                 <span class="w-2 h-6 bg-secondary dark:bg-white"></span>
-                                ÚLTIMAS EVALUACIONES
+                                ANÁLISIS DE EVALUACIONES
                             </h3>
                             <a href="mis-evaluaciones/index.html" class="text-primary hover:underline text-sm font-bold uppercase">Ver todas →</a>
                         </div>
-                        <div class="space-y-4" id="ultimasEvaluaciones">
-                            <!-- Se llenará dinámicamente -->
-                            <div class="text-center py-8 text-gray-400">
-                                <span class="material-symbols-outlined text-5xl mb-2">assignment</span>
-                                <p>Cargando evaluaciones...</p>
+
+                        <!-- Tabs de Análisis -->
+                        <div class="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-gray-200 dark:border-white/5 overflow-hidden">
+                            <!-- Tabs Header -->
+                            <div class="flex border-b border-gray-200 dark:border-white/10">
+                                <button onclick="cambiarTabAnalisis('mejores')" 
+                                        id="tabMejores" 
+                                        class="flex-1 px-6 py-4 font-semibold text-sm uppercase tracking-wider transition-all border-b-2 border-primary text-primary bg-primary/5">
+                                    <span class="material-symbols-outlined text-lg mr-2 align-middle">trending_up</span>
+                                    Mejores
+                                </button>
+                                <button onclick="cambiarTabAnalisis('mejorar')" 
+                                        id="tabMejorar" 
+                                        class="flex-1 px-6 py-4 font-semibold text-sm uppercase tracking-wider transition-all border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                                    <span class="material-symbols-outlined text-lg mr-2 align-middle">warning</span>
+                                    Por Mejorar
+                                </button>
+                                <button onclick="cambiarTabAnalisis('recientes')" 
+                                        id="tabRecientes" 
+                                        class="flex-1 px-6 py-4 font-semibold text-sm uppercase tracking-wider transition-all border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                                    <span class="material-symbols-outlined text-lg mr-2 align-middle">schedule</span>
+                                    Recientes
+                                </button>
+                            </div>
+
+                            <!-- Contenido de Tabs -->
+                            <div class="p-6">
+                                <!-- Tab: Mejores Evaluaciones -->
+                                <div id="contenidoMejores" class="space-y-4">
+                                    <div class="text-center py-8 text-gray-400">
+                                        <span class="material-symbols-outlined text-5xl mb-2">grade</span>
+                                        <p>Cargando mejores evaluaciones...</p>
+                                    </div>
+                                </div>
+
+                                <!-- Tab: Por Mejorar -->
+                                <div id="contenidoMejorar" class="hidden space-y-4">
+                                    <div class="text-center py-8 text-gray-400">
+                                        <span class="material-symbols-outlined text-5xl mb-2">trending_down</span>
+                                        <p>Cargando evaluaciones por mejorar...</p>
+                                    </div>
+                                </div>
+
+                                <!-- Tab: Recientes -->
+                                <div id="contenidoRecientes" class="hidden space-y-4">
+                                    <div class="text-center py-8 text-gray-400">
+                                        <span class="material-symbols-outlined text-5xl mb-2">history</span>
+                                        <p>Cargando evaluaciones recientes...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ✅ NUEVO: Gráfico de Evolución -->
+                    <section>
+                        <h3 class="font-display text-xl font-bold uppercase italic tracking-wider mb-6 flex items-center gap-2">
+                            <span class="w-2 h-6 bg-primary"></span>
+                            EVOLUCIÓN DE RENDIMIENTO
+                        </h3>
+                        <div class="bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-white/5">
+                            <div class="h-80">
+                                <canvas id="chartEvolucion"></canvas>
                             </div>
                         </div>
                     </section>
@@ -296,7 +358,7 @@
     </button>
 
     <!-- Scripts -->
-    <script src="api.js?v=20260207-001"></script>
-    <script src="dashboard.js"></script>
+    <script src="api.js?v=20260208-001"></script>
+    <script src="dashboard.js?v=20260208-001"></script>
 </body>
 </html>

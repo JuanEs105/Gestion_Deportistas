@@ -23,8 +23,7 @@
     <header class="registro-header">
         <div class="logo-container">
             <div class="logo-circle">
-                <img src="../assets/images/logo titanes.jpg"
-                    alt="Logo Titanes Evolution" class="logo-img">
+                <img src="../assets/images/logo titanes.jpg" alt="Logo Titanes Evolution" class="logo-img">
             </div>
             <span class="logo-text">Titanes<span class="text-primary">Evolution</span></span>
         </div>
@@ -112,11 +111,12 @@
                             <div class="error-message" id="errorEmail"></div>
                         </div>
 
-                        <!-- NUEVO: Contraseña -->
+                        <!-- Contraseña -->
                         <div class="form-group">
                             <label for="password" class="field-required">Contraseña</label>
                             <div class="password-input-wrapper">
-                                <input type="password" id="password" name="password" placeholder="INGRESA TU CONTRASEÑA" required minlength="6">
+                                <input type="password" id="password" name="password" placeholder="INGRESA TU CONTRASEÑA"
+                                    required minlength="6">
                                 <button type="button" class="toggle-password" id="togglePassword">
                                     <span class="material-symbols-outlined">visibility</span>
                                 </button>
@@ -125,11 +125,12 @@
                             <div class="password-hint">Mínimo 6 caracteres</div>
                         </div>
 
-                        <!-- NUEVO: Confirmar Contraseña -->
+                        <!-- Confirmar Contraseña -->
                         <div class="form-group">
                             <label for="confirm_password" class="field-required">Confirmar Contraseña</label>
                             <div class="password-input-wrapper">
-                                <input type="password" id="confirm_password" name="confirm_password" placeholder="CONFIRMA TU CONTRASEÑA" required minlength="6">
+                                <input type="password" id="confirm_password" name="confirm_password"
+                                    placeholder="CONFIRMA TU CONTRASEÑA" required minlength="6">
                                 <button type="button" class="toggle-password" id="toggleConfirmPassword">
                                     <span class="material-symbols-outlined">visibility</span>
                                 </button>
@@ -213,28 +214,31 @@
                         </div>
                     </div>
 
-                    <!-- Archivos -->
+                    <!-- ✅ SECCIÓN DE ARCHIVOS CORREGIDA -->
                     <div class="archivos-grid">
+                        <!-- DOCUMENTO PDF -->
                         <div class="archivo-group">
                             <label class="field-required">PDF Documento Identidad</label>
-                            <div class="upload-area" id="uploadDocumento">
+                            <label for="documento" class="upload-area"
+                                style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 120px;">
                                 <span class="upload-text">Subir PDF</span>
                                 <span class="material-symbols-outlined upload-icon">upload_file</span>
-                                <input type="file" id="documento" name="documento" accept=".pdf" class="hidden"
-                                    required>
-                                <div class="file-info" id="fileInfoDocumento"></div>
-                            </div>
+                            </label>
+                            <input type="file" id="documento" name="documento" accept=".pdf" style="display: none;">
+                            <div class="file-info" id="fileInfoDocumento" style="margin-top: 10px;"></div>
                             <div class="error-message" id="errorDocumento"></div>
                         </div>
 
+                        <!-- ✅ FOTO - AHORA OBLIGATORIA -->
                         <div class="archivo-group">
-                            <label class="field-optional">Fotografía Deportista</label>
-                            <div class="upload-area" id="uploadFoto">
+                            <label class="field-required">Fotografía Deportista</label>
+                            <label for="foto" class="upload-area"
+                                style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 120px;">
                                 <span class="upload-text">Subir Foto (JPG/PNG)</span>
                                 <span class="material-symbols-outlined upload-icon">photo_camera</span>
-                                <input type="file" id="foto" name="foto" accept=".jpg,.jpeg,.png" class="hidden">
-                                <div class="file-info" id="fileInfoFoto"></div>
-                            </div>
+                            </label>
+                            <input type="file" id="foto" name="foto" accept=".jpg,.jpeg,.png" style="display: none;">
+                            <div class="file-info" id="fileInfoFoto" style="margin-top: 10px;"></div>
                             <div class="preview-container" id="previewFoto"></div>
                             <div class="error-message" id="errorFoto"></div>
                         </div>
@@ -307,14 +311,13 @@
         </div>
     </footer>
 
-    <!-- Modal de Términos y Condiciones (OCULTO POR DEFECTO) -->
+    <!-- MODAL DE TÉRMINOS Y CONDICIONES ACTUALIZADO - 3 DE FEBRERO 2026 -->
     <div id="terminosModal" class="modal-terminos-overlay hidden">
         <div class="modal-terminos-content">
             <div class="modal-terminos-header">
                 <div class="logo-container">
                     <div class="logo-circle">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcw5Zw_VZ5QoFPk9QYIT89zW1mZesKOh5HIHLL41Mtd6HKuExl984TKKSHxE2FqiuFkaUeaMHfO-dutvPmOFiuT4xa0bJGzfv5ohyPe9Vgl7BroW_NqKwKJ-OCWoB0jQxk8nvXMo_BVwY1WqezyMIKcth1GPpIosmGURpSBe3Eac8HR9iSTJdTqRgnz3CTJCIFlrnxyl7afGX8iitVgkEYrseFRx9EIjWZuQGeoIL71DWubp-u6atx_t8w79rEnwBRufn6xLryzNq8"
-                            alt="Logo Titanes Evolution">
+                        <img src="../assets/images/logo titanes.jpg" alt="Logo Titanes Evolution">
                     </div>
                     <h2>Titanes<span class="text-primary">Evolution</span></h2>
                 </div>
@@ -325,118 +328,428 @@
 
             <div class="modal-terminos-body">
                 <div class="terminos-header">
-                    <h1>TÉRMINOS Y <span class="text-primary">CONDICIONES</span></h1>
-                    <p>Contrato de Registro Titanes Evolution</p>
+                    <h1>POLÍTICAS, TÉRMINOS Y <span class="text-primary">CONDICIONES</span></h1>
+                    <p>Club Deportivo Titanes Cheer Evolution</p>
+                    <p class="fecha-revision">Documento revisado: 3 de febrero de 2026</p>
                 </div>
 
                 <div class="terminos-content custom-scrollbar">
-                    <!-- Contenido completo de los términos -->
-                    <section class="seccion-terminos">
-                        <h3>1. REGLAMENTO INTERNO</h3>
-                        <p>Como miembro de Titanes Evolution, el atleta se compromete a mantener una conducta deportiva
-                            ejemplar en todo momento. El respeto hacia los entrenadores, compañeros y personal
-                            administrativo es obligatorio. Cualquier acto de indisciplina, bullying o comportamiento que
-                            manche la imagen del club será motivo de sanción o expulsión inmediata.</p>
+                    <!-- Introducción -->
+                    <section class="seccion-terminos intro">
+                        <p><strong>Bienvenidos al Club Deportivo Titanes Cheer Evolution.</strong> El presente documento
+                            establece las políticas, términos y condiciones que rigen la participación de los
+                            deportistas y sus familias en las actividades del Club. Su finalidad es garantizar el
+                            adecuado funcionamiento institucional, la seguridad de los deportistas y el desarrollo
+                            integral de los procesos deportivos. La aceptación de este documento implica el compromiso
+                            de cumplir las disposiciones aquí establecidas.</p>
                     </section>
 
+                    <!-- 1. INSCRIPCIÓN Y AFILIACIÓN -->
                     <section class="seccion-terminos">
-                        <h3>2. COMPROMISO Y ASISTENCIA</h3>
-                        <p>La asistencia a los entrenamientos es fundamental para el desarrollo del equipo. El atleta
-                            debe cumplir con los horarios establecidos y notificar cualquier ausencia con antelación. En
-                            temporadas de competencia, la asistencia al 100% de las prácticas es requisito indispensable
-                            para la participación.</p>
-                    </section>
+                        <h3>1. INSCRIPCIÓN Y AFILIACIÓN</h3>
 
-                    <section class="seccion-terminos">
-                        <h3>3. RESPONSABILIDAD MÉDICA</h3>
-                        <p>El representante legal declara que el atleta se encuentra en condiciones físicas óptimas para
-                            realizar actividad deportiva de alto impacto. Titanes Evolution no se hace responsable por
-                            lesiones preexistentes o condiciones de salud no informadas oportunamente en este registro.
-                        </p>
-                    </section>
+                        <h4>1.1. Proceso de Inscripción</h4>
+                        <p>Todos los deportistas deberán completar el formulario de inscripción y proporcionar copia de
+                            su documento de identidad. En el caso de menores de edad, la inscripción deberá ser
+                            realizada por el padre, madre o representante legal.</p>
+                        <p>Cada deportista mayor de edad, y en el caso de menores de edad su acudiente, deberá firmar al
+                            momento de la inscripción los documentos correspondientes a la exoneración de
+                            responsabilidad, la autorización para el tratamiento de datos personales y la aceptación de
+                            las políticas internas del Club.</p>
+                        <div class="highlight-box">
+                            <p><strong>Por política institucional del Club:</strong> La primera inscripción no tendrá
+                                costo. En caso de que un deportista se retire y posteriormente solicite una segunda
+                                inscripción, esta tendrá un costo establecido y comunicado dentro de la estructura de
+                                tarifas vigente para cada año.</p>
+                        </div>
 
-                    <section class="seccion-terminos">
-                        <h3>4. DERECHOS DE IMAGEN</h3>
-                        <p>Al registrarse, se autoriza el uso de la imagen (fotografías y videos) del atleta con fines
-                            promocionales, educativos e informativos relacionados exclusivamente con las actividades del
-                            club Titanes Evolution en redes sociales y medios de comunicación.</p>
-                    </section>
+                        <h4>1.2. Renovación Anual y Actualización de Datos</h4>
+                        <p>La afiliación al Club es renovable anualmente. Como requisito obligatorio, todos los
+                            deportistas deberán realizar una actualización anual de datos antes del inicio de la
+                            temporada deportiva y/o competitiva de cada año.</p>
+                        <p>Esta actualización podrá incluir: cambios en documentos de identidad, información de
+                            contacto, afiliación a EPS o datos del representante legal.</p>
+                        <p><strong>Requisito para renovación:</strong> El deportista deberá tramitar y presentar el
+                            respectivo paz y salvo, acreditando que no existen obligaciones económicas pendientes con el
+                            Club.</p>
 
-                    <section class="seccion-terminos">
-                        <h3>5. POLÍTICA DE PAGOS</h3>
-                        <p>Las mensualidades y costos de inscripción deben cancelarse dentro de los primeros cinco (5)
-                            días de cada mes. El incumplimiento en los pagos puede generar la suspensión temporal del
-                            atleta de las prácticas regulares.</p>
-                    </section>
+                        <h4>1.3. Estado de Inscripción</h4>
+                        <p>El estado de "deportista inscrito" se perderá cuando se presenten <strong>dos (2) meses
+                                consecutivos de inasistencia sin justificación válida</strong> y debidamente informada
+                            al Club.</p>
+                        <p><strong>Justificaciones válidas:</strong> Situaciones de lesión, enfermedad u otras
+                            circunstancias de fuerza mayor, siempre que sean comunicadas oportunamente y aceptadas por
+                            el Club.</p>
+                        <p><strong>NO se considerarán justificaciones válidas:</strong> Falta de recursos económicos,
+                            ausencia sin previo aviso, desinterés en la continuidad del proceso deportivo o cualquier
+                            otra causa no informada y aprobada previamente.</p>
 
-                    <section class="seccion-terminos">
-                        <h3>6. LÍMITE DE INASISTENCIAS</h3>
-                        <p>Se permitirá un máximo de dos inasistencias no justificadas por semestre:</p>
+                        <h4>1.4. Derechos y Deberes del Deportista</h4>
                         <ul>
-                            <li>3ra inasistencia sin justificación: El deportista será transferido a la línea recreativa
-                                del club.</li>
-                            <li>Para reincorporarse a un equipo de competencia, el deportista deberá presentar una
-                                solicitud formal que será evaluada por la comisión técnica del club.</li>
-                            <li>En caso de ser aceptado nuevamente, se deberá firmar un compromiso de asistencia.</li>
+                            <li><strong>Derechos:</strong> Participar en los entrenamientos y actividades organizadas
+                                por el Club, de acuerdo con la línea deportiva a la que pertenezca.</li>
+                            <li><strong>Deberes:</strong> Cumplir con las normas, horarios, reglamentos y políticas
+                                internas del Club.</li>
+                        </ul>
+
+                        <h4>1.5. Retiro Voluntario del Deportista</h4>
+                        <p>El retiro voluntario deberá ser notificado de manera <strong>formal, clara y expresa</strong>
+                            al Club:</p>
+                        <ul>
+                            <li>Menores de edad: Notificación por el padre, madre o representante legal</li>
+                            <li>Mayores de edad: Notificación directa del deportista</li>
+                        </ul>
+                        <div class="warning-box">
+                            <p><strong>⚠️ IMPORTANTE:</strong> La notificación deberá efectuarse por escrito a través de
+                                los canales oficiales del Club (correo electrónico institucional o medio autorizado por
+                                la administración).</p>
+                            <p>El retiro solo se considerará efectivo a partir de la fecha en que el Club reciba y
+                                confirme dicha notificación.</p>
+                            <p><strong>Mientras no exista notificación formal de retiro</strong>, el deportista
+                                continuará siendo considerado activo, y todas las obligaciones económicas,
+                                administrativas y deportivas, incluyendo el pago de mensualidades, continuarán
+                                generándose y siendo exigibles.</p>
+                        </div>
+                    </section>
+
+                    <!-- 2. CUOTAS Y PAGOS -->
+                    <section class="seccion-terminos">
+                        <h3>2. CUOTAS Y PAGOS</h3>
+
+                        <h4>2.1. Estructura de Pagos</h4>
+                        <p>Las tarifas del Club serán definidas y comunicadas anualmente en el mes de enero, momento en
+                            el cual inicia el proceso administrativo del año deportivo.</p>
+                        <p>El Club podrá realizar ajustes anuales a las tarifas, los cuales serán notificados
+                            oportunamente y entrarán en vigencia a partir del mes de febrero de cada año.</p>
+
+                        <h4>2.2. Políticas de Pagos</h4>
+                        <p>Las mensualidades deberán ser canceladas dentro de los <strong>primeros diez (10) días
+                                calendario</strong> de cada mes.</p>
+                        <div class="highlight-box">
+                            <p><strong>En caso de retraso:</strong></p>
+                            <ul>
+                                <li>1 mes de mora: El Club notificará al deportista o acudientes</li>
+                                <li>Si transcurridos 10 días del segundo mes de mora no se ha regularizado: El
+                                    deportista no podrá continuar asistiendo a entrenamientos</li>
+                            </ul>
+                        </div>
+
+                        <h4>2.3. No Ajustes en la Mensualidad por Inasistencia</h4>
+                        <div class="warning-box">
+                            <p><strong>El valor de la mensualidad corresponde al derecho de participación del
+                                    deportista</strong> en el programa deportivo del Club, incluyendo la planificación,
+                                organización, cupo asignado, acompañamiento técnico y estructura operativa del grupo.
+                            </p>
+                            <p><strong>NO se realizarán descuentos, devoluciones, compensaciones ni ajustes</strong> en
+                                el valor de la mensualidad por inasistencias parciales o totales durante el mes,
+                                independientemente de que estas se deban a viajes, compromisos personales, vacaciones,
+                                situaciones académicas u otras circunstancias ajenas al Club.</p>
+                            <p>La única forma de cesar la obligación de pago será mediante el <strong>retiro formal del
+                                    deportista</strong>, conforme a lo establecido en el numeral 1.5.</p>
+                        </div>
+
+                        <h4>2.4. Política de No Devoluciones</h4>
+                        <div class="warning-box">
+                            <p><strong>⚠️ NO SE REALIZARÁN DEVOLUCIONES DE NINGÚN TIPO</strong>, bajo ninguna
+                                circunstancia, una vez efectuado cualquier pago.</p>
+                            <p>Esta política aplica para pagos correspondientes a:</p>
+                            <ul>
+                                <li>Inscripciones</li>
+                                <li>Mensualidades</li>
+                                <li>Competencias</li>
+                                <li>Eventos</li>
+                                <li>Uniformes</li>
+                                <li>Trámites federativos</li>
+                                <li>Transporte</li>
+                                <li>Cualquier otro concepto asociado a la participación del deportista</li>
+                            </ul>
+                            <p>Los valores cancelados son destinados a la planificación, organización y ejecución de los
+                                programas deportivos, administrativos y competitivos del Club, por lo cual, una vez
+                                realizado el pago, <strong>no será posible efectuar reembolsos</strong>, incluso en
+                                casos de inasistencia, retiro voluntario, lesiones, decisiones personales, cambios de
+                                programación o no participación en competencias previamente informadas.</p>
+                        </div>
+
+                        <h4>2.5. Pagos de Transporte y Hospedaje</h4>
+                        <ul>
+                            <li><strong>Transporte terrestre:</strong> El costo se calculará según la cantidad de
+                                asistentes confirmados. Se realizará un apartado inicial para garantizar el cupo. Los
+                                valores presentados en reuniones son aproximados.</li>
+                            <li><strong>Transporte aéreo:</strong> Los tiquetes deben adquirirse en los horarios
+                                establecidos por el club para cumplir con el cronograma de la competencia.</li>
                         </ul>
                     </section>
 
+                    <!-- 3. NORMAS DE CONDUCTA -->
                     <section class="seccion-terminos">
-                        <h3>7. POLÍTICAS DE DEVOLUCIONES</h3>
-                        <div class="subseccion">
-                            <h4>7.1. Inscripciones y Afiliaciones:</h4>
-                            <p>No se realizarán devoluciones del valor pagado por inscripciones o afiliaciones al club
-                                bajo ninguna circunstancia.</p>
-                        </div>
-                        <div class="subseccion">
-                            <h4>7.2. Mensualidades:</h4>
-                            <p>No se reembolsarán pagos realizados por mensualidades, independientemente de la
-                                asistencia o participación del deportista.</p>
-                        </div>
-                        <div class="subseccion">
-                            <h4>7.3. Competencias:</h4>
-                            <p>Los pagos realizados por inscripciones a competencias no son reembolsables, salvo que la
-                                competencia sea cancelada por los organizadores.</p>
+                        <h3>3. NORMAS DE CONDUCTA</h3>
+
+                        <h4>3.1. Conducta de los Deportistas</h4>
+                        <ul>
+                            <li>Respetar a entrenadores, compañeros y personal administrativo</li>
+                            <li>Mantener conducta ética, deportiva y disciplinada dentro y fuera de las instalaciones
+                            </li>
+                            <li>Cumplir con el código de vestimenta del club durante entrenamientos y competencias</li>
+                        </ul>
+
+                        <h4>3.2. Conducta de los Padres y Tutores</h4>
+                        <ul>
+                            <li>Apoyar el desarrollo de los deportistas con actitudes positivas y constructivas</li>
+                            <li>Respetar las decisiones técnicas y administrativas del club</li>
+                            <li>Abstenerse de realizar comentarios negativos o conductas inapropiadas en eventos,
+                                entrenamientos o redes sociales</li>
+                        </ul>
+
+                        <h4>3.3. Sanción por Incumplimiento</h4>
+                        <p>Las violaciones a estas normas pueden llevar a amonestaciones, suspensión temporal o
+                            expulsión del club, dependiendo de la gravedad del caso.</p>
+                    </section>
+
+                    <!-- 4. SEGURIDAD Y SALUD -->
+                    <section class="seccion-terminos">
+                        <h3>4. SEGURIDAD Y SALUD</h3>
+
+                        <h4>4.1. Prevención de Lesiones</h4>
+                        <ul>
+                            <li>El club garantiza entrenamientos guiados por profesionales certificados para minimizar
+                                el riesgo de lesiones</li>
+                            <li>Los deportistas deben reportar inmediatamente cualquier lesión o malestar físico al
+                                entrenador</li>
+                        </ul>
+
+                        <h4>4.2. Cobertura Médica</h4>
+                        <ul>
+                            <li>Todos los deportistas deben contar con un seguro médico vigente que cubra accidentes
+                                deportivos</li>
+                            <li>En caso de emergencia, el club realizará los procedimientos necesarios para salvaguardar
+                                la salud del deportista, con costos asumidos por los padres o tutores</li>
+                        </ul>
+                    </section>
+
+                    <!-- 5. PARTICIPACIÓN EN COMPETENCIAS -->
+                    <section class="seccion-terminos">
+                        <h3>5. PARTICIPACIÓN EN COMPETENCIAS</h3>
+
+                        <h4>5.1. Acompañamiento de Menores</h4>
+                        <p>Los deportistas <strong>menores de 12 años</strong> deben estar acompañados por un padre o un
+                            adulto responsable en cada competencia.</p>
+
+                        <h4>5.2. Hospedaje</h4>
+                        <ul>
+                            <li><strong>Competencias en Boyacá, Bogotá o Cundinamarca cercanos a Duitama:</strong> Los
+                                deportistas pueden optar por hospedarse en un hotel diferente al ofrecido por el club si
+                                la competencia es de dos días</li>
+                            <li><strong>Competencias en otras localidades:</strong> El hospedaje será obligatorio en el
+                                hotel ofrecido por el club para garantizar la concentración y minimizar contratiempos
+                            </li>
+                            <li>En todos los casos, los menores de 12 años deben estar acompañados por un adulto
+                                responsable y no podrán quedarse solos en el hotel</li>
+                        </ul>
+
+                        <h4>5.3. Transporte</h4>
+                        <ul>
+                            <li><strong>Transporte terrestre:</strong> Las familias pueden optar por utilizar el
+                                transporte del club o gestionarlo por su cuenta</li>
+                            <li>En caso de transporte independiente, se debe cumplir estrictamente con los horarios
+                                establecidos</li>
+                            <li>Los tiquetes aéreos deben adquirirse en los horarios definidos por el club</li>
+                        </ul>
+
+                        <h4>5.4. Viáticos de Entrenadores</h4>
+                        <div class="highlight-box">
+                            <p>Los deportistas que viajen por cuenta propia deberán cubrir un valor correspondiente a
+                                los viáticos de los entrenadores, el cual será comunicado 30 días antes de cada
+                                competencia.</p>
+                            <p>Para los deportistas que utilicen el transporte y hospedaje del club, este valor estará
+                                incluido.</p>
                         </div>
                     </section>
 
+                    <!-- 6. NORMAS DE ASISTENCIA -->
                     <section class="seccion-terminos">
-                        <h3>8. AUTORIZACIÓN DE TRATAMIENTO DE DATOS</h3>
-                        <p>Declaro de manera libre, expresa, inequívoca e informada, que AUTORIZO al CLUB TITANES CHEER
-                            EVOLUTION para que realice la recolección, almacenamiento, uso, circulación, supresión, y en
-                            general, tratamiento de mis datos, de mi hijo(a) y/o acudido incluyendo datos sensibles
-                            (condiciones de salud física y mental, información médica, etc.).</p>
-                    </section>
+                        <h3>6. NORMAS DE ASISTENCIA A ENTRENAMIENTOS</h3>
 
-                    <section class="seccion-terminos">
-                        <h3>9. CANALES DE CONTACTO Y RECLAMOS</h3>
-                        <p>Mediante la firma del presente documento, manifiesto que reconozco y acepto que cualquier
-                            consulta o reclamación relacionada con el Tratamiento de mis datos personales podrá ser
-                            elevada por escrito ante el responsable del Tratamiento:</p>
-                        <div class="contacto-info">
-                            <p><strong>Correo Electrónico:</strong> titanesallstarscolombia@gmail.com</p>
-                            <p><strong>Teléfonos:</strong> 313-3864382 | 314-4624936</p>
+                        <h4>6.1. Asistencia Obligatoria</h4>
+                        <p>Todos los deportistas deberán asistir a los entrenamientos programados según la línea
+                            deportiva a la que pertenezcan. Las inasistencias deberán ser justificadas oportunamente.
+                        </p>
+
+                        <h4>6.2. Límite de Inasistencias (Equipos Competitivos)</h4>
+                        <div class="warning-box">
+                            <p><strong>Para deportistas en equipos de competencia:</strong></p>
+                            <p>Se permitirá un máximo de <strong>tres (3) inasistencias no justificadas por
+                                    semestre</strong>.</p>
+                            <p><strong>Ante una tercera inasistencia sin justificación:</strong> El deportista será
+                                transferido a la línea recreativa del Club.</p>
+                            <p><strong>Para reincorporarse a un equipo competitivo:</strong> Deberá presentar una
+                                solicitud formal que será evaluada por la comisión técnica y, en caso de ser aceptado,
+                                firmar un compromiso de asistencia.</p>
                         </div>
+
+                        <h4>6.3. Frecuencia Mínima de Entrenamiento</h4>
+                        <p>El Club establece que los procesos de formación deportiva se desarrollan bajo una
+                            <strong>frecuencia mínima de dos (2) entrenamientos semanales</strong>, condición necesaria
+                            para garantizar un aprendizaje adecuado, seguro y progresivo.</p>
+                        <div class="highlight-box">
+                            <p><strong>Excepción temporal:</strong> De manera excepcional, el Club podrá autorizar la
+                                asistencia a un (1) entrenamiento semanal, únicamente durante un período máximo de un
+                                (1) mes calendario, como etapa inicial de adaptación.</p>
+                            <p>Finalizado dicho período, el deportista deberá ajustarse a la frecuencia mínima de dos
+                                (2) entrenamientos por semana.</p>
+                        </div>
+
+                        <h4>6.4. Proyección Deportiva y Transición a Equipos de Competencia</h4>
+                        <p>El Club orienta sus programas a la formación deportiva con proyección competitiva. Los grupos
+                            de iniciación, con frecuencia de dos (2) entrenamientos semanales, tienen como objetivo
+                            principal la adquisición de habilidades necesarias para integrarse a los equipos de
+                            competencia del Club.</p>
+                        <p>Una vez el deportista alcance las condiciones técnicas requeridas, el Club informará sobre la
+                            posibilidad de su ingreso a un equipo competitivo, los compromisos asociados y la frecuencia
+                            de entrenamiento correspondiente: <strong>tres (3) entrenamientos semanales</strong>.</p>
                     </section>
 
+                    <!-- 10. MODIFICACIONES -->
+                    <section class="seccion-terminos">
+                        <h3>10. MODIFICACIONES A LAS POLÍTICAS</h3>
+                        <p>El Club Deportivo Titanes Cheer Evolution se reserva el derecho de modificar las presentes
+                            políticas, términos y condiciones cuando sea necesario, informando dichos cambios con una
+                            antelación mínima de treinta (30) días.</p>
+                    </section>
+
+                    <!-- Firma -->
                     <div class="firma-section">
-                        <p>El presente documento se firma en Duitama - Boyacá</p>
-                        <p class="fecha">Mes de enero de 2025</p>
+                        <p class="firma-lugar">Duitama - Boyacá, Colombia</p>
+                        <p class="fecha">Documento revisado: 3 de febrero de 2026</p>
                         <div class="firma-line"></div>
                         <p class="firma-nombre">LUDWING JAIR FONSECA MONROY</p>
                         <p class="firma-cargo">Representante Legal</p>
+                        <p class="firma-club">Club Deportivo Titanes Cheer Evolution</p>
+                    </div>
+
+                    <div class="contacto-final">
+                        <h4>CANALES DE CONTACTO</h4>
+                        <p><strong>📧 Email:</strong> titanescheerevolution.com</p>
+                        <p><strong>📱 Teléfonos:</strong> 3114443158</p>
                     </div>
                 </div>
 
                 <div class="terminos-footer">
                     <button class="btn-terminos-cerrar" id="cerrarTerminosBtn">
-                        Cerrar y Continuar
+                        He leído y acepto los términos y condiciones
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <style>
+        /* Estilos adicionales para el modal actualizado */
+        .fecha-revision {
+            font-size: 14px;
+            color: #9CA3AF;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        .seccion-terminos.intro {
+            background: linear-gradient(135deg, rgba(226, 27, 35, 0.05) 0%, rgba(139, 0, 0, 0.05) 100%);
+            border-left: 4px solid #E21B23;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .seccion-terminos h4 {
+            color: #E21B23;
+            font-size: 16px;
+            font-weight: 700;
+            margin: 20px 0 10px 0;
+            text-transform: uppercase;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(3, 105, 161, 0.1) 100%);
+            border-left: 4px solid #0ea5e9;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, rgba(226, 27, 35, 0.1) 0%, rgba(139, 0, 0, 0.1) 100%);
+            border-left: 4px solid #E21B23;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .warning-box p:first-child {
+            font-weight: 700;
+            color: #E21B23;
+        }
+
+        .firma-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid rgba(226, 27, 35, 0.2);
+            text-align: center;
+        }
+
+        .firma-lugar {
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 10px;
+        }
+
+        .firma-line {
+            width: 300px;
+            height: 2px;
+            background: #E21B23;
+            margin: 30px auto;
+        }
+
+        .firma-nombre {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1F2937;
+            margin: 10px 0 5px 0;
+            text-transform: uppercase;
+        }
+
+        .firma-cargo {
+            font-size: 14px;
+            color: #6B7280;
+            font-style: italic;
+        }
+
+        .firma-club {
+            font-size: 16px;
+            font-weight: 600;
+            color: #E21B23;
+            margin-top: 10px;
+        }
+
+        .contacto-final {
+            background: linear-gradient(135deg, #000000 0%, #1A1A1A 100%);
+            border: 2px solid #E21B23;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .contacto-final h4 {
+            color: #E21B23;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .contacto-final p {
+            color: #E5E7EB;
+            margin: 8px 0;
+            font-size: 15px;
+        }
+    </style>
     <!-- Scripts -->
     <script src="../shared/js/auth.js"></script>
     <script src="../shared/js/utils.js"></script>

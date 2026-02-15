@@ -8,13 +8,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Navbar scroll effect
     const navbar = document.querySelector('.navbar');
     
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-    });
+    if (navbar) {
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    }
 
     // Mobile menu toggle
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
@@ -30,6 +32,9 @@ document.addEventListener('DOMContentLoaded', function() {
         mobileMenu.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
                 mobileMenu.classList.add('hidden');
+                if (mobileMenuBtn) {
+                    mobileMenuBtn.classList.remove('active');
+                }
             });
         });
     }
@@ -45,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 const targetElement = document.querySelector(targetId);
                 if (targetElement) {
-                    const navbarHeight = navbar.offsetHeight;
+                    const navbarHeight = navbar ? navbar.offsetHeight : 0;
                     const targetPosition = targetElement.offsetTop - navbarHeight;
                     
                     window.scrollTo({
@@ -56,6 +61,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Cerrar menú móvil si está abierto
                     if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
                         mobileMenu.classList.add('hidden');
+                        if (mobileMenuBtn) {
+                            mobileMenuBtn.classList.remove('active');
+                        }
                     }
                 }
             }
@@ -65,12 +73,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Gallery images lazy loading
     const galleryImages = document.querySelectorAll('img[loading="lazy"]');
     
-    if ('IntersectionObserver' in window) {
+    if ('IntersectionObserver' in window && galleryImages.length > 0) {
         const imageObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const img = entry.target;
-                    img.src = img.dataset.src || img.src;
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                    }
                     img.classList.add('loaded');
                     observer.unobserve(img);
                 }
@@ -94,11 +104,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Counter animation for stats
+    // Counter animation for stats (ya está en el HTML inline, pero por si acaso)
     const counters = document.querySelectorAll('.counter');
     
     const startCounter = (counter) => {
         const target = +counter.getAttribute('data-target');
+        if (!target) return;
+        
         const increment = target / 100;
         let current = 0;
         
@@ -116,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // Iniciar contadores cuando son visibles
-    if (counters.length > 0) {
+    if (counters.length > 0 && 'IntersectionObserver' in window) {
         const counterObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -132,20 +144,10 @@ document.addEventListener('DOMContentLoaded', function() {
         counters.forEach(counter => counterObserver.observe(counter));
     }
 
-    // Parallax effect for hero section
-    window.addEventListener('scroll', function() {
-        const scrolled = window.pageYOffset;
-        const hero = document.querySelector('.hero-section');
-        
-        if (hero) {
-            const rate = scrolled * 0.3;
-            hero.style.transform = `translate3d(0, ${rate}px, 0)`;
-        }
-    });
-
     // Initialize Material Icons
-    if (document.querySelector('.material-symbols-outlined')) {
-        document.querySelectorAll('.material-symbols-outlined').forEach(icon => {
+    const materialIcons = document.querySelectorAll('.material-symbols-outlined');
+    if (materialIcons.length > 0) {
+        materialIcons.forEach(icon => {
             icon.style.fontVariationSettings = "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24";
         });
     }
@@ -153,24 +155,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // AOS (Animate On Scroll) simple
     const aosElements = document.querySelectorAll('.fade-in');
     
-    const aosObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
+    if (aosElements.length > 0 && 'IntersectionObserver' in window) {
+        const aosObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '50px'
         });
-    }, {
-        threshold: 0.1,
-        rootMargin: '50px'
-    });
 
-    aosElements.forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        aosObserver.observe(el);
-    });
+        aosElements.forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            aosObserver.observe(el);
+        });
+    }
 
     // Form validation (si hay formularios)
     const contactForm = document.getElementById('contactForm');
@@ -178,8 +182,9 @@ document.addEventListener('DOMContentLoaded', function() {
         contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const formData = new FormData(this);
             const submitBtn = this.querySelector('button[type="submit"]');
+            if (!submitBtn) return;
+            
             const originalText = submitBtn.textContent;
             
             // Simular envío
@@ -197,22 +202,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Fix for GIF performance
-    const heroGif = document.querySelector('img[src*="InicioGif"]');
-    if (heroGif) {
-        // Pausar GIF después de 3 segundos para mejor performance
-        setTimeout(() => {
-            try {
-                const gif = heroGif;
-                gif.src = gif.src; // Reiniciar el GIF
-            } catch(e) {
-                console.log('GIF optimizado');
-            }
-        }, 3000);
+    // Fix for video/GIF performance
+    const heroVideo = document.querySelector('video[autoplay]');
+    if (heroVideo) {
+        // Asegurar que el video se reproduce correctamente
+        heroVideo.play().catch(e => {
+            console.log('Video autoplay prevented:', e);
+        });
     }
+
+    console.log('✅ Scripts inicializados correctamente');
 });
 
-// Función para cambiar tema (opcional)
+// Función para cambiar tema (opcional - si decides implementarlo)
 function toggleTheme() {
     const html = document.documentElement;
     const currentTheme = html.classList.contains('dark') ? 'dark' : 'light';
@@ -231,4 +233,6 @@ function toggleTheme() {
 
 // Cargar tema guardado (opcional)
 const savedTheme = localStorage.getItem('theme') || 'dark';
-document.documentElement.classList.add(savedTheme);
+if (savedTheme === 'dark') {
+    document.documentElement.classList.add('dark');
+}

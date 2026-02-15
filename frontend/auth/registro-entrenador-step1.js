@@ -223,18 +223,20 @@ async function enviarCodigoActivacion(email) {
     try {
         console.log('📤 Enviando solicitud a /solicitar-codigo-registro');
 
-        // Usar timeout para evitar esperas infinitas
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos timeout
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-        const response = await fetch('https://gestiondeportistas-production.up.railway.app/api/auth/solicitar-codigo-registro', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: email }),
-            signal: controller.signal
-        });
+        const response = await fetch(
+            'https://gestiondeportistas-production.up.railway.app/api/auth/solicitar-codigo-registro',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email }),
+                signal: controller.signal
+            }
+        );
 
         clearTimeout(timeoutId);
 
@@ -242,7 +244,6 @@ async function enviarCodigoActivacion(email) {
         console.log('📥 Respuesta del servidor:', data);
 
         if (!response.ok) {
-            // Manejar errores específicos del endpoint de ACTIVACIÓN
             let errorMsg = data.error || 'Error del servidor';
 
             if (data.error && data.error.includes('No se encontró')) {
@@ -263,35 +264,8 @@ async function enviarCodigoActivacion(email) {
     } catch (error) {
         console.error('❌ Error en la solicitud de ACTIVACIÓN:', error);
 
-        // NO intentar con /forgot-password porque es de RECUPERACIÓN
-        // Mostrar error específico
         if (error.name === 'AbortError') {
             throw new Error('Timeout: El servidor no respondió a tiempo');
-        }
-
-        // Modo desarrollo: simular éxito SOLO si es localhost
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            console.warn('⚠️ Modo desarrollo: Simulando envío de código de ACTIVACIÓN');
-            console.warn('⚠️ Asegúrate de que el backend esté corriendo en https://gestiondeportistas-production.up.railway.app');
-
-            // Verificar si el backend está activo
-            try {
-                const healthCheck = await fetch('https://gestiondeportistas-production.up.railway.app/api/auth/health', {
-                    method: 'GET',
-                    signal: AbortSignal.timeout(3000)
-                });
-                console.log('🔍 Estado del backend:', healthCheck.status);
-            } catch (healthError) {
-                console.error('❌ Backend no disponible:', healthError);
-                throw new Error('Backend no disponible. Asegúrate de que el servidor esté corriendo en https://gestiondeportistas-production.up.railway.app');
-            }
-
-            // Simular éxito para desarrollo
-            return {
-                success: true,
-                message: '✅ Código de activación simulado: 123456',
-                expiresIn: 15
-            };
         }
 
         throw error;

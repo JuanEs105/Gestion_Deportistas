@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Titanes Evolution | Elite Cheerleading Club</title>
+    <title>Baby Titans | Titanes Evolution</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Fonts -->
@@ -13,6 +13,7 @@
         rel="stylesheet">
     <!-- CSS Personalizado -->
     <link rel="stylesheet" href="assets/css/landing.css">
+    <link rel="stylesheet" href="assets/css/ubicacion.css">
     <!-- Configuración Tailwind -->
     <script>
         tailwind.config = {
@@ -30,46 +31,70 @@
                     },
                     animation: {
                         'ping-slow': 'ping 3s cubic-bezier(0, 0, 0.2, 1) infinite',
-                    },
-                    transform: {
-                        'skew-20': 'skewX(-20deg)',
-                        'skew-10': 'skewX(-10deg)',
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Estilos adicionales para el efecto ladeado */
-        .skewed-container {
-            transform: skewX(-15deg);
-        }
+        @layer components {
+            .neon-red-glow {
+                text-shadow: 0 0 20px rgba(255, 0, 0, 0.7), 0 0 40px rgba(255, 0, 0, 0.3);
+            }
 
-        .unskew-content {
-            transform: skewX(15deg);
-        }
+            .angular-card {
+                clip-path: polygon(0 0, 100% 0, 100% 90%, 92% 100%, 0 100%);
+            }
 
-        .skewed-image-frame {
-            transform: perspective(1000px) rotateY(5deg) rotateX(2deg) skewX(-12deg);
-            transform-style: preserve-3d;
-        }
+            .angular-clip {
+                clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            }
 
-        /* Remover parallax problemático */
-        .hero-section {
-            transform: none !important;
-        }
+            .btn-shine {
+                position: relative;
+                overflow: hidden;
+            }
 
-        /* Fix para que no se mueva el texto */
-        .section-content {
-            transform: translateZ(0);
-            backface-visibility: hidden;
+            .btn-shine::after {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -60%;
+                width: 20%;
+                height: 200%;
+                background: rgba(255, 255, 255, 0.4);
+                transform: rotate(30deg);
+                transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            }
+
+            .btn-shine:hover::after {
+                left: 120%;
+            }
+
+            @keyframes pulse-red {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+                }
+
+                70% {
+                    box-shadow: 0 0 0 20px rgba(255, 0, 0, 0);
+                }
+
+                100% {
+                    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+                }
+            }
+
+            .animate-pulse-red {
+                animation: pulse-red 2s infinite;
+            }
         }
     </style>
 </head>
 
 <body class="overflow-x-hidden bg-deepBlack text-white font-montserrat">
-    <!-- Navbar -->
-    <nav class="navbar fixed w-full z-[100] bg-black/80 backdrop-blur-xl border-b border-primary/20">
+    <!-- Navbar FIJO -->
+    <nav class="navbar fixed w-full z-[100] bg-black/95 backdrop-blur-xl border-b border-primary/20 scrolled">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex justify-between h-24 items-center">
                 <!-- Logo -->
@@ -90,7 +115,7 @@
                 <div class="hidden lg:flex items-center space-x-10">
                     <a class="nav-link" href="index.html">INICIO</a>
                     <a class="nav-link" href="historia.html">HISTORIA</a>
-                    <a class="nav-link" href="equipos-formativos.html">EQUIPOS</a>
+                    <a class="nav-link text-primary" href="baby-titans.html">EQUIPOS</a>
                     <a class="nav-link" href="competencias.html">COMPETENCIAS</a>
                     <a class="nav-link" href="ubicacion.html">UBICACIÓN</a>
                     <a class="nav-btn" href="auth/acceso.html">
@@ -110,7 +135,7 @@
             <div class="max-w-7xl mx-auto px-6 py-6 space-y-4">
                 <a class="block nav-link text-lg" href="index.html">INICIO</a>
                 <a class="block nav-link text-lg" href="historia.html">HISTORIA</a>
-                <a class="block nav-link text-lg" href="equipos-formativos.html">EQUIPOS</a>
+                <a class="block nav-link text-lg text-primary" href="baby-titans.html">EQUIPOS</a>
                 <a class="block nav-link text-lg" href="competencias.html">COMPETENCIAS</a>
                 <a class="block nav-link text-lg" href="ubicacion.html">UBICACIÓN</a>
                 <a class="block nav-btn mt-4 text-center" href="auth/acceso.html">
@@ -120,464 +145,350 @@
         </div>
     </nav>
 
-    <!-- Hero Section con Video en marco horizontal -->
-    <header class="hero-section relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-deepBlack">
+    <!-- Hero Baby Titans -->
+    <header class="relative h-screen flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <!-- 🖼️ IMAGEN 1: Niños entrenando Baby Titans (imagen principal del hero) -->
+            <img alt="Baby Titans entrenando" class="w-full h-full object-cover opacity-60 contrast-125"
+                src="assets/images/baby-titans/AQUI_VA_IMAGEN_1_HERO.jpg" />
+            <div class="absolute inset-0 bg-gradient-to-tr from-deepBlack via-primary/20 to-deepBlack/80"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-deepBlack/40 to-deepBlack"></div>
+        </div>
 
-        <!-- Contenedor principal -->
-        <div class="relative z-20 w-full max-w-7xl mx-auto px-6 py-12 lg:py-20">
-            <div class="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-
-                <!-- Columna izquierda: Video en marco horizontal -->
-                <div class="relative group order-2 lg:order-1">
-                    <!-- Marco exterior con efecto 3D -->
-                    <div
-                        class="relative skewed-image-frame transition-all duration-500 hover:skew-x-[-8deg] hover:scale-[1.02]">
-                        <!-- Sombra de fondo -->
-                        <div
-                            class="absolute -inset-6 bg-gradient-to-br from-primary/30 via-red-600/20 to-primary/10 blur-3xl rounded-3xl opacity-60 group-hover:opacity-80 transition-opacity duration-700">
-                        </div>
-
-                        <!-- Marco principal horizontal -->
-                        <div class="relative overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black border-2 border-primary/30 backdrop-blur-sm"
-                            style="clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);">
-
-                            <!-- Video dentro del marco -->
-                            <div class="relative h-[600px] lg:h-[700px] w-full overflow-hidden">
-                                <video autoplay muted loop playsinline
-                                    class="absolute inset-0 w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105"
-                                    style="transform: skewX(8deg) scale(1.05); transform-origin: center;">
-                                    <source src="assets/images/c0009_UuwZy5Ci.mp4" type="video/mp4">
-                                    <!-- Fallback si no carga el video -->
-                                    <img src="assets/images/InicioGif.gif" alt="Titanes Evolution"
-                                        class="w-full h-full object-cover">
-                                </video>
-
-                                <!-- Overlay de gradiente para mejor legibilidad -->
-                                <div
-                                    class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent">
-                                </div>
-                                <div
-                                    class="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40">
-                                </div>
-                            </div>
-
-                            <!-- Borde luminoso interior -->
-                            <div class="absolute inset-0 border border-white/10 pointer-events-none"></div>
-                        </div>
-
-                        <!-- Esquina decorativa superior derecha -->
-                        <div class="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 border-primary rounded-tr-lg">
-                        </div>
-
-                        <!-- Esquina decorativa inferior izquierda -->
-                        <div
-                            class="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 border-primary rounded-bl-lg">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Columna derecha: Texto y botones -->
-                <div class="space-y-8 lg:space-y-10 order-1 lg:order-2">
-                    <!-- Badge Elite -->
-                    <div class="inline-block bg-primary text-white px-6 py-2 font-sport text-xl skew-x-[-20deg] mb-6">
-                        <span class="inline-block skew-x-[20deg]">ELITE CHEERLEADING</span>
-                    </div>
-
-                    <!-- Título Principal -->
-                    <div class="mb-6">
-                        <h1 class="font-sport text-5xl md:text-7xl lg:text-8xl leading-[0.8] text-white mb-2">
-                            TITANES
-                        </h1>
-                        <h1 class="font-sport text-5xl md:text-7xl lg:text-8xl leading-[0.8] text-white">
-                            <span class="text-primary">EVOLUTION</span>
-                        </h1>
-                    </div>
-
-                    <!-- Subtítulo -->
-                    <h2 class="font-sport text-3xl md:text-4xl lg:text-5xl text-white mb-6">
-                        LA TRIBU DEL <span class="neon-red">JAGUAR</span>
-                    </h2>
-
-                    <!-- Descripción -->
-                    <div class="space-y-4 mb-8">
-                        <p
-                            class="text-xl md:text-2xl font-light text-gray-200 italic border-l-4 border-primary pl-4 py-2">
-                            Que todo el mundo sepa que el gran rojo está en la casa.
-                        </p>
-                        <p class="text-lg md:text-xl text-gray-300">
-                            Únete al club de porrismo más laureado de la región.
-                        </p>
-                    </div>
-
-                    <!-- Estadísticas rápidas -->
-                    <div class="grid grid-cols-2 gap-4 mb-8">
-                        <div class="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <div class="font-sport text-3xl text-primary">50+</div>
-                            <div class="text-xs uppercase tracking-widest text-gray-400 mt-1">Títulos</div>
-                        </div>
-                        <div class="bg-white/5 p-4 rounded-lg border border-white/10">
-                            <div class="font-sport text-3xl text-primary">100+</div>
-                            <div class="text-xs uppercase tracking-widest text-gray-400 mt-1">Deportistas</div>
-                        </div>
-                    </div>
-
-                    <!-- Botones -->
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="historia.html" class="btn-primary flex-1 text-center justify-center">
-                            <span class="flex items-center justify-center gap-3">
-                                <span>EMPEZAR AHORA</span>
-                                <span
-                                    class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
-                            </span>
-                        </a>
-                    </div>
-                </div>
+        <div class="relative z-10 text-center px-6">
+            <h2 class="font-sport text-primary text-2xl md:text-3xl tracking-[0.5em] mb-4 drop-shadow-lg">EL PRIMER PASO
+                DEL CAMPEÓN</h2>
+            <h1 class="font-sport text-7xl md:text-[12rem] leading-none italic neon-red-glow">
+                BABY <br />
+                <span class="text-white">TITANS</span>
+            </h1>
+            <div class="mt-12 flex justify-center items-center gap-8">
+                <div class="h-[3px] w-24 bg-gradient-to-r from-transparent to-primary"></div>
+                <span class="font-sport text-white tracking-[0.4em] text-lg italic">EDADES: 5 A 7 AÑOS</span>
+                <div class="h-[3px] w-24 bg-gradient-to-l from-transparent to-primary"></div>
             </div>
+        </div>
+
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+            <span class="material-symbols-outlined text-primary text-4xl">expand_more</span>
         </div>
     </header>
 
-   <!-- Sección Historia -->
-<section class="section-padding bg-cardBlack" id="historia">
-    <div class="max-w-7xl mx-auto px-6 section-content">
-        <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <!-- Columna Izquierda: Imagen con marco LADEADO MÁS GRANDE -->
-            <div class="relative group order-2 lg:order-1">
-                <!-- Marco ladeado con efecto 3D -->
-                <div
-                    class="relative skewed-image-frame transition-all duration-500 hover:skew-x-[-10deg] hover:scale-[1.02]">
-                    <!-- Sombra roja de fondo -->
-                    <div
-                        class="absolute -inset-6 bg-gradient-to-br from-primary/30 via-red-600/20 to-primary/10 blur-3xl rounded-3xl opacity-60 group-hover:opacity-80 transition-opacity duration-700">
-                    </div>
-
-                    <!-- Marco principal ladeado MÁS GRANDE -->
-                    <div class="relative overflow-hidden bg-gradient-to-br from-primary/20 via-red-700/10 to-primary/10 border-2 border-primary/30 backdrop-blur-sm"
-                        style="clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%);">
-
-                        <!-- Imagen dentro del marco ladeado - ALTURA AUMENTADA -->
-                        <div class="relative h-[650px] md:h-[700px] overflow-hidden">
-                            <img alt="Historia del equipo Titanes Evolution"
-                                class="w-full h-full object-cover object-center transform transition-transform duration-700 group-hover:scale-105"
-                                src="assets/images/historia.jpg" loading="lazy"
-                                style="transform: skewX(12deg) scale(1.1); transform-origin: center;">
-
-                            <!-- Overlay de gradiente -->
-                            <div
-                                class="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent mix-blend-overlay">
-                            </div>
-                        </div>
-
-                        <!-- Borde luminoso interior -->
-                        <div class="absolute inset-0 border-2 border-white/10 pointer-events-none"></div>
-                    </div>
-
-                    <!-- Efecto de esquina superior derecha -->
-                    <div
-                        class="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-primary/70 rounded-tr-lg">
-                    </div>
-
-                    <!-- Efecto de esquina inferior izquierda -->
-                    <div
-                        class="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-primary/70 rounded-bl-lg">
-                    </div>
-
-                    <!-- Badge ladeado -->
-                    <div
-                        class="absolute -bottom-6 -right-4 bg-gradient-to-br from-primary to-primaryDark px-8 py-3 font-sport text-xl angular-clip-left shadow-2xl z-10 border-2 border-white/20 transform -skew-x-12">
-                        <span class="inline-block skew-x-12 text-white drop-shadow-lg">EST. 2004</span>
-                    </div>
+    <!-- Sección Descripción -->
+    <section class="py-32 px-6 relative overflow-hidden bg-cardBlack">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <div class="space-y-8">
+                <div class="inline-block px-4 py-1 border-l-4 border-primary bg-primary/10">
+                    <span class="font-sport text-primary tracking-widest text-sm">NIVEL SEMILLERO</span>
                 </div>
-            </div>
-
-            <!-- Columna Derecha: Contenido -->
-            <div class="space-y-8 order-1 lg:order-2">
-                <div>
-                    <h2 class="font-sport text-5xl md:text-6xl lg:text-7xl italic leading-none text-white">
-                        NUESTRA <br>
-                        <span class="text-primary">HISTORIA</span>
-                    </h2>
-                    <div class="h-2 w-32 bg-primary mt-4"></div>
-                </div>
-
-                <p class="text-gray-300 text-lg md:text-xl leading-relaxed">
-                    Titanes Evolution no es solo un equipo, es una filosofía de vida.
-                    Nacidos en Duitama con el sueño de elevar el nivel del cheerleading
-                    en Boyacá, hemos transformado el esfuerzo en oro y el sudor en
-                    gloria nacional.
+                <h2 class="font-sport text-5xl md:text-6xl leading-tight">
+                    MÁS QUE JUEGO, <br />
+                    <span class="text-primary italic">ES FORMACIÓN.</span>
+                </h2>
+                <p class="text-gray-300 text-xl leading-relaxed font-medium italic">
+                    Baby Titans es el <span class="text-white font-bold">primer paso en el camino deportivo</span> de tu
+                    hijo o hija 🦁✨
+                </p>
+                <p class="text-gray-300 text-lg leading-relaxed">
+                    Este programa está diseñado para niños y niñas entre los <span
+                        class="text-white font-bold underline decoration-primary">5 y 7 años</span>,
+                    en una etapa clave donde el movimiento, la confianza y la socialización marcan la diferencia en su
+                    desarrollo.
+                </p>
+                <p class="text-gray-300 text-lg leading-relaxed">
+                    A través de <span class="text-white">clases dinámicas, seguras y llenas de motivación</span>, los
+                    niños comienzan su formación
+                    en porrismo y gimnasia mientras:
                 </p>
 
-                <!-- Estadísticas con fondo ladeado -->
-                <div class="grid grid-cols-2 gap-6 md:gap-8 pt-6">
-                    <div class="relative overflow-hidden group">
-                        <!-- Fondo ladeado -->
-                        <div
-                            class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent transform -skew-x-6 -ml-2">
-                        </div>
-                        <!-- Contenido -->
-                        <div
-                            class="relative text-center p-6 border border-white/10 hover:border-primary/30 transition-all duration-300">
-                            <span class="font-sport text-4xl md:text-5xl text-white block counter"
-                                data-target="50">0</span>
-                            <span class="text-primary font-bold tracking-widest text-xs uppercase mt-2">Títulos
-                                Nacionales</span>
-                            <div class="h-1 w-0 bg-primary mt-3 group-hover:w-full transition-all duration-500">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="relative overflow-hidden group">
-                        <!-- Fondo ladeado -->
-                        <div
-                            class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent transform -skew-x-6 -ml-2">
-                        </div>
-                        <!-- Contenido -->
-                        <div
-                            class="relative text-center p-6 border border-white/10 hover:border-primary/30 transition-all duration-300">
-                            <span class="font-sport text-4xl md:text-5xl text-white block counter"
-                                data-target="100">0</span>
-                            <span class="text-primary font-bold tracking-widest text-xs uppercase mt-2">Deportistas
-                                Activos</span>
-                            <div class="h-1 w-0 bg-primary mt-3 group-hover:w-full transition-all duration-500">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Botón ver más -->
-                <div class="pt-6">
-                    <a href="historia.html"
-                        class="inline-flex items-center gap-2 font-bold uppercase text-sm tracking-widest text-primary hover:gap-4 transition-all group">
-                        VER HISTORIA COMPLETA
-                        <span
-                            class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-    <!-- Sección Competencias -->
-    <section class="section-padding bg-deepBlack" id="competencias">
-        <div class="max-w-7xl mx-auto px-6 section-content">
-            <!-- Header de sección -->
-            <div class="mb-12 lg:mb-16 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-                <div>
-                    <h2 class="font-sport text-5xl md:text-6xl lg:text-8xl text-primary neon-red">DOMINIO</h2>
-                    <h3 class="font-sport text-4xl md:text-5xl lg:text-6xl text-white">EN EL TAPETE</h3>
-                </div>
-                <div class="max-w-md text-left lg:text-right text-gray-400 font-medium">
-                    Momentos épicos capturados en las competencias más exigentes del país.
-                </div>
-            </div>
-
-            <!-- Galería de competencias - Imagen principal más grande -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 mb-6 md:mb-8">
-                <!-- Imagen 1 PRINCIPAL - Más grande verticalmente -->
-                <div
-                    class="lg:col-span-7 h-[1000px] md:h-[1000px] lg:h-[750px] relative overflow-hidden group rounded-xl">
-                    <!-- Gradiente sutil de fondo mientras carga -->
-                    <div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-30"></div>
-
-                    <img alt="Competencia nacional - Titanes Evolution"
-                        class="w-full h-full object-cover object-center transition-all duration-700 group-hover:scale-105"
-                        src="assets/images/esta queremos que sea la principal ya que nos gusta mucho.jpg"
-                        loading="eager" style="transform-origin: center center;">
-
-                    <!-- Overlay de gradiente para texto -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
-                    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent"></div>
-
-                    <!-- Texto en la imagen -->
-                    <div class="absolute bottom-0 left-0 right-0 p-6 md:p-8 lg:p-10">
-                        <div class="mb-3">
-                            <span
-                                class="font-sport text-3xl md:text-4xl text-white bg-primary/90 px-5 py-3 rounded-lg inline-block">
-                                GLORIA NACIONAL
-                            </span>
-                        </div>
-                        <h4 class="font-sport text-4xl md:text-5xl lg:text-6xl text-white mb-3">
-                            2024
-                        </h4>
-                        <p class="text-gray-200 text-lg md:text-xl max-w-2xl">
-                            Titanes final worlds 2024
-                        </p>
-                    </div>
-
-                    <!-- Efecto de brillo al hover -->
+                <!-- Beneficios Grid -->
+                <div class="grid grid-cols-2 gap-6 pt-8">
                     <div
-                        class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000">
-                    </div>
-                </div>
-
-                <!-- Columna derecha con dos imágenes más pequeñas -->
-                <div class="lg:col-span-5 flex flex-col gap-4 md:gap-6">
-                    <!-- Imagen 2 (arriba) -->
-                    <div class="h-[550px] md:h-[650px] relative overflow-hidden group rounded-xl">
-                        <img alt="Entrenamiento intenso"
-                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            src="assets/images/IMG_1175.jpg" loading="lazy">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent">
-                        </div>
-                        <div class="absolute bottom-6 left-6">
-                            <span class="font-sport text-xl text-white bg-primary/90 px-4 py-2 rounded">ENTRENO</span>
-                        </div>
-                        <!-- Texto superpuesto -->
-                        <div class="absolute top-6 right-6 text-right">
-                            <p class="text-white/80 text-sm uppercase tracking-widest">PREPARACIÓN</p>
+                        class="flex items-start gap-4 p-4 bg-deepBlack border-l-2 border-primary/30 group hover:border-primary transition-colors">
+                        <span class="material-symbols-outlined text-primary text-3xl">sports_gymnastics</span>
+                        <div>
+                            <h4 class="font-sport text-lg">Coordinación</h4>
+                            <p class="text-xs text-gray-500 uppercase tracking-tighter">Mejoran equilibrio</p>
                         </div>
                     </div>
-
-                    <!-- Imagen 3 (abajo) -->
-                    <div class="h-[350px] md:h-[400px] relative overflow-hidden group rounded-xl">
-                        <img alt="Celebración del equipo"
-                            class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                            src="assets/images/IMG_2416.jpg" loading="lazy">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-                        <!-- Texto central grande -->
-                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center w-full">
-                            <h4
-                                class="font-sport text-4xl md:text-5xl lg:text-6xl text-white/20 group-hover:text-white/40 transition-colors uppercase">
-                                EQUIPO
-                            </h4>
-                        </div>
-                        <!-- Badge esquina -->
-                        <div class="absolute bottom-6 right-6">
-                            <span class="font-sport text-xl text-white bg-primary/90 px-4 py-2 rounded">UNIÓN</span>
+                    <div
+                        class="flex items-start gap-4 p-4 bg-deepBlack border-l-2 border-primary/30 group hover:border-primary transition-colors">
+                        <span class="material-symbols-outlined text-primary text-3xl">fitness_center</span>
+                        <div>
+                            <h4 class="font-sport text-lg">Fuerza</h4>
+                            <p class="text-xs text-gray-500 uppercase tracking-tighter">Fortalecen su cuerpo</p>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Fila inferior con texto destacado -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6 md:mt-8">
-                <!-- Texto destacado -->
-                <div
-                    class="lg:col-span-5 h-[250px] md:h-[300px] flex items-center justify-center bg-primary transform -skew-x-3 lg:-skew-x-6 -ml-4 lg:-ml-10 z-10 rounded-xl">
-                    <div class="transform skew-x-3 lg:skew-x-6 text-center p-6 lg:p-8">
-                        <h5 class="font-sport text-3xl md:text-4xl lg:text-5xl text-black leading-tight">
-                            MÁS QUE UN <br />
-                            <span class="text-white">EQUIPO</span>
-                        </h5>
-                        <p class="text-black/90 font-bold uppercase mt-4 tracking-tighter text-sm md:text-base">
-                            Una evolución imparable hacia la cima
-                        </p>
-                        <div class="mt-6">
-                            <div class="inline-flex items-center gap-2 text-black font-bold">
-                                <span>FAMILIA</span>
-                                <span class="material-symbols-outlined">favorite</span>
-                                <span>PASIÓN</span>
-                            </div>
+                    <div
+                        class="flex items-start gap-4 p-4 bg-deepBlack border-l-2 border-primary/30 group hover:border-primary transition-colors">
+                        <span class="material-symbols-outlined text-primary text-3xl">psychology</span>
+                        <div>
+                            <h4 class="font-sport text-lg">Confianza</h4>
+                            <p class="text-xs text-gray-500 uppercase tracking-tighter">Seguridad en sí mismos</p>
                         </div>
                     </div>
-                </div>
-
-                <!-- Imagen 4 -->
-                <div class="lg:col-span-7 h-[250px] md:h-[300px] relative overflow-hidden group rounded-xl">
-                    <img alt="Trofeos y reconocimientos"
-                        class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
-                        src="assets/images/Titanes toe toch worlds 2024.jpg" loading="lazy">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent"></div>
-                    <div class="absolute bottom-6 left-6 max-w-md">
-                        <h6 class="font-sport text-2xl md:text-3xl text-white mb-2">RECONOCIMIENTOS</h6>
-                        <p class="text-gray-200 text-sm md:text-base">
-                            50+ títulos nacionales y reconocimientos internacionales
-                        </p>
+                    <div
+                        class="flex items-start gap-4 p-4 bg-deepBlack border-l-2 border-primary/30 group hover:border-primary transition-colors">
+                        <span class="material-symbols-outlined text-primary text-3xl">group</span>
+                        <div>
+                            <h4 class="font-sport text-lg">Equipo</h4>
+                            <p class="text-xs text-gray-500 uppercase tracking-tighter">Trabajo conjunto</p>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-start gap-4 p-4 bg-deepBlack border-l-2 border-primary/30 group hover:border-primary transition-colors">
+                        <span class="material-symbols-outlined text-primary text-3xl">verified_user</span>
+                        <div>
+                            <h4 class="font-sport text-lg">Disciplina</h4>
+                            <p class="text-xs text-gray-500 uppercase tracking-tighter">De forma divertida</p>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-start gap-4 p-4 bg-deepBlack border-l-2 border-primary/30 group hover:border-primary transition-colors">
+                        <span class="material-symbols-outlined text-primary text-3xl">sentiment_satisfied</span>
+                        <div>
+                            <h4 class="font-sport text-lg">Diversión</h4>
+                            <p class="text-xs text-gray-500 uppercase tracking-tighter">Energía positiva</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Botón ver más -->
-            <div class="text-center mt-12 md:mt-16">
-                <a href="competencias.html"
-                    class="inline-flex items-center gap-2 font-bold uppercase text-sm tracking-widest text-primary hover:gap-4 transition-all group px-8 py-4 border-2 border-primary/30 hover:border-primary rounded-lg">
-                    VER TODAS LAS COMPETENCIAS
-                    <span
-                        class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
-                </a>
+            <!-- 🖼️ IMAGEN 2: Foto de grupo Baby Titans -->
+            <div class="relative group">
+                <div class="angular-clip overflow-hidden border-2 border-primary/30 rounded-lg">
+                    <video class="w-full h-[1000px] object-cover transition-transform duration-700 group-hover:scale-105"
+                        autoplay loop muted playsinline>
+                        <source src="assets/images/C0006 (1) (online-video-cutter.com).mp4" type="video/mp4">
+                        Tu navegador no soporta el elemento de video.
+                    </video>
+                    <div class="absolute inset-0 bg-gradient-to-t from-deepBlack/80 via-transparent to-transparent">
+                    </div>
+
+                    <!-- Bordes decorativos -->
+                    <div class="absolute top-0 left-0 w-20 h-20 border-t-4 border-l-4 border-primary"></div>
+                    <div class="absolute bottom-0 right-0 w-20 h-20 border-b-4 border-r-4 border-primary"></div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Sección Ubicación -->
-    <section class="section-padding bg-cardBlack" id="ubicacion">
-        <div class="max-w-7xl mx-auto px-6 section-content">
-            <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-                <!-- Contenido -->
-                <div class="space-y-8 lg:space-y-10">
-                    <div class="relative">
-                        <h2 class="font-sport text-5xl md:text-6xl lg:text-7xl text-white leading-none">
-                            DONDE <br />
-                            <span class="text-primary">ENTRENAMOS</span>
-                        </h2>
-                        <span
-                            class="absolute -top-6 -left-6 text-[80px] md:text-[120px] font-sport text-white/5 pointer-events-none">
-                            VENUE
-                        </span>
-                    </div>
+    <!-- Sección Lo Que Ofrecemos -->
+    <section class="section-padding bg-deepBlack">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-sport text-4xl md:text-7xl text-white mb-4">
+                    MÁS QUE UNA <span class="neon-red">CLASE DEPORTIVA</span>
+                </h2>
+                <p class="text-gray-400 text-xl italic max-w-3xl mx-auto">
+                    Baby Titans es un espacio donde los niños descubren su potencial
+                </p>
+            </div>
 
-                    <!-- Información de contacto -->
-                    <div class="space-y-6">
-                        <div class="flex items-start gap-6 group">
-                            <div class="info-icon">
-                                <span class="material-symbols-outlined text-3xl">location_on</span>
-                            </div>
-                            <div>
-                                <h4 class="font-sport text-xl md:text-2xl text-white">CENTRO DE ALTO RENDIMIENTO</h4>
-                                <p class="text-gray-400 font-medium mt-2">📍 Duitama/Boyacá Carrera 25# 22 -14</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-6 group">
-                            <div class="info-icon">
-                                <span class="material-symbols-outlined text-3xl">timer</span>
-                            </div>
-                            <div>
-                                <h4 class="font-sport text-xl md:text-2xl text-white">HORARIOS ELITE</h4>
-                                <p class="text-gray-400 font-medium mt-2">Lunes a Viernes: 3:30 PM - 7:30 PM</p>
-                                <p class="text-gray-400 font-medium">Sábado: 8:00 AM - 1:30 PM</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Cita -->
-                    <div class="p-6 border-2 border-primary/30 angular-clip-left bg-primary/5">
-                        <p class="italic text-gray-300 text-lg">
-                            "Instalaciones equipadas con peana de competencia."
-                        </p>
-                    </div>
-
-                    <!-- Botón ver más -->
-                    <div>
-                        <a href="ubicacion.html"
-                            class="inline-flex items-center gap-2 font-bold uppercase text-sm tracking-widest text-primary hover:gap-4 transition-all group">
-                            VER UBICACIÓN COMPLETA
-                            <span
-                                class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
-                        </a>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16">
+                <div class="bg-cardBlack p-8 border-l-4 border-primary/30 hover:border-primary transition-all group">
+                    <span
+                        class="material-symbols-outlined text-primary text-5xl mb-4 block group-hover:scale-110 transition-transform">
+                        shield_person
+                    </span>
+                    <h3 class="font-sport text-2xl mb-3">Ganan Seguridad</h3>
+                    <p class="text-gray-400 text-sm">Confianza para enfrentar nuevos retos</p>
                 </div>
 
-                <!-- Mapa/Imagen -->
-                <div class="relative h-[400px] lg:h-[500px]">
-                    <div class="absolute inset-0 bg-primary/20 transform translate-x-3 translate-y-3 rounded-lg"></div>
-                    <div class="relative h-full w-full overflow-hidden border-2 border-white/20 shadow-2xl rounded-lg">
-                        <img alt="Gimnasio Titanes Evolution"
-                            class="w-full h-full object-cover object-center grayscale hover:grayscale-0 transition-all duration-700"
-                            src="assets/images/WhatsApp Image 2026-01-31 at 12.21.58 PM.jpeg" loading="lazy">
-                        <div class="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent mix-blend-color">
-                        </div>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div
-                                class="w-16 h-16 md:w-20 md:h-20 bg-primary/90 rounded-full flex items-center justify-center animate-ping-slow absolute">
-                            </div>
-                            <div
-                                class="w-12 h-12 md:w-16 md:h-16 bg-primary rounded-full flex items-center justify-center relative z-10 border-4 border-white">
-                                <span class="material-symbols-outlined text-white">location_on</span>
-                            </div>
-                        </div>
-                    </div>
+                <div class="bg-cardBlack p-8 border-l-4 border-primary/30 hover:border-primary transition-all group">
+                    <span
+                        class="material-symbols-outlined text-primary text-5xl mb-4 block group-hover:scale-110 transition-transform">
+                        groups
+                    </span>
+                    <h3 class="font-sport text-2xl mb-3">Hacen Amigos</h3>
+                    <p class="text-gray-400 text-sm">Vínculos fuertes y duraderos</p>
+                </div>
+
+                <div class="bg-cardBlack p-8 border-l-4 border-primary/30 hover:border-primary transition-all group">
+                    <span
+                        class="material-symbols-outlined text-primary text-5xl mb-4 block group-hover:scale-110 transition-transform">
+                        bolt
+                    </span>
+                    <h3 class="font-sport text-2xl mb-3">Expresan Energía</h3>
+                    <p class="text-gray-400 text-sm">De forma positiva y saludable</p>
+                </div>
+
+                <div class="bg-cardBlack p-8 border-l-4 border-primary/30 hover:border-primary transition-all group">
+                    <span
+                        class="material-symbols-outlined text-primary text-5xl mb-4 block group-hover:scale-110 transition-transform">
+                        emoji_events
+                    </span>
+                    <h3 class="font-sport text-2xl mb-3">Construyen Futuro</h3>
+                    <p class="text-gray-400 text-sm">Bases para su carrera deportiva</p>
                 </div>
             </div>
+
+            <!-- GALERÍA: 2 Fotos con marcos inclinados estilo Titanes -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto mt-20">
+
+                <!-- 🖼️ FOTO 1 HORIZONTAL - Niños entrenando (marco inclinado izquierda) -->
+                <div class="relative group transform hover:-rotate-1 transition-transform duration-500">
+                    <!-- Resplandor rojo de fondo -->
+                    <div
+                        class="absolute -inset-4 bg-gradient-to-br from-primary/30 to-transparent blur-2xl opacity-50 group-hover:opacity-80 transition-opacity">
+                    </div>
+
+                    <!-- Marco principal con inclinación -->
+                    <div class="relative transform -rotate-2 group-hover:rotate-0 transition-transform duration-500">
+                        <div class="relative overflow-hidden border-4 border-primary/60 shadow-[0_8px_30px_rgba(255,0,0,0.4)]"
+                            style="clip-path: polygon(2% 0, 100% 0, 98% 100%, 0% 100%);">
+                            <!-- 🖼️ IMAGEN HORIZONTAL: Niños entrenando en el suelo -->
+                            <img alt="Baby Titans en acción"
+                                class="w-full h-[400px] object-cover transition-transform duration-700 group-hover:scale-110"
+                                src="assets/images/image.png" />
+
+                            <!-- Overlay gradient -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent">
+                            </div>
+
+                            <!-- Texto sobre la imagen -->
+                            <div class="absolute bottom-0 left-0 right-0 p-8">
+                                <span class="material-symbols-outlined text-primary text-4xl mb-2 block">
+                                    sports_gymnastics
+                                </span>
+                                <h4 class="font-sport text-3xl text-white mb-2 italic">COORDINACIÓN</h4>
+                                <p class="text-gray-300 text-sm tracking-wide">Desarrollando habilidades motrices</p>
+                            </div>
+
+                            <!-- Líneas decorativas en esquinas -->
+                            <div class="absolute top-0 left-0 w-20 h-20 border-t-[6px] border-l-[6px] border-white/50">
+                            </div>
+                            <div
+                                class="absolute bottom-0 right-0 w-20 h-20 border-b-[6px] border-r-[6px] border-white/50">
+                            </div>
+
+                            <!-- Badge "Baby Titans" -->
+                            <div class="absolute top-4 right-4 bg-primary px-4 py-2 transform rotate-3">
+                                <span class="font-sport text-white text-sm tracking-widest">BABY TITANS</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🖼️ FOTO 2 VERTICAL - Niña posando (marco inclinado derecha) -->
+                <div class="relative group transform hover:rotate-1 transition-transform duration-500">
+                    <!-- Resplandor rojo de fondo -->
+                    <div
+                        class="absolute -inset-4 bg-gradient-to-bl from-primary/30 to-transparent blur-2xl opacity-50 group-hover:opacity-80 transition-opacity">
+                    </div>
+
+                    <!-- Marco principal con inclinación opuesta -->
+                    <div class="relative transform rotate-2 group-hover:rotate-0 transition-transform duration-500">
+                        <div class="relative overflow-hidden border-4 border-primary/60 shadow-[0_8px_30px_rgba(255,0,0,0.4)]"
+                            style="clip-path: polygon(0% 0, 98% 0, 100% 100%, 2% 100%);">
+                            <!-- 🖼️ IMAGEN VERTICAL: Niña posando -->
+                            <img alt="Baby Titan posando"
+                                class="w-full h-[600px] object-cover object-center transition-transform duration-700 group-hover:scale-110"
+                                src="assets/images/thumbnail (6) (1).jpeg" />
+
+                            <!-- Overlay gradient -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent">
+                            </div>
+
+                            <!-- Texto sobre la imagen -->
+                            <div class="absolute bottom-0 left-0 right-0 p-8">
+                                <span class="material-symbols-outlined text-primary text-4xl mb-2 block">
+                                    emoji_events
+                                </span>
+                                <h4 class="font-sport text-3xl text-white mb-2 italic">ACTITUD TITÁN</h4>
+                                <p class="text-gray-300 text-sm tracking-wide">Confianza desde pequeños</p>
+                            </div>
+
+                            <!-- Líneas decorativas en esquinas -->
+                            <div class="absolute top-0 right-0 w-20 h-20 border-t-[6px] border-r-[6px] border-white/50">
+                            </div>
+                            <div
+                                class="absolute bottom-0 left-0 w-20 h-20 border-b-[6px] border-l-[6px] border-white/50">
+                            </div>
+
+                            <!-- Badge "En Acción" -->
+                            <div class="absolute top-4 left-4 bg-primary px-4 py-2 transform -rotate-3">
+                                <span class="font-sport text-white text-sm tracking-widest">EN ACCIÓN</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Sección Entrenadores -->
+    <section class="py-24 px-6 bg-cardBlack">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="font-sport text-4xl md:text-6xl text-white mb-4">
+                    ENTRENAMIENTO <span class="text-primary">ESPECIALIZADO</span>
+                </h2>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto italic">
+                    Todo dentro de un entorno seguro, guiado por entrenadores especializados en formación infantil
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-deepBlack p-8 border border-primary/20 rounded-lg">
+                    <span class="material-symbols-outlined text-primary text-6xl mb-4 block">
+                        school
+                    </span>
+                    <h4 class="font-sport text-2xl mb-3">Entrenadores Certificados</h4>
+                    <p class="text-gray-400">Profesionales especializados en formación deportiva infantil</p>
+                </div>
+
+                <div class="bg-deepBlack p-8 border border-primary/20 rounded-lg">
+                    <span class="material-symbols-outlined text-primary text-6xl mb-4 block">
+                        health_and_safety
+                    </span>
+                    <h4 class="font-sport text-2xl mb-3">Seguridad Primero</h4>
+                    <p class="text-gray-400">Instalaciones y equipamiento adecuado para la edad</p>
+                </div>
+
+                <div class="bg-deepBlack p-8 border border-primary/20 rounded-lg">
+                    <span class="material-symbols-outlined text-primary text-6xl mb-4 block">
+                        favorite
+                    </span>
+                    <h4 class="font-sport text-2xl mb-3">Metodología Adaptada</h4>
+                    <p class="text-gray-400">Enfoque pedagógico diseñado para niños de 5-7 años</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección CTA Clase de Adaptación -->
+    <section class="py-24 relative bg-deepBlack overflow-hidden">
+        <div
+            class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-30">
+        </div>
+        <div class="max-w-4xl mx-auto px-6 text-center relative z-10">
+            <h3 class="font-sport text-4xl md:text-5xl mb-8 italic">
+                ¿TU HIJO(A) TIENE ESPÍRITU <span class="text-primary">TITÁN?</span>
+            </h3>
+            <p class="text-gray-300 text-xl mb-12 leading-relaxed">
+                Podrán vivir una <span class="text-white font-bold">clase de adaptación</span>, donde experimentan el
+                deporte
+                mientras los padres conocen nuestra metodología, el ambiente de entrenamiento y el enfoque formativo que
+                nos caracteriza.
+            </p>
+            <div class="relative inline-block">
+                <a class="bg-primary text-white font-sport text-2xl px-16 py-6 angular-clip btn-shine animate-pulse-red flex items-center justify-center gap-4 transition-transform hover:scale-105 active:scale-95"
+                    href="https://wa.me/573114443158?text=Hola,%20quiero%20agendar%20una%20clase%20de%20adaptación%20para%20Baby%20Titans"
+                    target="_blank">
+                    <span class="material-symbols-outlined">calendar_month</span>
+                    AGENDAR CLASE DE ADAPTACIÓN
+                </a>
+                <div
+                    class="absolute -top-4 -right-4 bg-white text-black font-sport text-xs px-2 py-1 transform rotate-12">
+                    ¡CUPOS LIMITADOS!
+                </div>
+            </div>
+            <p class="mt-12 text-gray-500 font-bold tracking-[0.3em] text-xs">
+                VIVE LA EXPERIENCIA TITANES EVOLUTION
+            </p>
         </div>
     </section>
 
@@ -593,8 +504,8 @@
                         </div>
                     </div>
                     <p class="text-gray-400 max-w-md text-lg italic">
-                        El primer club de porrismo en Duitama enfocado en alto rendimiento y formación integral.
-                        Liderando el camino hacia la excelencia deportiva desde 2004.
+                        Forjando el futuro del porrismo colombiano. 20 años de historia, pasión y títulos mundiales
+                        que respaldan nuestro legado.
                     </p>
                     <!-- Redes sociales -->
                     <div class="flex gap-4">
@@ -623,7 +534,7 @@
                     <ul class="space-y-3">
                         <li><a class="footer-link" href="index.html">INICIO</a></li>
                         <li><a class="footer-link" href="historia.html">HISTORIA</a></li>
-                        <li><a class="footer-link" href="equipos-formativos.html">EQUIPOS FORMATIVOS</a></li>
+                        <li><a class="footer-link text-primary" href="baby-titans.html">EQUIPOS</a></li>
                         <li><a class="footer-link" href="competencias.html">COMPETENCIAS</a></li>
                         <li><a class="footer-link" href="ubicacion.html">UBICACIÓN</a></li>
                     </ul>
@@ -635,7 +546,11 @@
                     <ul class="space-y-4 text-gray-400">
                         <li class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-primary">phone_iphone</span>
-                            +57 311 4443158
+                            +57 311 444 3158
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary">location_on</span>
+                            Duitama, Boyacá - Colombia
                         </li>
                     </ul>
                 </div>
@@ -645,7 +560,7 @@
             <div class="footer-bottom">
                 <p>© 2026 TITANES EVOLUTION. ALL RIGHTS RESERVED.</p>
                 <div class="flex gap-6 md:gap-8">
-                    <a class="footer-legal-link" href="#" onclick="mostrarTerminos(event)">TÉRMINOS Y CONDICIONES</a>
+                    <a class="footer-legal-link" href="#" onclick="mostrarTerminos(event)">TÉRMINOS</a>
                 </div>
             </div>
         </div>
@@ -660,8 +575,7 @@
         </svg>
     </a>
 
-    <!-- Modal para Términos y Condiciones -->
-<div id="modalTerminos" class="fixed inset-0 bg-black bg-opacity-75 z-[200] hidden items-center justify-center p-4">
+    <div id="modalTerminos" class="fixed inset-0 bg-black bg-opacity-75 z-[200] hidden items-center justify-center p-4">
     <div class="bg-cardBlack border-2 border-primary/30 rounded-lg max-w-5xl w-full max-h-[90vh] overflow-hidden">
         <div class="bg-primary p-6 flex justify-between items-center">
             <h3 class="font-sport text-2xl md:text-3xl text-white">TÉRMINOS Y CONDICIONES</h3>
@@ -997,44 +911,46 @@
     </div>
 </div>
 
-<script src="assets/js/main.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Estabilidad de secciones
-        document.querySelectorAll('.section-content').forEach(el => {
-            el.style.transform = 'translateZ(0)';
+    <!-- JavaScript -->
+    <script src="assets/js/main.js"></script>
+    <script>
+        function mostrarTerminos(event) {
+            event.preventDefault();
+            const modal = document.getElementById('modalTerminos');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarTerminos() {
+            const modal = document.getElementById('modalTerminos');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.getElementById('modalTerminos')?.addEventListener('click', function (e) {
+            if (e.target === this) {
+                cerrarTerminos();
+            }
         });
 
-        // CONTADOR DE ESTADÍSTICAS - CORREGIDO
-        const counters = document.querySelectorAll('.counter');
-        if (counters.length > 0) {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
-                        const target = parseInt(entry.target.getAttribute('data-target'));
-                        const increment = target / 100;
-                        let current = 0;
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                cerrarTerminos();
+            }
+        });
 
-                        const updateCounter = () => {
-                            if (current < target) {
-                                current += increment;
-                                entry.target.textContent = Math.ceil(current);
-                                requestAnimationFrame(updateCounter);
-                            } else {
-                                entry.target.textContent = target + '+';
-                                entry.target.classList.add('counted');
-                            }
-                        };
+        // Mobile menu
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
 
-                        updateCounter();
-                    }
-                });
-            }, { threshold: 0.3 });
-
-            counters.forEach(counter => observer.observe(counter));
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', function () {
+                mobileMenu.classList.toggle('hidden');
+            });
         }
-    });
-</script>
+    </script>
 </body>
 
 </html>

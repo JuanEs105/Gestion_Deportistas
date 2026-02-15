@@ -3,21 +3,25 @@
 // ==========================================
 
 const APIService = {
-    baseURL: 'https://gestiondeportistas-production.up.railway.app/api',
-
-    // Headers comunes
-    getHeaders: function(isFormData = false) {
+    baseURL: (() => {
+        const hostname = window.location.hostname;
+        if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            return 'http://localhost:5000/api';
+        }
+        return 'https://gestiondeportistas-production.up.railway.app/api';
+    })(),
+    getHeaders: function (isFormData = false) {
         const headers = {};
         const token = AuthAPI?.getToken();
-        
+
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
         }
-        
+
         if (!isFormData) {
             headers['Content-Type'] = 'application/json';
         }
-        
+
         return headers;
     },
 
@@ -25,7 +29,7 @@ const APIService = {
     async request(endpoint, method = 'GET', data = null, isFormData = false) {
         const url = `${this.baseURL}${endpoint}`;
         const headers = this.getHeaders(isFormData);
-        
+
         const options = {
             method,
             headers,
@@ -38,7 +42,7 @@ const APIService = {
 
         try {
             const response = await fetch(url, options);
-            
+
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
                 throw new Error(errorData.message || `Error ${response.status}`);
@@ -53,64 +57,64 @@ const APIService = {
 
     // DEPORTISTAS API
     deportistas: {
-        getAll: async function() {
+        getAll: async function () {
             return APIService.request('/deportistas', 'GET');
         },
 
-        getById: async function(id) {
+        getById: async function (id) {
             return APIService.request(`/deportistas/${id}`, 'GET');
         },
 
-        create: async function(data) {
+        create: async function (data) {
             return APIService.request('/deportistas', 'POST', data);
         },
 
-        update: async function(id, data) {
+        update: async function (id, data) {
             return APIService.request(`/deportistas/${id}`, 'PUT', data);
         },
 
-        delete: async function(id) {
+        delete: async function (id) {
             return APIService.request(`/deportistas/${id}`, 'DELETE');
         },
 
-        updateFoto: async function(id, formData) {
+        updateFoto: async function (id, formData) {
             return APIService.request(`/deportistas/${id}/foto`, 'PUT', formData, true);
         }
     },
 
     // EVALUACIONES API
     evaluaciones: {
-        getByDeportista: async function(deportistaId) {
+        getByDeportista: async function (deportistaId) {
             return APIService.request(`/evaluaciones/deportista/${deportistaId}`, 'GET');
         },
 
-        create: async function(data) {
+        create: async function (data) {
             return APIService.request('/evaluaciones', 'POST', data);
         }
     },
 
     // HABILIDADES API
     habilidades: {
-        getAll: async function() {
+        getAll: async function () {
             return APIService.request('/habilidades', 'GET');
         },
 
-        getByNivel: async function(nivel) {
+        getByNivel: async function (nivel) {
             return APIService.request(`/habilidades/nivel/${nivel}`, 'GET');
         }
     },
 
     // ADMIN API
     admin: {
-        getDeportistas: async function() {
+        getDeportistas: async function () {
             return APIService.request('/admin/deportistas', 'GET');
         },
 
-        getEntrenadores: async function() {
+        getEntrenadores: async function () {
             return APIService.request('/admin/entrenadores', 'GET');
         },
 
-        getAdministradores: async function() {
+        getAdministradores: async function () {
             return APIService.request('/admin/administradores', 'GET');
         }
     }

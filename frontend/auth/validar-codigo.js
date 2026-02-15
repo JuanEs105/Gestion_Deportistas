@@ -5,7 +5,7 @@
 // Configuración
 const CONFIG = {
     FORGOT_PASSWORD_URL: 'https://gestiondeportistas-production.up.railway.app/api/auth/forgot-password',
-    VERIFY_CODE_URL: 'https://gestiondeportistas-production.up.railway.app/api/auth/verify-code' // Ruta nueva que necesitas crear en el backend
+    VERIFY_CODE_URL: 'https://gestiondeportistas-production.up.railway.app/api/auth/verify-code'
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -137,7 +137,7 @@ function initValidarForm() {
                 console.log('🔐 Verificando código para:', email);
                 
                 // PRIMERO: Solo verificar el código (sin cambiar contraseña)
-                const response = await fetch('https://gestiondeportistas-production.up.railway.app/api/auth/verify-code', {
+                const response = await fetch(CONFIG.VERIFY_CODE_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -1,9 +1,9 @@
 // ===================================
 // MIS EVALUACIONES - TITANES EVOLUTION
-// JavaScript Funcional
+// VERSIÓN CORREGIDA - Solo nivel actual
 // ===================================
 
-console.log('🎯 Inicializando Mis Evaluaciones...');
+console.log('🎯 Inicializando Mis Evaluaciones (VERSIÓN CORREGIDA)...');
 
 // ==========================================
 // VARIABLES GLOBALES
@@ -12,13 +12,9 @@ let deportistaData = null;
 let evaluacionesData = [];
 let evaluacionesFiltradas = [];
 let filtros = {
-    categoria: 'todas',
     estado: 'todas',
     orden: 'reciente'
 };
-
-const EVALUACIONES_POR_PAGINA = 10;
-let paginaActual = 1;
 
 // ==========================================
 // INICIALIZACIÓN
@@ -61,16 +57,8 @@ function setupEventListeners() {
     }
     
     // Filtros
-    const filtroCategoria = document.getElementById('filtroCategoria');
     const filtroEstado = document.getElementById('filtroEstado');
     const filtroOrden = document.getElementById('filtroOrden');
-    
-    if (filtroCategoria) {
-        filtroCategoria.addEventListener('change', (e) => {
-            filtros.categoria = e.target.value;
-            aplicarFiltros();
-        });
-    }
     
     if (filtroEstado) {
         filtroEstado.addEventListener('change', (e) => {
@@ -83,14 +71,6 @@ function setupEventListeners() {
         filtroOrden.addEventListener('change', (e) => {
             filtros.orden = e.target.value;
             aplicarFiltros();
-        });
-    }
-    
-    // Descargar reporte
-    const downloadBtn = document.getElementById('downloadReportBtn');
-    if (downloadBtn) {
-        downloadBtn.addEventListener('click', () => {
-            descargarReportePDF();
         });
     }
     
@@ -116,13 +96,32 @@ async function cargarDatos() {
         const nombreFinal = user.nombre || deportistaData.nombre || window.DeportistaAPI.user?.nombre || window.DeportistaAPI.user?.name || 'Deportista';
         
         console.log('👤 Perfil cargado:', nombreFinal);
+        console.log('📍 Nivel actual del deportista:', deportistaData.nivel_actual);
         
         // Actualizar perfil en sidebar con nombre correcto
         actualizarPerfilSidebar({ ...deportistaData, nombre: nombreFinal, user: user });
         
-        // Cargar evaluaciones
-        evaluacionesData = await window.DeportistaAPI.getEvaluaciones();
-        console.log('📋 Evaluaciones cargadas:', evaluacionesData.length);
+        // Cargar TODAS las evaluaciones
+        const todasEvaluaciones = await window.DeportistaAPI.getEvaluaciones();
+        
+        console.log('📋 Total evaluaciones recibidas:', todasEvaluaciones.length);
+        
+        // 🔥 FILTRAR POR:
+        // 1. Solo habilidades (categoría = 'habilidad')
+        // 2. Solo del nivel actual del deportista
+        evaluacionesData = todasEvaluaciones.filter(e => {
+            const esHabilidad = e.habilidad?.categoria === 'habilidad';
+            const esDelNivelActual = e.habilidad?.nivel === deportistaData.nivel_actual;
+            
+            if (esHabilidad && esDelNivelActual) {
+                console.log(`   ✅ Evaluación incluida: ${e.habilidad?.nombre} (Nivel: ${e.habilidad?.nivel})`);
+                return true;
+            }
+            
+            return false;
+        });
+        
+        console.log(`📊 Evaluaciones del nivel actual (${deportistaData.nivel_actual}):`, evaluacionesData.length);
         
         // Aplicar filtros iniciales
         aplicarFiltros();
@@ -176,13 +175,6 @@ function aplicarFiltros() {
     
     evaluacionesFiltradas = [...evaluacionesData];
     
-    // Filtrar por categoría
-    if (filtros.categoria !== 'todas') {
-        evaluacionesFiltradas = evaluacionesFiltradas.filter(e => 
-            e.habilidad?.categoria === filtros.categoria
-        );
-    }
-    
     // Filtrar por estado
     if (filtros.estado === 'completadas') {
         evaluacionesFiltradas = evaluacionesFiltradas.filter(e => e.completado);
@@ -219,10 +211,9 @@ function aplicarFiltros() {
 // ==========================================
 function renderizarContenido() {
     renderizarHeader();
-    renderizarUltimas3Evaluaciones();
     renderizarFeedbackDestacado();
     renderizarHistorialCompleto();
-    renderizarRadarChart();
+    renderizarBarChart();
     renderizarEstadisticas();
 }
 
@@ -233,6 +224,25 @@ function renderizarHeader() {
     const promedioGlobal = document.getElementById('promedioGlobal');
     const nivelPromedio = document.getElementById('nivelPromedio');
     
+    // 🔥 AGREGAR BADGE DEL NIVEL ACTUAL
+    const headerElement = document.querySelector('header .relative');
+    if (headerElement && deportistaData) {
+        const nivelBadge = headerElement.querySelector('.nivel-badge');
+        if (!nivelBadge) {
+            const nivelNombre = getNivelNombreCompleto(deportistaData.nivel_actual);
+            const badgeHTML = `
+                <div class="nivel-badge bg-primary/20 border-2 border-primary px-6 py-3 rounded-xl mt-4 inline-flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary text-2xl">military_tech</span>
+                    <div>
+                        <p class="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Nivel Actual</p>
+                        <p class="font-display text-xl font-bold text-primary italic">${nivelNombre}</p>
+                    </div>
+                </div>
+            `;
+            headerElement.insertAdjacentHTML('beforeend', badgeHTML);
+        }
+    }
+    
     if (evaluacionesData.length === 0) {
         promedioGlobal.textContent = '0.0';
         nivelPromedio.textContent = 'Sin Evaluaciones';
@@ -242,94 +252,31 @@ function renderizarHeader() {
     const promedio = (evaluacionesData.reduce((sum, e) => sum + e.puntuacion, 0) / evaluacionesData.length).toFixed(1);
     promedioGlobal.textContent = promedio;
     
-    if (promedio >= 9) {
+    if (promedio >= 4.5) {
         nivelPromedio.textContent = 'Nivel Elite';
-    } else if (promedio >= 7) {
+    } else if (promedio >= 3.5) {
         nivelPromedio.textContent = 'Nivel Pro';
-    } else if (promedio >= 5) {
+    } else if (promedio >= 2.5) {
         nivelPromedio.textContent = 'Nivel Sólido';
     } else {
         nivelPromedio.textContent = 'En Desarrollo';
     }
 }
 
-// ==========================================
-// RENDERIZAR ÚLTIMAS 3 EVALUACIONES
-// ==========================================
-function renderizarUltimas3Evaluaciones() {
-    const container = document.getElementById('ultimasEvaluacionesContainer');
-    if (!container) return;
+function getNivelNombreCompleto(nivel) {
+    if (!nivel || nivel === 'pendiente') return 'SIN DEFINIR';
     
-    const ultimas3 = evaluacionesData
-        .sort((a, b) => new Date(b.fecha_evaluacion) - new Date(a.fecha_evaluacion))
-        .slice(0, 3);
+    const niveles = {
+        'baby_titans': 'Baby Titans',
+        '1_basico': 'Nivel 1 Básico',
+        '1_medio': 'Nivel 1 Medio',
+        '1_avanzado': 'Nivel 1 Avanzado',
+        '2': 'Nivel 2',
+        '3': 'Nivel 3',
+        '4': 'Nivel 4'
+    };
     
-    if (ultimas3.length === 0) {
-        container.innerHTML = `
-            <div class="col-span-3 text-center py-12 text-gray-400">
-                <div class="text-6xl mb-4">📋</div>
-                <h4 class="text-xl font-bold mb-2">No tienes evaluaciones aún</h4>
-                <p class="text-sm">Tu entrenador registrará aquí tus evaluaciones</p>
-            </div>
-        `;
-        return;
-    }
-    
-    container.innerHTML = ultimas3.map((evaluacion, index) => {
-        const fecha = formatFecha(evaluacion.fecha_evaluacion, 'corta');
-        const entrenador = evaluacion.entrenador?.nombre || 'Entrenador';
-        const entrenadorFoto = evaluacion.entrenador?.foto_perfil;
-        const puntuacion = evaluacion.puntuacion;
-        const completado = evaluacion.completado;
-        
-        let iconoEstado = 'check_circle';
-        let colorEstado = 'primary';
-        
-        if (index === 0 && puntuacion >= 9) {
-            iconoEstado = 'check_circle';
-            colorEstado = 'primary';
-        } else if (completado) {
-            iconoEstado = 'verified';
-            colorEstado = 'green-500';
-        } else {
-            iconoEstado = 'trending_up';
-            colorEstado = 'blue-500';
-        }
-        
-        const borderClass = index === 0 ? 'border-2 border-primary/40 shadow-[0_0_15px_rgba(226,27,35,0.2)]' : 'border border-white/10';
-        
-        return `
-            <div class="bg-zinc-900/90 ${borderClass} p-6 rounded-xl interactive-hover relative overflow-hidden group slide-in-up" style="animation-delay: ${index * 0.1}s">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <p class="text-[10px] uppercase font-bold ${index === 0 ? 'text-primary' : 'text-gray-400'} tracking-widest">${fecha}</p>
-                        <p class="font-display text-2xl font-bold italic text-white uppercase">Sesión #${evaluacionesData.length - evaluacionesData.indexOf(evaluacion)}</p>
-                    </div>
-                    <div class="bg-${colorEstado}/20 text-${colorEstado} p-2 rounded-lg flex items-center justify-center">
-                        <span class="material-symbols-outlined text-2xl fill-1">${iconoEstado}</span>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4 mb-6">
-                    ${entrenadorFoto ? 
-                        `<img src="${entrenadorFoto}" alt="${entrenador}" class="w-10 h-10 rounded-full object-cover border border-${index === 0 ? 'primary' : 'white'}/40" />` :
-                        `<div class="w-10 h-10 rounded-full overflow-hidden border border-${index === 0 ? 'primary' : 'white'}/40 bg-primary/20 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-primary">person</span>
-                        </div>`
-                    }
-                    <p class="text-sm font-semibold text-gray-300">${entrenador}</p>
-                </div>
-                <div class="flex items-baseline justify-between">
-                    <div class="flex items-baseline gap-2">
-                        <span class="font-display text-5xl font-bold ${index === 0 ? 'text-primary neon-text' : 'text-gray-300'} italic">${puntuacion.toFixed(1)}</span>
-                        <span class="text-[10px] uppercase font-bold text-gray-500">${puntuacion >= 9 ? 'Elite Score' : puntuacion >= 7 ? 'Pro Score' : 'Solid Base'}</span>
-                    </div>
-                    <button onclick="verDetalleEvaluacion(${evaluacion.id})" class="text-primary group-hover:bg-primary group-hover:text-white p-2 rounded-full border border-primary/20 transition-all">
-                        <span class="material-symbols-outlined text-lg">arrow_forward</span>
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
+    return niveles[nivel] || nivel;
 }
 
 // ==========================================
@@ -377,7 +324,7 @@ function renderizarFeedbackDestacado() {
                     <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
                         <div class="flex-shrink-0 flex flex-col items-center">
                             <div class="bg-primary text-white font-display text-6xl font-bold px-5 py-2 italic rounded-lg neon-border mb-3">${puntuacion.toFixed(1)}</div>
-                            <span class="text-[10px] uppercase font-bold text-primary tracking-widest text-center">Calificación<br/>Final</span>
+                            <span class="text-[10px] uppercase font-bold text-primary tracking-widest text-center">Calificación<br/>de 5</span>
                         </div>
                         <div class="flex-1">
                             <p class="italic text-xl leading-relaxed text-gray-200 mb-6">
@@ -421,8 +368,8 @@ function renderizarHistorialCompleto() {
         container.innerHTML = `
             <div class="text-center py-12 text-gray-400">
                 <div class="text-6xl mb-4">🔍</div>
-                <h4 class="text-xl font-bold mb-2">No hay evaluaciones con estos filtros</h4>
-                <p class="text-sm">Intenta cambiar los filtros para ver más resultados</p>
+                <h4 class="text-xl font-bold mb-2">No hay evaluaciones del nivel actual</h4>
+                <p class="text-sm">Las evaluaciones de otros niveles las puedes ver en "Mi Progreso"</p>
             </div>
         `;
         return;
@@ -430,41 +377,49 @@ function renderizarHistorialCompleto() {
     
     container.innerHTML = evaluacionesFiltradas.map((evaluacion, index) => {
         const habilidad = evaluacion.habilidad?.nombre || 'Habilidad';
-        const categoria = evaluacion.habilidad?.categoria || 'habilidad';
         const fecha = formatFecha(evaluacion.fecha_evaluacion);
         const puntuacion = evaluacion.puntuacion;
-        const minimo = evaluacion.habilidad?.puntuacion_minima || 7;
         const completado = evaluacion.completado;
         const observaciones = evaluacion.observaciones;
         const videoUrl = evaluacion.video_url;
         const entrenador = evaluacion.entrenador?.nombre || 'Entrenador';
         
-        const categoryIcon = getCategoriaIcon(categoria);
-        const categoryClass = `category-badge-${categoria.replace('_', '-')}`;
+        const porcentaje = (puntuacion / 5) * 100;
+        
+        // ID único para cada evaluación
+        const evalId = `eval-${evaluacion.id || index}`;
         
         return `
             <div class="evaluation-card ${completado ? 'evaluation-card-completed' : 'evaluation-card-pending'} bg-zinc-800 border-2 rounded-xl p-5 slide-in-up" style="animation-delay: ${index * 0.05}s">
                 <div class="flex items-start justify-between mb-4">
                     <div class="flex items-center gap-3 flex-1">
-                        <span class="text-3xl">${categoryIcon}</span>
+                        <span class="text-3xl">🏆</span>
                         <div>
                             <div class="flex items-center gap-2 mb-1">
                                 <h4 class="font-bold text-white text-lg">${habilidad}</h4>
-                                <span class="px-2 py-1 ${categoryClass} rounded-full text-xs font-bold uppercase">
-                                    ${categoria.replace('_', ' ')}
+                                <span class="px-2 py-1 category-badge-habilidad rounded-full text-xs font-bold uppercase">
+                                    HABILIDAD
                                 </span>
                             </div>
                             <p class="text-xs text-gray-400">📅 ${fecha} • 👨‍🏫 ${entrenador}</p>
                         </div>
                     </div>
-                    <div class="score-circle" style="--score: ${puntuacion * 10}">
-                        <span class="text-primary neon-text">${puntuacion}</span>
+                    <div class="score-circle-5" style="--score: ${porcentaje}">
+                        <span class="text-primary neon-text">${puntuacion.toFixed(1)}</span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="flex justify-between items-center text-xs text-gray-400 mb-2">
+                        <span>Progreso</span>
+                        <span class="font-bold text-primary">${puntuacion.toFixed(1)}/5</span>
+                    </div>
+                    <div class="w-full bg-zinc-700 rounded-full h-2">
+                        <div class="bg-primary h-2 rounded-full transition-all duration-500" style="width: ${porcentaje}%"></div>
                     </div>
                 </div>
                 
                 <div class="flex items-center gap-4 text-sm text-gray-400 mb-3">
-                    <span>Mínimo: <span class="font-bold text-blue-400">${minimo}/10</span></span>
-                    <span>•</span>
                     <span class="${completado ? 'text-green-400' : 'text-yellow-400'} font-bold">
                         ${completado ? '✅ Completado' : '🔄 En Progreso'}
                     </span>
@@ -472,24 +427,24 @@ function renderizarHistorialCompleto() {
                 
                 ${observaciones || videoUrl ? `
                     <div class="mt-4">
-                        <button onclick="toggleFeedback(${evaluacion.id})" class="flex items-center justify-between w-full p-3 bg-primary/10 hover:bg-primary/20 rounded-lg transition-all">
+                        <button onclick="toggleFeedback('${evalId}')" class="flex items-center justify-between w-full p-3 bg-primary/10 hover:bg-primary/20 rounded-lg transition-all">
                             <div class="flex items-center gap-2">
                                 <span class="text-lg">💬</span>
-                                <span class="font-semibold text-primary">Retroalimentación del Entrenador</span>
+                                <span class="font-semibold text-primary">Ver Comentarios del Entrenador</span>
                                 ${videoUrl ? '<span class="text-xs px-2 py-1 bg-primary/30 text-primary rounded-full ml-2">🎥 Video</span>' : ''}
                             </div>
-                            <span class="text-primary feedback-toggle-icon-${evaluacion.id}">▼</span>
+                            <span class="text-primary feedback-toggle-icon-${evalId}">▼</span>
                         </button>
                         
-                        <div id="feedback-${evaluacion.id}" class="feedback-collapsed mt-3">
+                        <div id="feedback-${evalId}" class="feedback-collapsed mt-3">
                             <div class="p-4 bg-zinc-900 rounded-lg space-y-3">
                                 ${observaciones ? `
                                     <div>
                                         <p class="text-sm font-semibold text-gray-300 mb-2 flex items-center">
                                             <span class="mr-2">📝</span> Observaciones:
                                         </p>
-                                        <p class="text-sm text-gray-400 bg-zinc-800 p-3 rounded-lg">
-                                            ${observaciones}
+                                        <p class="text-sm text-gray-400 bg-zinc-800 p-3 rounded-lg italic leading-relaxed">
+                                            "${observaciones}"
                                         </p>
                                     </div>
                                 ` : ''}
@@ -517,40 +472,58 @@ function renderizarHistorialCompleto() {
 }
 
 // ==========================================
-// RENDERIZAR RADAR CHART
+// RENDERIZAR GRÁFICA DE BARRAS
 // ==========================================
-function renderizarRadarChart() {
-    const radarPolygon = document.getElementById('radarPolygon');
-    if (!radarPolygon) return;
+function renderizarBarChart() {
+    const container = document.getElementById('barChartContainer');
+    if (!container) return;
     
     const ultimas6 = evaluacionesData
         .sort((a, b) => new Date(b.fecha_evaluacion) - new Date(a.fecha_evaluacion))
-        .slice(0, 6);
+        .slice(0, 6)
+        .reverse(); // Para mostrar cronológicamente
     
     if (ultimas6.length === 0) {
-        radarPolygon.setAttribute('points', '50,50 50,50 50,50 50,50 50,50');
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-400">
+                <div class="text-5xl mb-3">📊</div>
+                <p class="text-sm">No hay evaluaciones para mostrar</p>
+            </div>
+        `;
         return;
     }
     
-    // Calcular promedio por tipo (simplificado)
-    const puntuaciones = ultimas6.map(e => e.puntuacion);
-    const promedio = puntuaciones.reduce((a, b) => a + b, 0) / puntuaciones.length;
-    
-    // Generar puntos del polígono (5 puntos para 5 ejes)
-    const factor = promedio / 10; // Normalizar a 0-1
-    const radio = 45; // Radio máximo
-    const centro = 50;
-    
-    const puntos = [
-        { x: centro, y: centro - (radio * factor) }, // Top
-        { x: centro + (radio * factor * 0.95), y: centro - (radio * factor * 0.35) }, // Top-right
-        { x: centro + (radio * factor * 0.8), y: centro + (radio * factor * 0.85) }, // Bottom-right
-        { x: centro - (radio * factor * 0.8), y: centro + (radio * factor * 0.85) }, // Bottom-left
-        { x: centro - (radio * factor * 0.95), y: centro - (radio * factor * 0.35) }  // Top-left
-    ];
-    
-    const pointsString = puntos.map(p => `${p.x},${p.y}`).join(' ');
-    radarPolygon.setAttribute('points', pointsString);
+    container.innerHTML = ultimas6.map((evaluacion, index) => {
+        const habilidad = evaluacion.habilidad?.nombre || 'Habilidad';
+        const puntuacion = evaluacion.puntuacion;
+        const porcentaje = (puntuacion / 5) * 100;
+        const fecha = new Date(evaluacion.fecha_evaluacion).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+        
+        let colorClass = 'bg-red-500';
+        if (puntuacion >= 4) {
+            colorClass = 'bg-green-500';
+        } else if (puntuacion >= 3) {
+            colorClass = 'bg-yellow-500';
+        } else if (puntuacion >= 2) {
+            colorClass = 'bg-orange-500';
+        }
+        
+        return `
+            <div class="slide-in-up" style="animation-delay: ${index * 0.1}s">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex-1">
+                        <p class="text-xs font-bold text-gray-300 truncate">${habilidad}</p>
+                        <p class="text-[10px] text-gray-500">${fecha}</p>
+                    </div>
+                    <span class="text-sm font-bold text-primary ml-2">${puntuacion.toFixed(1)}</span>
+                </div>
+                <div class="w-full bg-zinc-800 rounded-full h-3 overflow-hidden">
+                    <div class="${colorClass} h-3 rounded-full transition-all duration-700 shadow-[0_0_10px_currentColor]" 
+                         style="width: ${porcentaje}%"></div>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 // ==========================================
@@ -571,7 +544,6 @@ function renderizarEstadisticas() {
     
     const completadas = evaluacionesData.filter(e => e.completado).length;
     const mejor = Math.max(...evaluacionesData.map(e => e.puntuacion));
-    const peor = Math.min(...evaluacionesData.map(e => e.puntuacion));
     const promedio = (evaluacionesData.reduce((sum, e) => sum + e.puntuacion, 0) / evaluacionesData.length).toFixed(1);
     const conFeedback = evaluacionesData.filter(e => e.observaciones || e.video_url).length;
     
@@ -586,11 +558,11 @@ function renderizarEstadisticas() {
         </div>
         <div class="bg-zinc-800 p-3 rounded-lg flex justify-between items-center border-l-2 border-yellow-500">
             <span class="text-xs uppercase font-bold text-gray-400">Promedio</span>
-            <span class="font-bold text-yellow-400 text-lg">${promedio}</span>
+            <span class="font-bold text-yellow-400 text-lg">${promedio}/5</span>
         </div>
         <div class="bg-zinc-800 p-3 rounded-lg flex justify-between items-center border-l-2 border-blue-500">
             <span class="text-xs uppercase font-bold text-gray-400">Mejor Puntuación</span>
-            <span class="font-bold text-blue-400 text-lg">${mejor.toFixed(1)}</span>
+            <span class="font-bold text-blue-400 text-lg">${mejor.toFixed(1)}/5</span>
         </div>
         <div class="bg-zinc-800 p-3 rounded-lg flex justify-between items-center border-l-2 border-purple-500">
             <span class="text-xs uppercase font-bold text-gray-400">Con Feedback</span>
@@ -602,15 +574,6 @@ function renderizarEstadisticas() {
 // ==========================================
 // FUNCIONES AUXILIARES
 // ==========================================
-function getCategoriaIcon(categoria) {
-    const iconos = {
-        'habilidad': '🏆',
-        'ejercicio_accesorio': '💪',
-        'postura': '🧘'
-    };
-    return iconos[categoria] || '📋';
-}
-
 function formatFecha(fecha, tipo = 'completa') {
     const date = new Date(fecha);
     
@@ -631,38 +594,29 @@ function formatFecha(fecha, tipo = 'completa') {
     });
 }
 
+// 🔥 FUNCIÓN CORREGIDA: Toggle Feedback
 function toggleFeedback(evaluacionId) {
+    console.log('🔄 Toggling feedback para:', evaluacionId);
+    
     const feedbackDiv = document.getElementById(`feedback-${evaluacionId}`);
     const toggleIcon = document.querySelector(`.feedback-toggle-icon-${evaluacionId}`);
     
-    if (!feedbackDiv) return;
+    if (!feedbackDiv) {
+        console.warn('⚠️ No se encontró el div de feedback para:', evaluacionId);
+        return;
+    }
     
     if (feedbackDiv.classList.contains('feedback-collapsed')) {
         feedbackDiv.classList.remove('feedback-collapsed');
         feedbackDiv.classList.add('feedback-expanded');
         if (toggleIcon) toggleIcon.textContent = '▲';
+        console.log('✅ Feedback expandido');
     } else {
         feedbackDiv.classList.remove('feedback-expanded');
         feedbackDiv.classList.add('feedback-collapsed');
         if (toggleIcon) toggleIcon.textContent = '▼';
+        console.log('✅ Feedback colapsado');
     }
-}
-
-function verDetalleEvaluacion(evaluacionId) {
-    const evaluacion = evaluacionesData.find(e => e.id === evaluacionId);
-    if (!evaluacion) return;
-    
-    // Scroll a la evaluación en el historial
-    const feedbackBtn = document.querySelector(`button[onclick="toggleFeedback(${evaluacionId})"]`);
-    if (feedbackBtn) {
-        feedbackBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        feedbackBtn.click();
-    }
-}
-
-function descargarReportePDF() {
-    window.DeportistaAPI.showNotification('📄 Función de reporte PDF en desarrollo', 'info');
-    // TODO: Implementar generación de PDF
 }
 
 // ==========================================
@@ -690,6 +644,5 @@ function showError(message) {
 
 // Hacer funciones globales para onclick
 window.toggleFeedback = toggleFeedback;
-window.verDetalleEvaluacion = verDetalleEvaluacion;
 
-console.log('✅ Mis Evaluaciones cargado correctamente');
+console.log('✅ Mis Evaluaciones cargado correctamente - VERSIÓN CORREGIDA');

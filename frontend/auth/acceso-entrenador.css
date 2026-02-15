@@ -113,12 +113,12 @@
 
 .acceso-login-section .acceso-section-bg {
     background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), 
-                     url('https://images.unsplash.com/photo-1594498653385-d5172c532c00?auto=format&fit=crop&q=80&w=1920');
+                     url('../assets/images/132933Wide-11701-wide_39883.jpg');
 }
 
 .acceso-register-section .acceso-section-bg {
     background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), 
-                     url('https://images.unsplash.com/photo-1526232759583-d6f448131dbc?auto=format&fit=crop&q=80&w=1920');
+                     url('../assets/images/133049Wide-11701-wide_39922.jpg');
 }
 
 .acceso-section-content {

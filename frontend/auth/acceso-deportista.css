@@ -101,12 +101,12 @@
 
 .acceso-login-section .acceso-section-bg {
     background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), 
-                     url('https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?auto=format&fit=crop&q=80&w=1920');
+                     url('../assets/images/inicioHistoria.jpg');
 }
 
 .acceso-register-section .acceso-section-bg {
     background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), 
-                     url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&q=80&w=1920');
+                     url('../assets/images/IMG_1161.jpg');
 }
 
 .acceso-section-content {

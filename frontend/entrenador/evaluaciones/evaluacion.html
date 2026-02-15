@@ -87,10 +87,6 @@
                     <span class="material-symbols-outlined">calendar_month</span>
                     <span class="nav-text">Calendario</span>
                 </a>
-                <a href="../reportes/index.html" class="nav-item">
-                    <span class="material-symbols-outlined">bar_chart</span>
-                    <span class="nav-text">Reportes</span>
-                </a>
             </nav>
 
             <!-- Footer del Sidebar -->
@@ -152,7 +148,7 @@
             <!-- Estadísticas rápidas -->
             <div class="flex flex-wrap gap-4">
                 <div class="bg-white dark:bg-zinc-900 px-4 py-3 border-l-4 border-primary shadow-sm">
-                    <p class="text-xs uppercase font-bold text-gray-400">Evaluaciones Totales</p>
+                    <p class="text-xs uppercase font-bold text-gray-400">Habilidades Evaluadas</p>
                     <p id="totalEvaluaciones" class="font-display text-xl font-bold">0</p>
                 </div>
                 <div class="bg-white dark:bg-zinc-900 px-4 py-3 border-l-4 border-primary shadow-sm">
@@ -194,31 +190,26 @@
             </div>
         </div>
 
-        <!-- Pestañas de categorías -->
-        <div class="mb-8">
-            <div class="flex space-x-1 border-b border-gray-200 dark:border-white/10">
-                <button onclick="cambiarCategoria('habilidad')" 
-                        id="tabHabilidad" 
-                        class="px-6 py-3 font-semibold text-sm uppercase tracking-wider transition-all duration-200 border-b-2 border-primary text-primary">
-                    🏆 Habilidades
-                </button>
-                <button onclick="cambiarCategoria('ejercicio_accesorio')" 
-                        id="tabEjercicio" 
-                        class="px-6 py-3 font-semibold text-sm uppercase tracking-wider transition-all duration-200 border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
-                    💪 Ejercicios
-                </button>
-                <button onclick="cambiarCategoria('postura')" 
-                        id="tabPostura" 
-                        class="px-6 py-3 font-semibold text-sm uppercase tracking-wider transition-all duration-200 border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
-                    🧘 Posturas
-                </button>
+        <!-- Título de sección - Solo Habilidades -->
+        <div class="mb-8 flex items-center gap-4">
+            <div class="flex items-center gap-3 bg-white dark:bg-zinc-900 px-6 py-4 rounded-xl shadow-lg border-l-4 border-primary w-full">
+                <span class="material-symbols-outlined text-primary text-3xl">emoji_events</span>
+                <div class="flex-1">
+                    <h2 class="font-display text-2xl font-bold uppercase tracking-wider text-gray-800 dark:text-white">
+                        Habilidades Técnicas
+                    </h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Evaluación de competencias fundamentales del nivel</p>
+                </div>
+                <div class="bg-primary/10 px-4 py-2 rounded-lg">
+                    <p class="text-xs font-bold text-primary uppercase">Solo Habilidades</p>
+                </div>
             </div>
         </div>
 
         <div class="grid lg:grid-cols-3 gap-8">
             <!-- Columna izquierda - Formulario de evaluación -->
             <div class="lg:col-span-2">
-                <!-- Lista de habilidades por categoría -->
+                <!-- Lista de habilidades -->
                 <div id="listaHabilidades" class="space-y-6">
                     <!-- Se llenará dinámicamente -->
                     <div class="text-center py-12">
@@ -243,19 +234,10 @@
 
             <!-- Columna derecha - Gráficas y estadísticas -->
             <div class="space-y-8">
-                <!-- Gráfica de progreso -->
-                <div class="chart-container">
-                    <h3 class="chart-title">📈 Progreso por Categoría</h3>
-                    <p class="chart-subtitle">Distribución de evaluaciones realizadas</p>
-                    <div class="h-64">
-                        <canvas id="chartProgreso"></canvas>
-                    </div>
-                </div>
-
                 <!-- Gráfica de radar -->
                 <div class="chart-container">
                     <h3 class="chart-title">🎯 Competencias Clave</h3>
-                    <p class="chart-subtitle">Evaluación actual vs promedio</p>
+                    <p class="chart-subtitle">Evaluación actual de habilidades</p>
                     <div class="h-64">
                         <canvas id="chartRadar"></canvas>
                     </div>

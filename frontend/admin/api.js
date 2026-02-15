@@ -1,6 +1,36 @@
 // frontend/api.js - VERSIÓN DEFINITIVA Y COMPLETA
 window.AdminAPI = {
-    baseURL: 'https://gestiondeportistas-production.up.railway.app/api',
+    baseURL: (() => {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return (() => {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return (() => {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return (() => {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return (() => {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:5000/api';
+    }
+    return 'https://gestiondeportistas-production.up.railway.app/api';
+})();
+    }
+    return 'https://gestiondeportistas-production.up.railway.app/api';
+})();
+    }
+    return 'https://gestiondeportistas-production.up.railway.app/api';
+})();
+    }
+    return 'https://gestiondeportistas-production.up.railway.app/api';
+})();
+    }
+    return 'https://gestiondeportistas-production.up.railway.app/api';
+})(),
 
     // ==========================================
     // CONFIGURACIÓN
@@ -1551,7 +1581,7 @@ window.AdminAPI = {
         
         // Mensajes de error más específicos
         if (error.message.includes('Failed to fetch')) {
-            errorMessage = 'No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose en https://gestiondeportistas-production.up.railway.app';
+            errorMessage = 'No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose en http://localhost:5000';
         } else if (error.message.includes('404')) {
             errorMessage = 'Ruta del API no encontrada. Verifica que el endpoint /api/calendario exista en el backend';
         } else if (error.message.includes('500')) {

@@ -3,10 +3,13 @@
 // ==========================================
 
 // Configuración
-const CONFIG = {
-    RESET_PASSWORD_URL: 'https://gestiondeportistas-production.up.railway.app/api/auth/reset-password'
-};
+const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:5000'
+    : 'https://gestiondeportistas-production.up.railway.app';
 
+const CONFIG = {
+    RESET_PASSWORD_URL: `${API_BASE_URL}/api/auth/reset-password`
+};
 document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ Cambiar Contraseña page loaded');
     

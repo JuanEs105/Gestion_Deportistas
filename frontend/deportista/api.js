@@ -5,7 +5,13 @@
 console.log('📦 Cargando DeportistaAPI...');
 
 window.DeportistaAPI = {
-    baseURL: 'https://gestiondeportistas-production.up.railway.app/api',
+    baseURL: (() => {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:5000/api';
+    }
+    return 'https://gestiondeportistas-production.up.railway.app/api';
+})(),
 
     // ==========================================
     // CONFIGURACIÓN Y AUTENTICACIÓN
@@ -187,8 +193,8 @@ window.DeportistaAPI = {
                                 <span class="material-symbols-outlined text-blue-600 dark:text-blue-400">phone</span>
                                 <div class="flex-1">
                                     <p class="text-sm text-gray-500 dark:text-gray-400">WhatsApp</p>
-                                    <a href="https://wa.me/573133864382" target="_blank" class="font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
-                                        +57 313 386 4382
+                                    <a href="https://wa.me/573114443158" target="_blank" class="font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+                                        +57 311 444 3158
                                         <span class="material-symbols-outlined text-green-500 text-xl">chat</span>
                                     </a>
                                 </div>
