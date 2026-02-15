@@ -1,6 +1,10 @@
 // ===================================
-// CONFIGURACIÓN Y UTILIDADES
+// DASHBOARD ENTRENADOR - VERSIÓN CORREGIDA
+// Titanes Evolution
 // ===================================
+
+console.log('🚀 Inicializando Dashboard Entrenador CORREGIDO');
+
 const API = window.EntrenadorAPI;
 
 // Alias para compatibilidad
@@ -8,73 +12,6 @@ const getUserData = () => API.user;
 const formatNivel = (nivel) => API.formatNivel(nivel);
 const formatFecha = (fecha) => API.formatFecha(fecha);
 const formatHora = (fecha) => API.formatHora(fecha);
-
-// ===================================
-// FUNCIÓN DE DIAGNÓSTICO
-// ===================================
-async function diagnosticarDashboard() {
-    console.log('🔍 DIAGNÓSTICO DEL DASHBOARD');
-    
-    try {
-        // 1. Verificar usuario
-        const user = getUserData();
-        console.log('👤 Usuario actual:', {
-            id: user?.id,
-            nombre: user?.nombre,
-            email: user?.email,
-            role: user?.role,
-            niveles_asignados: user?.niveles_asignados,
-            tieneNiveles: user?.niveles_asignados?.length > 0
-        });
-        
-        // 2. Probar API.getDeportistas()
-        console.log('📥 Probando API.getDeportistas()...');
-        const deportistas = await API.getDeportistas();
-        console.log('✅ Resultado getDeportistas():', {
-            total: deportistas?.length || 0,
-            primeros3: deportistas?.slice(0, 3)
-        });
-        
-        // 3. Probar endpoint directo
-        console.log('🌐 Probando endpoint directo...');
-        const response = await fetch(`${API.baseURL}/deportistas`, {
-            method: 'GET',
-            headers: API.getHeaders()
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            const deportistasDirectos = data.deportistas || data || [];
-            console.log('✅ Endpoint directo:', {
-                total: deportistasDirectos?.length || 0,
-                muestra: deportistasDirectos?.slice(0, 3)
-            });
-            
-            // Comparar
-            console.log('📊 COMPARACIÓN:', {
-                'API.getDeportistas()': deportistas?.length || 0,
-                'Endpoint directo': deportistasDirectos?.length || 0,
-                'Diferencia': (deportistasDirectos?.length || 0) - (deportistas?.length || 0)
-            });
-        } else {
-            console.warn('❌ Endpoint falló:', response.status);
-        }
-        
-        return deportistas;
-        
-    } catch (error) {
-        console.error('❌ Error en diagnóstico:', error);
-        return [];
-    }
-}
-
-// Ejecutar diagnóstico cuando se presione Ctrl+Shift+D
-document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-        e.preventDefault();
-        diagnosticarDashboard();
-    }
-});
 
 // ===================================
 // VERIFICACIÓN DE AUTENTICACIÓN
@@ -120,20 +57,16 @@ const cargarNivelesAsignados = () => {
 };
 
 // ===================================
-// CARGAR ESTADÍSTICAS - VERSIÓN CORREGIDA
+// CARGAR ESTADÍSTICAS
 // ===================================
 const cargarEstadisticas = async () => {
     try {
         console.log('📊 Cargando estadísticas...');
         
-        // 1. OBTENER DEPORTISTAS SIN FILTRAR
+        // 1. OBTENER DEPORTISTAS
         let deportistas = [];
         
         try {
-            // Primero intentar obtener TODOS los deportistas
-            console.log('📥 Obteniendo deportistas...');
-            
-            // Usar endpoint directo para evitar filtrado
             const response = await fetch(`${API.baseURL}/deportistas`, {
                 method: 'GET',
                 headers: API.getHeaders()
@@ -142,84 +75,43 @@ const cargarEstadisticas = async () => {
             if (response.ok) {
                 const data = await response.json();
                 deportistas = data.deportistas || data || [];
-                console.log(`✅ Obtenidos ${deportistas.length} deportistas (endpoint directo)`);
+                console.log(`✅ Obtenidos ${deportistas.length} deportistas`);
             } else {
-                // Si falla, usar API con filtro pero mostrar advertencia
-                console.warn('⚠️ Endpoint directo falló, usando API.getDeportistas()');
+                console.warn('⚠️ Usando API.getDeportistas()');
                 deportistas = await API.getDeportistas();
-                console.log(`✅ Obtenidos ${deportistas.length} deportistas (API filtrado)`);
             }
         } catch (error) {
             console.error('❌ Error obteniendo deportistas:', error);
         }
         
-        // Si no hay deportistas, mostrar advertencia
-        if (deportistas.length === 0) {
-            console.warn('⚠️ NO SE ENCONTRARON DEPORTISTAS');
-            console.log('🔄 Verificando si es problema de niveles asignados...');
-            
-            const user = getUserData();
-            if (!user?.niveles_asignados || user.niveles_asignados.length === 0) {
-                console.log('⚠️ El entrenador NO tiene niveles asignados en su perfil');
-                console.log('💡 Sugerencia: Agrega niveles en /api/entrenador/perfil');
-            }
-        }
-        
         // 2. OBTENER EVALUACIONES
-        let evaluacionesPendientes = 0;
         let evaluacionesRealizadas = 0;
-        let promedioCalificacion = 0;
         
         try {
-            console.log('📋 Obteniendo evaluaciones...');
             const evaluacionesData = await API.getEvaluaciones();
             evaluacionesRealizadas = evaluacionesData.length || 0;
-            
-            // Calcular promedio de calificación
-            if (evaluacionesData.length > 0) {
-                const suma = evaluacionesData.reduce((acc, evalu) => {
-                    return acc + (evalu.calificacion_total || evalu.puntuacion || 3.5);
-                }, 0);
-                promedioCalificacion = (suma / evaluacionesData.length).toFixed(1);
-            }
-            
             console.log(`✅ Evaluaciones realizadas: ${evaluacionesRealizadas}`);
         } catch (error) {
-            console.warn('⚠️ No se pudieron obtener evaluaciones:', error.message);
+            console.warn('⚠️ No se pudieron obtener evaluaciones');
         }
         
-        // Obtener evaluaciones pendientes
-        try {
-            const evaluacionesPend = await API.getEvaluacionesPendientes();
-            evaluacionesPendientes = evaluacionesPend.length || 0;
-            console.log(`✅ Evaluaciones pendientes: ${evaluacionesPendientes}`);
-        } catch (error) {
-            console.warn('⚠️ No se pudieron obtener evaluaciones pendientes:', error.message);
-        }
-        
-        // Filtrar deportistas activos
-        const deportistasActivos = deportistas.filter(d => d.estado === 'activo' || d.activo === true);
+        // Evalua deportistas pendientes (simplificado)
+        const evaluacionesPendientes = Math.max(0, deportistas.length - evaluacionesRealizadas);
         
         // 3. ACTUALIZAR UI
-        document.getElementById('totalDeportistas').textContent = deportistas.length;
-        document.getElementById('deportistasActivos').textContent = deportistasActivos.length;
-        document.getElementById('evaluacionesPendientes').textContent = evaluacionesPendientes;
-        document.getElementById('evaluacionesRealizadas').textContent = evaluacionesRealizadas;
-        document.getElementById('promedioCalificacion').textContent = promedioCalificacion;
-        document.getElementById('evaluacionesMes').textContent = evaluacionesRealizadas;
+        const totalEl = document.getElementById('totalDeportistas');
+        const pendientesEl = document.getElementById('evaluacionesPendientes');
+        const realizadasEl = document.getElementById('evaluacionesRealizadas');
         
-        console.log('📈 Estadísticas actualizadas:', {
-            deportistas: deportistas.length,
-            activos: deportistasActivos.length,
-            evaluacionesPendientes,
-            evaluacionesRealizadas,
-            promedioCalificacion
-        });
+        if (totalEl) totalEl.textContent = deportistas.length;
+        if (pendientesEl) pendientesEl.textContent = evaluacionesPendientes;
+        if (realizadasEl) realizadasEl.textContent = evaluacionesRealizadas;
+        
+        console.log('📈 Estadísticas actualizadas');
         
         return deportistas;
     } catch (error) {
         console.error('❌ Error cargando estadísticas:', error);
-        mostrarError('Error al cargar las estadísticas');
         return [];
     }
 };
@@ -228,10 +120,14 @@ const cargarEstadisticas = async () => {
 // CARGAR PRÓXIMO ENTRENAMIENTO
 // ===================================
 const cargarProximoEntrenamiento = async () => {
+    const proximoEl = document.getElementById('proximoEntrenamiento');
+    const nivelEl = document.getElementById('nivelProximoEntrenamiento');
+    
+    if (!proximoEl || !nivelEl) return;
+    
     try {
         const eventos = await API.getEventosCalendario();
         
-        // Buscar el próximo evento
         const ahora = new Date();
         const proximosEventos = eventos
             .filter(e => new Date(e.fecha_evento) > ahora)
@@ -241,21 +137,19 @@ const cargarProximoEntrenamiento = async () => {
             const proximo = proximosEventos[0];
             const fecha = new Date(proximo.fecha_evento);
             
-            // Verificar si es hoy
             const esHoy = fecha.toDateString() === ahora.toDateString();
             const texto = esHoy ? `Hoy, ${formatHora(proximo.fecha_evento)}` : formatFecha(proximo.fecha_evento);
             
-            document.getElementById('proximoEntrenamiento').textContent = texto;
-            document.getElementById('nivelProximoEntrenamiento').textContent = 
-                formatNivel(proximo.nivel) || 'Evento General';
+            proximoEl.textContent = texto;
+            nivelEl.textContent = formatNivel(proximo.nivel) || 'Evento General';
         } else {
-            document.getElementById('proximoEntrenamiento').textContent = 'Sin eventos';
-            document.getElementById('nivelProximoEntrenamiento').textContent = 'próximos';
+            proximoEl.textContent = 'Sin eventos';
+            nivelEl.textContent = 'próximos';
         }
     } catch (error) {
         console.error('Error cargando próximo entrenamiento:', error);
-        document.getElementById('proximoEntrenamiento').textContent = '--';
-        document.getElementById('nivelProximoEntrenamiento').textContent = '--';
+        proximoEl.textContent = '--';
+        nivelEl.textContent = '--';
     }
 };
 
@@ -269,9 +163,7 @@ const cargarDeportistasPorNivel = (deportistas) => {
     if (deportistas.length === 0) {
         container.innerHTML = `
             <div style="text-align: center; padding: 3rem; color: var(--gray-500);">
-                <span class="material-symbols-outlined" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;">
-                    groups
-                </span>
+                <span class="material-symbols-outlined" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;">groups</span>
                 <p>No se encontraron deportistas</p>
                 <p style="font-size: 0.875rem; margin-top: 0.5rem;">
                     <button onclick="window.location.href='deportistas/registrar.html'" 
@@ -291,10 +183,9 @@ const cargarDeportistasPorNivel = (deportistas) => {
         porNivel[nivel] = (porNivel[nivel] || 0) + 1;
     });
     
-    // Ordenar y preparar datos
     const datosNiveles = Object.entries(porNivel)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 6); // Top 6 niveles
+        .slice(0, 6);
     
     const maxValue = Math.max(...datosNiveles.map(([_, count]) => count));
     
@@ -325,9 +216,7 @@ const cargarDeportistasRecientes = (deportistas) => {
         tbody.innerHTML = `
             <tr>
                 <td colspan="4" style="text-align: center; padding: 3rem; color: var(--gray-400);">
-                    <span class="material-symbols-outlined" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;">
-                        groups
-                    </span>
+                    <span class="material-symbols-outlined" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;">groups</span>
                     <p>No hay deportistas registrados</p>
                     <button onclick="window.location.href='deportistas/registrar.html'" 
                             style="background: var(--primary-red); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-top: 1rem; font-size: 0.875rem;">
@@ -339,17 +228,13 @@ const cargarDeportistasRecientes = (deportistas) => {
         return;
     }
     
-    // Ordenar por fecha de creación y tomar los 5 más recientes
     const recientes = deportistas
-        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
         .slice(0, 5);
     
     tbody.innerHTML = recientes.map(deportista => {
-        const calificacion = Math.random() * 2 + 3; // Simulado: 3-5
-        const estrellas = Math.round(calificacion);
-        
         return `
-            <tr onclick="verDetalleDeportista('${deportista.id}')">
+            <tr onclick="verDetalleDeportista('${deportista.id}')" style="cursor: pointer;">
                 <td>
                     <div class="athlete-cell">
                         <div class="athlete-avatar">
@@ -357,8 +242,8 @@ const cargarDeportistasRecientes = (deportistas) => {
                                  alt="${deportista.user?.nombre || 'Deportista'}">
                         </div>
                         <div class="athlete-info">
-                            <div class="athlete-name">${deportista.user?.nombre || 'Sin nombre'}</div>
-                            <div class="athlete-role">${deportista.equipo_competitivo || 'Atleta'}</div>
+                            <div class="athlete-name">${deportista.user?.nombre || deportista.nombre || 'Sin nombre'}</div>
+                            <div class="athlete-role">${formatEquipo(deportista.equipo_competitivo)}</div>
                         </div>
                     </div>
                 </td>
@@ -366,16 +251,7 @@ const cargarDeportistasRecientes = (deportistas) => {
                     <span class="nivel-badge">${formatNivel(deportista.nivel_actual)}</span>
                 </td>
                 <td>
-                    <div class="rating">
-                        <span class="rating-value">${calificacion.toFixed(1)}</span>
-                        <div class="stars">
-                            ${Array(5).fill(0).map((_, i) => `
-                                <span class="material-symbols-outlined" style="${i < estrellas ? 'font-variation-settings: \'FILL\' 1;' : ''}">
-                                    star
-                                </span>
-                            `).join('')}
-                        </div>
-                    </div>
+                    <span class="text-sm text-gray-500">--</span>
                 </td>
                 <td style="text-align: right;">
                     <span class="material-symbols-outlined chevron-icon">chevron_right</span>
@@ -384,6 +260,18 @@ const cargarDeportistasRecientes = (deportistas) => {
         `;
     }).join('');
 };
+
+function formatEquipo(equipo) {
+    const equipos = {
+        'sin_equipo': 'Sin Equipo',
+        'rocks_titans': 'Rocks Titans',
+        'lightning_titans': 'Lightning Titans',
+        'storm_titans': 'Storm Titans',
+        'fire_titans': 'Fire Titans',
+        'electric_titans': 'Electric Titans'
+    };
+    return equipos[equipo] || 'Atleta';
+}
 
 // ===================================
 // VER DETALLE DE DEPORTISTA
@@ -402,7 +290,6 @@ const cargarProximasActividades = async () => {
     try {
         const eventos = await API.getEventosCalendario();
         
-        // Filtrar eventos próximos (próximos 3 días)
         const ahora = new Date();
         const enTresDias = new Date();
         enTresDias.setDate(ahora.getDate() + 3);
@@ -421,14 +308,8 @@ const cargarProximasActividades = async () => {
         if (proximas.length === 0) {
             container.innerHTML = `
                 <div style="text-align: center; padding: 1rem; color: var(--gray-500);">
-                    <span class="material-symbols-outlined" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.3;">
-                        event
-                    </span>
+                    <span class="material-symbols-outlined" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.3;">event</span>
                     <p style="font-size: 0.875rem;">No hay actividades próximas</p>
-                    <button onclick="window.location.href='calendario/agregar.html'" 
-                            style="background: var(--primary-red); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-top: 0.5rem; font-size: 0.75rem;">
-                        Agregar evento
-                    </button>
                 </div>
             `;
             return;
@@ -436,9 +317,7 @@ const cargarProximasActividades = async () => {
         
         container.innerHTML = proximas.map(evento => `
             <div class="notification-item">
-                <span class="material-symbols-outlined notification-icon">
-                    event
-                </span>
+                <span class="material-symbols-outlined notification-icon">event</span>
                 <div class="notification-content">
                     <p class="notification-text">${evento.titulo || 'Entrenamiento'}</p>
                     <p class="notification-time">${formatFecha(evento.fecha_evento)}</p>
@@ -449,14 +328,41 @@ const cargarProximasActividades = async () => {
         console.error('Error cargando próximas actividades:', error);
         container.innerHTML = `
             <div style="text-align: center; padding: 1rem; color: var(--gray-500);">
-                <span class="material-symbols-outlined" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.3;">
-                    sync_problem
-                </span>
-                <p style="font-size: 0.875rem;">No se pudieron cargar las actividades</p>
+                <span class="material-symbols-outlined" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.3;">sync_problem</span>
+                <p style="font-size: 0.875rem;">Error cargando actividades</p>
             </div>
         `;
     }
 };
+
+// ===================================
+// 🔥 CONFIGURAR ACCIONES INMEDIATAS (CORREGIDO)
+// ===================================
+const configurarAccionesInmediatas = () => {
+    const container = document.getElementById('accionesInmediatas');
+    if (!container) return;
+    
+    // 🔥 RUTAS CORREGIDAS
+    container.innerHTML = `
+        <div class="activity-item" onclick="irAEvaluaciones()" style="cursor: pointer;">
+            <div class="activity-text">Crear evaluación rápida</div>
+            <div class="activity-time">Selecciona un deportista</div>
+        </div>
+        <div class="activity-item" onclick="window.location.href='deportistas/index.html'" style="cursor: pointer;">
+            <div class="activity-text">Ver lista de deportistas</div>
+            <div class="activity-time">Gestionar atletas</div>
+        </div>
+        <div class="activity-item" onclick="window.location.href='calendario/index.html'" style="cursor: pointer;">
+            <div class="activity-text">Ver calendario</div>
+            <div class="activity-time">Programar entrenamientos</div>
+        </div>
+    `;
+};
+
+// 🔥 Función para ir a evaluaciones
+function irAEvaluaciones() {
+    window.location.href = 'evaluaciones/index.html';
+}
 
 // ===================================
 // THEME TOGGLE
@@ -474,9 +380,10 @@ const initThemeToggle = () => {
             document.documentElement.classList.toggle('dark', isDark);
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             
-            // Actualizar icono
             const icon = toggleBtn.querySelector('.material-symbols-outlined');
-            icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+            if (icon) {
+                icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+            }
         });
     }
 };
@@ -493,25 +400,6 @@ const initLogout = () => {
             }
         });
     }
-};
-
-// ===================================
-// PERFIL CLICK
-// ===================================
-const initProfileClick = () => {
-    const profileBtn = document.getElementById('coachProfile');
-    if (profileBtn) {
-        profileBtn.addEventListener('click', () => {
-            window.location.href = 'perfil/index.html';
-        });
-    }
-};
-
-// ===================================
-// MOSTRAR ERROR
-// ===================================
-const mostrarError = (mensaje) => {
-    console.error(mensaje);
 };
 
 // ===================================
@@ -535,22 +423,22 @@ const init = async () => {
     // Cargar niveles asignados
     cargarNivelesAsignados();
     
+    // 🔥 Configurar acciones inmediatas con rutas correctas
+    configurarAccionesInmediatas();
+    
     // Inicializar controles
     initThemeToggle();
     initLogout();
-    initProfileClick();
     
     try {
-        // Cargar datos en paralelo
+        // Cargar datos
         const deportistas = await cargarEstadisticas();
         
-        // Cargar el resto de datos
         await Promise.all([
             cargarProximoEntrenamiento(),
             cargarProximasActividades()
         ]);
         
-        // Cargar gráficas con los deportistas obtenidos
         cargarDeportistasPorNivel(deportistas);
         cargarDeportistasRecientes(deportistas);
         
@@ -558,16 +446,12 @@ const init = async () => {
         
     } catch (error) {
         console.error('❌ Error al cargar el dashboard:', error);
-        mostrarError('Error al cargar los datos del dashboard');
         
-        // Mostrar estado de error en la UI
         const nivelesChart = document.getElementById('nivelesChart');
         if (nivelesChart) {
             nivelesChart.innerHTML = `
                 <div style="text-align: center; padding: 3rem; color: var(--danger);">
-                    <span class="material-symbols-outlined" style="font-size: 3rem; margin-bottom: 1rem;">
-                        error
-                    </span>
+                    <span class="material-symbols-outlined" style="font-size: 3rem; margin-bottom: 1rem;">error</span>
                     <p>Error al cargar los datos</p>
                     <button onclick="location.reload()" 
                             style="background: var(--primary-red); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-top: 1rem;">
@@ -587,3 +471,9 @@ if (document.readyState === 'loading') {
 } else {
     init();
 }
+
+// Hacer funciones globales
+window.verDetalleDeportista = verDetalleDeportista;
+window.irAEvaluaciones = irAEvaluaciones;
+
+console.log('✅ Dashboard Entrenador CORREGIDO cargado');
