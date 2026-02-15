@@ -567,7 +567,10 @@ class ReportesController {
 static async descargarDocumentoPDF(req, res) {
     try {
         const { deportista_id } = req.params;
-        
+
+        console.log('\n📄 === DESCARGA DOCUMENTO PDF ===');
+        console.log('🆔 Deportista ID:', deportista_id);
+
         const deportista = await Deportista.findByPk(deportista_id, {
             include: [{
                 model: User,
@@ -576,17 +579,32 @@ static async descargarDocumentoPDF(req, res) {
             }]
         });
 
-        if (!deportista || !deportista.documento_identidad) {
+        if (!deportista) {
             return res.status(404).json({
                 success: false,
-                error: 'Documento no encontrado'
+                error: 'Deportista no encontrado'
             });
         }
 
-        // 🔥 SIMPLE: Solo devolver la URL
+        if (!deportista.documento_identidad) {
+            return res.status(404).json({
+                success: false,
+                error: 'Este deportista no tiene documento cargado'
+            });
+        }
+
+        const docUrl = deportista.documento_identidad;
+        console.log('🌐 URL original:', docUrl);
+        console.log('✅ Devolviendo URL sin modificar');
+
+        // 🔥 SOLUCIÓN: URL sin modificar
         return res.json({
             success: true,
-            url: deportista.documento_identidad
+            url: docUrl,
+            deportista: {
+                id: deportista.id,
+                nombre: deportista.user?.nombre || ''
+            }
         });
 
     } catch (error) {
@@ -597,7 +615,6 @@ static async descargarDocumentoPDF(req, res) {
         });
     }
 }
-
   // ============================================
   // OBTENER DEPORTISTAS COMPLETOS
   // ============================================
