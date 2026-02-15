@@ -1,23 +1,20 @@
 // ===================================
-// MENÚ DE NIVELES - TITANES EVOLUTION
-// VERSIÓN SIMPLIFICADA - USA SOLO EVALUACIONES
-// No hace llamadas adicionales al backend problemático
+// MENÚ DE NIVELES - VERSIÓN FINAL CORREGIDA
+// Obtiene TODAS las habilidades del nivel desde el backend
 // ===================================
 
-console.log('🎯 Inicializando Menú de Niveles (VERSIÓN SIMPLIFICADA)...');
+console.log('🎯 Inicializando Menú de Niveles (VERSIÓN FINAL)...');
 
 let deportistaData = null;
 let todosLosNiveles = [];
-let evaluacionesData = [];
 
-// Definir todos los niveles del sistema
 const NIVELES_SISTEMA = [
     { id: '1_basico', nombre: 'Nivel 1 BÁSICO', descripcion: '', orden: 1 },
     { id: '1_medio', nombre: 'Nivel 1 MEDIO', descripcion: '', orden: 2 },
     { id: '1_avanzado', nombre: 'Nivel 1 AVANZADO', descripcion: '', orden: 3 },
-    { id: '2', nombre: 'Nivel 2 ', descripcion: '', orden: 4 },
-    { id: '3', nombre: 'Nivel 3 ', descripcion: '', orden: 5 },
-    { id: '4', nombre: 'Nivel 4 ', descripcion: '', orden: 6 }
+    { id: '2', nombre: 'Nivel 2', descripcion: '', orden: 4 },
+    { id: '3', nombre: 'Nivel 3', descripcion: '', orden: 5 },
+    { id: '4', nombre: 'Nivel 4', descripcion: '', orden: 6 }
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -47,7 +44,6 @@ async function cargarDatos() {
         showLoading();
         console.log('📥 Cargando datos del deportista...');
         
-        // Cargar perfil
         deportistaData = await window.DeportistaAPI.getMe();
         if (!deportistaData) {
             throw new Error('No se pudo cargar el perfil del deportista');
@@ -62,28 +58,15 @@ async function cargarDatos() {
         
         actualizarPerfilSidebar({ ...deportistaData, nombre: nombreFinal, user: user });
         
-        // Cargar TODAS las evaluaciones
+        // Cargar evaluaciones
         const todasEvaluaciones = await window.DeportistaAPI.getEvaluaciones();
+        const evaluacionesHabilidades = todasEvaluaciones.filter(e => e.habilidad?.categoria === 'habilidad');
         
-        console.log('📋 Total evaluaciones recibidas:', todasEvaluaciones.length);
+        console.log('📊 Evaluaciones de habilidades:', evaluacionesHabilidades.length);
         
-        // Filtrar solo habilidades
-        evaluacionesData = todasEvaluaciones.filter(e => {
-            const esHabilidad = e.habilidad?.categoria === 'habilidad';
-            
-            if (esHabilidad) {
-                console.log(`   ✅ Evaluación: ${e.habilidad?.nombre || 'Sin nombre'} | Nivel: ${e.habilidad?.nivel} | Puntuación: ${e.puntuacion} | Completado: ${e.completado}`);
-            }
-            
-            return esHabilidad;
-        });
+        // 🔥 CARGAR PROGRESO REAL PARA CADA NIVEL
+        await calcularProgresoRealPorNivel(evaluacionesHabilidades);
         
-        console.log('📊 Evaluaciones de HABILIDADES:', evaluacionesData.length);
-        
-        // 🔥 NUEVO: Calcular progreso SOLO basándonos en las evaluaciones existentes
-        calcularProgresoDesdeEvaluaciones();
-        
-        // Renderizar
         renderizarContenido();
         
         hideLoading();
@@ -98,16 +81,15 @@ async function cargarDatos() {
     }
 }
 
-// 🔥 NUEVA FUNCIÓN: Calcular progreso solo desde evaluaciones
-function calcularProgresoDesdeEvaluaciones() {
-    console.log('🔍 Calculando progreso desde evaluaciones...');
+// 🔥 FUNCIÓN CLAVE: Obtiene TODAS las habilidades del nivel y calcula progreso real
+async function calcularProgresoRealPorNivel(evaluaciones) {
+    console.log('🔍 Calculando progreso REAL por nivel...');
     
     todosLosNiveles = [];
     
     // Agrupar evaluaciones por nivel
     const evaluacionesPorNivel = {};
-    
-    evaluacionesData.forEach(ev => {
+    evaluaciones.forEach(ev => {
         const nivel = ev.habilidad?.nivel;
         if (!nivel) return;
         
@@ -115,96 +97,87 @@ function calcularProgresoDesdeEvaluaciones() {
             evaluacionesPorNivel[nivel] = [];
         }
         
-        // Solo agregar si no está ya (evitar duplicados)
-        const yaExiste = evaluacionesPorNivel[nivel].some(e => 
-            e.habilidad_id === ev.habilidad_id || 
-            (e.habilidad?.id === ev.habilidad?.id)
-        );
-        
-        if (!yaExiste) {
-            evaluacionesPorNivel[nivel].push(ev);
-        }
+        evaluacionesPorNivel[nivel].push(ev);
     });
     
-    console.log('📊 Evaluaciones agrupadas por nivel:', evaluacionesPorNivel);
-    
-    // Para cada nivel del sistema, calcular progreso
+    // Para cada nivel del sistema
     for (const nivel of NIVELES_SISTEMA) {
-        const evaluacionesNivel = evaluacionesPorNivel[nivel.id] || [];
-        
         console.log(`\n📚 Procesando ${nivel.nombre} (${nivel.id})...`);
-        console.log(`   Evaluaciones encontradas: ${evaluacionesNivel.length}`);
         
-        if (evaluacionesNivel.length === 0) {
-            // Nivel sin evaluaciones
-            console.log(`   ⚠️ Sin evaluaciones para ${nivel.nombre}`);
+        try {
+            // 🔥 OBTENER TODAS LAS HABILIDADES DEL NIVEL
+            const response = await fetch(`${window.DeportistaAPI.baseURL}/habilidades/nivel/${nivel.id}`, {
+                headers: window.DeportistaAPI.getHeaders()
+            });
+            
+            if (!response.ok) {
+                console.warn(`⚠️ No se pudieron cargar habilidades del nivel ${nivel.id}`);
+                todosLosNiveles.push({
+                    ...nivel,
+                    completadas: 0,
+                    total: 0,
+                    porcentaje: 0,
+                    estado: determinarEstadoNivel(nivel.id, deportistaData.nivel_actual, 0)
+                });
+                continue;
+            }
+            
+            const data = await response.json();
+            const todasHabilidades = (data.habilidades || data || []).filter(h => h.categoria === 'habilidad');
+            const totalHabilidades = todasHabilidades.length;
+            
+            console.log(`   📊 Total habilidades en backend: ${totalHabilidades}`);
+            
+            // Obtener evaluaciones de este nivel
+            const evaluacionesNivel = evaluacionesPorNivel[nivel.id] || [];
+            console.log(`   📋 Evaluaciones realizadas: ${evaluacionesNivel.length}`);
+            
+            // Contar completadas
+            let completadas = 0;
+            todasHabilidades.forEach(habilidad => {
+                const evaluacion = evaluacionesNivel.find(e => 
+                    e.habilidad_id === habilidad.id || e.habilidad?.id === habilidad.id
+                );
+                
+                if (evaluacion) {
+                    const puntuacionMinima = habilidad.puntuacion_minima || 3;
+                    const estaCompletada = evaluacion.completado && evaluacion.puntuacion >= puntuacionMinima;
+                    
+                    if (estaCompletada) {
+                        completadas++;
+                        console.log(`      ✅ ${habilidad.nombre}: COMPLETADA`);
+                    } else {
+                        console.log(`      🔄 ${habilidad.nombre}: En progreso (${evaluacion.puntuacion}/${puntuacionMinima})`);
+                    }
+                } else {
+                    console.log(`      ⚪ ${habilidad.nombre}: Sin evaluar`);
+                }
+            });
+            
+            const porcentaje = totalHabilidades > 0 ? Math.round((completadas / totalHabilidades) * 100) : 0;
+            
+            console.log(`   📊 RESUMEN: ${completadas}/${totalHabilidades} = ${porcentaje}%`);
+            
+            const estado = determinarEstadoNivel(nivel.id, deportistaData.nivel_actual, porcentaje);
             
             todosLosNiveles.push({
                 ...nivel,
-                habilidades: [],
+                completadas,
+                total: totalHabilidades,
+                porcentaje,
+                estado
+            });
+            
+        } catch (error) {
+            console.error(`❌ Error procesando nivel ${nivel.id}:`, error);
+            todosLosNiveles.push({
+                ...nivel,
                 completadas: 0,
                 total: 0,
                 porcentaje: 0,
-                estado: determinarEstadoNivel(nivel.id, deportistaData.nivel_actual, 0)
+                estado: 'bloqueado'
             });
-            continue;
         }
-        
-        // Obtener habilidades únicas de este nivel
-        const habilidadesUnicas = new Map();
-        
-        evaluacionesNivel.forEach(ev => {
-            const habilidadId = ev.habilidad_id || ev.habilidad?.id;
-            
-            if (!habilidadId) return;
-            
-            // Si ya existe, mantener la de mayor puntuación
-            if (habilidadesUnicas.has(habilidadId)) {
-                const existente = habilidadesUnicas.get(habilidadId);
-                if (ev.puntuacion > existente.puntuacion) {
-                    habilidadesUnicas.set(habilidadId, ev);
-                }
-            } else {
-                habilidadesUnicas.set(habilidadId, ev);
-            }
-        });
-        
-        const total = habilidadesUnicas.size;
-        let completadas = 0;
-        
-        console.log(`   🎯 Habilidades únicas: ${total}`);
-        
-        // Contar completadas
-        habilidadesUnicas.forEach((ev, habilidadId) => {
-            const puntuacionMinima = ev.habilidad?.puntuacion_minima || 3;
-            const puntuacion = parseFloat(ev.puntuacion) || 0;
-            const estaCompletada = ev.completado === true || ev.completado === 1 || ev.completado === '1';
-            const tienePuntuacionSuficiente = puntuacion >= puntuacionMinima;
-            
-            if (estaCompletada && tienePuntuacionSuficiente) {
-                completadas++;
-                console.log(`      ✅ ${ev.habilidad?.nombre}: ${puntuacion}/${puntuacionMinima} - COMPLETADA`);
-            } else {
-                console.log(`      🔄 ${ev.habilidad?.nombre}: ${puntuacion}/${puntuacionMinima} - EN PROGRESO`);
-            }
-        });
-        
-        const porcentaje = total > 0 ? Math.round((completadas / total) * 100) : 0;
-        
-        console.log(`   📊 RESUMEN: ${completadas}/${total} = ${porcentaje}%`);
-        
-        const estado = determinarEstadoNivel(nivel.id, deportistaData.nivel_actual, porcentaje);
-        
-        console.log(`   🎯 Estado: ${estado}`);
-        
-        todosLosNiveles.push({
-            ...nivel,
-            habilidades: Array.from(habilidadesUnicas.values()).map(ev => ev.habilidad),
-            completadas,
-            total,
-            porcentaje,
-            estado
-        });
     }
     
     console.log('\n✅ Todos los niveles procesados:', todosLosNiveles.length);
@@ -214,19 +187,12 @@ function determinarEstadoNivel(nivelId, nivelActual, porcentaje) {
     const nivelInfo = NIVELES_SISTEMA.find(n => n.id === nivelId);
     const nivelActualInfo = NIVELES_SISTEMA.find(n => n.id === nivelActual);
     
-    if (!nivelInfo) {
-        return 'bloqueado';
-    }
-    
-    if (!nivelActualInfo) {
-        return nivelInfo.orden === 1 ? 'en_progreso' : 'bloqueado';
-    }
+    if (!nivelInfo) return 'bloqueado';
+    if (!nivelActualInfo) return nivelInfo.orden === 1 ? 'en_progreso' : 'bloqueado';
     
     if (nivelInfo.orden < nivelActualInfo.orden) {
         return 'completado';
     } else if (nivelInfo.orden === nivelActualInfo.orden) {
-        return 'en_progreso';
-    } else if (nivelInfo.orden === nivelActualInfo.orden + 1 && porcentaje >= 100) {
         return 'en_progreso';
     } else {
         return 'bloqueado';
@@ -246,19 +212,13 @@ function renderizarNiveles() {
             <div class="col-span-3 text-center py-12 text-gray-400">
                 <div class="text-6xl mb-4">📋</div>
                 <h4 class="text-xl font-bold mb-2">No hay niveles disponibles</h4>
-                <p class="text-sm">Contacta con tu entrenador</p>
             </div>
         `;
         return;
     }
     
-    console.log('🎯 Renderizando niveles. Nivel actual del deportista:', deportistaData.nivel_actual);
-    
     container.innerHTML = todosLosNiveles.map((nivel, index) => {
         const esNivelActual = nivel.id === deportistaData.nivel_actual;
-        
-        console.log(`   Renderizando ${nivel.nombre}: ID=${nivel.id} | Es actual=${esNivelActual} | Estado=${nivel.estado} | Progreso=${nivel.porcentaje}%`);
-        
         return renderizarCardNivel(nivel, esNivelActual, index);
     }).join('');
 }
@@ -293,15 +253,12 @@ function renderizarCardNivel(nivel, esNivelActual, index) {
     }
     
     const strokeDashoffset = 263.89 - (263.89 * porcentaje / 100);
-    
     const onclick = (estado === 'completado' || estado === 'en_progreso' || esNivelActual) 
-        ? `onclick="verDetalleNivel('${nivel.id}')"` 
-        : '';
+        ? `onclick="verDetalleNivel('${nivel.id}')"` : '';
     
     return `
         <button class="level-card ${bgClass} border ${borderClass} p-8 text-left group ${opacityClass} hover:grayscale-0 hover:opacity-100 transition-all ${cursorClass} relative"
-                ${onclick}
-                style="animation-delay: ${index * 0.1}s">
+                ${onclick} style="animation-delay: ${index * 0.1}s">
             
             ${esNivelActual ? `
                 <div class="absolute top-4 right-4 flex items-center gap-1">
@@ -315,7 +272,7 @@ function renderizarCardNivel(nivel, esNivelActual, index) {
             `}
             
             <h3 class="font-display text-5xl font-black italic tracking-tighter ${estado === 'bloqueado' && !esNivelActual ? 'text-gray-500' : 'text-white'} mb-2 leading-none uppercase">
-                ${nivel.nombre.split(' ')[0]} <span class="${estado === 'bloqueado' && !esNivelActual ? 'text-gray-700' : 'text-primary'}">${nivel.nombre.split(' ')[1]}</span>
+                ${nivel.nombre.split(' ')[0]} <span class="${estado === 'bloqueado' && !esNivelActual ? 'text-gray-700' : 'text-primary'}">${nivel.nombre.split(' ')[1] || ''}</span>
             </h3>
             
             <p class="text-[10px] font-bold ${estado === 'bloqueado' && !esNivelActual ? 'text-gray-600' : 'text-gray-500'} tracking-[0.2em] mb-8 uppercase italic">
@@ -342,7 +299,7 @@ function renderizarCardNivel(nivel, esNivelActual, index) {
                         ${textoEstado}
                     </p>
                     <span class="text-xs ${estado === 'bloqueado' && !esNivelActual ? 'text-gray-600 italic' : 'text-gray-400'} font-medium">
-                        ${total > 0 ? `${completadas}/${total} habilidades` : 'Sin evaluaciones'}
+                        ${total > 0 ? `${completadas}/${total} habilidades` : 'Sin habilidades'}
                     </span>
                 </div>
             </div>
@@ -361,9 +318,7 @@ function actualizarPerfilSidebar(deportista) {
     
     const nombreMostrar = deportista.nombre || 'Deportista';
     
-    if (profileName) {
-        profileName.textContent = nombreMostrar;
-    }
+    if (profileName) profileName.textContent = nombreMostrar;
     
     if (profileAvatarContainer) {
         if (deportista.foto_perfil) {
@@ -400,4 +355,4 @@ function showError(message) {
 
 window.verDetalleNivel = verDetalleNivel;
 
-console.log('✅ Menu niveles cargado - VERSIÓN SIMPLIFICADA (sin llamadas problemáticas al backend)');
+console.log('✅ Menu niveles FINAL - Obtiene TODAS las habilidades del nivel');
