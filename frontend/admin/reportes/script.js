@@ -379,14 +379,53 @@ if (typeof window.ReportesApp === 'undefined') {
 
             const resultados = this.state.deportistasFiltrados.slice(0, 10);
 
+            // 🔍 DEBUG TEMPORAL - ver estructura real del API (borrar cuando funcione)
+            if (resultados.length > 0) {
+                console.log('=== ESTRUCTURA DEL API ===');
+                console.log('Claves del objeto:', Object.keys(resultados[0]));
+                console.log('Objeto completo:', JSON.stringify(resultados[0], null, 2));
+                console.log('=========================');
+            }
+
             resultados.forEach(deportista => {
                 const row = document.createElement('tr');
 
-                const nombre = deportista.nombre_completo || '';
-                const documento = deportista.numero_documento || '';
-                const nivel = deportista.nivel_actual || 'Pendiente';
-                const estado = deportista.estado || 'Activo';
-                const tieneDoc = deportista.tiene_documento;
+                // El objeto puede venir plano o anidado (deportista.User, deportista.deportista, etc.)
+                // Buscar en todas las posibles estructuras que devuelve este API
+                const d = deportista;
+                const u = deportista.User || deportista.user || {};
+                const dd = deportista.deportista || {};
+
+                const nombre = d.nombre_completo
+                    || d.nombreCompleto
+                    || d.full_name
+                    || (u.nombre ? u.nombre : null)
+                    || dd.nombre
+                    || d.nombre
+                    || '';
+
+                const documento = d.numero_documento
+                    || d.numeroDocumento
+                    || d.cedula
+                    || d.documento
+                    || (u.cedula || u.documento || u.numero_documento || null)
+                    || '';
+
+                const nivel = d.nivel_actual
+                    || dd.nivel_actual
+                    || d.nivelActual
+                    || d.nivel
+                    || 'Pendiente';
+
+                const estado = d.estado
+                    || dd.estado
+                    || d.status
+                    || 'activo';
+
+                const tieneDoc = d.tiene_documento
+                    ?? d.tieneDocumento
+                    ?? d.has_document
+                    ?? false;
 
                 row.innerHTML = `
                     <td class="px-6 py-4 font-medium">${nombre}</td>
