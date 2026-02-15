@@ -36,6 +36,7 @@ app.use(cors({
   'http://localhost:5500',
 
   // ✅ VERCEL (AGREGAR AQUÍ)
+  'https://titanes-evolution.vercel.app',
   'https://gestion-deportistas-sandy.vercel.app',
 
   // Railway local
