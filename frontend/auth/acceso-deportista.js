@@ -5,18 +5,95 @@
 // ✅ CÓDIGO VÁLIDO - CÁMBIALO AQUÍ
 const CODIGO_VALIDO = 'TITAN2026';
 
+console.log('📝 Script cargado - Código válido configurado:', CODIGO_VALIDO);
+
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('✅ Acceso Deportista page loaded');
+    console.log('✅ DOM cargado - Iniciando configuración...');
     
     // Inicializar AuthAPI
     if (typeof AuthAPI !== 'undefined') {
         AuthAPI.init();
     }
 
-    // ✅ CREAR MODAL DE CÓDIGO
+    // ✅ CREAR MODAL DE CÓDIGO PRIMERO
     crearModalCodigo();
     
-    // Configurar efecto hover para secciones
+    // ✅ ESPERAR UN POCO Y LUEGO INTERCEPTAR EL BOTÓN
+    setTimeout(() => {
+        interceptarBotonRegistro();
+    }, 100);
+    
+    // Configurar resto de funcionalidades
+    configurarSeccionesHover();
+    agregarEstilos();
+    checkAuthStatus();
+    setupParallax();
+});
+
+// ✅ FUNCIÓN PARA INTERCEPTAR EL BOTÓN DE REGISTRO
+function interceptarBotonRegistro() {
+    console.log('🔍 Buscando botón de registro...');
+    
+    // Buscar el botón por múltiples métodos
+    const btnRegistro = document.querySelector('.btn-register') || 
+                       document.querySelector('a.btn-register') ||
+                       document.querySelector('button.btn-register') ||
+                       document.querySelector('.acceso-register-section .btn-acceso-deportista');
+    
+    if (!btnRegistro) {
+        console.error('❌ No se encontró el botón de registro');
+        // Buscar cualquier elemento con "Crear Cuenta"
+        const todosElementos = document.querySelectorAll('a, button');
+        todosElementos.forEach(el => {
+            if (el.textContent.trim().includes('Crear Cuenta')) {
+                console.log('✅ Encontrado por texto:', el);
+                setupBotonClick(el);
+            }
+        });
+        return;
+    }
+    
+    console.log('✅ Botón encontrado:', btnRegistro);
+    console.log('   Tipo:', btnRegistro.tagName);
+    console.log('   Clases:', btnRegistro.className);
+    console.log('   Href:', btnRegistro.href);
+    
+    setupBotonClick(btnRegistro);
+}
+
+// ✅ CONFIGURAR EL CLICK DEL BOTÓN
+function setupBotonClick(boton) {
+    // Si es un enlace, cambiar el href para que no navegue
+    if (boton.tagName === 'A') {
+        const hrefOriginal = boton.href;
+        boton.href = 'javascript:void(0)';
+        console.log('🔗 Href modificado de', hrefOriginal, 'a javascript:void(0)');
+    }
+    
+    // Agregar evento click
+    boton.addEventListener('click', function(e) {
+        console.log('🚀 ¡CLICK DETECTADO!');
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        mostrarModalCodigo();
+        return false;
+    }, true); // Usar capture phase
+    
+    // También agregar en bubbling phase por si acaso
+    boton.addEventListener('click', function(e) {
+        console.log('🚀 ¡CLICK DETECTADO (bubbling)!');
+        e.preventDefault();
+        e.stopPropagation();
+        mostrarModalCodigo();
+        return false;
+    }, false);
+    
+    console.log('✅ Event listeners configurados');
+}
+
+// Configurar hover para secciones
+function configurarSeccionesHover() {
     const sections = document.querySelectorAll('.acceso-section');
     sections.forEach(section => {
         section.addEventListener('mouseenter', function() {
@@ -36,16 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // ✅ INTERCEPTAR CLICK EN BOTÓN DE REGISTRO
-    const btnRegistro = document.querySelector('.btn-register');
-    if (btnRegistro) {
-        btnRegistro.addEventListener('click', function(e) {
-            e.preventDefault();
-            mostrarModalCodigo();
-        });
-    }
-    
-    // Configurar botones
+    // Configurar efecto ripple para botones
     const buttons = document.querySelectorAll('.btn-acceso-deportista');
     buttons.forEach(button => {
         button.addEventListener('mouseenter', function(event) {
@@ -64,27 +132,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             setTimeout(() => ripple.remove(), 600);
         });
-        
-        // Efecto de clic (solo para botones que NO son de registro)
-        if (!button.classList.contains('btn-register')) {
-            button.addEventListener('click', function(e) {
-                this.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 150);
-            });
-        }
     });
-    
-    // Agregar estilos
-    agregarEstilos();
-    
-    // Verificar si el usuario ya está autenticado
-    checkAuthStatus();
-    
-    // Añadir efecto parallax
-    setupParallax();
-});
+}
 
 // ✅ AGREGAR ESTILOS
 function agregarEstilos() {
@@ -310,6 +359,7 @@ function crearModalCodigo() {
         </div>
     `;
     document.body.appendChild(modal);
+    console.log('✅ Modal creado y agregado al DOM');
 
     // Configurar eventos del modal
     configurarEventosModal();
@@ -325,12 +375,14 @@ function configurarEventosModal() {
 
     // Cerrar modal
     btnCancelar.addEventListener('click', () => {
+        console.log('🚪 Cerrando modal');
         modal.classList.remove('show');
     });
 
     // Cerrar modal al hacer clic fuera
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
+            console.log('🚪 Cerrando modal (click fuera)');
             modal.classList.remove('show');
         }
     });
@@ -338,6 +390,7 @@ function configurarEventosModal() {
     // Validar código al presionar Enter
     codigoInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
+            console.log('⌨️ Enter presionado');
             validarCodigo();
         }
     });
@@ -349,11 +402,15 @@ function configurarEventosModal() {
     });
 
     // Validar código
-    btnValidar.addEventListener('click', validarCodigo);
+    btnValidar.addEventListener('click', () => {
+        console.log('🔘 Botón Continuar presionado');
+        validarCodigo();
+    });
 
     // Cerrar modal con tecla ESC
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && modal.classList.contains('show')) {
+            console.log('🚪 Cerrando modal (ESC)');
             modal.classList.remove('show');
         }
     });
@@ -361,14 +418,22 @@ function configurarEventosModal() {
 
 // ✅ MOSTRAR MODAL
 function mostrarModalCodigo() {
+    console.log('📺 Mostrando modal de código');
     const modal = document.getElementById('modalCodigo');
     const codigoInput = document.getElementById('codigoInput');
     const errorCodigo = document.getElementById('errorCodigo');
     
+    if (!modal) {
+        console.error('❌ Modal no encontrado');
+        return;
+    }
+    
     modal.classList.add('show');
     codigoInput.value = '';
     errorCodigo.classList.remove('show');
+    codigoInput.style.borderColor = 'rgba(255, 255, 255, 0.1)';
     setTimeout(() => codigoInput.focus(), 300);
+    console.log('✅ Modal mostrado');
 }
 
 // ✅ VALIDAR CÓDIGO
@@ -376,6 +441,8 @@ function validarCodigo() {
     const codigoInput = document.getElementById('codigoInput');
     const errorCodigo = document.getElementById('errorCodigo');
     const codigo = codigoInput.value.trim().toUpperCase();
+
+    console.log('🔍 Validando código:', codigo);
 
     if (!codigo) {
         mostrarError('Por favor, ingresa un código');
@@ -385,7 +452,7 @@ function validarCodigo() {
     // Verificar si el código es válido
     if (codigo === CODIGO_VALIDO) {
         // ✅ Código correcto
-        console.log('✅ Código válido');
+        console.log('✅ ¡Código válido! Redirigiendo...');
         
         // Guardar código en sessionStorage
         sessionStorage.setItem('codigoAcceso', codigo);
@@ -400,6 +467,7 @@ function validarCodigo() {
         }, 500);
     } else {
         // ❌ Código incorrecto
+        console.log('❌ Código incorrecto');
         mostrarError('❌ Código incorrecto. Verifica e intenta nuevamente.');
         codigoInput.value = '';
         codigoInput.focus();
@@ -414,6 +482,7 @@ function mostrarError(mensaje) {
     errorCodigo.textContent = mensaje;
     errorCodigo.classList.add('show');
     codigoInput.style.borderColor = '#EF4444';
+    console.log('⚠️ Error mostrado:', mensaje);
 }
 
 // Verificar estado de autenticación
@@ -421,7 +490,6 @@ function checkAuthStatus() {
     if (typeof AuthAPI !== 'undefined' && AuthAPI.isAuthenticated()) {
         const user = AuthAPI.getCurrentUser();
         if (user && user.role === 'deportista') {
-            // Si ya está autenticado como deportista, redirigir al dashboard
             setTimeout(() => {
                 window.location.href = '../deportista/dashboard.html';
             }, 1000);
@@ -442,46 +510,4 @@ function setupParallax() {
     });
 }
 
-// Manejar errores de imágenes
-document.querySelectorAll('img').forEach(img => {
-    img.addEventListener('error', function() {
-        console.log('Error loading image:', this.src);
-        this.style.display = 'none';
-        
-        // Crear fallback
-        const fallback = document.createElement('div');
-        fallback.style.cssText = `
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, #E21B23 0%, #1A1A1A 100%);
-            opacity: 0.3;
-        `;
-        this.parentNode.appendChild(fallback);
-    });
-});
-
-// Verificar conexión
-function checkConnection() {
-    if (!navigator.onLine) {
-        if (typeof Utils !== 'undefined') {
-            Utils.showNotification('No hay conexión a internet', 'error');
-        } else {
-            console.warn('Sin conexión a internet');
-        }
-    }
-    
-    window.addEventListener('online', () => {
-        if (typeof Utils !== 'undefined') {
-            Utils.showNotification('Conexión restablecida', 'success', 2000);
-        }
-    });
-    
-    window.addEventListener('offline', () => {
-        if (typeof Utils !== 'undefined') {
-            Utils.showNotification('Conexión perdida', 'error');
-        }
-    });
-}
-
-// Inicializar verificación de conexión
-checkConnection();
+console.log('✅ Script completamente cargado y listo');
