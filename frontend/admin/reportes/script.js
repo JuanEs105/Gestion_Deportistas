@@ -1,5 +1,5 @@
 // ==========================================
-// REPORTES APP - VERSIÓN CORREGIDA - LOGOUT ARREGLADO
+// REPORTES APP - VERSIÓN CORREGIDA CON FILTROS RÁPIDOS
 // ==========================================
 
 if (typeof window.ReportesApp === 'undefined') {
@@ -8,7 +8,12 @@ if (typeof window.ReportesApp === 'undefined') {
             deportistas: [],
             deportistasFiltrados: [],
             loading: false,
-            filtros: {}
+            filtros: {},
+            filtrosVistaRapida: {
+                estado: '',
+                nivel: '',
+                grupo: ''
+            }
         },
 
         // ==========================================
@@ -32,6 +37,54 @@ if (typeof window.ReportesApp === 'undefined') {
                 return false;
             }
             return true;
+        },
+
+        // ==========================================
+        // FILTROS RÁPIDOS DE VISTA PREVIA
+        // ==========================================
+        aplicarFiltrosVistaRapida() {
+            console.log('🔎 Aplicando filtros rápidos de vista...');
+            
+            // Obtener los filtros rápidos
+            const estadoChip = document.querySelector('.filtro-vista-chip.estado-vista.active');
+            const estado = estadoChip?.dataset.estado || '';
+            const nivel = document.getElementById('filtroVistaRapidaNivel')?.value || '';
+            const grupo = document.getElementById('filtroVistaRapidaGrupo')?.value || '';
+
+            this.state.filtrosVistaRapida = { estado, nivel, grupo };
+
+            // Filtrar la lista actual
+            let resultados = [...this.state.deportistasFiltrados];
+
+            // Aplicar filtro de estado
+            if (estado && estado !== '') {
+                resultados = resultados.filter(d => {
+                    const estadoDeportista = (d.estado || 'activo').toLowerCase();
+                    return estadoDeportista === estado.toLowerCase();
+                });
+            }
+
+            // Aplicar filtro de nivel
+            if (nivel && nivel !== '') {
+                resultados = resultados.filter(d => {
+                    const nivelDeportista = (d.nivel_actual || '').toLowerCase();
+                    return nivelDeportista === nivel.toLowerCase();
+                });
+            }
+
+            // Aplicar filtro de grupo
+            if (grupo && grupo !== '') {
+                resultados = resultados.filter(d => {
+                    const grupoDeportista = (d.equipo_competitivo || 'sin_equipo').toLowerCase();
+                    return grupoDeportista === grupo.toLowerCase();
+                });
+            }
+
+            // Actualizar la vista con resultados filtrados
+            this.actualizarVistaPrevia(resultados);
+
+            const mensaje = `${resultados.length} resultado${resultados.length !== 1 ? 's' : ''} en vista previa`;
+            console.log(`✅ ${mensaje}`);
         },
 
         // ==========================================
@@ -218,7 +271,7 @@ if (typeof window.ReportesApp === 'undefined') {
         },
 
         // ==========================================
-        // APLICAR FILTROS (VISTA PREVIA)
+        // APLICAR FILTROS (BÚSQUEDA COMPLETA)
         // ==========================================
         async aplicarFiltros() {
             try {
@@ -360,7 +413,7 @@ if (typeof window.ReportesApp === 'undefined') {
             document.getElementById('cloudinaryDocs').textContent = stats.cloudinary || 0;
         },
 
-        actualizarVistaPrevia() {
+        actualizarVistaPrevia(deportistasPersonalizados = null) {
             const tbody = document.getElementById('tablaResultados');
             const sinResultados = document.getElementById('sinResultados');
             const resultadosTotales = document.getElementById('resultadosTotales');
@@ -369,7 +422,12 @@ if (typeof window.ReportesApp === 'undefined') {
 
             tbody.innerHTML = '';
 
-            if (this.state.deportistasFiltrados.length === 0) {
+            // Usar deportistas personalizados o los filtrados del state
+            const fuente = deportistasPersonalizados !== null 
+                ? deportistasPersonalizados 
+                : this.state.deportistasFiltrados;
+
+            if (fuente.length === 0) {
                 sinResultados?.classList.remove('hidden');
                 if (resultadosTotales) resultadosTotales.textContent = 'Mostrando 0 resultados';
                 return;
@@ -377,35 +435,36 @@ if (typeof window.ReportesApp === 'undefined') {
 
             sinResultados?.classList.add('hidden');
 
-            const resultados = this.state.deportistasFiltrados.slice(0, 10);
+            const resultados = fuente.slice(0, 10);
 
             resultados.forEach(deportista => {
                 const row = document.createElement('tr');
+                row.className = 'border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors';
 
                 const u = deportista.user || deportista.User || {};
 
                 const nombre = (deportista.nombre_completo && deportista.nombre_completo.trim())
                     || ((u.nombre || u.apellidos) ? `${u.nombre || ''} ${u.apellidos || ''}`.trim() : '')
                     || deportista.nombre
-                    || '';
+                    || 'Sin nombre';
 
                 const documento = deportista.numero_documento
                     || u.numero_documento
-                    || '';
+                    || 'N/A';
 
-                const nivel = deportista.nivel_actual || '';
+                const nivel = deportista.nivel_actual || 'N/A';
                 const estado = deportista.estado || 'activo';
                 const tieneDoc = deportista.tiene_documento ?? false;
 
                 row.innerHTML = `
-                    <td class="px-6 py-4 font-medium">${nombre}</td>
-                    <td class="px-6 py-4">${documento}</td>
-                    <td class="px-6 py-4"><span class="badge bg-blue-100">${nivel}</span></td>
+                    <td class="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">${nombre}</td>
+                    <td class="px-6 py-4 text-gray-700 dark:text-gray-300">${documento}</td>
+                    <td class="px-6 py-4"><span class="badge bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">${nivel}</span></td>
                     <td class="px-6 py-4"><span class="badge ${this.getEstadoColor(estado)}">${estado}</span></td>
                     <td class="px-6 py-4">
                         ${tieneDoc
-                            ? '<span class="badge bg-green-100">✓ Subido</span>'
-                            : '<span class="badge bg-gray-100">✗ Pendiente</span>'}
+                            ? '<span class="badge bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">✓ Subido</span>'
+                            : '<span class="badge bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">✗ Pendiente</span>'}
                     </td>
                     <td class="px-6 py-4 text-right">
                         ${tieneDoc
@@ -418,7 +477,7 @@ if (typeof window.ReportesApp === 'undefined') {
             });
 
             if (resultadosTotales) {
-                resultadosTotales.textContent = `Mostrando ${Math.min(resultados.length, 10)} de ${this.state.deportistasFiltrados.length} resultados`;
+                resultadosTotales.textContent = `Mostrando ${Math.min(resultados.length, 10)} de ${fuente.length} resultados`;
             }
         },
 
@@ -429,12 +488,12 @@ if (typeof window.ReportesApp === 'undefined') {
 
         getEstadoColor(estado) {
             const colores = {
-                'activo': 'bg-green-100',
-                'inactivo': 'bg-red-100',
-                'lesionado': 'bg-yellow-100',
-                'pendiente': 'bg-gray-100'
+                'activo': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+                'inactivo': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+                'lesionado': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+                'pendiente': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
             };
-            return colores[estado?.toLowerCase()] || 'bg-gray-100';
+            return colores[estado?.toLowerCase()] || 'bg-gray-100 text-gray-800';
         },
 
         limpiarFiltros() {
@@ -454,9 +513,16 @@ if (typeof window.ReportesApp === 'undefined') {
                 chip.classList.add('active');
             });
 
+            // Resetear filtros rápidos de vista
+            document.querySelectorAll('.filtro-vista-chip').forEach(chip => chip.classList.remove('active'));
+            document.querySelector('.filtro-vista-chip[data-estado=""]')?.classList.add('active');
+            document.getElementById('filtroVistaRapidaNivel').value = '';
+            document.getElementById('filtroVistaRapidaGrupo').value = '';
+
             document.getElementById('filtrosAplicados')?.classList.add('hidden');
 
             this.state.deportistasFiltrados = [...this.state.deportistas];
+            this.state.filtrosVistaRapida = { estado: '', nivel: '', grupo: '' };
             this.actualizarVistaPrevia();
             this.actualizarContadores();
 
@@ -500,13 +566,33 @@ if (typeof window.ReportesApp === 'undefined') {
                 this.limpiarFiltros();
             });
 
-            // Chips de estado y nivel
+            // Chips de estado y nivel (filtros principales)
             document.querySelectorAll('.filtro-chip').forEach(chip => {
                 chip.addEventListener('click', (e) => {
                     const tipo = e.target.classList.contains('estado') ? 'estado' : 'nivel';
                     document.querySelectorAll(`.filtro-chip.${tipo}`).forEach(c => c.classList.remove('active'));
                     e.target.classList.add('active');
                 });
+            });
+
+            // ✅ FILTROS RÁPIDOS DE VISTA PREVIA
+            // Chips de estado vista rápida
+            document.querySelectorAll('.filtro-vista-chip.estado-vista').forEach(chip => {
+                chip.addEventListener('click', (e) => {
+                    document.querySelectorAll('.filtro-vista-chip.estado-vista').forEach(c => c.classList.remove('active'));
+                    e.target.classList.add('active');
+                    this.aplicarFiltrosVistaRapida();
+                });
+            });
+
+            // Select de nivel vista rápida
+            document.getElementById('filtroVistaRapidaNivel')?.addEventListener('change', () => {
+                this.aplicarFiltrosVistaRapida();
+            });
+
+            // Select de grupo vista rápida
+            document.getElementById('filtroVistaRapidaGrupo')?.addEventListener('change', () => {
+                this.aplicarFiltrosVistaRapida();
             });
 
             // Enter en campos de texto dispara búsqueda
@@ -520,12 +606,17 @@ if (typeof window.ReportesApp === 'undefined') {
             document.getElementById('btnAyuda')?.addEventListener('click', () => {
                 alert(
                     '📋 GUÍA DE USO\n\n' +
-                    '1️⃣ Completa los filtros que necesites (nombre, documento, email, etc.)\n' +
-                    '2️⃣ Selecciona Estado, Nivel y/o Grupo Competitivo\n' +
-                    '3️⃣ Haz clic en "Aplicar" para buscar\n' +
-                    '4️⃣ Los deportistas encontrados aparecen en la tabla\n' +
-                    '5️⃣ Descarga PDFs individuales con el botón "Descargar"\n' +
-                    '6️⃣ O descarga el Excel completo con "Descargar Excel"'
+                    '1️⃣ FILTROS DE BÚSQUEDA:\n' +
+                    '   - Completa los filtros que necesites (nombre, documento, etc.)\n' +
+                    '   - Haz clic en "Aplicar" para buscar en toda la base de datos\n\n' +
+                    '2️⃣ FILTROS RÁPIDOS DE VISTA PREVIA:\n' +
+                    '   - Usa los filtros arriba de la tabla para filtrar rápidamente\n' +
+                    '   - Los resultados se actualizan inmediatamente\n\n' +
+                    '3️⃣ DESCARGAR:\n' +
+                    '   - PDFs individuales: botón "Descargar" en cada fila\n' +
+                    '   - Excel completo: botón "DESCARGAR EXCEL" (respeta filtros de búsqueda)\n\n' +
+                    '4️⃣ LIMPIAR:\n' +
+                    '   - Botón "Limpiar" resetea todos los filtros'
                 );
             });
         },
@@ -616,4 +707,4 @@ function toggleTheme() {
 
 if (localStorage.getItem('theme') === 'dark') {
     document.documentElement.classList.add('dark');
-}
+}s

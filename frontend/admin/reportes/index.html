@@ -14,6 +14,34 @@
             theme: { extend: { colors: { primary: "#E21B23", secondary: "#1A1A1A" } } }
         };
     </script>
+    <style>
+        /* Estilos para chips de filtros rápidos */
+        .filtro-vista-chip {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 2px solid #e5e7eb;
+            background: white;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .dark .filtro-vista-chip {
+            background: #18181b;
+            border-color: #3f3f46;
+            color: #9ca3af;
+        }
+        .filtro-vista-chip:hover {
+            border-color: #E21B23;
+            color: #E21B23;
+        }
+        .filtro-vista-chip.active {
+            background: #E21B23;
+            border-color: #E21B23;
+            color: white;
+        }
+    </style>
 </head>
 <body class="font-body bg-gray-50 dark:bg-zinc-900 text-gray-900 dark:text-gray-100">
 
@@ -254,14 +282,63 @@
         </div>
     </section>
 
-    <!-- Tabla -->
+    <!-- Tabla con Filtros Rápidos -->
     <div class="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-gray-200 dark:border-white/5 p-6">
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-xl font-bold flex items-center gap-2">
                 <span class="material-symbols-outlined text-primary">preview</span>
-                Vista Previa
+                Vista Previa (Primeros 10 resultados)
             </h3>
             <span class="text-sm text-gray-600 dark:text-gray-400" id="resultadosTotales">0 resultados</span>
+        </div>
+
+        <!-- ✅ FILTROS RÁPIDOS PARA VISTA PREVIA -->
+        <div class="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
+            <h4 class="text-sm font-bold mb-4 text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-lg">filter_alt</span>
+                Filtros Rápidos de Vista Previa
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Filtro Estado -->
+                <div>
+                    <label class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2 block">Estado</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="filtro-vista-chip estado-vista active" data-estado="">Todos</button>
+                        <button class="filtro-vista-chip estado-vista" data-estado="activo">Activos</button>
+                        <button class="filtro-vista-chip estado-vista" data-estado="inactivo">Inactivos</button>
+                        <button class="filtro-vista-chip estado-vista" data-estado="lesionado">Lesionados</button>
+                    </div>
+                </div>
+
+                <!-- Filtro Nivel -->
+                <div>
+                    <label class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2 block">Nivel</label>
+                    <select id="filtroVistaRapidaNivel" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-800 text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                        <option value="">Todos los niveles</option>
+                        <option value="baby_titans">Baby Titans</option>
+                        <option value="1_basico">1 Básico</option>
+                        <option value="1_medio">1 Medio</option>
+                        <option value="1_avanzado">1 Avanzado</option>
+                        <option value="2">Nivel 2</option>
+                        <option value="3">Nivel 3</option>
+                        <option value="4">Nivel 4</option>
+                    </select>
+                </div>
+
+                <!-- Filtro Grupo -->
+                <div>
+                    <label class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2 block">Grupo Competitivo</label>
+                    <select id="filtroVistaRapidaGrupo" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-800 text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                        <option value="">Todos los grupos</option>
+                        <option value="sin_equipo">Sin equipo</option>
+                        <option value="rocks_titans">Rocks Titans</option>
+                        <option value="lightning_titans">Lightning Titans</option>
+                        <option value="storm_titans">Storm Titans</option>
+                        <option value="fire_titans">Fire Titans</option>
+                        <option value="electric_titans">Electric Titans</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <div class="overflow-x-auto">
