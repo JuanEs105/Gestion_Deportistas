@@ -1,13 +1,14 @@
 // ==========================================
-// REPORTES APP - VERSIÓN 1.1 - TABLA ALINEADA + FILTROS RÁPIDOS
+// REPORTES APP - VERSIÓN 1.2 - TABLA CON 7 COLUMNAS
 // ==========================================
-// ✅ TABLA CON 6 COLUMNAS CORRECTAMENTE ALINEADAS:
-// 1. Deportista (nombre completo)
-// 2. Documento (número de identificación)
-// 3. Nivel (nivel actual)
-// 4. Estado (activo/inactivo/lesionado)
-// 5. Doc (tiene documento SI/NO)
-// 6. Acción (botón descargar PDF)
+// ✅ TABLA CON 7 COLUMNAS PERFECTAMENTE ALINEADAS:
+// 1. ID (identificador del deportista)
+// 2. Deportista (nombre completo)
+// 3. Documento (número de identificación)
+// 4. Nivel (nivel actual)
+// 5. Estado (activo/inactivo/lesionado)
+// 6. Doc (tiene documento SI/NO)
+// 7. Acción (botón descargar PDF)
 // ==========================================
 
 if (typeof window.ReportesApp === 'undefined') {
@@ -463,9 +464,11 @@ if (typeof window.ReportesApp === 'undefined') {
                 const nivel = deportista.nivel_actual || 'N/A';
                 const estado = deportista.estado || 'activo';
                 const tieneDoc = deportista.tiene_documento ?? false;
+                const deportistaId = deportista.id || 'N/A';
 
-                // ✅ GENERANDO 6 COLUMNAS: Nombre, Documento, Nivel, Estado, Doc, Acción
+                // ✅ GENERANDO 7 COLUMNAS: ID, Nombre, Documento, Nivel, Estado, Doc, Acción
                 row.innerHTML = `
+                    <td class="px-6 py-4 text-gray-600 dark:text-gray-400 font-mono text-xs">${deportistaId}</td>
                     <td class="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">${nombre}</td>
                     <td class="px-6 py-4 text-gray-700 dark:text-gray-300">${documento}</td>
                     <td class="px-6 py-4"><span class="badge bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">${nivel}</span></td>
@@ -485,8 +488,8 @@ if (typeof window.ReportesApp === 'undefined') {
                 tbody.appendChild(row);
             });
 
-            // Debug: Verificar que todas las filas tienen 6 columnas
-            console.log(`✅ Tabla actualizada: ${resultados.length} filas con 6 columnas cada una`);
+            // Debug: Verificar que todas las filas tienen 7 columnas
+            console.log(`✅ Tabla actualizada: ${resultados.length} filas con 7 columnas cada una`);
 
             if (resultadosTotales) {
                 resultadosTotales.textContent = `Mostrando ${Math.min(resultados.length, 10)} de ${fuente.length} resultados`;

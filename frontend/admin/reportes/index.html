@@ -42,7 +42,7 @@
             color: white;
         }
 
-        /* ✅ FORZAR ALINEACIÓN CORRECTA DE LA TABLA */
+        /* ✅ FORZAR ALINEACIÓN CORRECTA DE LA TABLA - 7 COLUMNAS */
         #tablaResultados tr {
             display: table-row;
         }
@@ -51,23 +51,34 @@
             vertical-align: middle;
         }
         #tablaResultados td:first-child {
-            min-width: 200px; /* Columna de nombre */
+            min-width: 80px; /* Columna de ID */
+            max-width: 100px;
         }
         #tablaResultados td:nth-child(2) {
-            min-width: 120px; /* Columna de documento */
+            min-width: 200px; /* Columna de nombre */
         }
         #tablaResultados td:nth-child(3) {
-            min-width: 100px; /* Columna de nivel */
+            min-width: 120px; /* Columna de documento */
         }
         #tablaResultados td:nth-child(4) {
-            min-width: 100px; /* Columna de estado */
+            min-width: 100px; /* Columna de nivel */
         }
         #tablaResultados td:nth-child(5) {
-            min-width: 100px; /* Columna de doc */
+            min-width: 100px; /* Columna de estado */
         }
         #tablaResultados td:nth-child(6) {
+            min-width: 100px; /* Columna de doc */
+        }
+        #tablaResultados td:nth-child(7) {
             min-width: 130px; /* Columna de acción */
             text-align: right;
+        }
+        
+        /* Estilo para columna ID */
+        #tablaResultados td:first-child {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: #6b7280;
         }
         
         /* Badge styling */
@@ -382,6 +393,7 @@
             <table class="w-full text-sm">
                 <thead class="bg-secondary text-white">
                     <tr>
+                        <th class="px-6 py-4 text-left">ID</th>
                         <th class="px-6 py-4 text-left">Deportista</th>
                         <th class="px-6 py-4 text-left">Documento</th>
                         <th class="px-6 py-4 text-left">Nivel</th>
@@ -412,7 +424,7 @@
 <div id="notificationContainer"></div>
 
 <script src="../api.js"></script>
-<script src="./script.js"></script>
+<script src="./script-v2.js?v=1771203234"></script>
 
 </body>
 </html>
