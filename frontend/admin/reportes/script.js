@@ -1,14 +1,13 @@
 // ==========================================
-// REPORTES APP - VERSIÓN 1.2 - TABLA CON 7 COLUMNAS
+// REPORTES APP - VERSIÓN 1.3 - TABLA 6 COLUMNAS (SIN ID)
 // ==========================================
-// ✅ TABLA CON 7 COLUMNAS PERFECTAMENTE ALINEADAS:
-// 1. ID (identificador del deportista)
-// 2. Deportista (nombre completo)
-// 3. Documento (número de identificación)
-// 4. Nivel (nivel actual)
-// 5. Estado (activo/inactivo/lesionado)
-// 6. Doc (tiene documento SI/NO)
-// 7. Acción (botón descargar PDF)
+// ✅ TABLA CON 6 COLUMNAS ALINEADAS:
+// 1. Deportista (nombre completo)
+// 2. Documento (número de identificación)
+// 3. Nivel (nivel actual)
+// 4. Estado (activo/inactivo/lesionado)
+// 5. Doc (tiene documento SI/NO)
+// 6. Acción (botón descargar PDF)
 // ==========================================
 
 if (typeof window.ReportesApp === 'undefined') {
@@ -30,7 +29,16 @@ if (typeof window.ReportesApp === 'undefined') {
         // ==========================================
         async init() {
             console.log('🚀 Inicializando ReportesApp...');
-            if (!this.checkAuth()) return;
+            console.log('🔑 Token:', localStorage.getItem('token')?.substring(0, 20) + '...');
+            console.log('👤 Usuario:', localStorage.getItem('user'));
+            
+            if (!this.checkAuth()) {
+                console.error('❌ Sin autenticación - Redirigiendo...');
+                return;
+            }
+            
+            console.log('✅ Autenticación OK');
+            
             await this.cargarEstadisticas();
             await this.cargarDeportistas();
             this.configurarEventos();
@@ -338,7 +346,8 @@ if (typeof window.ReportesApp === 'undefined') {
                 }
 
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-                const url = `https://gestiondeportistas-production.up.railway.app/api/reportes/deportistas?${params.toString()}`;
+                // ✅ CORREGIDO: Usar /admin/deportistas en lugar de /reportes/deportistas
+                const url = `https://gestiondeportistas-production.up.railway.app/api/admin/deportistas?${params.toString()}`;
 
                 console.log('🌐 URL de búsqueda:', url);
 
@@ -349,14 +358,16 @@ if (typeof window.ReportesApp === 'undefined') {
                 if (!response.ok) throw new Error('Error aplicando filtros');
 
                 const data = await response.json();
+                console.log('📦 Respuesta de filtros:', data);
 
-                if (data.success) {
-                    this.state.deportistasFiltrados = data.deportistas || [];
-                    this.actualizarVistaPrevia();
-                    this.actualizarContadores();
-                    document.getElementById('filtrosAplicados')?.classList.remove('hidden');
-                    this.showNotification(`✅ ${this.state.deportistasFiltrados.length} deportistas encontrados`, 'success', 2000);
-                }
+                // ✅ El endpoint /admin/deportistas devuelve { deportistas: [...] } o directamente [...]
+                const deportistas = data.deportistas || data || [];
+                
+                this.state.deportistasFiltrados = deportistas;
+                this.actualizarVistaPrevia();
+                this.actualizarContadores();
+                document.getElementById('filtrosAplicados')?.classList.remove('hidden');
+                this.showNotification(`✅ ${this.state.deportistasFiltrados.length} deportistas encontrados`, 'success', 2000);
 
             } catch (error) {
                 console.error('❌ Error:', error);
@@ -393,7 +404,8 @@ if (typeof window.ReportesApp === 'undefined') {
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
                 console.log('🔄 Cargando deportistas desde API...');
-                const response = await fetch('https://gestiondeportistas-production.up.railway.app/api/reportes/deportistas', {
+                // ✅ CORREGIDO: Usar el endpoint correcto /admin/deportistas
+                const response = await fetch('https://gestiondeportistas-production.up.railway.app/api/admin/deportistas', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
@@ -402,25 +414,28 @@ if (typeof window.ReportesApp === 'undefined') {
                 if (response.ok) {
                     const data = await response.json();
                     console.log('📦 Datos recibidos:', data);
-                    console.log('📊 Cantidad de deportistas:', data.deportistas?.length || 0);
                     
-                    if (data.success) {
-                        this.state.deportistas = data.deportistas || [];
-                        this.state.deportistasFiltrados = [...this.state.deportistas];
-                        
-                        console.log('✅ Deportistas cargados en state:', this.state.deportistas.length);
+                    // ✅ El endpoint /admin/deportistas devuelve { deportistas: [...] } o directamente [...]
+                    const deportistas = data.deportistas || data || [];
+                    console.log('📊 Cantidad de deportistas:', deportistas.length);
+                    
+                    this.state.deportistas = deportistas;
+                    this.state.deportistasFiltrados = [...this.state.deportistas];
+                    
+                    console.log('✅ Deportistas cargados en state:', this.state.deportistas.length);
+                    if (this.state.deportistas.length > 0) {
                         console.log('✅ Muestra del primer deportista:', this.state.deportistas[0]);
-                        
-                        this.actualizarVistaPrevia();
-                        this.actualizarContadores();
-                    } else {
-                        console.warn('⚠️ API respondió con success: false');
                     }
+                    
+                    this.actualizarVistaPrevia();
+                    this.actualizarContadores();
                 } else {
                     console.error('❌ Error HTTP:', response.status);
+                    this.showNotification(`Error al cargar deportistas: ${response.status}`, 'error');
                 }
             } catch (error) {
                 console.error('❌ Error cargando deportistas:', error);
+                this.showNotification('Error al cargar deportistas', 'error');
             } finally {
                 this.mostrarLoading(false);
             }
@@ -485,7 +500,7 @@ if (typeof window.ReportesApp === 'undefined') {
                 const estado = deportista.estado || 'activo';
                 const tieneDoc = deportista.tiene_documento ?? false;
                 
-                // ✅ Intentar obtener el ID de múltiples fuentes posibles
+                // ✅ Intentar obtener el ID de múltiples fuentes posibles (para el botón)
                 const deportistaId = deportista.id 
                     || deportista._id 
                     || deportista.deportista_id 
@@ -493,9 +508,8 @@ if (typeof window.ReportesApp === 'undefined') {
                     || u.id
                     || 'N/A';
 
-                // ✅ GENERANDO 7 COLUMNAS: ID, Nombre, Documento, Nivel, Estado, Doc, Acción
+                // ✅ GENERANDO 6 COLUMNAS: Nombre, Documento, Nivel, Estado, Doc, Acción
                 row.innerHTML = `
-                    <td class="px-6 py-4 text-gray-600 dark:text-gray-400 font-mono text-xs">${deportistaId}</td>
                     <td class="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">${nombre}</td>
                     <td class="px-6 py-4 text-gray-700 dark:text-gray-300">${documento}</td>
                     <td class="px-6 py-4"><span class="badge bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">${nivel}</span></td>
