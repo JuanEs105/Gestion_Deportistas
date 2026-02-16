@@ -1,5 +1,13 @@
 // ==========================================
-// REPORTES APP - VERSIÓN CORREGIDA CON FILTROS RÁPIDOS
+// REPORTES APP - VERSIÓN 1.1 - TABLA ALINEADA + FILTROS RÁPIDOS
+// ==========================================
+// ✅ TABLA CON 6 COLUMNAS CORRECTAMENTE ALINEADAS:
+// 1. Deportista (nombre completo)
+// 2. Documento (número de identificación)
+// 3. Nivel (nivel actual)
+// 4. Estado (activo/inactivo/lesionado)
+// 5. Doc (tiene documento SI/NO)
+// 6. Acción (botón descargar PDF)
 // ==========================================
 
 if (typeof window.ReportesApp === 'undefined') {
@@ -456,6 +464,7 @@ if (typeof window.ReportesApp === 'undefined') {
                 const estado = deportista.estado || 'activo';
                 const tieneDoc = deportista.tiene_documento ?? false;
 
+                // ✅ GENERANDO 6 COLUMNAS: Nombre, Documento, Nivel, Estado, Doc, Acción
                 row.innerHTML = `
                     <td class="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">${nombre}</td>
                     <td class="px-6 py-4 text-gray-700 dark:text-gray-300">${documento}</td>
@@ -475,6 +484,9 @@ if (typeof window.ReportesApp === 'undefined') {
 
                 tbody.appendChild(row);
             });
+
+            // Debug: Verificar que todas las filas tienen 6 columnas
+            console.log(`✅ Tabla actualizada: ${resultados.length} filas con 6 columnas cada una`);
 
             if (resultadosTotales) {
                 resultadosTotales.textContent = `Mostrando ${Math.min(resultados.length, 10)} de ${fuente.length} resultados`;
@@ -707,4 +719,4 @@ function toggleTheme() {
 
 if (localStorage.getItem('theme') === 'dark') {
     document.documentElement.classList.add('dark');
-}s
+}

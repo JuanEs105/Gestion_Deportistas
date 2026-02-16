@@ -41,6 +41,43 @@
             border-color: #E21B23;
             color: white;
         }
+
+        /* ✅ FORZAR ALINEACIÓN CORRECTA DE LA TABLA */
+        #tablaResultados tr {
+            display: table-row;
+        }
+        #tablaResultados td {
+            display: table-cell;
+            vertical-align: middle;
+        }
+        #tablaResultados td:first-child {
+            min-width: 200px; /* Columna de nombre */
+        }
+        #tablaResultados td:nth-child(2) {
+            min-width: 120px; /* Columna de documento */
+        }
+        #tablaResultados td:nth-child(3) {
+            min-width: 100px; /* Columna de nivel */
+        }
+        #tablaResultados td:nth-child(4) {
+            min-width: 100px; /* Columna de estado */
+        }
+        #tablaResultados td:nth-child(5) {
+            min-width: 100px; /* Columna de doc */
+        }
+        #tablaResultados td:nth-child(6) {
+            min-width: 130px; /* Columna de acción */
+            text-align: right;
+        }
+        
+        /* Badge styling */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body class="font-body bg-gray-50 dark:bg-zinc-900 text-gray-900 dark:text-gray-100">
