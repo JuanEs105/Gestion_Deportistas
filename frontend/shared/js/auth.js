@@ -3,6 +3,13 @@
 // ==========================================
 
 const AuthAPI = {
+    // ✅ AGREGAR CONFIG QUE FALTABA
+    config: {
+        tokenKey: 'titanes_token',
+        userKey: 'titanes_user',
+        tokenExpiryKey: 'titanes_token_expiry'
+    },
+    
     apiBaseUrl: (() => {
         const hostname = window.location.hostname;
         if (hostname === 'localhost' || hostname === '127.0.0.1') {
@@ -55,7 +62,7 @@ const AuthAPI = {
             console.log('🔐 Attempting login...');
 
             const response = await axios.post(
-                `${this.config.apiBaseUrl}/auth/login`,
+                `${this.apiBaseUrl}/auth/login`,
                 credentials
             );
 
@@ -102,7 +109,7 @@ const AuthAPI = {
             console.log('📝 Registering deportista...');
 
             const response = await axios.post(
-                `${this.config.apiBaseUrl}/auth/registro-deportista`,
+                `${this.apiBaseUrl}/auth/registro-deportista`,
                 formData,
                 {
                     headers: {
