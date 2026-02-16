@@ -49,7 +49,9 @@
                 <h2 class="acceso-section-title">
                     Registrar<br><span class="text-white">Se</span>
                 </h2>
-                <a href="registro-deportista.html" class="btn-acceso-deportista btn-register">
+                <!-- ✅ CAMBIO CRÍTICO: href="#" en lugar de href="registro-deportista.html" -->
+                <!-- El JavaScript interceptará el click y mostrará el modal de código -->
+                <a href="#" class="btn-acceso-deportista btn-register" id="btnCrearCuenta">
                     Crear Cuenta
                 </a>
             </div>
