@@ -392,21 +392,35 @@ if (typeof window.ReportesApp === 'undefined') {
                 this.mostrarLoading(true);
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
+                console.log('🔄 Cargando deportistas desde API...');
                 const response = await fetch('https://gestiondeportistas-production.up.railway.app/api/reportes/deportistas', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
+                console.log('📡 Respuesta HTTP:', response.status, response.statusText);
+
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('📦 Datos recibidos:', data);
+                    console.log('📊 Cantidad de deportistas:', data.deportistas?.length || 0);
+                    
                     if (data.success) {
                         this.state.deportistas = data.deportistas || [];
                         this.state.deportistasFiltrados = [...this.state.deportistas];
+                        
+                        console.log('✅ Deportistas cargados en state:', this.state.deportistas.length);
+                        console.log('✅ Muestra del primer deportista:', this.state.deportistas[0]);
+                        
                         this.actualizarVistaPrevia();
                         this.actualizarContadores();
+                    } else {
+                        console.warn('⚠️ API respondió con success: false');
                     }
+                } else {
+                    console.error('❌ Error HTTP:', response.status);
                 }
             } catch (error) {
-                console.error('❌ Error deportistas:', error);
+                console.error('❌ Error cargando deportistas:', error);
             } finally {
                 this.mostrarLoading(false);
             }
@@ -447,6 +461,12 @@ if (typeof window.ReportesApp === 'undefined') {
             const resultados = fuente.slice(0, 10);
 
             resultados.forEach(deportista => {
+                // DEBUG: Ver estructura del deportista
+                if (resultados.indexOf(deportista) === 0) {
+                    console.log('🔍 Estructura del primer deportista:', deportista);
+                    console.log('🔍 Claves disponibles:', Object.keys(deportista));
+                }
+
                 const row = document.createElement('tr');
                 row.className = 'border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors';
 
@@ -464,7 +484,14 @@ if (typeof window.ReportesApp === 'undefined') {
                 const nivel = deportista.nivel_actual || 'N/A';
                 const estado = deportista.estado || 'activo';
                 const tieneDoc = deportista.tiene_documento ?? false;
-                const deportistaId = deportista.id || 'N/A';
+                
+                // ✅ Intentar obtener el ID de múltiples fuentes posibles
+                const deportistaId = deportista.id 
+                    || deportista._id 
+                    || deportista.deportista_id 
+                    || deportista.user_id
+                    || u.id
+                    || 'N/A';
 
                 // ✅ GENERANDO 7 COLUMNAS: ID, Nombre, Documento, Nivel, Estado, Doc, Acción
                 row.innerHTML = `
@@ -480,7 +507,7 @@ if (typeof window.ReportesApp === 'undefined') {
                     </td>
                     <td class="px-6 py-4 text-right">
                         ${tieneDoc
-                            ? `<button onclick="ReportesApp.descargarDocumentoIndividual('${deportista.id}')" class="px-3 py-1 text-xs bg-primary text-white rounded hover:bg-red-700 transition-colors">Descargar</button>`
+                            ? `<button onclick="ReportesApp.descargarDocumentoIndividual('${deportistaId}')" class="px-3 py-1 text-xs bg-primary text-white rounded hover:bg-red-700 transition-colors">Descargar</button>`
                             : '<span class="text-gray-400 text-xs">No disponible</span>'}
                     </td>
                 `;
