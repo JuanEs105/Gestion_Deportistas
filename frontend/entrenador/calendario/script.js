@@ -10,12 +10,12 @@ const API_BASE_URL = window.EntrenadorAPI ? window.EntrenadorAPI.baseURL : (() =
     const hostname = window.location.hostname;
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
         return (() => {
-    const hostname = window.location.hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        return 'http://localhost:5000/api';
-    }
-    return 'https://gestiondeportistas-production.up.railway.app/api';
-})();
+            const hostname = window.location.hostname;
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                return 'http://localhost:5000/api';
+            }
+            return 'https://gestiondeportistas-production.up.railway.app/api';
+        })();
     }
     return 'https://gestiondeportistas-production.up.railway.app/api';
 })();
@@ -40,17 +40,17 @@ let estadoCalendario = {
 // ===================================
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Inicializando Calendario (Entrenador)...');
-    
+
     // Verificar autenticación
     if (!window.EntrenadorAPI || !window.EntrenadorAPI.checkAuth()) {
         console.error('❌ Usuario no autenticado');
         window.location.href = '../../auth/login-entrenador.html';
         return;
     }
-    
+
     // Actualizar información del sidebar
     actualizarSidebar();
-    
+
     // Verificar elementos del DOM
     const elementosRequeridos = [
         'calendarGrid',
@@ -61,20 +61,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         'totalEventos',
         'crearEventoBtn'
     ];
-    
+
     const elementosFaltantes = elementosRequeridos.filter(id => !document.getElementById(id));
-    
+
     if (elementosFaltantes.length > 0) {
         console.error('❌ Elementos del DOM faltantes:', elementosFaltantes);
         mostrarError('Error: Elementos del calendario no encontrados en el DOM');
         return;
     }
-    
+
     console.log('✅ Todos los elementos del DOM encontrados');
-    
+
     // Mejorar diseño del botón "Crear Evento"
     mejorarBotonCrearEvento();
-    
+
     try {
         await inicializarCalendario();
         configurarEventListeners();
@@ -92,7 +92,7 @@ function mejorarBotonCrearEvento() {
         console.error('❌ Botón "crearEventoBtn" no encontrado');
         return;
     }
-    
+
     // Añadir estilos adicionales
     crearEventoBtn.style.cssText = `
         background: linear-gradient(135deg, #E21B23 0%, #C4161D 100%);
@@ -112,61 +112,61 @@ function mejorarBotonCrearEvento() {
         position: relative;
         overflow: hidden;
     `;
-    
+
     // Efecto hover
-    crearEventoBtn.addEventListener('mouseenter', function() {
+    crearEventoBtn.addEventListener('mouseenter', function () {
         this.style.transform = 'translateY(-3px)';
         this.style.boxShadow = '0 8px 25px rgba(226, 27, 35, 0.4)';
         this.style.background = 'linear-gradient(135deg, #C4161D 0%, #A81218 100%)';
     });
-    
-    crearEventoBtn.addEventListener('mouseleave', function() {
+
+    crearEventoBtn.addEventListener('mouseleave', function () {
         this.style.transform = 'translateY(0)';
         this.style.boxShadow = '0 4px 15px rgba(226, 27, 35, 0.3)';
         this.style.background = 'linear-gradient(135deg, #E21B23 0%, #C4161D 100%)';
     });
-    
+
     // Efecto click
-    crearEventoBtn.addEventListener('mousedown', function() {
+    crearEventoBtn.addEventListener('mousedown', function () {
         this.style.transform = 'translateY(1px)';
         this.style.boxShadow = '0 2px 10px rgba(226, 27, 35, 0.3)';
     });
-    
-    crearEventoBtn.addEventListener('mouseup', function() {
+
+    crearEventoBtn.addEventListener('mouseup', function () {
         this.style.transform = 'translateY(-3px)';
         this.style.boxShadow = '0 8px 25px rgba(226, 27, 35, 0.4)';
     });
-    
+
     console.log('🎨 Botón "Crear Evento" mejorado');
 }
 
 async function inicializarCalendario() {
     try {
         mostrarCargando(true);
-        
+
         console.log('📥 Paso 1: Cargando grupos disponibles...');
         await cargarGruposDisponibles();
-        
+
         console.log('🎨 Paso 2: Renderizando filtros...');
         renderizarFiltrosNiveles();
         renderizarFiltrosGrupos();
-        
+
         console.log('📅 Paso 3: Cargando eventos...');
         await cargarEventos();
-        
+
         console.log('📊 Paso 4: Renderizando calendario...');
         renderizarCalendario();
-        
+
         console.log('📈 Paso 5: Actualizando estadísticas...');
         actualizarEstadisticas();
-        
+
         console.log('⏰ Paso 6: Renderizando próximos eventos...');
         renderizarProximosEventos();
-        
+
         actualizarTiempoActualizacion();
-        
+
         console.log('✅ Inicialización completada exitosamente');
-        
+
     } catch (error) {
         console.error('❌ Error en inicializarCalendario:', error);
         console.error('Stack trace:', error.stack);
@@ -185,11 +185,11 @@ function actualizarSidebar() {
     if (user) {
         const sidebarName = document.getElementById('sidebarName');
         const sidebarAvatar = document.getElementById('sidebarAvatar');
-        
+
         if (sidebarName) {
             sidebarName.textContent = user.nombre || user.email || 'Entrenador';
         }
-        
+
         if (sidebarAvatar && user.foto_perfil) {
             sidebarAvatar.src = user.foto_perfil;
         }
@@ -203,25 +203,25 @@ async function cargarEventos() {
     try {
         const mes = estadoCalendario.mesActual + 1;
         const año = estadoCalendario.añoActual;
-        
+
         console.log(`📅 Cargando eventos para ${mes}/${año}...`);
-        
+
         const eventos = await window.EntrenadorAPI.getEventosCalendario({
             mes: mes,
             año: año
         });
-        
+
         console.log('📊 Eventos recibidos de la API:', eventos);
         console.log('📋 Detalle de eventos:');
         eventos.forEach((evento, index) => {
             console.log(`  ${index + 1}. ${evento.titulo} | Nivel: ${evento.nivel} | Grupo: ${evento.grupo_competitivo} | Fecha: ${new Date(evento.fecha).toLocaleDateString()}`);
         });
-        
+
         estadoCalendario.eventosGlobales = eventos || [];
         console.log(`✅ ${eventos.length} eventos cargados`);
-        
+
         aplicarFiltros();
-        
+
     } catch (error) {
         console.error('❌ Error cargando eventos:', error);
         estadoCalendario.eventosGlobales = [];
@@ -234,13 +234,13 @@ async function cargarEventos() {
 async function cargarGruposDisponibles() {
     try {
         console.log('🏆 Cargando grupos competitivos...');
-        
+
         // Intentar cargar desde la API
         try {
             const response = await fetch(`${API_BASE_URL}/calendario/grupos-competitivos`, {
                 headers: window.EntrenadorAPI.getHeaders()
             });
-            
+
             if (response.ok) {
                 const data = await response.json();
                 if (data.success && data.grupos && Array.isArray(data.grupos) && data.grupos.length > 0) {
@@ -252,9 +252,9 @@ async function cargarGruposDisponibles() {
         } catch (error) {
             console.warn('⚠️ No se pudieron cargar grupos desde API, usando valores por defecto');
         }
-        
+
         console.log('✅ Usando grupos por defecto');
-        
+
     } catch (error) {
         console.error('❌ Error cargando grupos:', error);
         console.log('✅ Usando grupos por defecto');
@@ -267,7 +267,7 @@ async function cargarGruposDisponibles() {
 function renderizarFiltrosNiveles() {
     const container = document.getElementById('nivelesCheckboxes');
     if (!container) return;
-    
+
     const nivelesLabels = {
         'baby_titans': 'Baby Titans',
         '1_basico': 'Nivel 1 - Básico',
@@ -277,11 +277,11 @@ function renderizarFiltrosNiveles() {
         '3': 'Nivel 3',
         '4': 'Nivel 4'
     };
-    
+
     // Filtrar solo los niveles asignados al entrenador
     const user = window.EntrenadorAPI.user;
     const nivelesAsignados = user?.niveles_asignados || estadoCalendario.nivelesDisponibles;
-    
+
     container.innerHTML = nivelesAsignados.map(nivel => `
         <label class="filter-checkbox">
             <input 
@@ -294,14 +294,14 @@ function renderizarFiltrosNiveles() {
             <span class="event-count-badge" id="count-nivel-${nivel}">0</span>
         </label>
     `).join('');
-    
+
     actualizarContadoresFiltros();
 }
 
 function renderizarFiltrosGrupos() {
     const container = document.getElementById('gruposCheckboxes');
     if (!container) return;
-    
+
     container.innerHTML = estadoCalendario.gruposDisponibles.map(grupo => {
         const grupoId = grupo.toLowerCase().replace(/\s+/g, '_');
         return `
@@ -317,7 +317,7 @@ function renderizarFiltrosGrupos() {
             </label>
         `;
     }).join('');
-    
+
     actualizarContadoresFiltros();
 }
 
@@ -327,7 +327,7 @@ function renderizarFiltrosGrupos() {
 function toggleFiltroNivel(nivel) {
     const checkbox = document.querySelector(`#nivelesCheckboxes input[value="${nivel}"]`);
     if (!checkbox) return;
-    
+
     if (checkbox.checked) {
         if (!estadoCalendario.nivelesSeleccionados.includes(nivel)) {
             estadoCalendario.nivelesSeleccionados.push(nivel);
@@ -338,9 +338,9 @@ function toggleFiltroNivel(nivel) {
             estadoCalendario.nivelesSeleccionados.splice(index, 1);
         }
     }
-    
+
     console.log('📊 Niveles seleccionados:', estadoCalendario.nivelesSeleccionados);
-    
+
     aplicarFiltros();
     renderizarCalendario();
     actualizarEstadisticas();
@@ -350,7 +350,7 @@ function toggleFiltroNivel(nivel) {
 function toggleFiltroGrupo(grupo) {
     const checkbox = document.querySelector(`#gruposCheckboxes input[value="${grupo}"]`);
     if (!checkbox) return;
-    
+
     if (checkbox.checked) {
         if (!estadoCalendario.gruposSeleccionados.includes(grupo)) {
             estadoCalendario.gruposSeleccionados.push(grupo);
@@ -361,9 +361,9 @@ function toggleFiltroGrupo(grupo) {
             estadoCalendario.gruposSeleccionados.splice(index, 1);
         }
     }
-    
+
     console.log('🏆 Grupos seleccionados:', estadoCalendario.gruposSeleccionados);
-    
+
     aplicarFiltros();
     renderizarCalendario();
     actualizarEstadisticas();
@@ -375,38 +375,38 @@ function aplicarFiltros() {
     console.log('📊 Eventos globales:', estadoCalendario.eventosGlobales.length);
     console.log('🎯 Niveles seleccionados:', estadoCalendario.nivelesSeleccionados);
     console.log('🏆 Grupos seleccionados:', estadoCalendario.gruposSeleccionados);
-    
+
     let eventosFiltrados = [...estadoCalendario.eventosGlobales];
-    
+
     // Si no hay filtros, mostrar todo
     if (estadoCalendario.nivelesSeleccionados.length === 0 && estadoCalendario.gruposSeleccionados.length === 0) {
         console.log('🎯 Mostrando TODOS los eventos (sin filtros)');
         estadoCalendario.eventosFiltrados = eventosFiltrados;
         return;
     }
-    
+
     // Filtrar por niveles
     if (estadoCalendario.nivelesSeleccionados.length > 0) {
-        eventosFiltrados = eventosFiltrados.filter(evento => 
-            estadoCalendario.nivelesSeleccionados.includes(evento.nivel) || 
+        eventosFiltrados = eventosFiltrados.filter(evento =>
+            estadoCalendario.nivelesSeleccionados.includes(evento.nivel) ||
             evento.nivel === 'todos'
         );
     }
-    
+
     // Filtrar por grupos
     if (estadoCalendario.gruposSeleccionados.length > 0) {
         eventosFiltrados = eventosFiltrados.filter(evento => {
             if (!evento.grupo_competitivo) return true;
-            
+
             const grupoEvento = evento.grupo_competitivo.toUpperCase();
-            return estadoCalendario.gruposSeleccionados.some(g => 
+            return estadoCalendario.gruposSeleccionados.some(g =>
                 g.toUpperCase() === grupoEvento
             );
         });
     }
-    
+
     estadoCalendario.eventosFiltrados = eventosFiltrados;
-    
+
     console.log(`✅ Filtrados: ${eventosFiltrados.length} de ${estadoCalendario.eventosGlobales.length} eventos`);
 }
 
@@ -416,58 +416,58 @@ function aplicarFiltros() {
 function renderizarCalendario() {
     console.log('🎨 Renderizando calendario...');
     console.log(`📊 Eventos filtrados: ${estadoCalendario.eventosFiltrados.length}`);
-    
+
     const grid = document.getElementById('calendarGrid');
     if (!grid) {
         console.error('❌ Elemento calendarGrid no encontrado');
         return;
     }
-    
+
     grid.innerHTML = '';
-    
+
     const primerDia = new Date(estadoCalendario.añoActual, estadoCalendario.mesActual, 1);
     const ultimoDia = new Date(estadoCalendario.añoActual, estadoCalendario.mesActual + 1, 0);
-    
+
     const primerDiaSemana = primerDia.getDay();
     const diasEnMes = ultimoDia.getDate();
-    
+
     // Días del mes anterior
     const mesAnterior = new Date(estadoCalendario.añoActual, estadoCalendario.mesActual, 0);
     const diasMesAnterior = mesAnterior.getDate();
-    
+
     for (let i = primerDiaSemana - 1; i >= 0; i--) {
         const dia = diasMesAnterior - i;
         grid.appendChild(crearCeldaDia(dia, true, mesAnterior.getMonth(), mesAnterior.getFullYear()));
     }
-    
+
     // Días del mes actual
     for (let dia = 1; dia <= diasEnMes; dia++) {
         grid.appendChild(crearCeldaDia(dia, false, estadoCalendario.mesActual, estadoCalendario.añoActual));
     }
-    
+
     // Días del siguiente mes
     const diasRestantes = 42 - (primerDiaSemana + diasEnMes);
     for (let dia = 1; dia <= diasRestantes; dia++) {
         const mesSiguiente = estadoCalendario.mesActual + 1;
         grid.appendChild(crearCeldaDia(dia, true, mesSiguiente, estadoCalendario.añoActual));
     }
-    
+
     actualizarTituloMes();
 }
 
 function crearCeldaDia(dia, esOtroMes, mes, año) {
     const celda = document.createElement('div');
     celda.className = 'calendar-day';
-    
+
     const fecha = new Date(año, mes, dia);
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
     const fechaSinHora = new Date(fecha);
     fechaSinHora.setHours(0, 0, 0, 0);
-    
+
     const esHoy = fechaSinHora.getTime() === hoy.getTime();
     const esFinDeSemana = fecha.getDay() === 0 || fecha.getDay() === 6;
-    
+
     // Clases CSS
     if (esOtroMes) {
         celda.classList.add('other-month');
@@ -478,10 +478,10 @@ function crearCeldaDia(dia, esOtroMes, mes, año) {
     if (esFinDeSemana && !esOtroMes) {
         celda.classList.add('weekend');
     }
-    
+
     // Obtener eventos del día
     const eventosDelDia = obtenerEventosDelDia(fecha);
-    
+
     // HTML de la celda
     celda.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
@@ -504,7 +504,7 @@ function crearCeldaDia(dia, esOtroMes, mes, año) {
             ` : ''}
         </div>
     `;
-    
+
     // Si hay eventos, añadir botón para eliminar todos
     if (eventosDelDia.length > 1) {
         const eliminarTodosBtn = document.createElement('div');
@@ -527,27 +527,27 @@ function crearCeldaDia(dia, esOtroMes, mes, año) {
             justify-content: center;
             transition: all 0.2s;
         `;
-        eliminarTodosBtn.onmouseenter = function() {
+        eliminarTodosBtn.onmouseenter = function () {
             this.style.background = 'rgba(239, 68, 68, 0.2)';
         };
-        eliminarTodosBtn.onmouseleave = function() {
+        eliminarTodosBtn.onmouseleave = function () {
             this.style.background = 'rgba(239, 68, 68, 0.1)';
         };
         eliminarTodosBtn.onclick = (e) => {
             e.stopPropagation();
             eliminarEventosDelDia(fecha);
         };
-        
+
         const container = celda.querySelector('div:last-child');
         container.appendChild(eliminarTodosBtn);
     }
-    
+
     celda.onclick = (e) => {
         if (!e.target.classList.contains('event-badge') && !e.target.closest('.eliminar-todos-btn')) {
             mostrarEventosDelDia(fecha, eventosDelDia);
         }
     };
-    
+
     return celda;
 }
 
@@ -566,10 +566,10 @@ function obtenerIconoTipo(tipo) {
 function obtenerEventosDelDia(fecha) {
     const fechaInicio = new Date(fecha);
     fechaInicio.setHours(0, 0, 0, 0);
-    
+
     const fechaFin = new Date(fecha);
     fechaFin.setHours(23, 59, 59, 999);
-    
+
     return estadoCalendario.eventosFiltrados.filter(evento => {
         const fechaEvento = new Date(evento.fecha);
         return fechaEvento >= fechaInicio && fechaEvento <= fechaFin;
@@ -583,28 +583,28 @@ async function eliminarEventosDelDia(fecha) {
     try {
         // Obtener eventos del día
         const eventosDelDia = obtenerEventosDelDia(fecha);
-        
+
         if (eventosDelDia.length === 0) {
             mostrarError('No hay eventos para eliminar en este día');
             return;
         }
-        
+
         const fechaFormateada = fecha.toLocaleDateString('es-ES', {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         });
-        
+
         const confirmacion = confirm(`¿Estás seguro de eliminar TODOS los eventos del ${fechaFormateada}?\n\nSe eliminarán ${eventosDelDia.length} evento(s).\n\n⚠️ Esta acción NO se puede deshacer.`);
-        
+
         if (!confirmacion) return;
-        
+
         mostrarCargando(true);
-        
+
         let eliminadosExitosos = 0;
         let errores = [];
-        
+
         // Eliminar todos los eventos en paralelo
         const promesas = eventosDelDia.map(async (evento) => {
             try {
@@ -618,31 +618,31 @@ async function eliminarEventosDelDia(fecha) {
                 return { success: false, evento: evento.titulo, error: error.message };
             }
         });
-        
+
         await Promise.all(promesas);
-        
+
         mostrarCargando(false);
-        
+
         // Mostrar resultados
         if (eliminadosExitosos > 0) {
             mostrarExito(`✅ ${eliminadosExitosos} evento(s) eliminado(s) correctamente`);
-            
+
             // Cerrar modal si está abierto
             const modal = document.getElementById('eventModal');
             if (modal && modal.classList.contains('active')) {
                 closeModal();
             }
-            
+
             // Recargar datos inmediatamente
             await recargarDatosCalendario();
-            
+
             if (errores.length > 0) {
                 console.warn('⚠️ Algunos eventos no se pudieron eliminar:', errores);
             }
         } else {
             mostrarError('No se pudo eliminar ningún evento');
         }
-        
+
     } catch (error) {
         console.error('❌ Error eliminando eventos del día:', error);
         mostrarError('Error al eliminar eventos: ' + error.message);
@@ -666,65 +666,65 @@ async function recargarDatosCalendario() {
 // ===================================
 function actualizarEstadisticas() {
     const eventos = estadoCalendario.eventosFiltrados;
-    
+
     // Total eventos
     const totalElement = document.getElementById('totalEventos');
     if (totalElement) totalElement.textContent = eventos.length;
-    
+
     // Por tipo
     const competencias = eventos.filter(e => e.tipo === 'competencia').length;
     const entrenamientos = eventos.filter(e => e.tipo === 'entrenamiento').length;
     const evaluaciones = eventos.filter(e => e.tipo === 'evaluacion').length;
-    
+
     const competenciasElement = document.getElementById('competenciasEventos');
     const entrenamientosElement = document.getElementById('entrenamientosEventos');
     const evaluacionesElement = document.getElementById('evaluacionesEventos');
-    
+
     if (competenciasElement) competenciasElement.textContent = competencias;
     if (entrenamientosElement) entrenamientosElement.textContent = entrenamientos;
     if (evaluacionesElement) evaluacionesElement.textContent = evaluaciones;
-    
+
     // Próximos 7 días
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
     const enUnaSemana = new Date(hoy.getTime() + 7 * 24 * 60 * 60 * 1000);
-    
+
     const proximos = eventos.filter(e => {
         const fechaEvento = new Date(e.fecha);
         return fechaEvento >= hoy && fechaEvento <= enUnaSemana;
     }).length;
-    
+
     const proximosElement = document.getElementById('proximos7dias');
     if (proximosElement) proximosElement.textContent = proximos;
-    
+
     // Filtrados
     const filtradosElement = document.getElementById('filtradosEventos');
     if (filtradosElement) filtradosElement.textContent = eventos.length;
-    
+
     actualizarContadoresFiltros();
 }
 
 function actualizarContadoresFiltros() {
     // Actualizar contadores de niveles
     estadoCalendario.nivelesDisponibles.forEach(nivel => {
-        const count = estadoCalendario.eventosGlobales.filter(e => 
+        const count = estadoCalendario.eventosGlobales.filter(e =>
             e.nivel === nivel || e.nivel === 'todos'
         ).length;
-        
+
         const badge = document.getElementById(`count-nivel-${nivel}`);
         if (badge) badge.textContent = count;
     });
-    
+
     // Actualizar contadores de grupos
     estadoCalendario.gruposDisponibles.forEach(grupo => {
         const grupoId = grupo.toLowerCase().replace(/\s+/g, '_');
         const grupoNormalizado = grupo.toUpperCase();
-        
+
         const count = estadoCalendario.eventosGlobales.filter(e => {
             if (!e.grupo_competitivo) return false;
             return e.grupo_competitivo.toUpperCase() === grupoNormalizado;
         }).length;
-        
+
         const badge = document.getElementById(`count-grupo-${grupoId}`);
         if (badge) badge.textContent = count;
     });
@@ -736,10 +736,10 @@ function actualizarContadoresFiltros() {
 function renderizarProximosEventos() {
     const container = document.getElementById('proximosEventos');
     if (!container) return;
-    
+
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
-    
+
     const proximos = estadoCalendario.eventosFiltrados
         .filter(e => {
             const fechaEvento = new Date(e.fecha);
@@ -747,7 +747,7 @@ function renderizarProximosEventos() {
         })
         .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
         .slice(0, 5);
-    
+
     if (proximos.length === 0) {
         container.innerHTML = `
             <div class="text-center py-4 text-muted">
@@ -757,14 +757,14 @@ function renderizarProximosEventos() {
         `;
         return;
     }
-    
+
     container.innerHTML = proximos.map(evento => {
         const fecha = new Date(evento.fecha);
         const fechaFormateada = fecha.toLocaleDateString('es-ES', {
             day: 'numeric',
             month: 'short'
         });
-        
+
         return `
             <div class="proximo-evento" onclick="abrirDetalleEvento('${evento.id}')">
                 <div class="fecha">${fechaFormateada.toUpperCase()}</div>
@@ -780,23 +780,23 @@ function renderizarProximosEventos() {
 // ===================================
 function openCreateEventModal() {
     console.log('🎯 Abriendo modal de crear evento...');
-    
+
     const modal = document.getElementById('eventModal');
     const backdrop = document.getElementById('modalBackdrop');
     const content = document.getElementById('modalContent');
-    
+
     if (!modal || !backdrop || !content) {
         console.error('❌ Elementos del modal no encontrados');
         return;
     }
-    
+
     content.innerHTML = generarFormularioEvento();
-    
+
     backdrop.classList.add('active');
     setTimeout(() => {
         modal.classList.add('active');
     }, 10);
-    
+
     // Forzar selección por defecto del primer nivel
     setTimeout(() => {
         forzarSeleccionNivelPorDefecto();
@@ -809,7 +809,7 @@ function forzarSeleccionNivelPorDefecto() {
 
 function generarFormularioEvento(evento = null) {
     const esEdicion = evento !== null;
-    
+
     console.log('🎯 Generando formulario para evento:', evento?.titulo);
     console.log('📋 Datos del evento (ORIGINAL):', {
         nivel: evento?.nivel,
@@ -817,18 +817,18 @@ function generarFormularioEvento(evento = null) {
         tipo: evento?.tipo,
         eventoCompleto: evento
     });
-    
+
     // 🔥 CORRECCIÓN CRÍTICA: Normalizar grupo competitivo para comparación
     let gruposSeleccionados = [];
     if (esEdicion && evento.grupo_competitivo) {
         // IMPORTANTE: Normalizar el grupo para comparación con los disponibles
         const grupoOriginal = evento.grupo_competitivo;
-        
+
         // Buscar coincidencia exacta en los grupos disponibles
-        const grupoEncontrado = estadoCalendario.gruposDisponibles.find(grupo => 
+        const grupoEncontrado = estadoCalendario.gruposDisponibles.find(grupo =>
             grupo.toUpperCase() === grupoOriginal.toUpperCase()
         );
-        
+
         if (grupoEncontrado) {
             gruposSeleccionados = [grupoEncontrado];
             console.log('🎯 Grupo competitivo encontrado y normalizado:', grupoEncontrado);
@@ -838,26 +838,22 @@ function generarFormularioEvento(evento = null) {
             console.log('⚠️ Grupo no encontrado en lista disponible, usando original:', grupoOriginal);
         }
     }
-    
+
     // Preparar niveles seleccionados
     let nivelesSeleccionados = [];
     if (esEdicion && evento.nivel) {
         nivelesSeleccionados = [evento.nivel];
     } else {
-        // Para creación nueva
-        const user = window.EntrenadorAPI.user;
-        const nivelesPermitidos = user?.niveles_asignados || estadoCalendario.nivelesDisponibles;
-        if (nivelesPermitidos.length > 0) {
-            nivelesSeleccionados = [nivelesPermitidos[0]];
-        }
+        // Para creación nueva — sin selección por defecto
+        nivelesSeleccionados = [];
     }
-    
-    console.log('🎯 Configuración inicial para formulario:', { 
-        nivelesSeleccionados, 
+
+    console.log('🎯 Configuración inicial para formulario:', {
+        nivelesSeleccionados,
         gruposSeleccionados,
-        gruposDisponibles: estadoCalendario.gruposDisponibles 
+        gruposDisponibles: estadoCalendario.gruposDisponibles
     });
-    
+
     return `
         <form onsubmit="guardarEvento(event, ${esEdicion ? `'${evento.id}'` : 'null'})" style="display: flex; flex-direction: column; gap: 1.5rem;">
             <!-- Título -->
@@ -947,7 +943,7 @@ function generarFormularioEvento(evento = null) {
             
             <!-- Niveles -->
             <div class="form-group">
-                <label class="form-label">Niveles *</label>
+                <label class="form-label">Niveles <span style="font-size:0.75rem;color:#6B7280;">(opcional)</span></label>
                 <div class="option-grid" id="nivelesOptions">
                     ${generarOpcionesNiveles(nivelesSeleccionados)}
                 </div>
@@ -996,7 +992,7 @@ function toggleTipoPersonalizado() {
     const tipoSelect = document.getElementById('tipoEvento');
     const container = document.getElementById('tipoPersonalizadoContainer');
     const input = document.getElementById('tipoPersonalizado');
-    
+
     if (tipoSelect && container && input) {
         if (tipoSelect.value === 'otro') {
             container.style.display = 'block';
@@ -1019,18 +1015,18 @@ function generarOpcionesNiveles(seleccionados = []) {
         '3': 'Nivel 3',
         '4': 'Nivel 4'
     };
-    
+
     // Filtrar solo niveles asignados al entrenador
     const user = window.EntrenadorAPI.user;
     const nivelesPermitidos = user?.niveles_asignados || Object.keys(niveles);
-     
+
     console.log('🎯 Generando opciones de niveles con:', { seleccionados, nivelesPermitidos });
-    
+
     return Object.entries(niveles)
         .filter(([valor]) => nivelesPermitidos.includes(valor))
         .map(([valor, label]) => {
             const estaSeleccionado = seleccionados.includes(valor);
-            
+
             return `
                 <button 
                     type="button" 
@@ -1048,15 +1044,15 @@ function generarOpcionesNiveles(seleccionados = []) {
 function generarOpcionesGrupos(seleccionados = []) {
     console.log('🎯 Generando opciones de grupos con seleccionados:', seleccionados);
     console.log('📊 Grupos disponibles:', estadoCalendario.gruposDisponibles);
-    
+
     // 🔥 CORRECCIÓN: Normalizar para comparación insensible a mayúsculas
     const seleccionadosNormalizados = seleccionados.map(g => g.toUpperCase());
-    
+
     const html = estadoCalendario.gruposDisponibles.map(grupo => {
         const estaSeleccionado = seleccionadosNormalizados.includes(grupo.toUpperCase());
-        
+
         console.log(`  - "${grupo}": ${estaSeleccionado ? 'SELECCIONADO ✓' : 'no seleccionado'}`);
-        
+
         return `
             <button 
                 type="button" 
@@ -1069,15 +1065,15 @@ function generarOpcionesGrupos(seleccionados = []) {
             </button>
         `;
     }).join('');
-    
+
     return html;
 }
 
 function toggleOpcion(btn, tipo) {
     const container = btn.closest('.option-grid');
-    
+
     btn.classList.toggle('selected');
-    
+
     // Agregar/remover checkmark visual
     if (btn.classList.contains('selected')) {
         if (!btn.querySelector('.check-mark')) {
@@ -1092,7 +1088,7 @@ function toggleOpcion(btn, tipo) {
             checkMark.remove();
         }
     }
-    
+
     // Mostrar en consola para debugging
     const valor = btn.getAttribute('data-value');
     const ahoraSeleccionado = btn.classList.contains('selected');
@@ -1101,10 +1097,10 @@ function toggleOpcion(btn, tipo) {
 
 async function guardarEvento(e, eventoId = null) {
     e.preventDefault();
-    
+
     console.log('📝 ========== INICIANDO GUARDADO DE EVENTO ==========');
     console.log('📋 Modo:', eventoId ? 'EDICIÓN' : 'CREACIÓN');
-    
+
     // Obtener valores del formulario
     const form = e.target;
     const titulo = form.querySelector('[name="titulo"]').value;
@@ -1114,36 +1110,21 @@ async function guardarEvento(e, eventoId = null) {
     const ubicacion = form.querySelector('[name="ubicacion"]').value;
     const tipo = form.querySelector('[name="tipo"]').value;
     const tipo_personalizado = form.querySelector('[name="tipo_personalizado"]')?.value || '';
-    
+
     // Obtener niveles seleccionados
     const nivelesSeleccionados = [];
     const botonesNivel = form.querySelectorAll('#nivelesOptions .option-btn.selected');
     botonesNivel.forEach(btn => {
         nivelesSeleccionados.push(btn.getAttribute('data-value'));
     });
-    
+
     console.log('🔍 DEBUG - Niveles seleccionados encontrados:', nivelesSeleccionados);
-    
-    // Si no hay niveles seleccionados, forzar selección
-    if (nivelesSeleccionados.length === 0) {
-        console.warn('⚠️ No se encontraron niveles seleccionados, forzando selección...');
-        
-        const todosBotonesNivel = form.querySelectorAll('#nivelesOptions .option-btn');
-        if (todosBotonesNivel.length > 0) {
-            todosBotonesNivel[0].classList.add('selected');
-            nivelesSeleccionados.push(todosBotonesNivel[0].getAttribute('data-value'));
-            console.log('🔧 Nivel forzado:', nivelesSeleccionados[0]);
-        } else {
-            console.error('❌ No hay botones de nivel disponibles');
-            mostrarError('No se encontraron niveles disponibles');
-            return;
-        }
-    }
-    
+    // ✅ Array vacío es válido — el backend usa 'todos' como fallback
+
     // Obtener grupos seleccionados
     const gruposSeleccionados = Array.from(form.querySelectorAll('#gruposOptions .option-btn.selected'))
         .map(btn => btn.getAttribute('data-value'));
-    
+
     console.log('📋 Valores obtenidos:');
     console.log('- título:', titulo);
     console.log('- fecha:', fecha);
@@ -1151,18 +1132,18 @@ async function guardarEvento(e, eventoId = null) {
     console.log('- niveles seleccionados:', nivelesSeleccionados);
     console.log('- grupos seleccionados:', gruposSeleccionados);
     console.log('- tipo:', tipo);
-    
+
     // Validación básica
     if (!titulo || !fecha) {
         mostrarError('El título y la fecha son obligatorios');
         return;
     }
-    
-    
+
+
     // Procesar tipo personalizado
     let tipoFinal = tipo;
     let tipoPersonalizadoFinal = null;
-    
+
     if (tipo === 'otro') {
         tipoPersonalizadoFinal = tipo_personalizado;
         if (!tipoPersonalizadoFinal || tipoPersonalizadoFinal.trim() === '') {
@@ -1170,10 +1151,10 @@ async function guardarEvento(e, eventoId = null) {
             return;
         }
     }
-    
+
     // Formato correcto de fecha y hora
     let fechaCompleta = fecha;
-    
+
     // Si hay hora, formatearla correctamente
     if (horaInput && horaInput.trim() !== '') {
         const [horas, minutos] = horaInput.split(':');
@@ -1181,9 +1162,9 @@ async function guardarEvento(e, eventoId = null) {
         fechaCompleta = `${fecha}T${horaFormateada}:00`;
         console.log('🕒 Hora formateada:', horaFormateada);
     }
-    
+
     console.log('📅 Fecha final enviada:', fechaCompleta);
-    
+
     // Verificar que la fecha sea válida
     const testDate = new Date(fechaCompleta);
     if (isNaN(testDate.getTime())) {
@@ -1191,7 +1172,7 @@ async function guardarEvento(e, eventoId = null) {
         mostrarError('Fecha inválida. Por favor verifica el formato.');
         return;
     }
-    
+
     // Datos para el backend
     const datos = {
         titulo: titulo.trim(),
@@ -1205,13 +1186,13 @@ async function guardarEvento(e, eventoId = null) {
         tipo_personalizado: tipoPersonalizadoFinal,
         entrenador_id: window.EntrenadorAPI?.user?.id
     };
-    
+
     console.log('📤 ========== ENVIANDO AL BACKEND ==========');
     console.log('Datos completos:', datos);
-    
+
     try {
         mostrarCargando(true);
-        
+
         let resultado;
         if (eventoId) {
             console.log(`✏️ Actualizando evento ${eventoId}...`);
@@ -1227,26 +1208,26 @@ async function guardarEvento(e, eventoId = null) {
                 tipo: tipoFinal,
                 tipo_personalizado: tipoPersonalizadoFinal
             };
-            
+
             console.log('📤 Datos para actualizar (singular):', datosUpdate);
             resultado = await window.EntrenadorAPI.updateEvento(eventoId, datosUpdate);
         } else {
             console.log('➕ Creando nuevo evento (múltiples)...');
             resultado = await window.EntrenadorAPI.createEvento(datos);
         }
-        
+
         console.log('✅ RESPUESTA DEL BACKEND:', resultado);
-        
+
         // Cerrar modal inmediatamente
         closeModal();
-        
+
         // Recargar datos inmediatamente
         await recargarDatosCalendario();
-        
+
         mostrarExito(eventoId ? '✅ Evento actualizado correctamente' : '✅ Evento creado correctamente');
-        
+
         console.log('✅ Proceso de guardado COMPLETADO');
-        
+
     } catch (error) {
         console.error('❌ ERROR EN GUARDADO:', error);
         mostrarError(error.message || 'Error al guardar el evento');
@@ -1258,32 +1239,32 @@ async function guardarEvento(e, eventoId = null) {
 async function abrirDetalleEvento(eventoId) {
     try {
         mostrarCargando(true);
-        
+
         // Buscar el evento en el array de eventos cargados
         const evento = estadoCalendario.eventosGlobales.find(e => e.id === eventoId);
-        
+
         if (!evento) {
             throw new Error('Evento no encontrado');
         }
-        
+
         console.log('📋 Evento encontrado para editar:', {
             id: evento.id,
             titulo: evento.titulo,
             nivel: evento.nivel,
             grupo_competitivo: evento.grupo_competitivo
         });
-        
+
         const modal = document.getElementById('eventModal');
         const backdrop = document.getElementById('modalBackdrop');
         const content = document.getElementById('modalContent');
-        
+
         content.innerHTML = generarFormularioEvento(evento);
-        
+
         backdrop.classList.add('active');
         setTimeout(() => {
             modal.classList.add('active');
         }, 10);
-        
+
     } catch (error) {
         console.error('❌ Error cargando evento:', error);
         mostrarError('Error al cargar el evento');
@@ -1295,9 +1276,9 @@ async function abrirDetalleEvento(eventoId) {
 function closeModal() {
     const modal = document.getElementById('eventModal');
     const backdrop = document.getElementById('modalBackdrop');
-    
+
     modal.classList.remove('active');
-    
+
     setTimeout(() => {
         backdrop.classList.remove('active');
     }, 300);
@@ -1307,22 +1288,22 @@ async function eliminarEventoConfirmar(eventoId, titulo) {
     if (!confirm(`¿Estás seguro de eliminar "${titulo}"?`)) {
         return;
     }
-    
+
     try {
         mostrarCargando(true);
-        
+
         await window.EntrenadorAPI.deleteEvento(eventoId);
-        
+
         console.log('✅ Evento eliminado');
-        
+
         // Cerrar modal inmediatamente
         closeModal();
-        
+
         // Recargar datos inmediatamente
         await recargarDatosCalendario();
-        
+
         mostrarExito('✅ Evento eliminado correctamente');
-        
+
     } catch (error) {
         console.error('❌ Error eliminando evento:', error);
         mostrarError('Error al eliminar el evento');
@@ -1336,23 +1317,23 @@ async function eliminarEventoConfirmar(eventoId, titulo) {
 // ===================================
 function mostrarEventosDelDia(fecha, eventos) {
     console.log('📅 Mostrando eventos del día:', fecha, eventos);
-    
+
     const modal = document.getElementById('eventModal');
     const backdrop = document.getElementById('modalBackdrop');
     const content = document.getElementById('modalContent');
-    
+
     if (!modal || !backdrop || !content) {
         console.error('❌ Elementos del modal no encontrados');
         return;
     }
-    
+
     const fechaFormateada = fecha.toLocaleDateString('es-ES', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric'
     });
-    
+
     if (eventos.length === 0) {
         content.innerHTML = `
             <div class="text-center py-4" style="padding: 3rem 0;">
@@ -1393,7 +1374,7 @@ function mostrarEventosDelDia(fecha, eventos) {
             </div>
         `;
     }
-    
+
     backdrop.classList.add('active');
     setTimeout(() => {
         modal.classList.add('active');
@@ -1414,9 +1395,9 @@ function generarTarjetaEvento(evento) {
         'general': 'event',
         'otro': 'more_horiz'
     };
-    
+
     const icono = tipoIconos[evento.tipo] || 'event';
-    
+
     return `
         <div class="evento-card">
             <div class="evento-card-header">
@@ -1477,25 +1458,25 @@ async function eliminarEventoDirecto(eventoId, titulo) {
     if (!confirm(`¿Estás seguro de eliminar "${titulo}"?`)) {
         return;
     }
-    
+
     try {
         mostrarCargando(true);
-        
+
         await window.EntrenadorAPI.deleteEvento(eventoId);
-        
+
         console.log('✅ Evento eliminado');
-        
+
         // Cerrar modal si está abierto
         const modal = document.getElementById('eventModal');
         if (modal && modal.classList.contains('active')) {
             closeModal();
         }
-        
+
         // Recargar datos inmediatamente
         await recargarDatosCalendario();
-        
+
         mostrarExito('✅ Evento eliminado correctamente');
-        
+
     } catch (error) {
         console.error('❌ Error eliminando evento:', error);
         mostrarError('Error al eliminar el evento');
@@ -1509,16 +1490,16 @@ async function eliminarEventoDirecto(eventoId, titulo) {
 // ===================================
 function configurarEventListeners() {
     console.log('🎯 Configurando event listeners...');
-    
+
     // Botones de navegación de mes
     const prevBtn = document.getElementById('prevMonthBtn');
     const nextBtn = document.getElementById('nextMonthBtn');
     const todayBtn = document.getElementById('todayBtn');
-    
+
     if (prevBtn) prevBtn.addEventListener('click', mesAnterior);
     if (nextBtn) nextBtn.addEventListener('click', mesSiguiente);
     if (todayBtn) todayBtn.addEventListener('click', irAHoy);
-    
+
     // Botón de actualizar
     const refreshBtn = document.getElementById('refreshBtn');
     if (refreshBtn) {
@@ -1527,7 +1508,7 @@ function configurarEventListeners() {
             mostrarExito('Calendario actualizado');
         });
     }
-    
+
     // Botón crear evento
     const crearEventoBtn = document.getElementById('crearEventoBtn');
     if (crearEventoBtn) {
@@ -1536,29 +1517,29 @@ function configurarEventListeners() {
     } else {
         console.error('❌ Botón "crearEventoBtn" no encontrado en el DOM');
     }
-    
+
     // Botón cerrar modal
     const closeModalBtn = document.getElementById('closeModalBtn');
     const backdrop = document.getElementById('modalBackdrop');
-    
+
     if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
     if (backdrop) backdrop.addEventListener('click', closeModal);
-    
+
     // Botón de ayuda
     const ayudaBtn = document.getElementById('ayudaBtn');
     if (ayudaBtn) ayudaBtn.addEventListener('click', mostrarAyuda);
-    
+
     // Botón de tema
     const toggleTheme = document.getElementById('toggleTheme');
     if (toggleTheme) {
         toggleTheme.addEventListener('click', () => {
             document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', 
+            localStorage.setItem('theme',
                 document.documentElement.classList.contains('dark') ? 'dark' : 'light'
             );
         });
     }
-    
+
     // Botón de logout
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
@@ -1568,18 +1549,18 @@ function configurarEventListeners() {
             }
         });
     }
-    
+
     console.log('✅ Event listeners configurados correctamente');
 }
 
 async function mesAnterior() {
     estadoCalendario.mesActual--;
-    
+
     if (estadoCalendario.mesActual < 0) {
         estadoCalendario.mesActual = 11;
         estadoCalendario.añoActual--;
     }
-    
+
     await cargarEventos();
     renderizarCalendario();
     actualizarEstadisticas();
@@ -1588,12 +1569,12 @@ async function mesAnterior() {
 
 async function mesSiguiente() {
     estadoCalendario.mesActual++;
-    
+
     if (estadoCalendario.mesActual > 11) {
         estadoCalendario.mesActual = 0;
         estadoCalendario.añoActual++;
     }
-    
+
     await cargarEventos();
     renderizarCalendario();
     actualizarEstadisticas();
@@ -1604,7 +1585,7 @@ async function irAHoy() {
     const hoy = new Date();
     estadoCalendario.mesActual = hoy.getMonth();
     estadoCalendario.añoActual = hoy.getFullYear();
-    
+
     await cargarEventos();
     renderizarCalendario();
     actualizarEstadisticas();
@@ -1616,12 +1597,12 @@ function actualizarTituloMes() {
         'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
     ];
-    
+
     const titulo = document.getElementById('currentMonth');
     if (titulo) {
         titulo.innerHTML = `${meses[estadoCalendario.mesActual]} <span class="text-primary">${estadoCalendario.añoActual}</span>`;
     }
-    
+
     const status = document.getElementById('loadingStatus');
     if (status) {
         status.textContent = `Calendario cargado • ${meses[estadoCalendario.mesActual]} ${estadoCalendario.añoActual}`;
@@ -1640,9 +1621,9 @@ function obtenerNivelLegible(nivel) {
         '2': 'Nivel 2',
         '3': 'Nivel 3',
         '4': 'Nivel 4',
-        'todos': '' 
+        'todos': ''
     };
-    
+
     return niveles[nivel] || nivel;
 }
 
@@ -1650,7 +1631,7 @@ function actualizarTiempoActualizacion() {
     const ahora = new Date();
     const horas = ahora.getHours().toString().padStart(2, '0');
     const minutos = ahora.getMinutes().toString().padStart(2, '0');
-    
+
     const elemento = document.getElementById('updateTime');
     if (elemento) {
         elemento.textContent = `Actualizado: ${horas}:${minutos}`;
@@ -1701,7 +1682,7 @@ AYUDA - CALENDARIO TITANES EVOLUTION
 ¿Problemas?
 Verifica que tu backend esté corriendo en http://localhost:5000
     `;
-    
+
     mostrarExito(ayuda);
 }
 
