@@ -38,7 +38,7 @@ const calendarioController = {
       // ✅ DESPUÉS — niveles opcionales
       const nivelesFinales = niveles && Array.isArray(niveles) && niveles.length > 0
         ? niveles
-        : [null];
+        : ['todos'];
 
       // Validar tipo personalizado
       if (tipo === 'otro' && (!tipo_personalizado || tipo_personalizado.trim() === '')) {
@@ -257,7 +257,7 @@ const calendarioController = {
         fecha: fecha ? new Date(fecha) : evento.fecha,
         hora: hora !== undefined ? hora : evento.hora,
         ubicacion: ubicacion !== undefined ? (ubicacion ? ubicacion.trim() : null) : evento.ubicacion,
-        nivel: nivel || evento.nivel,
+        nivel: nivel !== undefined ? (nivel || 'todos') : evento.nivel,
         grupo_competitivo: grupo_competitivo !== undefined ? grupo_competitivo : evento.grupo_competitivo,
         tipo: tipo || evento.tipo,
         tipo_personalizado: tipo_personalizado !== undefined ? tipo_personalizado : evento.tipo_personalizado

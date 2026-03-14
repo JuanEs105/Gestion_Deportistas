@@ -902,7 +902,7 @@ window.AdminAPI = {
                 fecha: eventoData.fecha,
                 hora: eventoData.hora || null,
                 ubicacion: eventoData.ubicacion || '',
-                nivel: eventoData.nivel || null,
+                nivel: eventoData.nivel || 'todos',
                 grupo_competitivo: eventoData.grupo_competitivo || null,
                 tipo: eventoData.tipo || 'general',
                 tipo_personalizado: eventoData.tipo_personalizado || null

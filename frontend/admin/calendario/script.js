@@ -27,7 +27,7 @@ let estadoCalendario = {
     nivelesSeleccionados: [],
     gruposSeleccionados: [],
     nivelesDisponibles: ['baby_titans', '1_basico', '1_medio', '1_avanzado', '2', '3', '4'],
-    gruposDisponibles: ['ROCKS TITANS', 'LIGHTNING TITANS', 'STORM TITANS', 'FIRE TITANS', 'ELECTRIC TITANS', 'STARS EVOLUTION','NOVA TITANS']
+    gruposDisponibles: ['ROCKS TITANS', 'LIGHTNING TITANS', 'STORM TITANS', 'FIRE TITANS', 'ELECTRIC TITANS', 'STARS EVOLUTION', 'NOVA TITANS']
 };
 
 // ===================================
@@ -902,7 +902,7 @@ function generarFormularioEvento(evento = null) {
             
             <!-- Niveles -->
             <div class="form-group">
-                <label class="form-label">Niveles *</label>
+                <label class="form-label">Niveles <span style="font-size:0.75rem;color:#6B7280;">(opcional)</span></label>
                 <div class="option-grid" id="nivelesOptions">
                     ${generarOpcionesNiveles(nivelesSeleccionados)}
                 </div>
@@ -1177,7 +1177,7 @@ async function guardarEvento(e, eventoId = null) {
                 fecha: datos.fecha,
                 hora: datos.hora,
                 ubicacion: datos.ubicacion,
-                nivel: nivelesSeleccionados.length > 0 ? nivelesSeleccionados[0] : null, // ✅ null si no hay niveles
+                nivel: nivelesSeleccionados.length > 0 ? nivelesSeleccionados[0] : 'todos',// ✅ null si no hay niveles
                 grupo_competitivo: gruposSeleccionados.length > 0 ? gruposSeleccionados[0] : null,
                 tipo: datos.tipo,
                 tipo_personalizado: datos.tipo_personalizado
@@ -1608,10 +1608,9 @@ function obtenerNivelLegible(nivel) {
         '2': 'Nivel 2',
         '3': 'Nivel 3',
         '4': 'Nivel 4',
-        'todos': 'Todos los niveles'
+        'todos': ''
     };
-
-    return niveles[nivel] || nivel;
+    return niveles[nivel] || '';
 }
 
 function actualizarTiempoActualizacion() {
