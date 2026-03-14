@@ -35,12 +35,10 @@ const calendarioController = {
         });
       }
 
-      if (!niveles || !Array.isArray(niveles) || niveles.length === 0) {
-        return res.status(400).json({
-          success: false,
-          error: 'Debes seleccionar al menos un nivel'
-        });
-      }
+      // ✅ DESPUÉS — niveles opcionales
+      const nivelesFinales = niveles && Array.isArray(niveles) && niveles.length > 0
+        ? niveles
+        : [null];
 
       // Validar tipo personalizado
       if (tipo === 'otro' && (!tipo_personalizado || tipo_personalizado.trim() === '')) {
@@ -199,7 +197,8 @@ const calendarioController = {
         'STORM TITANS',
         'FIRE TITANS',
         'ELECTRIC TITANS',
-        'STARS EVOLUTION'
+        'STARS EVOLUTION',
+        'NOVA TITANS'
       ];
 
       res.json({
