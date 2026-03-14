@@ -542,23 +542,23 @@ const EntrenadoresManager = {
             equiposGrid.innerHTML = this.config.EQUIPOS_DISPONIBLES.map(equipo => {
                 const seleccionado = this.state.equiposSeleccionados.includes(equipo.value);
                 return `
-                    <div class="relative">
-                        <input type="checkbox" 
-                               id="equipo-${equipo.value}" 
-                               value="${equipo.value}" 
-                               class="hidden" 
-                               ${seleccionado ? 'checked' : ''}>
-                        <label for="equipo-${equipo.value}" 
-                               onclick="window.EntrenadoresManager.toggleEquipo('${equipo.value}')"
-                               class="flex flex-col items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all ${seleccionado ? 'border-primary bg-primary/5' : 'border-gray-300 dark:border-gray-600 hover:border-primary'}">
-                            <span class="material-symbols-outlined text-2xl mb-2" style="color: ${equipo.color}">
-                                ${equipo.icon}
-                            </span>
-                            <span class="text-sm font-medium text-center">${equipo.label}</span>
-                            ${seleccionado ? '<span class="absolute -top-1 -right-1 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">✓</span>' : ''}
-                        </label>
-                    </div>
-                `;
+            <div class="relative">
+                <input type="checkbox" 
+                       id="equipo-sel-${equipo.value}" 
+                       value="${equipo.value}" 
+                       class="hidden" 
+                       ${seleccionado ? 'checked' : ''}>
+                <label for="equipo-sel-${equipo.value}" 
+                       onclick="window.EntrenadoresManager.toggleEquipo('${equipo.value}')"
+                       class="flex flex-col items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all ${seleccionado ? 'border-primary bg-primary/5' : 'border-gray-300 dark:border-gray-600 hover:border-primary'}">
+                    <span class="material-symbols-outlined text-2xl mb-2" style="color: ${equipo.color}">
+                        ${equipo.icon}
+                    </span>
+                    <span class="text-sm font-medium text-center">${equipo.label}</span>
+                    ${seleccionado ? '<span class="absolute -top-1 -right-1 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">✓</span>' : ''}
+                </label>
+            </div>
+        `;
             }).join('');
         }
 

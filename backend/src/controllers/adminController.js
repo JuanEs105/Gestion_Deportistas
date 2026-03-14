@@ -359,7 +359,7 @@ class AdminController {
       }
 
       // Procesar grupos competitivos
-      const equiposValidos = ['rocks_titans', 'lightning_titans', 'storm_titans', 'fire_titans', 'electric_titans'];
+      const equiposValidos = ['rocks_titans', 'lightning_titans', 'storm_titans', 'fire_titans', 'electric_titans', 'baby_titans', 'nova_titans'];
       let equiposFinales = [];
 
       if (grupos_competitivos && Array.isArray(grupos_competitivos)) {
@@ -814,7 +814,7 @@ class AdminController {
 
       // ✅ CORRECCIÓN: Actualizar equipos correctamente
       if (Array.isArray(grupos_competitivos)) {
-        const equiposValidos = ['rocks_titans', 'lightning_titans', 'storm_titans', 'fire_titans', 'electric_titans'];
+        const equiposValidos = ['rocks_titans', 'lightning_titans', 'storm_titans', 'fire_titans', 'electric_titans', 'baby_titans', 'nova_titans'];
         const equiposFiltrados = grupos_competitivos.filter(e => equiposValidos.includes(e));
 
         updateData.grupos_competitivos = equiposFiltrados; // Sin el if, permite array vacío
