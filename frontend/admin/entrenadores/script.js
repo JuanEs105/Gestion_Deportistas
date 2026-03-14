@@ -34,7 +34,9 @@ const EntrenadoresManager = {
             { value: 'lightning_titans', label: 'Lightning Titans', icon: 'flash_on', color: '#FBBF24' },
             { value: 'storm_titans', label: 'Storm Titans', icon: 'thunderstorm', color: '#3B82F6' },
             { value: 'fire_titans', label: 'Fire Titans', icon: 'local_fire_department', color: '#EF4444' },
-            { value: 'electric_titans', label: 'Electric Titans', icon: 'bolt', color: '#8B5CF6' }
+            { value: 'electric_titans', label: 'Electric Titans', icon: 'bolt', color: '#8B5CF6' },
+            { value: 'baby_titans', label: 'Baby Titans', icon: 'dark_mode', color: '#374151' },
+            { value: 'nova_titans', label: 'Nova Titans', icon: 'emoji_people', color: '#10B981' }
         ]
     },
 
