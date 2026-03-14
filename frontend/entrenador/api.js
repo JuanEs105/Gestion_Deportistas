@@ -998,11 +998,6 @@ window.EntrenadorAPI = {
                 entrenador_id: this.user.id
             };
 
-            // Validación de niveles
-            if (!payload.niveles || payload.niveles.length === 0) {
-                throw new Error('Debes seleccionar al menos un nivel');
-            }
-
             console.log('📤 Enviando payload:', payload);
 
             const response = await fetch(`${this.baseURL}/calendario`, {
@@ -1037,7 +1032,7 @@ window.EntrenadorAPI = {
                 fecha: eventoData.fecha,
                 hora: eventoData.hora || null,
                 ubicacion: eventoData.ubicacion || '',
-                nivel: eventoData.nivel || null,
+                nivel: eventoData.nivel || 'todos',
                 grupo_competitivo: eventoData.grupo_competitivo || null,
                 tipo: eventoData.tipo || 'general',
                 tipo_personalizado: eventoData.tipo_personalizado || null

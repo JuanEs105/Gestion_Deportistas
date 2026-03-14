@@ -804,15 +804,7 @@ function openCreateEventModal() {
 }
 
 function forzarSeleccionNivelPorDefecto() {
-    const botonesNivel = document.querySelectorAll('#nivelesOptions .option-btn');
-    if (botonesNivel.length > 0) {
-        // Si no hay ninguno seleccionado, seleccionar el primero
-        const seleccionados = document.querySelectorAll('#nivelesOptions .option-btn.selected');
-        if (seleccionados.length === 0) {
-            botonesNivel[0].click();
-            console.log('🔧 Nivel por defecto seleccionado:', botonesNivel[0].dataset.value);
-        }
-    }
+    console.log('ℹ️ Niveles opcionales — sin selección forzada');
 }
 
 function generarFormularioEvento(evento = null) {
@@ -1031,12 +1023,7 @@ function generarOpcionesNiveles(seleccionados = []) {
     // Filtrar solo niveles asignados al entrenador
     const user = window.EntrenadorAPI.user;
     const nivelesPermitidos = user?.niveles_asignados || Object.keys(niveles);
-    
-    // Siempre debe haber al menos uno seleccionado
-    if (seleccionados.length === 0 && nivelesPermitidos.length > 0) {
-        seleccionados = [nivelesPermitidos[0]];
-    }
-    
+     
     console.log('🎯 Generando opciones de niveles con:', { seleccionados, nivelesPermitidos });
     
     return Object.entries(niveles)
@@ -1088,15 +1075,6 @@ function generarOpcionesGrupos(seleccionados = []) {
 
 function toggleOpcion(btn, tipo) {
     const container = btn.closest('.option-grid');
-    const opcionesSeleccionadas = container.querySelectorAll('.option-btn.selected');
-    
-    if (tipo === 'niveles') {
-        // Para niveles: debe haber al menos uno seleccionado
-        if (opcionesSeleccionadas.length === 1 && btn.classList.contains('selected')) {
-            console.log('⚠️ No se puede deseleccionar el último nivel');
-            return;
-        }
-    }
     
     btn.classList.toggle('selected');
     
@@ -1180,10 +1158,6 @@ async function guardarEvento(e, eventoId = null) {
         return;
     }
     
-    if (nivelesSeleccionados.length === 0) {
-        mostrarError('Debes seleccionar al menos un nivel');
-        return;
-    }
     
     // Procesar tipo personalizado
     let tipoFinal = tipo;
@@ -1248,7 +1222,7 @@ async function guardarEvento(e, eventoId = null) {
                 fecha: fechaCompleta,
                 hora: horaInput && horaInput.trim() !== '' ? horaInput.split(':').slice(0, 2).join(':') : null,
                 ubicacion: ubicacion && ubicacion.trim() !== '' ? ubicacion.trim() : null,
-                nivel: nivelesSeleccionados[0],
+                nivel: nivelesSeleccionados.length > 0 ? nivelesSeleccionados[0] : 'todos',
                 grupo_competitivo: gruposSeleccionados.length > 0 ? gruposSeleccionados[0] : null,
                 tipo: tipoFinal,
                 tipo_personalizado: tipoPersonalizadoFinal
@@ -1666,7 +1640,7 @@ function obtenerNivelLegible(nivel) {
         '2': 'Nivel 2',
         '3': 'Nivel 3',
         '4': 'Nivel 4',
-        'todos': 'Todos los niveles'
+        'todos': '' 
     };
     
     return niveles[nivel] || nivel;
