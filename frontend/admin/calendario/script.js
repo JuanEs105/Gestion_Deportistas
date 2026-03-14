@@ -35,17 +35,17 @@ let estadoCalendario = {
 // ===================================
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Inicializando Calendario (Admin)...');
-    
+
     // Verificar autenticación
     if (!window.AdminAPI || !window.AdminAPI.checkAuth()) {
         console.error('❌ Admin no autenticado');
         window.location.href = '../../auth/login-admin.html';
         return;
     }
-    
+
     // Actualizar información del sidebar
     actualizarSidebar();
-    
+
     // Verificar elementos del DOM
     const elementosRequeridos = [
         'calendarGrid',
@@ -56,20 +56,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         'totalEventos',
         'crearEventoBtn'
     ];
-    
+
     const elementosFaltantes = elementosRequeridos.filter(id => !document.getElementById(id));
-    
+
     if (elementosFaltantes.length > 0) {
         console.error('❌ Elementos del DOM faltantes:', elementosFaltantes);
         mostrarError('Error: Elementos del calendario no encontrados en el DOM');
         return;
     }
-    
+
     console.log('✅ Todos los elementos del DOM encontrados');
-    
+
     // Mejorar diseño del botón "Crear Evento"
     mejorarBotonCrearEvento();
-    
+
     try {
         await inicializarCalendario();
         configurarEventListeners();
@@ -87,7 +87,7 @@ function mejorarBotonCrearEvento() {
         console.error('❌ Botón "crearEventoBtn" no encontrado');
         return;
     }
-    
+
     // Añadir estilos adicionales
     crearEventoBtn.style.cssText = `
         background: linear-gradient(135deg, #E21B23 0%, #C4161D 100%);
@@ -107,61 +107,61 @@ function mejorarBotonCrearEvento() {
         position: relative;
         overflow: hidden;
     `;
-    
+
     // Efecto hover
-    crearEventoBtn.addEventListener('mouseenter', function() {
+    crearEventoBtn.addEventListener('mouseenter', function () {
         this.style.transform = 'translateY(-3px)';
         this.style.boxShadow = '0 8px 25px rgba(226, 27, 35, 0.4)';
         this.style.background = 'linear-gradient(135deg, #C4161D 0%, #A81218 100%)';
     });
-    
-    crearEventoBtn.addEventListener('mouseleave', function() {
+
+    crearEventoBtn.addEventListener('mouseleave', function () {
         this.style.transform = 'translateY(0)';
         this.style.boxShadow = '0 4px 15px rgba(226, 27, 35, 0.3)';
         this.style.background = 'linear-gradient(135deg, #E21B23 0%, #C4161D 100%)';
     });
-    
+
     // Efecto click
-    crearEventoBtn.addEventListener('mousedown', function() {
+    crearEventoBtn.addEventListener('mousedown', function () {
         this.style.transform = 'translateY(1px)';
         this.style.boxShadow = '0 2px 10px rgba(226, 27, 35, 0.3)';
     });
-    
-    crearEventoBtn.addEventListener('mouseup', function() {
+
+    crearEventoBtn.addEventListener('mouseup', function () {
         this.style.transform = 'translateY(-3px)';
         this.style.boxShadow = '0 8px 25px rgba(226, 27, 35, 0.4)';
     });
-    
+
     console.log('🎨 Botón "Crear Evento" mejorado');
 }
 
 async function inicializarCalendario() {
     try {
         mostrarCargando(true);
-        
+
         console.log('📥 Paso 1: Cargando grupos disponibles...');
         await cargarGruposDisponibles();
-        
+
         console.log('🎨 Paso 2: Renderizando filtros...');
         renderizarFiltrosNiveles();
         renderizarFiltrosGrupos();
-        
+
         console.log('📅 Paso 3: Cargando eventos...');
         await cargarEventos();
-        
+
         console.log('📊 Paso 4: Renderizando calendario...');
         renderizarCalendario();
-        
+
         console.log('📈 Paso 5: Actualizando estadísticas...');
         actualizarEstadisticas();
-        
+
         console.log('⏰ Paso 6: Renderizando próximos eventos...');
         renderizarProximosEventos();
-        
+
         actualizarTiempoActualizacion();
-        
+
         console.log('✅ Inicialización completada exitosamente');
-        
+
     } catch (error) {
         console.error('❌ Error en inicializarCalendario:', error);
         console.error('Stack trace:', error.stack);
@@ -180,11 +180,11 @@ function actualizarSidebar() {
     if (user) {
         const sidebarName = document.getElementById('sidebarName');
         const sidebarAvatar = document.getElementById('sidebarAvatar');
-        
+
         if (sidebarName) {
             sidebarName.textContent = user.nombre || user.email || 'Administrador';
         }
-        
+
         if (sidebarAvatar && user.foto_perfil) {
             sidebarAvatar.src = user.foto_perfil;
         } else {
@@ -200,26 +200,26 @@ async function cargarEventos() {
     try {
         const mes = estadoCalendario.mesActual + 1;
         const año = estadoCalendario.añoActual;
-        
+
         console.log(`📅 Cargando eventos para ${mes}/${año}...`);
-        
+
         // Como Admin, cargar TODOS los eventos
         const eventos = await window.AdminAPI.getEventosCalendario({
             mes: mes,
             año: año
         });
-        
+
         console.log('📊 Eventos recibidos de la API:', eventos);
         console.log('📋 Detalle de eventos:');
         eventos.forEach((evento, index) => {
             console.log(`  ${index + 1}. ${evento.titulo} | Nivel: ${evento.nivel} | Grupo: ${evento.grupo_competitivo} | Fecha: ${new Date(evento.fecha).toLocaleDateString()}`);
         });
-        
+
         estadoCalendario.eventosGlobales = eventos || [];
         console.log(`✅ ${eventos.length} eventos cargados`);
-        
+
         aplicarFiltros();
-        
+
     } catch (error) {
         console.error('❌ Error cargando eventos:', error);
         estadoCalendario.eventosGlobales = [];
@@ -232,10 +232,10 @@ async function cargarEventos() {
 async function cargarGruposDisponibles() {
     try {
         console.log('🏆 Cargando grupos competitivos...');
-        
+
         // Usar grupos por defecto ya que Admin tiene acceso a todos
         console.log('✅ Usando grupos por defecto para admin:', estadoCalendario.gruposDisponibles);
-        
+
     } catch (error) {
         console.error('❌ Error cargando grupos:', error);
         console.log('✅ Usando grupos por defecto');
@@ -248,7 +248,7 @@ async function cargarGruposDisponibles() {
 function renderizarFiltrosNiveles() {
     const container = document.getElementById('nivelesCheckboxes');
     if (!container) return;
-    
+
     const nivelesLabels = {
         'baby_titans': 'Baby Titans',
         '1_basico': 'Nivel 1 - Básico',
@@ -258,10 +258,10 @@ function renderizarFiltrosNiveles() {
         '3': 'Nivel 3',
         '4': 'Nivel 4'
     };
-    
+
     // Admin puede ver todos los niveles
     const todosNiveles = estadoCalendario.nivelesDisponibles;
-    
+
     container.innerHTML = todosNiveles.map(nivel => `
         <label class="filter-checkbox">
             <input 
@@ -274,14 +274,14 @@ function renderizarFiltrosNiveles() {
             <span class="event-count-badge" id="count-nivel-${nivel}">0</span>
         </label>
     `).join('');
-    
+
     actualizarContadoresFiltros();
 }
 
 function renderizarFiltrosGrupos() {
     const container = document.getElementById('gruposCheckboxes');
     if (!container) return;
-    
+
     container.innerHTML = estadoCalendario.gruposDisponibles.map(grupo => {
         const grupoId = grupo.toLowerCase().replace(/\s+/g, '_');
         return `
@@ -297,7 +297,7 @@ function renderizarFiltrosGrupos() {
             </label>
         `;
     }).join('');
-    
+
     actualizarContadoresFiltros();
 }
 
@@ -307,7 +307,7 @@ function renderizarFiltrosGrupos() {
 function toggleFiltroNivel(nivel) {
     const checkbox = document.querySelector(`#nivelesCheckboxes input[value="${nivel}"]`);
     if (!checkbox) return;
-    
+
     if (checkbox.checked) {
         if (!estadoCalendario.nivelesSeleccionados.includes(nivel)) {
             estadoCalendario.nivelesSeleccionados.push(nivel);
@@ -318,9 +318,9 @@ function toggleFiltroNivel(nivel) {
             estadoCalendario.nivelesSeleccionados.splice(index, 1);
         }
     }
-    
+
     console.log('📊 Niveles seleccionados:', estadoCalendario.nivelesSeleccionados);
-    
+
     aplicarFiltros();
     renderizarCalendario();
     actualizarEstadisticas();
@@ -330,7 +330,7 @@ function toggleFiltroNivel(nivel) {
 function toggleFiltroGrupo(grupo) {
     const checkbox = document.querySelector(`#gruposCheckboxes input[value="${grupo}"]`);
     if (!checkbox) return;
-    
+
     if (checkbox.checked) {
         if (!estadoCalendario.gruposSeleccionados.includes(grupo)) {
             estadoCalendario.gruposSeleccionados.push(grupo);
@@ -341,9 +341,9 @@ function toggleFiltroGrupo(grupo) {
             estadoCalendario.gruposSeleccionados.splice(index, 1);
         }
     }
-    
+
     console.log('🏆 Grupos seleccionados:', estadoCalendario.gruposSeleccionados);
-    
+
     aplicarFiltros();
     renderizarCalendario();
     actualizarEstadisticas();
@@ -355,38 +355,38 @@ function aplicarFiltros() {
     console.log('📊 Eventos globales:', estadoCalendario.eventosGlobales.length);
     console.log('🎯 Niveles seleccionados:', estadoCalendario.nivelesSeleccionados);
     console.log('🏆 Grupos seleccionados:', estadoCalendario.gruposSeleccionados);
-    
+
     let eventosFiltrados = [...estadoCalendario.eventosGlobales];
-    
+
     // Si no hay filtros, mostrar todo
     if (estadoCalendario.nivelesSeleccionados.length === 0 && estadoCalendario.gruposSeleccionados.length === 0) {
         console.log('🎯 Mostrando TODOS los eventos (sin filtros)');
         estadoCalendario.eventosFiltrados = eventosFiltrados;
         return;
     }
-    
+
     // Filtrar por niveles
     if (estadoCalendario.nivelesSeleccionados.length > 0) {
-        eventosFiltrados = eventosFiltrados.filter(evento => 
-            estadoCalendario.nivelesSeleccionados.includes(evento.nivel) || 
+        eventosFiltrados = eventosFiltrados.filter(evento =>
+            estadoCalendario.nivelesSeleccionados.includes(evento.nivel) ||
             evento.nivel === 'todos'
         );
     }
-    
+
     // Filtrar por grupos
     if (estadoCalendario.gruposSeleccionados.length > 0) {
         eventosFiltrados = eventosFiltrados.filter(evento => {
             if (!evento.grupo_competitivo) return true;
-            
+
             const grupoEvento = evento.grupo_competitivo.toUpperCase();
-            return estadoCalendario.gruposSeleccionados.some(g => 
+            return estadoCalendario.gruposSeleccionados.some(g =>
                 g.toUpperCase() === grupoEvento
             );
         });
     }
-    
+
     estadoCalendario.eventosFiltrados = eventosFiltrados;
-    
+
     console.log(`✅ Filtrados: ${eventosFiltrados.length} de ${estadoCalendario.eventosGlobales.length} eventos`);
 }
 
@@ -396,58 +396,58 @@ function aplicarFiltros() {
 function renderizarCalendario() {
     console.log('🎨 Renderizando calendario...');
     console.log(`📊 Eventos filtrados: ${estadoCalendario.eventosFiltrados.length}`);
-    
+
     const grid = document.getElementById('calendarGrid');
     if (!grid) {
         console.error('❌ Elemento calendarGrid no encontrado');
         return;
     }
-    
+
     grid.innerHTML = '';
-    
+
     const primerDia = new Date(estadoCalendario.añoActual, estadoCalendario.mesActual, 1);
     const ultimoDia = new Date(estadoCalendario.añoActual, estadoCalendario.mesActual + 1, 0);
-    
+
     const primerDiaSemana = primerDia.getDay();
     const diasEnMes = ultimoDia.getDate();
-    
+
     // Días del mes anterior
     const mesAnterior = new Date(estadoCalendario.añoActual, estadoCalendario.mesActual, 0);
     const diasMesAnterior = mesAnterior.getDate();
-    
+
     for (let i = primerDiaSemana - 1; i >= 0; i--) {
         const dia = diasMesAnterior - i;
         grid.appendChild(crearCeldaDia(dia, true, mesAnterior.getMonth(), mesAnterior.getFullYear()));
     }
-    
+
     // Días del mes actual
     for (let dia = 1; dia <= diasEnMes; dia++) {
         grid.appendChild(crearCeldaDia(dia, false, estadoCalendario.mesActual, estadoCalendario.añoActual));
     }
-    
+
     // Días del siguiente mes
     const diasRestantes = 42 - (primerDiaSemana + diasEnMes);
     for (let dia = 1; dia <= diasRestantes; dia++) {
         const mesSiguiente = estadoCalendario.mesActual + 1;
         grid.appendChild(crearCeldaDia(dia, true, mesSiguiente, estadoCalendario.añoActual));
     }
-    
+
     actualizarTituloMes();
 }
 
 function crearCeldaDia(dia, esOtroMes, mes, año) {
     const celda = document.createElement('div');
     celda.className = 'calendar-day';
-    
+
     const fecha = new Date(año, mes, dia);
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
     const fechaSinHora = new Date(fecha);
     fechaSinHora.setHours(0, 0, 0, 0);
-    
+
     const esHoy = fechaSinHora.getTime() === hoy.getTime();
     const esFinDeSemana = fecha.getDay() === 0 || fecha.getDay() === 6;
-    
+
     // Clases CSS
     if (esOtroMes) {
         celda.classList.add('other-month');
@@ -458,10 +458,10 @@ function crearCeldaDia(dia, esOtroMes, mes, año) {
     if (esFinDeSemana && !esOtroMes) {
         celda.classList.add('weekend');
     }
-    
+
     // Obtener eventos del día
     const eventosDelDia = obtenerEventosDelDia(fecha);
-    
+
     // HTML de la celda
     celda.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
@@ -484,7 +484,7 @@ function crearCeldaDia(dia, esOtroMes, mes, año) {
             ` : ''}
         </div>
     `;
-    
+
     // Si hay eventos, añadir botón para eliminar todos
     if (eventosDelDia.length > 1) {
         const eliminarTodosBtn = document.createElement('div');
@@ -507,27 +507,27 @@ function crearCeldaDia(dia, esOtroMes, mes, año) {
             justify-content: center;
             transition: all 0.2s;
         `;
-        eliminarTodosBtn.onmouseenter = function() {
+        eliminarTodosBtn.onmouseenter = function () {
             this.style.background = 'rgba(239, 68, 68, 0.2)';
         };
-        eliminarTodosBtn.onmouseleave = function() {
+        eliminarTodosBtn.onmouseleave = function () {
             this.style.background = 'rgba(239, 68, 68, 0.1)';
         };
         eliminarTodosBtn.onclick = (e) => {
             e.stopPropagation();
             eliminarEventosDelDia(fecha);
         };
-        
+
         const container = celda.querySelector('div:last-child');
         container.appendChild(eliminarTodosBtn);
     }
-    
+
     celda.onclick = (e) => {
         if (!e.target.classList.contains('event-badge') && !e.target.closest('.eliminar-todos-btn')) {
             mostrarEventosDelDia(fecha, eventosDelDia);
         }
     };
-    
+
     return celda;
 }
 
@@ -546,10 +546,10 @@ function obtenerIconoTipo(tipo) {
 function obtenerEventosDelDia(fecha) {
     const fechaInicio = new Date(fecha);
     fechaInicio.setHours(0, 0, 0, 0);
-    
+
     const fechaFin = new Date(fecha);
     fechaFin.setHours(23, 59, 59, 999);
-    
+
     return estadoCalendario.eventosFiltrados.filter(evento => {
         const fechaEvento = new Date(evento.fecha);
         return fechaEvento >= fechaInicio && fechaEvento <= fechaFin;
@@ -563,28 +563,28 @@ async function eliminarEventosDelDia(fecha) {
     try {
         // Obtener eventos del día
         const eventosDelDia = obtenerEventosDelDia(fecha);
-        
+
         if (eventosDelDia.length === 0) {
             mostrarError('No hay eventos para eliminar en este día');
             return;
         }
-        
+
         const fechaFormateada = fecha.toLocaleDateString('es-ES', {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         });
-        
+
         const confirmacion = confirm(`¿Estás seguro de eliminar TODOS los eventos del ${fechaFormateada}?\n\nSe eliminarán ${eventosDelDia.length} evento(s).\n\n⚠️ Esta acción NO se puede deshacer.`);
-        
+
         if (!confirmacion) return;
-        
+
         mostrarCargando(true);
-        
+
         let eliminadosExitosos = 0;
         let errores = [];
-        
+
         // Eliminar todos los eventos en paralelo
         const promesas = eventosDelDia.map(async (evento) => {
             try {
@@ -598,31 +598,31 @@ async function eliminarEventosDelDia(fecha) {
                 return { success: false, evento: evento.titulo, error: error.message };
             }
         });
-        
+
         await Promise.all(promesas);
-        
+
         mostrarCargando(false);
-        
+
         // Mostrar resultados
         if (eliminadosExitosos > 0) {
             mostrarExito(`✅ ${eliminadosExitosos} evento(s) eliminado(s) correctamente`);
-            
+
             // Cerrar modal si está abierto
             const modal = document.getElementById('eventModal');
             if (modal && modal.classList.contains('active')) {
                 closeModal();
             }
-            
+
             // Recargar datos inmediatamente
             await recargarDatosCalendario();
-            
+
             if (errores.length > 0) {
                 console.warn('⚠️ Algunos eventos no se pudieron eliminar:', errores);
             }
         } else {
             mostrarError('No se pudo eliminar ningún evento');
         }
-        
+
     } catch (error) {
         console.error('❌ Error eliminando eventos del día:', error);
         mostrarError('Error al eliminar eventos: ' + error.message);
@@ -646,65 +646,65 @@ async function recargarDatosCalendario() {
 // ===================================
 function actualizarEstadisticas() {
     const eventos = estadoCalendario.eventosFiltrados;
-    
+
     // Total eventos
     const totalElement = document.getElementById('totalEventos');
     if (totalElement) totalElement.textContent = eventos.length;
-    
+
     // Por tipo
     const competencias = eventos.filter(e => e.tipo === 'competencia').length;
     const entrenamientos = eventos.filter(e => e.tipo === 'entrenamiento').length;
     const evaluaciones = eventos.filter(e => e.tipo === 'evaluacion').length;
-    
+
     const competenciasElement = document.getElementById('competenciasEventos');
     const entrenamientosElement = document.getElementById('entrenamientosEventos');
     const evaluacionesElement = document.getElementById('evaluacionesEventos');
-    
+
     if (competenciasElement) competenciasElement.textContent = competencias;
     if (entrenamientosElement) entrenamientosElement.textContent = entrenamientos;
     if (evaluacionesElement) evaluacionesElement.textContent = evaluaciones;
-    
+
     // Próximos 7 días
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
     const enUnaSemana = new Date(hoy.getTime() + 7 * 24 * 60 * 60 * 1000);
-    
+
     const proximos = eventos.filter(e => {
         const fechaEvento = new Date(e.fecha);
         return fechaEvento >= hoy && fechaEvento <= enUnaSemana;
     }).length;
-    
+
     const proximosElement = document.getElementById('proximos7dias');
     if (proximosElement) proximosElement.textContent = proximos;
-    
+
     // Filtrados
     const filtradosElement = document.getElementById('filtradosEventos');
     if (filtradosElement) filtradosElement.textContent = eventos.length;
-    
+
     actualizarContadoresFiltros();
 }
 
 function actualizarContadoresFiltros() {
     // Actualizar contadores de niveles
     estadoCalendario.nivelesDisponibles.forEach(nivel => {
-        const count = estadoCalendario.eventosGlobales.filter(e => 
+        const count = estadoCalendario.eventosGlobales.filter(e =>
             e.nivel === nivel || e.nivel === 'todos'
         ).length;
-        
+
         const badge = document.getElementById(`count-nivel-${nivel}`);
         if (badge) badge.textContent = count;
     });
-    
+
     // Actualizar contadores de grupos
     estadoCalendario.gruposDisponibles.forEach(grupo => {
         const grupoId = grupo.toLowerCase().replace(/\s+/g, '_');
         const grupoNormalizado = grupo.toUpperCase();
-        
+
         const count = estadoCalendario.eventosGlobales.filter(e => {
             if (!e.grupo_competitivo) return false;
             return e.grupo_competitivo.toUpperCase() === grupoNormalizado;
         }).length;
-        
+
         const badge = document.getElementById(`count-grupo-${grupoId}`);
         if (badge) badge.textContent = count;
     });
@@ -716,10 +716,10 @@ function actualizarContadoresFiltros() {
 function renderizarProximosEventos() {
     const container = document.getElementById('proximosEventos');
     if (!container) return;
-    
+
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
-    
+
     const proximos = estadoCalendario.eventosFiltrados
         .filter(e => {
             const fechaEvento = new Date(e.fecha);
@@ -727,7 +727,7 @@ function renderizarProximosEventos() {
         })
         .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
         .slice(0, 5);
-    
+
     if (proximos.length === 0) {
         container.innerHTML = `
             <div class="text-center py-4 text-muted">
@@ -737,14 +737,14 @@ function renderizarProximosEventos() {
         `;
         return;
     }
-    
+
     container.innerHTML = proximos.map(evento => {
         const fecha = new Date(evento.fecha);
         const fechaFormateada = fecha.toLocaleDateString('es-ES', {
             day: 'numeric',
             month: 'short'
         });
-        
+
         return `
             <div class="proximo-evento" onclick="abrirDetalleEvento('${evento.id}')">
                 <div class="fecha">${fechaFormateada.toUpperCase()}</div>
@@ -760,23 +760,23 @@ function renderizarProximosEventos() {
 // ===================================
 function openCreateEventModal() {
     console.log('🎯 Abriendo modal de crear evento...');
-    
+
     const modal = document.getElementById('eventModal');
     const backdrop = document.getElementById('modalBackdrop');
     const content = document.getElementById('modalContent');
-    
+
     if (!modal || !backdrop || !content) {
         console.error('❌ Elementos del modal no encontrados');
         return;
     }
-    
+
     content.innerHTML = generarFormularioEvento();
-    
+
     backdrop.classList.add('active');
     setTimeout(() => {
         modal.classList.add('active');
     }, 10);
-    
+
     // Forzar selección por defecto del primer nivel
     setTimeout(() => {
         forzarSeleccionNivelPorDefecto();
@@ -784,45 +784,38 @@ function openCreateEventModal() {
 }
 
 function forzarSeleccionNivelPorDefecto() {
-    const botonesNivel = document.querySelectorAll('#nivelesOptions .option-btn');
-    if (botonesNivel.length > 0) {
-        // Si no hay ninguno seleccionado, seleccionar el primero
-        const seleccionados = document.querySelectorAll('#nivelesOptions .option-btn.selected');
-        if (seleccionados.length === 0) {
-            botonesNivel[0].click();
-            console.log('🔧 Nivel por defecto seleccionado:', botonesNivel[0].dataset.value);
-        }
-    }
+    // Ya no forzamos ningún nivel por defecto
+    console.log('ℹ️ Niveles opcionales — sin selección forzada');
 }
 
 function generarFormularioEvento(evento = null) {
     const esEdicion = evento !== null;
-    
+
     console.log('🎯 Generando formulario para evento:', evento?.titulo);
-    
+
     // 🔥 CORRECCIÓN CRÍTICA: Normalizar grupo competitivo para comparación
     let gruposSeleccionados = [];
     if (esEdicion && evento.grupo_competitivo) {
         const grupoOriginal = evento.grupo_competitivo;
-        const grupoEncontrado = estadoCalendario.gruposDisponibles.find(grupo => 
+        const grupoEncontrado = estadoCalendario.gruposDisponibles.find(grupo =>
             grupo.toUpperCase() === grupoOriginal.toUpperCase()
         );
-        
+
         if (grupoEncontrado) {
             gruposSeleccionados = [grupoEncontrado];
         } else {
             gruposSeleccionados = [grupoOriginal];
         }
     }
-    
+
     // Preparar niveles seleccionados
     let nivelesSeleccionados = [];
     if (esEdicion && evento.nivel) {
         nivelesSeleccionados = [evento.nivel];
     } else {
-        nivelesSeleccionados = ['baby_titans'];
+        nivelesSeleccionados = [];
     }
-    
+
     return `
         <form onsubmit="guardarEvento(event, ${esEdicion ? `'${evento.id}'` : 'null'})" style="display: flex; flex-direction: column; gap: 1.5rem;">
             <!-- Título -->
@@ -961,7 +954,7 @@ function toggleTipoPersonalizado() {
     const tipoSelect = document.getElementById('tipoEvento');
     const container = document.getElementById('tipoPersonalizadoContainer');
     const input = document.getElementById('tipoPersonalizado');
-    
+
     if (tipoSelect && container && input) {
         if (tipoSelect.value === 'otro') {
             container.style.display = 'block';
@@ -984,19 +977,15 @@ function generarOpcionesNiveles(seleccionados = []) {
         '3': 'Nivel 3',
         '4': 'Nivel 4'
     };
-    
+
     // Admin puede ver y editar todos los niveles
     const todosNiveles = Object.keys(niveles);
-    
-    // Siempre debe haber al menos uno seleccionado
-    if (seleccionados.length === 0) {
-        seleccionados = ['baby_titans'];
-    }
-    
+
+
     return Object.entries(niveles)
         .map(([valor, label]) => {
             const estaSeleccionado = seleccionados.includes(valor);
-            
+
             return `
                 <button 
                     type="button" 
@@ -1013,10 +1002,10 @@ function generarOpcionesNiveles(seleccionados = []) {
 
 function generarOpcionesGrupos(seleccionados = []) {
     const seleccionadosNormalizados = seleccionados.map(g => g.toUpperCase());
-    
+
     const html = estadoCalendario.gruposDisponibles.map(grupo => {
         const estaSeleccionado = seleccionadosNormalizados.includes(grupo.toUpperCase());
-        
+
         return `
             <button 
                 type="button" 
@@ -1029,24 +1018,16 @@ function generarOpcionesGrupos(seleccionados = []) {
             </button>
         `;
     }).join('');
-    
+
     return html;
 }
 
 function toggleOpcion(btn, tipo) {
     const container = btn.closest('.option-grid');
-    const opcionesSeleccionadas = container.querySelectorAll('.option-btn.selected');
-    
-    if (tipo === 'niveles') {
-        // Para niveles: debe haber al menos uno seleccionado
-        if (opcionesSeleccionadas.length === 1 && btn.classList.contains('selected')) {
-            console.log('⚠️ No se puede deseleccionar el último nivel');
-            return;
-        }
-    }
-    
+
+
     btn.classList.toggle('selected');
-    
+
     // Agregar/remover checkmark visual
     if (btn.classList.contains('selected')) {
         if (!btn.querySelector('.check-mark')) {
@@ -1061,7 +1042,7 @@ function toggleOpcion(btn, tipo) {
             checkMark.remove();
         }
     }
-    
+
     // Mostrar en consola para debugging
     const valor = btn.getAttribute('data-value');
     const ahoraSeleccionado = btn.classList.contains('selected');
@@ -1070,12 +1051,11 @@ function toggleOpcion(btn, tipo) {
 
 async function guardarEvento(e, eventoId = null) {
     e.preventDefault();
-    
+
     console.log('📝 ========== INICIANDO GUARDADO DE EVENTO ==========');
     console.log('📋 Modo:', eventoId ? 'EDICIÓN' : 'CREACIÓN');
-    
+
     try {
-        // Obtener valores del formulario
         const form = e.target;
         const titulo = form.querySelector('[name="titulo"]')?.value || '';
         const descripcion = form.querySelector('[name="descripcion"]')?.value || '';
@@ -1084,30 +1064,30 @@ async function guardarEvento(e, eventoId = null) {
         const ubicacion = form.querySelector('[name="ubicacion"]')?.value || '';
         const tipo = form.querySelector('[name="tipo"]')?.value || 'general';
         const tipo_personalizado = form.querySelector('[name="tipo_personalizado"]')?.value || '';
-        
+
         console.log('📋 Valores básicos del formulario:');
         console.log('  - Título:', titulo);
         console.log('  - Fecha:', fecha);
         console.log('  - Hora:', horaInput);
         console.log('  - Tipo:', tipo);
-        
-        // 🔥 VALIDACIÓN CRÍTICA
+
+        // 🔥 VALIDACIÓN BÁSICA
         if (!titulo || titulo.trim() === '') {
             mostrarError('❌ El título del evento es obligatorio');
             return;
         }
-        
+
         if (!fecha || fecha.trim() === '') {
             mostrarError('❌ La fecha del evento es obligatoria');
             return;
         }
-        
-        // 🔥 OBTENER NIVELES SELECCIONADOS
+
+        // 🔥 OBTENER NIVELES SELECCIONADOS (ahora opcionales)
         const nivelesSeleccionados = [];
         const botonesNivel = form.querySelectorAll('#nivelesOptions .option-btn.selected');
-        
+
         console.log('🔍 Botones de nivel encontrados:', botonesNivel.length);
-        
+
         botonesNivel.forEach(btn => {
             const valor = btn.getAttribute('data-value');
             if (valor) {
@@ -1115,39 +1095,16 @@ async function guardarEvento(e, eventoId = null) {
                 console.log('  ✓ Nivel seleccionado:', valor);
             }
         });
-        
+
         console.log('🎯 Total niveles seleccionados:', nivelesSeleccionados);
-        
-        // 🔥 VALIDAR QUE HAY AL MENOS UN NIVEL
-        if (nivelesSeleccionados.length === 0) {
-            console.error('❌ ERROR: No hay niveles seleccionados');
-            console.log('🔍 Intentando encontrar niveles en el DOM...');
-            
-            // Intentar buscar todos los botones de nivel
-            const todosBotonesNivel = document.querySelectorAll('#nivelesOptions .option-btn');
-            console.log('📋 Botones de nivel totales en el DOM:', todosBotonesNivel.length);
-            
-            todosBotonesNivel.forEach((btn, index) => {
-                console.log(`  ${index + 1}. Valor: ${btn.getAttribute('data-value')}, Seleccionado: ${btn.classList.contains('selected')}`);
-            });
-            
-            // Si no hay ninguno seleccionado, forzar el primero
-            if (todosBotonesNivel.length > 0) {
-                const primerNivel = todosBotonesNivel[0].getAttribute('data-value');
-                nivelesSeleccionados.push(primerNivel);
-                console.log('🔧 Forzando nivel por defecto:', primerNivel);
-            } else {
-                mostrarError('❌ Debe seleccionar al menos un nivel');
-                return;
-            }
-        }
-        
+        // ✅ Ya no se fuerza nivel por defecto ni se lanza error si está vacío
+
         // 🔥 OBTENER GRUPOS SELECCIONADOS
         const gruposSeleccionados = [];
         const botonesGrupo = form.querySelectorAll('#gruposOptions .option-btn.selected');
-        
+
         console.log('🔍 Botones de grupo encontrados:', botonesGrupo.length);
-        
+
         botonesGrupo.forEach(btn => {
             const valor = btn.getAttribute('data-value');
             if (valor) {
@@ -1155,13 +1112,13 @@ async function guardarEvento(e, eventoId = null) {
                 console.log('  ✓ Grupo seleccionado:', valor);
             }
         });
-        
+
         console.log('🏆 Total grupos seleccionados:', gruposSeleccionados);
-        
+
         // 🔥 PROCESAR TIPO PERSONALIZADO
         let tipoFinal = tipo;
         let tipoPersonalizadoFinal = null;
-        
+
         if (tipo === 'otro') {
             if (!tipo_personalizado || tipo_personalizado.trim() === '') {
                 mostrarError('❌ Debe especificar el tipo de evento personalizado');
@@ -1170,24 +1127,20 @@ async function guardarEvento(e, eventoId = null) {
             tipoPersonalizadoFinal = tipo_personalizado.trim();
             console.log('📝 Tipo personalizado:', tipoPersonalizadoFinal);
         }
-        
+
         // 🔥 PROCESAR FECHA Y HORA
         let fechaCompleta = fecha;
         let horaFinal = null;
-        
+
         if (horaInput && horaInput.trim() !== '') {
-            // Asegurar formato HH:MM
             const [horas, minutos] = horaInput.split(':');
             horaFinal = `${horas.padStart(2, '0')}:${(minutos || '00').slice(0, 2).padStart(2, '0')}`;
-            
-            // Crear fecha completa con hora
             fechaCompleta = `${fecha}T${horaFinal}:00`;
-            
             console.log('🕒 Hora procesada:', horaFinal);
         }
-        
+
         console.log('📅 Fecha final:', fechaCompleta);
-        
+
         // 🔥 VALIDAR FECHA
         const testDate = new Date(fechaCompleta);
         if (isNaN(testDate.getTime())) {
@@ -1195,7 +1148,7 @@ async function guardarEvento(e, eventoId = null) {
             mostrarError('❌ Fecha inválida. Verifica el formato.');
             return;
         }
-        
+
         // 🔥 CONSTRUIR OBJETO DE DATOS
         const datos = {
             titulo: titulo.trim(),
@@ -1203,86 +1156,71 @@ async function guardarEvento(e, eventoId = null) {
             fecha: fechaCompleta,
             hora: horaFinal,
             ubicacion: ubicacion && ubicacion.trim() !== '' ? ubicacion.trim() : null,
-            niveles: nivelesSeleccionados, // Array
-            grupos_competitivos: gruposSeleccionados, // Array (puede estar vacío)
+            niveles: nivelesSeleccionados,           // puede ser array vacío
+            grupos_competitivos: gruposSeleccionados,
             tipo: tipoFinal,
             tipo_personalizado: tipoPersonalizadoFinal,
             entrenador_id: window.AdminAPI?.user?.id || null
         };
-        
+
         console.log('📤 ========== DATOS A ENVIAR AL BACKEND ==========');
         console.log(JSON.stringify(datos, null, 2));
-        
-        // 🔥 VALIDACIONES FINALES
-        if (datos.niveles.length === 0) {
-            mostrarError('❌ Debe seleccionar al menos un nivel');
-            return;
-        }
-        
+
         mostrarCargando(true);
-        
+
         let resultado;
-        
+
         if (eventoId) {
-            // 🔥 MODO EDICIÓN - Usar datos singulares
+            // 🔥 MODO EDICIÓN
             console.log(`✏️ Actualizando evento ${eventoId}...`);
-            
+
             const datosUpdate = {
                 titulo: datos.titulo,
                 descripcion: datos.descripcion,
                 fecha: datos.fecha,
                 hora: datos.hora,
                 ubicacion: datos.ubicacion,
-                nivel: datos.niveles[0], // Solo el primero
-                grupo_competitivo: datos.grupos_competitivos.length > 0 ? datos.grupos_competitivos[0] : null,
+                nivel: nivelesSeleccionados.length > 0 ? nivelesSeleccionados[0] : null, // ✅ null si no hay niveles
+                grupo_competitivo: gruposSeleccionados.length > 0 ? gruposSeleccionados[0] : null,
                 tipo: datos.tipo,
                 tipo_personalizado: datos.tipo_personalizado
             };
-            
+
             console.log('📤 Datos para actualizar (singular):', datosUpdate);
             resultado = await window.AdminAPI.updateEvento(eventoId, datosUpdate);
-            
+
         } else {
-            // 🔥 MODO CREACIÓN - Usar arrays
+            // 🔥 MODO CREACIÓN
             console.log('➕ Creando nuevo evento (múltiple)...');
             resultado = await window.AdminAPI.createEvento(datos);
         }
-        
+
         console.log('✅ RESPUESTA DEL BACKEND:', resultado);
-        
-        // Cerrar modal
+
         closeModal();
-        
-        // Recargar datos
         await recargarDatosCalendario();
-        
         mostrarExito(eventoId ? '✅ Evento actualizado' : '✅ Evento creado');
-        
+
         console.log('✅ ========== GUARDADO COMPLETADO ==========');
-        
+
     } catch (error) {
         console.error('❌ ========== ERROR EN GUARDADO ==========');
         console.error('Tipo:', error.constructor.name);
         console.error('Mensaje:', error.message);
         console.error('Stack:', error.stack);
-        
-        let mensajeError = 'Error desconocido';
-        
-        if (error.message) {
-            mensajeError = error.message;
-        }
-        
-        // Mensajes más específicos
+
+        let mensajeError = error.message || 'Error desconocido';
+
         if (error.message.includes('Failed to fetch')) {
-            mensajeError = 'No se pudo conectar con el servidor. Verifica que esté ejecutándose en http://localhost:5000';
+            mensajeError = 'No se pudo conectar con el servidor.';
         } else if (error.message.includes('404')) {
-            mensajeError = 'Ruta del API no encontrada (/api/calendario no existe)';
+            mensajeError = 'Ruta del API no encontrada.';
         } else if (error.message.includes('500')) {
-            mensajeError = 'Error interno del servidor. Revisa los logs del backend';
+            mensajeError = 'Error interno del servidor. Revisa los logs del backend.';
         }
-        
+
         mostrarError(`❌ ${mensajeError}`);
-        
+
     } finally {
         mostrarCargando(false);
     }
@@ -1291,32 +1229,32 @@ async function guardarEvento(e, eventoId = null) {
 async function abrirDetalleEvento(eventoId) {
     try {
         mostrarCargando(true);
-        
+
         // Buscar el evento en el array de eventos cargados
         const evento = estadoCalendario.eventosGlobales.find(e => e.id === eventoId);
-        
+
         if (!evento) {
             throw new Error('Evento no encontrado');
         }
-        
+
         console.log('📋 Evento encontrado para editar:', {
             id: evento.id,
             titulo: evento.titulo,
             nivel: evento.nivel,
             grupo_competitivo: evento.grupo_competitivo
         });
-        
+
         const modal = document.getElementById('eventModal');
         const backdrop = document.getElementById('modalBackdrop');
         const content = document.getElementById('modalContent');
-        
+
         content.innerHTML = generarFormularioEvento(evento);
-        
+
         backdrop.classList.add('active');
         setTimeout(() => {
             modal.classList.add('active');
         }, 10);
-        
+
     } catch (error) {
         console.error('❌ Error cargando evento:', error);
         mostrarError('Error al cargar el evento');
@@ -1328,9 +1266,9 @@ async function abrirDetalleEvento(eventoId) {
 function closeModal() {
     const modal = document.getElementById('eventModal');
     const backdrop = document.getElementById('modalBackdrop');
-    
+
     modal.classList.remove('active');
-    
+
     setTimeout(() => {
         backdrop.classList.remove('active');
     }, 300);
@@ -1340,22 +1278,22 @@ async function eliminarEventoConfirmar(eventoId, titulo) {
     if (!confirm(`¿Estás seguro de eliminar "${titulo}"?`)) {
         return;
     }
-    
+
     try {
         mostrarCargando(true);
-        
+
         await window.AdminAPI.deleteEvento(eventoId);
-        
+
         console.log('✅ Evento eliminado');
-        
+
         // Cerrar modal inmediatamente
         closeModal();
-        
+
         // Recargar datos inmediatamente
         await recargarDatosCalendario();
-        
+
         mostrarExito('✅ Evento eliminado correctamente');
-        
+
     } catch (error) {
         console.error('❌ Error eliminando evento:', error);
         mostrarError('Error al eliminar el evento');
@@ -1369,23 +1307,23 @@ async function eliminarEventoConfirmar(eventoId, titulo) {
 // ===================================
 function mostrarEventosDelDia(fecha, eventos) {
     console.log('📅 Mostrando eventos del día:', fecha, eventos);
-    
+
     const modal = document.getElementById('eventModal');
     const backdrop = document.getElementById('modalBackdrop');
     const content = document.getElementById('modalContent');
-    
+
     if (!modal || !backdrop || !content) {
         console.error('❌ Elementos del modal no encontrados');
         return;
     }
-    
+
     const fechaFormateada = fecha.toLocaleDateString('es-ES', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric'
     });
-    
+
     if (eventos.length === 0) {
         content.innerHTML = `
             <div class="text-center py-4" style="padding: 3rem 0;">
@@ -1426,7 +1364,7 @@ function mostrarEventosDelDia(fecha, eventos) {
             </div>
         `;
     }
-    
+
     backdrop.classList.add('active');
     setTimeout(() => {
         modal.classList.add('active');
@@ -1447,9 +1385,9 @@ function generarTarjetaEvento(evento) {
         'general': 'event',
         'otro': 'more_horiz'
     };
-    
+
     const icono = tipoIconos[evento.tipo] || 'event';
-    
+
     return `
         <div class="evento-card">
             <div class="evento-card-header">
@@ -1510,25 +1448,25 @@ async function eliminarEventoDirecto(eventoId, titulo) {
     if (!confirm(`¿Estás seguro de eliminar "${titulo}"?`)) {
         return;
     }
-    
+
     try {
         mostrarCargando(true);
-        
+
         await window.AdminAPI.deleteEvento(eventoId);
-        
+
         console.log('✅ Evento eliminado');
-        
+
         // Cerrar modal si está abierto
         const modal = document.getElementById('eventModal');
         if (modal && modal.classList.contains('active')) {
             closeModal();
         }
-        
+
         // Recargar datos inmediatamente
         await recargarDatosCalendario();
-        
+
         mostrarExito('✅ Evento eliminado correctamente');
-        
+
     } catch (error) {
         console.error('❌ Error eliminando evento:', error);
         mostrarError('Error al eliminar el evento');
@@ -1542,16 +1480,16 @@ async function eliminarEventoDirecto(eventoId, titulo) {
 // ===================================
 function configurarEventListeners() {
     console.log('🎯 Configurando event listeners...');
-    
+
     // Botones de navegación de mes
     const prevBtn = document.getElementById('prevMonthBtn');
     const nextBtn = document.getElementById('nextMonthBtn');
     const todayBtn = document.getElementById('todayBtn');
-    
+
     if (prevBtn) prevBtn.addEventListener('click', mesAnterior);
     if (nextBtn) nextBtn.addEventListener('click', mesSiguiente);
     if (todayBtn) todayBtn.addEventListener('click', irAHoy);
-    
+
     // Botón de actualizar
     const refreshBtn = document.getElementById('refreshBtn');
     if (refreshBtn) {
@@ -1560,7 +1498,7 @@ function configurarEventListeners() {
             mostrarExito('Calendario actualizado');
         });
     }
-    
+
     // Botón crear evento
     const crearEventoBtn = document.getElementById('crearEventoBtn');
     if (crearEventoBtn) {
@@ -1569,29 +1507,29 @@ function configurarEventListeners() {
     } else {
         console.error('❌ Botón "crearEventoBtn" no encontrado en el DOM');
     }
-    
+
     // Botón cerrar modal
     const closeModalBtn = document.getElementById('closeModalBtn');
     const backdrop = document.getElementById('modalBackdrop');
-    
+
     if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
     if (backdrop) backdrop.addEventListener('click', closeModal);
-    
+
     // Botón de ayuda
     const ayudaBtn = document.getElementById('ayudaBtn');
     if (ayudaBtn) ayudaBtn.addEventListener('click', mostrarAyuda);
-    
+
     // Botón de tema
     const toggleTheme = document.getElementById('toggleTheme');
     if (toggleTheme) {
         toggleTheme.addEventListener('click', () => {
             document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', 
+            localStorage.setItem('theme',
                 document.documentElement.classList.contains('dark') ? 'dark' : 'light'
             );
         });
     }
-    
+
     // Botón de logout
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
@@ -1601,18 +1539,18 @@ function configurarEventListeners() {
             }
         });
     }
-    
+
     console.log('✅ Event listeners configurados correctamente');
 }
 
 async function mesAnterior() {
     estadoCalendario.mesActual--;
-    
+
     if (estadoCalendario.mesActual < 0) {
         estadoCalendario.mesActual = 11;
         estadoCalendario.añoActual--;
     }
-    
+
     await cargarEventos();
     renderizarCalendario();
     actualizarEstadisticas();
@@ -1621,12 +1559,12 @@ async function mesAnterior() {
 
 async function mesSiguiente() {
     estadoCalendario.mesActual++;
-    
+
     if (estadoCalendario.mesActual > 11) {
         estadoCalendario.mesActual = 0;
         estadoCalendario.añoActual++;
     }
-    
+
     await cargarEventos();
     renderizarCalendario();
     actualizarEstadisticas();
@@ -1637,7 +1575,7 @@ async function irAHoy() {
     const hoy = new Date();
     estadoCalendario.mesActual = hoy.getMonth();
     estadoCalendario.añoActual = hoy.getFullYear();
-    
+
     await cargarEventos();
     renderizarCalendario();
     actualizarEstadisticas();
@@ -1649,12 +1587,12 @@ function actualizarTituloMes() {
         'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
     ];
-    
+
     const titulo = document.getElementById('currentMonth');
     if (titulo) {
         titulo.innerHTML = `${meses[estadoCalendario.mesActual]} <span class="text-primary">${estadoCalendario.añoActual}</span>`;
     }
-    
+
     const status = document.getElementById('loadingStatus');
     if (status) {
         status.textContent = `Calendario cargado • ${meses[estadoCalendario.mesActual]} ${estadoCalendario.añoActual}`;
@@ -1675,7 +1613,7 @@ function obtenerNivelLegible(nivel) {
         '4': 'Nivel 4',
         'todos': 'Todos los niveles'
     };
-    
+
     return niveles[nivel] || nivel;
 }
 
@@ -1683,7 +1621,7 @@ function actualizarTiempoActualizacion() {
     const ahora = new Date();
     const horas = ahora.getHours().toString().padStart(2, '0');
     const minutos = ahora.getMinutes().toString().padStart(2, '0');
-    
+
     const elemento = document.getElementById('updateTime');
     if (elemento) {
         elemento.textContent = `Actualizado: ${horas}:${minutos}`;
@@ -1736,7 +1674,7 @@ AYUDA - CALENDARIO TITANES EVOLUTION (ADMIN)
 ¿Problemas?
 Verifica que tu backend esté corriendo en http://localhost:5000istas-production.up.railway.app
     `;
-    
+
     mostrarExito(ayuda);
 }
 
