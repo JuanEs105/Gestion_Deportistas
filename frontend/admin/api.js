@@ -53,7 +53,7 @@ window.AdminAPI = {
             }
 
             const token = data.token || data.access_token;
-            const user  = data.user  || data;
+            const user = data.user || data;
 
             if (!token) throw new Error('No se recibió token de autenticación');
 
@@ -267,7 +267,7 @@ window.AdminAPI = {
 
     async fixAdminCredentials() {
         try {
-            const adminEmail  = 'xxedechicoxx@gmail.com';
+            const adminEmail = 'xxedechicoxx@gmail.com';
             const newPassword = 'Admin123!';
             const adminsResponse = await this.getAllAdministradores();
             const admin = (adminsResponse.administradores || []).find(a => a.email === adminEmail);
@@ -569,7 +569,7 @@ window.AdminAPI = {
         }
     },
 
-    updateDeportistaCampo: async function(deportistaId, datos) {
+    updateDeportistaCampo: async function (deportistaId, datos) {
         try {
             const response = await fetch(`${this.baseURL}/admin/deportistas/${deportistaId}/campo`, {
                 method: 'PATCH', headers: this.getHeaders(), body: JSON.stringify(datos)
@@ -758,20 +758,20 @@ window.AdminAPI = {
             const deportistas = await this.getDeportistas();
             if (!deportistas || deportistas.length === 0) {
                 return {
-                    por_nivel: ['baby_titans','1_basico','1_medio','1_avanzado','2','3','4'].map(n => ({ nivel_actual: n, cantidad: 0 })),
-                    por_estado: ['activo','lesionado','inactivo','descanso','pendiente'].map(e => ({ estado: e, cantidad: 0 }))
+                    por_nivel: ['baby_titans', '1_basico', '1_medio', '1_avanzado', '2', '3', '4'].map(n => ({ nivel_actual: n, cantidad: 0 })),
+                    por_estado: ['activo', 'lesionado', 'inactivo', 'descanso', 'pendiente'].map(e => ({ estado: e, cantidad: 0 }))
                 };
             }
             const porNivel = {}, porEstado = {};
             deportistas.forEach(d => {
-                const nivel  = d.nivel_actual  || d.deportista?.nivel_actual  || 'pendiente';
-                const estado = d.estado        || d.deportista?.estado        || 'activo';
-                porNivel[nivel]   = (porNivel[nivel]   || 0) + 1;
+                const nivel = d.nivel_actual || d.deportista?.nivel_actual || 'pendiente';
+                const estado = d.estado || d.deportista?.estado || 'activo';
+                porNivel[nivel] = (porNivel[nivel] || 0) + 1;
                 porEstado[estado] = (porEstado[estado] || 0) + 1;
             });
             return {
-                por_nivel:  Object.keys(porNivel).map(n => ({ nivel_actual: n, cantidad: porNivel[n] })),
-                por_estado: Object.keys(porEstado).map(e => ({ estado: e,        cantidad: porEstado[e] }))
+                por_nivel: Object.keys(porNivel).map(n => ({ nivel_actual: n, cantidad: porNivel[n] })),
+                por_estado: Object.keys(porEstado).map(e => ({ estado: e, cantidad: porEstado[e] }))
             };
         } catch (error) {
             console.error('❌ Error obteniendo estadísticas de deportistas:', error);
@@ -851,13 +851,12 @@ window.AdminAPI = {
 
             let niveles = eventoData.niveles && Array.isArray(eventoData.niveles)
                 ? eventoData.niveles
-                : eventoData.nivel ? [eventoData.nivel] : ['baby_titans'];
+                : eventoData.nivel ? [eventoData.nivel] : [];
 
             let grupos = eventoData.grupos_competitivos && Array.isArray(eventoData.grupos_competitivos)
                 ? eventoData.grupos_competitivos
                 : eventoData.grupo_competitivo ? [eventoData.grupo_competitivo] : [];
 
-            if (!niveles.length) throw new Error('Debe seleccionar al menos un nivel');
 
             const payload = {
                 titulo: eventoData.titulo.trim(),
@@ -960,12 +959,12 @@ window.AdminAPI = {
             container.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;max-width:400px;';
             document.body.appendChild(container);
         }
-        const colors = { error:'#EF4444', success:'#10B981', warning:'#F59E0B', info:'#3B82F6' };
-        const icons  = { error:'error', success:'check_circle', warning:'warning', info:'info' };
+        const colors = { error: '#EF4444', success: '#10B981', warning: '#F59E0B', info: '#3B82F6' };
+        const icons = { error: 'error', success: 'check_circle', warning: 'warning', info: 'info' };
         const n = document.createElement('div');
-        n.style.cssText = `background:${colors[type]||colors.info};color:white;padding:16px 20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);display:flex;align-items:center;gap:12px;animation:slideIn 0.3s ease-out;font-family:'Montserrat',sans-serif;font-weight:500;min-width:300px;`;
+        n.style.cssText = `background:${colors[type] || colors.info};color:white;padding:16px 20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);display:flex;align-items:center;gap:12px;animation:slideIn 0.3s ease-out;font-family:'Montserrat',sans-serif;font-weight:500;min-width:300px;`;
         n.innerHTML = `
-            <span class="material-symbols-outlined" style="font-size:20px;">${icons[type]||'info'}</span>
+            <span class="material-symbols-outlined" style="font-size:20px;">${icons[type] || 'info'}</span>
             <span style="flex:1;">${message}</span>
             <button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;cursor:pointer;">
                 <span class="material-symbols-outlined" style="font-size:16px;">close</span>
