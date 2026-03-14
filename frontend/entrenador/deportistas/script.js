@@ -12,7 +12,8 @@ const opcionesEquipos = [
     { value: 'lightning_titans', label: '⚡ Lightning Titans' },
     { value: 'storm_titans', label: '🌪️ Storm Titans' },
     { value: 'fire_titans', label: '🔥 Fire Titans' },
-    { value: 'electric_titans', label: '⚡ Electric Titans' }
+    { value: 'electric_titans', label: '⚡ Electric Titans' },
+    { value: 'nova_titans', label: '🌟 Nova Titans' }
 ];
 
 const opcionesNiveles = [
