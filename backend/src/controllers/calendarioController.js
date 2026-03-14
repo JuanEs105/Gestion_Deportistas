@@ -61,7 +61,7 @@ const calendarioController = {
       if (!grupos_competitivos || grupos_competitivos.length === 0) {
         console.log('📝 Creando eventos para TODOS los grupos (NULL)');
 
-        for (const nivel of niveles) {
+        for (const nivel of nivelesFinales) {  // ✅ nivelesFinales, no niveles
           console.log(`  → Nivel: ${nivel}, Grupo: NULL`);
 
           const evento = await CalendarioEvento.create({
@@ -71,7 +71,7 @@ const calendarioController = {
             hora: hora || null,
             ubicacion: ubicacion ? ubicacion.trim() : null,
             nivel: nivel,
-            grupo_competitivo: null, // ← NULL para todos
+            grupo_competitivo: null,
             tipo: tipo || 'general',
             tipo_personalizado: tipo === 'otro' ? tipo_personalizado.trim() : null,
             entrenador_id: req.user.id
@@ -87,7 +87,7 @@ const calendarioController = {
           // ⚠️ NO NORMALICES AQUÍ - el modelo lo hace automáticamente
           console.log(`  → Grupo recibido: "${grupo}"`);
 
-          for (const nivel of niveles) {
+          for (const nivel of nivelesFinales) {
             console.log(`    → Nivel: ${nivel}, Grupo: ${grupo}`);
 
             const evento = await CalendarioEvento.create({

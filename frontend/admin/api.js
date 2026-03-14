@@ -830,11 +830,12 @@ window.AdminAPI = {
             const mes = filtros.mes || hoy.getMonth() + 1;
             const año = filtros.año || hoy.getFullYear();
 
-            let response = await fetch(`${this.baseURL}/calendario?mes=${mes}&año=${año}`, { headers: this.getHeaders() });
-            if (!response.ok) {
-                response = await fetch(`${this.baseURL}/calendario/filtros?mes=${mes}&año=${año}`, { headers: this.getHeaders() });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            }
+            // ✅ Usar directamente /filtros (la ruta correcta del backend)
+            const response = await fetch(`${this.baseURL}/calendario/filtros?mes=${mes}&año=${año}`, {
+                headers: this.getHeaders()
+            });
+
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json();
             return data.eventos || data || [];
         } catch (error) {
@@ -843,7 +844,6 @@ window.AdminAPI = {
             return [];
         }
     },
-
     async createEvento(eventoData) {
         try {
             if (!eventoData.titulo?.trim()) throw new Error('El título del evento es obligatorio');

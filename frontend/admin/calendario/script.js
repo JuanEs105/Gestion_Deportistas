@@ -27,7 +27,7 @@ let estadoCalendario = {
     nivelesSeleccionados: [],
     gruposSeleccionados: [],
     nivelesDisponibles: ['baby_titans', '1_basico', '1_medio', '1_avanzado', '2', '3', '4'],
-    gruposDisponibles: ['ROCKS TITANS', 'LIGHTNING TITANS', 'STORM TITANS', 'FIRE TITANS', 'ELECTRIC TITANS', 'STARS EVOLUTION']
+    gruposDisponibles: ['ROCKS TITANS', 'LIGHTNING TITANS', 'STORM TITANS', 'FIRE TITANS', 'ELECTRIC TITANS', 'STARS EVOLUTION','NOVA TITANS']
 };
 
 // ===================================
@@ -231,14 +231,11 @@ async function cargarEventos() {
 
 async function cargarGruposDisponibles() {
     try {
-        console.log('🏆 Cargando grupos competitivos...');
-
-        // Usar grupos por defecto ya que Admin tiene acceso a todos
+        // Grupos por defecto para admin (ya incluye NOVA TITANS)
         console.log('✅ Usando grupos por defecto para admin:', estadoCalendario.gruposDisponibles);
-
+        // No hace nada más porque ya están en estadoCalendario
     } catch (error) {
         console.error('❌ Error cargando grupos:', error);
-        console.log('✅ Usando grupos por defecto');
     }
 }
 
