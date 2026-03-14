@@ -1410,9 +1410,11 @@ function generarTarjetaEvento(evento) {
                         <span class="evento-badge-small" style="background: rgba(226, 27, 35, 0.1); color: var(--primary-red);">
                             ${evento.tipo_personalizado || evento.tipo}
                         </span>
-                        <span class="evento-badge-small" style="background: rgba(59, 130, 246, 0.1); color: #2563EB;">
-                            ${obtenerNivelLegible(evento.nivel)}
-                        </span>
+                        ${obtenerNivelLegible(evento.nivel) ? `
+                                <span class="evento-badge-small" style="background: rgba(59, 130, 246, 0.1); color: #2563EB;">
+                                 ${obtenerNivelLegible(evento.nivel)}
+                                </span>
+                                ` : ''}
                         ${evento.grupo_competitivo ? `
                             <span class="evento-badge-small" style="background: rgba(16, 185, 129, 0.1); color: #059669;">
                                 ${evento.grupo_competitivo}

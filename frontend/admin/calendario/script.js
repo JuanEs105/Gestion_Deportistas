@@ -1398,7 +1398,7 @@ function generarTarjetaEvento(evento) {
                             ${evento.tipo_personalizado || evento.tipo}
                         </span>
                         <span class="evento-badge-small" style="background: rgba(59, 130, 246, 0.1); color: #2563EB;">
-                            ${obtenerNivelLegible(evento.nivel)}
+                        ${obtenerNivelLegible(evento.nivel)}
                         </span>
                         ${evento.grupo_competitivo ? `
                             <span class="evento-badge-small" style="background: rgba(16, 185, 129, 0.1); color: #059669;">

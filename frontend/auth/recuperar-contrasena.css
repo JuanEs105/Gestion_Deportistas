@@ -383,3 +383,16 @@
         height: 5rem;
     }
 }
+/* Scroll en móvil */
+.recuperar-body {
+    align-items: flex-start;
+    overflow-y: auto;
+    padding: 2rem 0;
+}
+
+@media (min-height: 700px) {
+    .recuperar-body {
+        align-items: center;
+        padding: 0;
+    }
+}
