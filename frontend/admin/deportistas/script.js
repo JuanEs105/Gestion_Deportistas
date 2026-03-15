@@ -59,9 +59,9 @@ const opcionesTalla = [
 // INICIALIZACIÓN
 // ==============================================
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('✅ DOM cargado - Inicializando sistema de deportistas (Admin)');
-    
+
     if (window.AdminAPI && AdminAPI.checkAuth) {
         if (!AdminAPI.checkAuth()) return;
         const userEmail = document.getElementById('userEmail');
@@ -69,24 +69,24 @@ document.addEventListener('DOMContentLoaded', function() {
             userEmail.textContent = AdminAPI.user.email || AdminAPI.user.correo || 'admin@titanes.com';
         }
     }
-    
+
     const searchInput = document.getElementById('searchInput');
     const filtroNivel = document.getElementById('filtroNivel');
     const filtroEstado = document.getElementById('filtroEstado');
     const filtroEquipo = document.getElementById('filtroEquipo');
-    
+
     if (searchInput) searchInput.addEventListener('input', filtrarDeportistas);
     if (filtroNivel) filtroNivel.addEventListener('change', filtrarDeportistas);
     if (filtroEstado) filtroEstado.addEventListener('change', filtrarDeportistas);
     if (filtroEquipo) filtroEquipo.addEventListener('change', filtrarDeportistas);
-    
+
     document.getElementById('btnLimpiarFiltros')?.addEventListener('click', limpiarFiltros);
     document.querySelector('.floating-help-btn')?.addEventListener('click', mostrarAyuda);
     document.getElementById('prevBtn')?.addEventListener('click', paginaAnterior);
     document.getElementById('nextBtn')?.addEventListener('click', paginaSiguiente);
-    
+
     setTimeout(cargarDeportistas, 100);
-    
+
     const savedTheme = localStorage.getItem('theme') || 'light';
     if (savedTheme === 'dark') document.documentElement.classList.add('dark');
 });
@@ -114,7 +114,7 @@ async function cargarDeportistas() {
 function procesarDatosDeportistas(data) {
     let deportistasData = data;
     if (!Array.isArray(deportistasData)) deportistasData = [];
-    
+
     deportistas = deportistasData.map(d => ({
         id: d.id,
         deportista_id: d.id,
@@ -141,10 +141,10 @@ function procesarDatosDeportistas(data) {
         usuario_asociado: d.user || null,
         activo: d.activo || d.User?.activo || true
     }));
-    
+
     deportistas.sort((a, b) => a.nombre.localeCompare(b.nombre));
     console.log(`✅ ${deportistas.length} deportistas procesados`);
-    
+
     verificarPagosPendientes();
     mostrarDeportistas();
     actualizarEstadisticas();
@@ -164,7 +164,7 @@ function verificarPagosPendientes() {
 function mostrarNotificacionPago(deportista) {
     const existingNotification = document.getElementById(`notificacion-pago-${deportista.id}`);
     if (existingNotification) return;
-    
+
     const notification = document.createElement('div');
     notification.id = `notificacion-pago-${deportista.id}`;
     notification.className = 'fixed top-4 right-4 z-50 bg-yellow-500 text-white p-4 rounded-lg shadow-lg max-w-md animate-fadeIn';
@@ -204,9 +204,9 @@ function cerrarNotificacionPago(deportistaId) {
 function mostrarDeportistas() {
     const tbody = document.getElementById('deportistasTableBody');
     if (!tbody) { console.error('❌ No se encontró el tbody'); return; }
-    
+
     deportistasFiltrados = filtrarDeportistasLocal();
-    
+
     if (deportistasFiltrados.length === 0) {
         tbody.innerHTML = `
             <tr>
@@ -223,14 +223,14 @@ function mostrarDeportistas() {
         `;
         return;
     }
-    
+
     const loadingRow = document.getElementById('loadingRow');
     if (loadingRow) loadingRow.remove();
-    
+
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, deportistasFiltrados.length);
     const deportistasParaMostrar = deportistasFiltrados.slice(startIndex, endIndex);
-    
+
     tbody.innerHTML = deportistasParaMostrar.map(deportista => {
         const imc = calcularIMC(deportista.peso, deportista.altura);
         const debePagar = deportista.estado === 'pendiente_de_pago';
@@ -242,9 +242,9 @@ function mostrarDeportistas() {
                 <td class="p-4">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full ${debePagar ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 border-2 border-yellow-500' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400'} flex items-center justify-center font-semibold overflow-hidden">
-                            ${deportista.foto_perfil ? 
-                                `<img src="${escapeHTML(deportista.foto_perfil)}" alt="${escapeHTML(deportista.nombre)}" class="w-full h-full object-cover rounded-full">` : 
-                                inicialNombre}
+                            ${deportista.foto_perfil ?
+                `<img src="${escapeHTML(deportista.foto_perfil)}" alt="${escapeHTML(deportista.nombre)}" class="w-full h-full object-cover rounded-full">` :
+                inicialNombre}
                         </div>
                         <div>
                             <div class="font-semibold ${debePagar ? 'text-yellow-700 dark:text-yellow-400' : 'text-gray-900 dark:text-white'}">${escapeHTML(deportista.nombre)}</div>
@@ -311,7 +311,7 @@ function mostrarDeportistas() {
             </tr>
         `;
     }).join('');
-    
+
     actualizarPaginacion();
 }
 
@@ -356,19 +356,19 @@ function mostrarMenuSeleccion(tipo, deportistaId, nombreDeportista, opciones, ti
     cerrarMenuSeleccion();
     if (menuAbierto) return;
     menuAbierto = true;
-    
+
     const target = event.target.closest('.dropdown-btn') || event.target;
     const rect = target.getBoundingClientRect();
-    
+
     const overlay = document.createElement('div');
     overlay.id = 'dropdownOverlay';
     overlay.className = 'fixed inset-0 z-40 cursor-default';
     overlay.onclick = cerrarMenuSeleccion;
-    
+
     const menu = document.createElement('div');
     menu.id = 'dropdownMenu';
     menu.className = 'fixed z-50 bg-white dark:bg-zinc-900 rounded-xl shadow-2xl border border-gray-200 dark:border-white/10 w-80 max-h-96 overflow-y-auto';
-    
+
     let left = rect.left;
     let top = rect.bottom + 5;
     const menuWidth = 320;
@@ -377,11 +377,11 @@ function mostrarMenuSeleccion(tipo, deportistaId, nombreDeportista, opciones, ti
     if (top + menuHeight > window.innerHeight) top = Math.max(10, rect.top - menuHeight);
     if (top < 10) top = 10;
     if (left < 10) left = 10;
-    
+
     menu.style.left = `${left}px`;
     menu.style.top = `${top}px`;
     menu.style.maxHeight = `${menuHeight}px`;
-    
+
     menu.innerHTML = `
         <div class="sticky top-0 bg-white dark:bg-zinc-900 p-4 border-b border-gray-200 dark:border-white/10 z-10">
             <div class="flex items-center justify-between">
@@ -404,7 +404,7 @@ function mostrarMenuSeleccion(tipo, deportistaId, nombreDeportista, opciones, ti
             `).join('')}
         </div>
     `;
-    
+
     document.body.appendChild(overlay);
     document.body.appendChild(menu);
     menu.style.opacity = '0';
@@ -437,7 +437,7 @@ function cerrarMenuSeleccion() {
 async function seleccionarOpcion(tipo, deportistaId, valor) {
     const deportista = deportistas.find(d => d.id === deportistaId);
     if (!deportista) return;
-    
+
     let titulo, valorActual, nuevoNombre, campo;
     if (tipo === 'nivel') {
         titulo = 'Cambiar nivel'; valorActual = getNivelNombre(deportista.nivel_actual);
@@ -453,11 +453,11 @@ async function seleccionarOpcion(tipo, deportistaId, valor) {
             if (!confirmacion) { cerrarMenuSeleccion(); return; }
         }
     }
-    
+
     if (!confirm(`¿${titulo} de ${deportista.nombre}?\n\nDe: ${valorActual}\nA: ${nuevoNombre}`)) {
         cerrarMenuSeleccion(); return;
     }
-    
+
     try {
         setLoading(true);
         const resultado = await AdminAPI.updateDeportistaCampo(deportistaId, { campo, valor });
@@ -510,13 +510,13 @@ async function desbloquearCuentaPorPago(deportista) {
 function verDetallesCompletos(deportistaId) {
     deportistaSeleccionado = deportistas.find(d => d.id === deportistaId);
     if (!deportistaSeleccionado) { mostrarError('Deportista no encontrado'); return; }
-    
+
     if (deportistaSeleccionado.estado === 'pendiente_de_pago') {
         mostrarNotificacionPago(deportistaSeleccionado);
         mostrarMensaje('⚠️ Este deportista tiene un pago pendiente. Acceso restringido.', 'warning');
         return;
     }
-    
+
     const imc = calcularIMC(deportistaSeleccionado.peso, deportistaSeleccionado.altura);
     const edad = calcularEdad(deportistaSeleccionado.fecha_nacimiento);
     const inicialNombre = deportistaSeleccionado.nombre?.charAt(0)?.toUpperCase() || '?';
@@ -525,7 +525,7 @@ function verDetallesCompletos(deportistaId) {
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4';
     modal.id = 'modalDetallesDeportista';
-    
+
     modal.innerHTML = `
         <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div class="p-6 border-b border-gray-200 dark:border-white/5 flex items-center justify-between">
@@ -538,10 +538,10 @@ function verDetallesCompletos(deportistaId) {
                 <div class="flex flex-col md:flex-row gap-6 mb-8">
                     <div class="flex-shrink-0">
                         <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-white dark:border-zinc-800 shadow-lg">
-                            ${deportistaSeleccionado.foto_perfil ? 
-                                `<img src="${escapeHTML(deportistaSeleccionado.foto_perfil)}" alt="${escapeHTML(deportistaSeleccionado.nombre)}" class="w-full h-full object-cover">` : 
-                                `<div class="w-full h-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-4xl font-bold text-blue-800 dark:text-blue-400">${inicialNombre}</div>`
-                            }
+                            ${deportistaSeleccionado.foto_perfil ?
+            `<img src="${escapeHTML(deportistaSeleccionado.foto_perfil)}" alt="${escapeHTML(deportistaSeleccionado.nombre)}" class="w-full h-full object-cover">` :
+            `<div class="w-full h-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-4xl font-bold text-blue-800 dark:text-blue-400">${inicialNombre}</div>`
+        }
                         </div>
                     </div>
                     
@@ -698,7 +698,7 @@ function verDetallesCompletos(deportistaId) {
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
 }
 
@@ -709,19 +709,19 @@ function verDetallesCompletos(deportistaId) {
 function editarDeportistaCompleto(deportistaId) {
     deportistaSeleccionado = deportistas.find(d => d.id === deportistaId);
     if (!deportistaSeleccionado) { mostrarError('Deportista no encontrado'); return; }
-    
+
     if (deportistaSeleccionado.estado === 'pendiente_de_pago') {
         mostrarNotificacionPago(deportistaSeleccionado);
         mostrarMensaje('❌ No se puede editar. El deportista tiene un pago pendiente.', 'error');
         return;
     }
-    
+
     cerrarModal();
-    
+
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4';
     modal.id = 'modalEditarDeportista';
-    
+
     modal.innerHTML = `
         <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="p-6 border-b border-gray-200 dark:border-white/5 flex items-center justify-between">
@@ -794,26 +794,27 @@ function editarDeportistaCompleto(deportistaId) {
                         </div>
                     </div>
 
-                    <!-- ✅ NUEVA SECCIÓN: Información Médica EDITABLE -->
-                    <div class="bg-red-50 dark:bg-red-900/10 rounded-xl p-6 border border-red-200 dark:border-red-800">
-                        <div class="flex items-center gap-2 mb-4">
-                            <span class="material-symbols-outlined text-red-500">medical_information</span>
-                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white">Información Médica</h4>
-                            <span class="ml-auto text-xs text-gray-500 dark:text-gray-400 italic">Solo visible para admin y entrenadores</span>
+                    <!-- Información Médica — SOLO LECTURA -->
+                        <div class="bg-red-50 dark:bg-red-900/10 rounded-xl p-6 border border-red-200 dark:border-red-800">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="material-symbols-outlined text-red-500">medical_information</span>
+                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white">Información Médica</h4>
+                                <span class="ml-auto inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 dark:bg-zinc-700 text-gray-500 dark:text-gray-400 text-xs rounded-full">
+                                    <span class="material-symbols-outlined text-xs">lock</span>
+                                    Solo lectura
+                                </span>
+                            </div>
+                            <div class="bg-white dark:bg-zinc-900 rounded-lg p-4 border border-red-200 dark:border-red-700 min-h-[80px]">
+                                <p class="text-gray-800 dark:text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">
+                                    ${deportistaSeleccionado.condicion_medica ? escapeHTML(deportistaSeleccionado.condicion_medica) : '<span class="text-gray-400 italic">Sin condiciones médicas registradas.</span>'}
+                                </p>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">info</span>
+                                Esta información solo puede ser modificada por el deportista al momento del registro.
+                            </p>
                         </div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Condición médica, lesión previa, alergia o situación de salud
-                        </label>
-                        <textarea id="editCondicionMedica" rows="5"
-                            placeholder="Ej: Alergia al polvo, asma leve controlada, lesión de rodilla derecha en 2023 ya recuperada..."
-                            class="w-full bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-red-400 focus:border-red-400 outline-none transition-all text-sm text-gray-800 dark:text-gray-200 resize-vertical min-h-[110px]"
-                        >${escapeHTML(deportistaSeleccionado.condicion_medica || '')}</textarea>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-1">
-                            <span class="material-symbols-outlined text-xs">info</span>
-                            Si el deportista no presenta ninguna condición, deja este campo en blanco.
-                        </p>
-                    </div>
-                    
+                                            
                     <!-- Solo lectura -->
                     <div class="bg-gray-50 dark:bg-zinc-800 rounded-xl p-6">
                         <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ℹ️ Información del Deportista (Solo Lectura)</h4>
@@ -852,10 +853,10 @@ function editarDeportistaCompleto(deportistaId) {
             </form>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
-    
-    document.getElementById('formEditarDeportista').addEventListener('submit', async function(e) {
+
+    document.getElementById('formEditarDeportista').addEventListener('submit', async function (e) {
         e.preventDefault();
         await guardarCambiosDeportistaAdmin();
     });
@@ -867,10 +868,10 @@ function editarDeportistaCompleto(deportistaId) {
 
 async function guardarCambiosDeportistaAdmin() {
     if (!deportistaSeleccionado) return;
-    
+
     try {
         setLoading(true);
-        
+
         const datosActualizados = {
             peso: document.getElementById('editPeso').value ? parseFloat(document.getElementById('editPeso').value) : null,
             altura: document.getElementById('editAltura').value ? parseFloat(document.getElementById('editAltura').value) : null,
@@ -878,21 +879,20 @@ async function guardarCambiosDeportistaAdmin() {
             nivel_actual: document.getElementById('editNivel').value,
             estado: document.getElementById('editEstado').value,
             equipo_competitivo: document.getElementById('editEquipo').value,
-            condicion_medica: document.getElementById('editCondicionMedica').value.trim() || null   // ✅ NUEVO
         };
-        
+
         console.log('💾 Guardando cambios completos:', datosActualizados);
-        
+
         const nuevoEstado = datosActualizados.estado;
         const estadoAnterior = deportistaSeleccionado.estado;
-        
+
         if (nuevoEstado === 'pendiente_de_pago' && estadoAnterior !== 'pendiente_de_pago') {
             const confirmacion = confirm(`⚠️ ¿ESTÁS SEGURO DE CAMBIAR A PENDIENTE DE PAGO?\n\nEsto BLOQUEARÁ la cuenta de ${deportistaSeleccionado.nombre}.\n\n¿Continuar?`);
             if (!confirmacion) { setLoading(false); return; }
         }
-        
+
         const resultado = await AdminAPI.updateDeportista(deportistaSeleccionado.id, datosActualizados);
-        
+
         if (resultado && resultado.success) {
             const index = deportistas.findIndex(d => d.id === deportistaSeleccionado.id);
             if (index !== -1) {
@@ -912,7 +912,7 @@ async function guardarCambiosDeportistaAdmin() {
         } else {
             mostrarError('Error al guardar los cambios');
         }
-        
+
     } catch (error) {
         console.error('Error:', error);
         mostrarError('Error al guardar los cambios: ' + error.message);
