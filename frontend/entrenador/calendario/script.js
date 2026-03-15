@@ -31,8 +31,8 @@ let estadoCalendario = {
     eventosFiltrados: [],
     nivelesSeleccionados: [],
     gruposSeleccionados: [],
-    nivelesDisponibles: ['baby_titans', '1_basico', '1_medio', '1_avanzado', '2', '3', '4'],
-    gruposDisponibles: ['ROCKS TITANS', 'LIGHTNING TITANS', 'STORM TITANS', 'FIRE TITANS', 'ELECTRIC TITANS', 'STARS EVOLUTION']
+    nivelesDisponibles: ['1_basico', '1_medio', '1_avanzado', '2', '3', '4'],
+    gruposDisponibles: ['ROCKS TITANS', 'LIGHTNING TITANS', 'STORM TITANS', 'FIRE TITANS', 'ELECTRIC TITANS', 'STARS EVOLUTION', 'BABY TITANS', 'NOVA TITANS']
 };
 
 // ===================================
