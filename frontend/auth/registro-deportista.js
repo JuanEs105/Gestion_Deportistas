@@ -7,10 +7,10 @@
 
 document.addEventListener('DOMContentLoaded', function () {
     console.log('✅ Registro Deportista page loaded');
-    
+
     // Agregar estilos para errores
     agregarEstilosDeError();
-    
+
     initFormValidation();
     initFileUploads();
     initDatePicker();
@@ -140,7 +140,7 @@ function validateField(field) {
         // ✅✅✅ VALIDACIÓN DE DIRECCIÓN CORREGIDA ✅✅✅
         case 'direccion':
             const numeroDocDireccion = document.getElementById('numero_documento')?.value.trim();
-            
+
             if (!value) {
                 isValid = false;
                 errorMessage = '❌ La dirección es obligatoria';
@@ -179,14 +179,14 @@ function validateField(field) {
 
         case 'password':
             const numeroDocumento = document.getElementById('numero_documento')?.value.trim();
-            
+
             if (!value) {
                 isValid = false;
                 errorMessage = '❌ La contraseña es obligatoria';
             } else if (value.length < 6) {
                 isValid = false;
                 errorMessage = '❌ Mínimo 6 caracteres';
-            } 
+            }
             else if (numeroDocumento && value === numeroDocumento) {
                 isValid = false;
                 errorMessage = '⚠️ La contraseña no puede ser igual al número de documento';
@@ -470,7 +470,7 @@ function setupFormSubmit() {
                 // Preparar datos
                 const apellidos = document.getElementById('apellidos').value.trim();
                 const nombres = document.getElementById('nombres').value.trim();
-                
+
                 formData.set('nombre', nombres);
                 formData.set('apellidos', apellidos);
 
@@ -496,6 +496,10 @@ function setupFormSubmit() {
                 }
 
                 formData.set('terminos_aceptados', 'true');
+                const condicionMedica = document.getElementById('condicion_medica')?.value.trim();
+                if (condicionMedica) {
+                    formData.set('condicion_medica', condicionMedica);
+                }
 
                 console.log('📤 Enviando a backend...');
 
@@ -533,7 +537,7 @@ function setupFormSubmit() {
             } catch (error) {
                 console.error('❌ Error:', error);
                 mostrarNotificacion(`❌ ${error.message}`, 'error');
-                
+
                 btnSubmit.disabled = false;
                 loadingSpinner.classList.add('hidden');
                 spanText.textContent = originalText;
@@ -575,7 +579,7 @@ function validateForm() {
     // Validar radio buttons
     const radioGroups = {};
     const radios = form.querySelectorAll('input[type="radio"][required]');
-    
+
     radios.forEach(radio => {
         const name = radio.name;
         if (!radioGroups[name]) {
@@ -641,7 +645,7 @@ function mostrarNotificacion(mensaje, tipo = 'info') {
     const notification = document.createElement('div');
     const bgColor = tipo === 'error' ? '#EF4444' :
         tipo === 'success' ? '#10B981' :
-        tipo === 'warning' ? '#F59E0B' : '#3B82F6';
+            tipo === 'warning' ? '#F59E0B' : '#3B82F6';
 
     notification.style.cssText = `
         background: ${bgColor};
