@@ -535,6 +535,7 @@ window.AdminAPI = {
                 nivel_actual: deportistaData.nivel_actual,
                 estado: deportistaData.estado,
                 equipo_competitivo: deportistaData.equipo_competitivo,
+                condicion_medica: deportistaData.condicion_medica ?? null,  //
                 contacto_emergencia_nombre: deportistaData.contacto_emergencia_nombre,
                 contacto_emergencia_telefono: deportistaData.contacto_emergencia_telefono,
                 contacto_emergencia_parentesco: deportistaData.contacto_emergencia_parentesco
