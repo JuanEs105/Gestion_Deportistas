@@ -217,7 +217,8 @@ class AuthController {
         nombre_acudiente,
         telefono_acudiente,
         email_acudiente,
-        terminos_aceptados
+        terminos_aceptados,
+        condicion_medica
       } = req.body;
 
       // Validaciones
@@ -302,6 +303,7 @@ class AuthController {
         direccion: direccion || null,
         eps: eps || null,
         talla_camiseta: talla_camiseta || null,
+        condicion_medica: condicion_medica || null,   // ✅
         contacto_emergencia_nombre: nombre_acudiente || null,
         contacto_emergencia_telefono: telefono_acudiente || null,
         contacto_emergencia_parentesco: 'Acudiente',
