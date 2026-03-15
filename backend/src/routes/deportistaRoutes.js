@@ -75,6 +75,7 @@ router.get('/me', async (req, res) => {
       estado: deportistaData.estado || 'pendiente',
       equipo_competitivo: deportistaData.equipo_competitivo || 'sin_equipo',
       foto_perfil: deportistaData.foto_perfil,
+      condicion_medica: deportistaData.condicion_medica || null,  // ✅ AGREGADO
       contacto_emergencia_nombre: deportistaData.contacto_emergencia_nombre,
       contacto_emergencia_telefono: deportistaData.contacto_emergencia_telefono,
       contacto_emergencia_parentesco: deportistaData.contacto_emergencia_parentesco,
@@ -138,6 +139,7 @@ router.get('/', async (req, res) => {
         peso: deportistaObj.peso,
         foto_perfil: deportistaObj.foto_perfil,
         equipo_competitivo: deportistaObj.equipo_competitivo || 'sin_equipo',
+        condicion_medica: deportistaObj.condicion_medica || null,  // ✅ AGREGADO
         contacto_emergencia_nombre: deportistaObj.contacto_emergencia_nombre,
         contacto_emergencia_telefono: deportistaObj.contacto_emergencia_telefono,
         contacto_emergencia_parentesco: deportistaObj.contacto_emergencia_parentesco,
@@ -168,6 +170,7 @@ router.get('/', async (req, res) => {
 // ====================
 
 // PUT /api/deportistas/me - Deportista actualiza SU PROPIO perfil
+// NOTA: condicion_medica NO se permite editar desde aquí — solo admin puede modificarla
 router.put('/me', async (req, res) => {
   try {
     console.log('📝 PUT /api/deportistas/me - Usuario:', req.user?.email);
@@ -199,6 +202,7 @@ router.put('/me', async (req, res) => {
       contacto_emergencia_nombre,
       contacto_emergencia_telefono,
       contacto_emergencia_parentesco
+      // condicion_medica ignorada intencionalmente — solo admin puede modificarla
     } = req.body;
     
     console.log('📋 Campos a actualizar:');
@@ -511,9 +515,9 @@ router.use(isEntrenador);
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    let {  // ← CAMBIO 1: Cambiar 'const' por 'let'
+    let {
       nivel_actual, estado, equipo_competitivo, 
-      peso, altura
+      peso, altura, condicion_medica             // ✅ condicion_medica agregada
     } = req.body;
 
     console.log('📝 PUT /api/deportistas/:id - ID:', id);
@@ -536,8 +540,14 @@ router.put('/:id', async (req, res) => {
     // Validar equipo competitivo
     if (equipo_competitivo) {
       const equiposValidos = [
-        'sin_equipo', 'rocks_titans', 'lightning_titans', 
-        'storm_titans', 'fire_titans', 'electric_titans'
+        'sin_equipo',
+        'baby_titans',        // ✅ AGREGADO
+        'rocks_titans',
+        'lightning_titans', 
+        'storm_titans',
+        'fire_titans',
+        'electric_titans',
+        'nova_titans'         // ✅ AGREGADO
       ];
       
       if (!equiposValidos.includes(equipo_competitivo)) {
@@ -551,8 +561,14 @@ router.put('/:id', async (req, res) => {
     // Validar nivel
     if (nivel_actual) {
       const nivelesValidos = [
-        'pendiente', 'baby_titans', '1_basico', '1_medio', 
-        '1_avanzado', '2', '3', '4'
+        'pendiente',
+        '1_basico',
+        '1_medio', 
+        '1_avanzado',
+        '2',
+        '3',
+        '4'
+        // baby_titans eliminado de niveles — ahora es solo equipo competitivo
       ];
       
       if (!nivelesValidos.includes(nivel_actual)) {
@@ -563,7 +579,7 @@ router.put('/:id', async (req, res) => {
       }
     }
 
-    // ✅✅✅ CAMBIO 2: NORMALIZAR Y VALIDAR ESTADO
+    // ✅✅✅ NORMALIZAR Y VALIDAR ESTADO
     if (estado) {
       // Normalizar: "Pendiente de pago" → "pendiente_de_pago"
       estado = estado.toLowerCase().trim().replace(/\s+/g, '_');
@@ -590,8 +606,9 @@ router.put('/:id', async (req, res) => {
     if (equipo_competitivo !== undefined) updates.equipo_competitivo = equipo_competitivo;
     if (peso !== undefined) updates.peso = peso;
     if (altura !== undefined) updates.altura = altura;
+    if (condicion_medica !== undefined) updates.condicion_medica = condicion_medica || null; // ✅ AGREGADO
 
-    console.log('📋 Updates a aplicar:', updates); // ← CAMBIO 3: Agregar este log
+    console.log('📋 Updates a aplicar:', updates);
 
     // Aplicar updates si hay campos para actualizar
     if (Object.keys(updates).length > 0) {
@@ -617,7 +634,7 @@ router.put('/:id', async (req, res) => {
 
   } catch (error) {
     console.error('❌ Error actualizando deportista:', error);
-    console.error('📍 Stack trace:', error.stack); // ← CAMBIO 4: Agregar stack trace
+    console.error('📍 Stack trace:', error.stack);
     
     res.status(500).json({
       success: false,
@@ -649,15 +666,11 @@ router.delete('/:id', isAdmin, async (req, res) => {
       });
     }
 
-    // Obtener nombre antes de eliminar
     const nombre = deportista.user?.nombre || 'Deportista';
-
     console.log(`📋 Eliminando deportista: ${nombre} (ID: ${id})`);
 
-    // Eliminar el deportista primero
     await deportista.destroy();
 
-    // Si hay usuario asociado, eliminarlo también
     if (deportista.user_id) {
       await User.destroy({
         where: { id: deportista.user_id }
@@ -703,8 +716,14 @@ router.put('/:id/equipo', async (req, res) => {
     }
 
     const equiposValidos = [
-      'sin_equipo', 'rocks_titans', 'lightning_titans', 
-      'storm_titans', 'fire_titans', 'electric_titans'
+      'sin_equipo',
+      'baby_titans',        // ✅ AGREGADO
+      'rocks_titans',
+      'lightning_titans', 
+      'storm_titans',
+      'fire_titans',
+      'electric_titans',
+      'nova_titans'         // ✅ AGREGADO
     ];
 
     if (!equiposValidos.includes(equipo_competitivo)) {
@@ -761,8 +780,14 @@ router.put('/:id/nivel', async (req, res) => {
     }
 
     const nivelesValidos = [
-      'pendiente', 'baby_titans', '1_basico', '1_medio', 
-      '1_avanzado', '2', '3', '4'
+      'pendiente',
+      '1_basico',
+      '1_medio',
+      '1_avanzado',
+      '2',
+      '3',
+      '4'
+      // baby_titans eliminado de niveles — ahora es solo equipo competitivo
     ];
 
     if (!nivelesValidos.includes(nivel_actual)) {

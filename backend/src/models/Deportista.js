@@ -1,4 +1,4 @@
-// backend/src/models/Deportista.js - CON EQUIPOS DE COMPETENCIA
+// backend/src/models/Deportista.js
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
@@ -57,12 +57,20 @@ const Deportista = sequelize.define('Deportista', {
   },
 
   // ==========================================
-  // NIVELES (SISTEMA ORIGINAL + BABY TITANS)
+  // CONDICIÓN MÉDICA — NUEVO CAMPO
+  // ==========================================
+  condicion_medica: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    comment: 'Condición médica, lesión previa o alergia declarada al momento del registro'
+  },
+
+  // ==========================================
+  // NIVELES — baby_titans ELIMINADO (ahora es solo equipo competitivo)
   // ==========================================
   nivel_actual: {
     type: DataTypes.ENUM(
       'pendiente',
-      'baby_titans',     // ✅ NUEVO NIVEL
       '1_basico',
       '1_medio',
       '1_avanzado',
@@ -76,7 +84,6 @@ const Deportista = sequelize.define('Deportista', {
   },
   nivel_sugerido: {
     type: DataTypes.ENUM(
-      'baby_titans',     // ✅ NUEVO NIVEL
       '1_basico',
       '1_medio',
       '1_avanzado',
@@ -89,16 +96,19 @@ const Deportista = sequelize.define('Deportista', {
   },
 
   // ==========================================
-  // EQUIPOS DE COMPETENCIA (NUEVO SISTEMA)
+  // EQUIPOS DE COMPETENCIA
+  // baby_titans y nova_titans agregados
   // ==========================================
   equipo_competitivo: {
     type: DataTypes.ENUM(
-      'sin_equipo',           // Por defecto
+      'sin_equipo',
+      'baby_titans',        // ✅ Ahora es equipo competitivo, no nivel
       'rocks_titans',
       'lightning_titans',
       'storm_titans',
       'fire_titans',
-      'electric_titans'
+      'electric_titans',
+      'nova_titans'         // ✅ Equipo nuevo
     ),
     defaultValue: 'sin_equipo',
     allowNull: false,
@@ -115,7 +125,6 @@ const Deportista = sequelize.define('Deportista', {
     allowNull: true,
     comment: 'Fecha del último cambio de nivel aprobado'
   },
-  // ✅ DESPUÉS
   estado: {
     type: DataTypes.ENUM('activo', 'pendiente', 'pendiente_de_pago', 'inactivo', 'lesionado', 'descanso'),
     defaultValue: 'activo',
@@ -142,7 +151,6 @@ const Deportista = sequelize.define('Deportista', {
     type: DataTypes.STRING,
     allowNull: true
   },
-
   acepta_terminos: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,

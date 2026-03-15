@@ -214,7 +214,7 @@
                         </div>
                     </div>
 
-                    <!-- ✅ SECCIÓN DE ARCHIVOS CORREGIDA -->
+                    <!-- SECCIÓN DE ARCHIVOS -->
                     <div class="archivos-grid">
                         <!-- DOCUMENTO PDF -->
                         <div class="archivo-group">
@@ -229,7 +229,7 @@
                             <div class="error-message" id="errorDocumento"></div>
                         </div>
 
-                        <!-- ✅ FOTO - AHORA OBLIGATORIA -->
+                        <!-- FOTO - OBLIGATORIA -->
                         <div class="archivo-group">
                             <label class="field-required">Fotografía Deportista</label>
                             <label for="foto" class="upload-area"
@@ -279,6 +279,78 @@
                     </div>
                 </section>
 
+                <!-- ✅ NUEVA Sección 3: Información Médica -->
+                <section class="seccion">
+                    <div class="seccion-header">
+                        <span class="seccion-numero">03</span>
+                        <h3>Información Médica</h3>
+                    </div>
+
+                    <div class="form-group full-width" style="margin-bottom: 0;">
+                        <label for="condicion_medica" class="field-optional"
+                            style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                            <span class="material-symbols-outlined"
+                                style="font-size: 1.1rem; color: #E21B23;">medical_information</span>
+                            Condición médica, lesión previa, alergia o situación de salud
+                        </label>
+
+                        <div style="
+                            background: rgba(226, 27, 35, 0.04);
+                            border: 1px solid rgba(226, 27, 35, 0.15);
+                            border-radius: 8px;
+                            padding: 16px;
+                            margin-bottom: 12px;
+                        ">
+                            <p style="
+                                font-size: 0.8rem;
+                                color: #9CA3AF;
+                                margin: 0 0 12px 0;
+                                line-height: 1.5;
+                                font-style: italic;
+                            ">
+                                <span class="material-symbols-outlined"
+                                    style="font-size: 0.95rem; vertical-align: middle; margin-right: 4px; color: #E21B23;">info</span>
+                                Indique si el deportista presenta alguna condición médica, lesión previa, alergia o
+                                situación de salud que deba considerarse durante la práctica del deporte. Si no
+                                presenta ninguna, puede dejar este campo en blanco.
+                            </p>
+
+                            <textarea
+                                id="condicion_medica"
+                                name="condicion_medica"
+                                placeholder="Ej: Alergia al polvo, asma leve controlada, lesión de rodilla derecha en 2023 ya recuperada, intolerancia a la lactosa..."
+                                rows="5"
+                                style="
+                                    width: 100%;
+                                    background: rgba(0, 0, 0, 0.25);
+                                    border: 1px solid rgba(255, 255, 255, 0.1);
+                                    border-radius: 6px;
+                                    color: white;
+                                    font-family: 'Montserrat', sans-serif;
+                                    font-size: 0.875rem;
+                                    padding: 12px 14px;
+                                    resize: vertical;
+                                    min-height: 110px;
+                                    max-height: 280px;
+                                    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+                                    box-sizing: border-box;
+                                "
+                                onfocus="this.style.borderColor='#E21B23'; this.style.boxShadow='0 0 0 2px rgba(226,27,35,0.2)'"
+                                onblur="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.boxShadow='none'"
+                            ></textarea>
+
+                            <p style="
+                                font-size: 0.7rem;
+                                color: #6B7280;
+                                text-align: right;
+                                margin: 6px 0 0 0;
+                            ">
+                                Esta información es confidencial y solo será utilizada por el cuerpo técnico del club.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Términos y Botón -->
                 <div class="form-footer">
                     <div class="terminos-container">
@@ -311,7 +383,7 @@
         </div>
     </footer>
 
-    <!-- MODAL DE TÉRMINOS Y CONDICIONES ACTUALIZADO - 3 DE FEBRERO 2026 -->
+    <!-- MODAL DE TÉRMINOS Y CONDICIONES -->
     <div id="terminosModal" class="modal-terminos-overlay hidden">
         <div class="modal-terminos-content">
             <div class="modal-terminos-header">
@@ -643,7 +715,6 @@
     </div>
 
     <style>
-        /* Estilos adicionales para el modal actualizado */
         .fecha-revision {
             font-size: 14px;
             color: #9CA3AF;
@@ -749,7 +820,14 @@
             margin: 8px 0;
             font-size: 15px;
         }
+
+        /* Placeholder del textarea */
+        #condicion_medica::placeholder {
+            color: #6B7280;
+            font-size: 0.82rem;
+        }
     </style>
+
     <!-- Scripts -->
     <script src="../shared/js/auth.js"></script>
     <script src="../shared/js/utils.js"></script>
