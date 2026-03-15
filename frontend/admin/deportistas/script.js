@@ -20,6 +20,14 @@ const opcionesEquipos = [
     { value: 'electric_titans', label: '⚡ Electric Titans' },
     { value: 'nova_titans', label: '🌟 Nova Titans' }
 ];
+const opcionesEstados = [
+    { value: 'activo', label: '✅ Activo' },
+    { value: 'pendiente', label: '⏳ Pendiente' },
+    { value: 'pendiente_de_pago', label: '💰 Pendiente de Pago' },
+    { value: 'inactivo', label: '❌ Inactivo' },
+    { value: 'lesionado', label: '🤕 Lesionado' },
+    { value: 'descanso', label: '🏝️ Descanso' }
+];
 
 // ✅ baby_titans ELIMINADO de niveles — solo existe como equipo competitivo
 const opcionesNiveles = [
