@@ -5,29 +5,6 @@ const initDatabase = async () => {
     try {
         console.log('🔧 Iniciando datos de la base de datos...');
 
-        // ==========================================
-        // 1. VERIFICAR Y CREAR USUARIOS
-        // ==========================================
-        
-        // Usuario Admin
-        const adminExists = await User.findOne({ where: { email: 'admin@deportes.com' } });
-        
-        if (!adminExists) {
-            const hashedPassword = await bcrypt.hash('admin123', 10);
-            await User.create({
-                nombre: 'Administrador',
-                apellidos: 'Sistema',
-                email: 'admin@deportes.com',
-                password: hashedPassword,
-                role: 'admin',
-                activo: true
-            });
-            console.log('✅ Usuario admin creado: admin@deportes.com / admin123');
-        } else {
-            console.log('ℹ️  Usuario admin ya existe');
-        }        
-
-
 
         // ==========================================
         // 2. VERIFICAR Y CARGAR HABILIDADES
