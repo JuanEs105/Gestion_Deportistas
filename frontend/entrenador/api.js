@@ -1282,7 +1282,6 @@ window.EntrenadorAPI = {
 
     formatNivel(nivel) {
         const niveles = {
-            'baby_titans': 'Baby Titans',
             '1_basico': 'Nivel 1 Básico',
             '1_medio': 'Nivel 1 Medio',
             '1_avanzado': 'Nivel 1 Avanzado',

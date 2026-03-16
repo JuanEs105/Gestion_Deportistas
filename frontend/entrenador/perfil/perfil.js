@@ -471,7 +471,7 @@ function actualizarGruposCompetitivos() {
     let grupos = entrenadorData.grupos_competitivos || [];
     
     if (!Array.isArray(grupos) || grupos.length === 0) {
-        grupos = ['rocks_titans', 'electric_titans', 'lightning_titans', 'storm_titans', 'fire_titans'];
+        grupos = ['rocks_titans', 'electric_titans', 'lightning_titans', 'storm_titans', 'fire_titans','nova_titans','baby_titans'];
     }
     
     count.textContent = grupos.length;
