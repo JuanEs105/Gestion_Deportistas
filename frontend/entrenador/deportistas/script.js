@@ -502,6 +502,14 @@ function verDetallesCompletos(deportistaId) {
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Dirección</p>
                                 <p class="font-medium">${escapeHTML(deportistaSeleccionado.direccion || 'No registrada')}</p>
                             </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Tipo de Documento</p>
+                                <p class="font-medium">${escapeHTML(deportistaSeleccionado.tipo_documento || 'No registrado')}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Número de Documento</p>
+                                <p class="font-medium">${escapeHTML(deportistaSeleccionado.numero_documento || 'No registrado')}</p>
+                            </div>
                         </div>
                     </div>
                     
