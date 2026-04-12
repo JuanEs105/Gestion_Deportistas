@@ -49,9 +49,9 @@ const CLOUDINARY_CLOUD_NAME = 'drch2xmrk';
 const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
 
 // Inicializar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('✅ DOM cargado - Inicializando sistema de deportistas (Entrenador)');
-    
+
     if (window.EntrenadorAPI && EntrenadorAPI.checkAuth) {
         if (!EntrenadorAPI.checkAuth()) return;
         const sidebarName = document.getElementById('sidebarName');
@@ -59,15 +59,15 @@ document.addEventListener('DOMContentLoaded', function() {
             sidebarName.textContent = EntrenadorAPI.user.nombre || EntrenadorAPI.user.email || 'Entrenador';
         }
     }
-    
+
     const searchInput = document.getElementById('searchInput');
     const filtroNivel = document.getElementById('filtroNivel');
     const filtroEquipo = document.getElementById('filtroEquipo');
-    
+
     if (searchInput) searchInput.addEventListener('input', filtrarDeportistas);
     if (filtroNivel) filtroNivel.addEventListener('change', filtrarDeportistas);
     if (filtroEquipo) filtroEquipo.addEventListener('change', filtrarDeportistas);
-    
+
     document.getElementById('btnLimpiarFiltros')?.addEventListener('click', limpiarFiltros);
     document.querySelector('.floating-help-btn')?.addEventListener('click', mostrarAyuda);
     document.getElementById('prevBtn')?.addEventListener('click', paginaAnterior);
@@ -77,9 +77,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('coachProfile')?.addEventListener('click', () => {
         window.location.href = '../perfil/perfil.html';
     });
-    
+
     setTimeout(cargarDeportistas, 100);
-    
+
     const savedTheme = localStorage.getItem('theme') || 'light';
     if (savedTheme === 'dark') document.documentElement.classList.add('dark');
 });
@@ -107,7 +107,7 @@ async function cargarDeportistas() {
 function procesarDatosDeportistas(data) {
     let deportistasData = data;
     if (!Array.isArray(deportistasData)) deportistasData = [];
-    
+
     deportistas = deportistasData.map(d => ({
         id: d.id,
         nombre: d.nombre || 'Sin nombre',
@@ -127,12 +127,15 @@ function procesarDatosDeportistas(data) {
         condicion_medica: d.condicion_medica || null,   // ✅ NUEVO
         contacto_emergencia_nombre: d.contacto_emergencia_nombre || d.contacto_emergencia || null,
         contacto_emergencia_telefono: d.contacto_emergencia_telefono || d.telefono_emergencia || null,
-        parentesco: d.parentesco || d.parentesco_emergencia || null
+        parentesco: d.parentesco || d.parentesco_emergencia || null,
+        numero_documento: d.numero_documento || null,
+        tipo_documento: d.tipo_documento || null
+
     }));
-    
+
     deportistas.sort((a, b) => a.nombre.localeCompare(b.nombre));
     console.log(`✅ ${deportistas.length} deportistas procesados`);
-    
+
     mostrarDeportistas();
     actualizarEstadisticas();
     if (deportistas.length > 0) mostrarMensaje(`✅ ${deportistas.length} deportistas cargados`, 'success');
@@ -145,9 +148,9 @@ function procesarDatosDeportistas(data) {
 function mostrarDeportistas() {
     const tbody = document.getElementById('deportistasTableBody');
     if (!tbody) { console.error('❌ No se encontró el tbody'); return; }
-    
+
     deportistasFiltrados = filtrarDeportistasLocal();
-    
+
     if (deportistasFiltrados.length === 0) {
         tbody.innerHTML = `
             <tr>
@@ -164,28 +167,28 @@ function mostrarDeportistas() {
         `;
         return;
     }
-    
+
     const loadingRow = document.getElementById('loadingRow');
     if (loadingRow) loadingRow.remove();
-    
+
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, deportistasFiltrados.length);
     const deportistasParaMostrar = deportistasFiltrados.slice(startIndex, endIndex);
-    
+
     tbody.innerHTML = deportistasParaMostrar.map(deportista => {
         const imc = calcularIMC(deportista.peso, deportista.altura);
         const debePagar = deportista.estado === 'pendiente_de_pago';
         const inicialNombre = deportista.nombre?.charAt(0)?.toUpperCase() || '?';
         const tieneCondicionMedica = deportista.condicion_medica && deportista.condicion_medica.trim() !== '';
-        
+
         return `
             <tr class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors ${debePagar ? 'opacity-75' : ''}">
                 <td class="p-6">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full ${debePagar ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400'} flex items-center justify-center font-semibold overflow-hidden">
-                            ${deportista.foto_perfil ? 
-                                `<img src="${escapeHTML(deportista.foto_perfil)}" alt="${escapeHTML(deportista.nombre)}" class="w-full h-full object-cover">` : 
-                                inicialNombre}
+                            ${deportista.foto_perfil ?
+                `<img src="${escapeHTML(deportista.foto_perfil)}" alt="${escapeHTML(deportista.nombre)}" class="w-full h-full object-cover">` :
+                inicialNombre}
                         </div>
                         <div>
                             <div class="font-semibold text-gray-900 dark:text-white">${escapeHTML(deportista.nombre)}</div>
@@ -232,7 +235,7 @@ function mostrarDeportistas() {
             </tr>
         `;
     }).join('');
-    
+
     actualizarPaginacion();
 }
 
@@ -269,19 +272,19 @@ function mostrarMenuSeleccion(tipo, deportistaId, nombreDeportista, opciones, ti
     cerrarMenuSeleccion();
     if (menuAbierto) return;
     menuAbierto = true;
-    
+
     const target = event.target.closest('.dropdown-btn') || event.target;
     const rect = target.getBoundingClientRect();
-    
+
     const overlay = document.createElement('div');
     overlay.id = 'dropdownOverlay';
     overlay.className = 'fixed inset-0 z-40 cursor-default';
     overlay.onclick = cerrarMenuSeleccion;
-    
+
     const menu = document.createElement('div');
     menu.id = 'dropdownMenu';
     menu.className = 'fixed z-50 bg-white dark:bg-zinc-900 rounded-xl shadow-2xl border border-gray-200 dark:border-white/10 w-80 max-h-96 overflow-y-auto';
-    
+
     let left = rect.left;
     let top = rect.bottom + 5;
     const menuWidth = 320;
@@ -290,11 +293,11 @@ function mostrarMenuSeleccion(tipo, deportistaId, nombreDeportista, opciones, ti
     if (top + menuHeight > window.innerHeight) top = Math.max(10, rect.top - menuHeight);
     if (top < 10) top = 10;
     if (left < 10) left = 10;
-    
+
     menu.style.left = `${left}px`;
     menu.style.top = `${top}px`;
     menu.style.maxHeight = `${menuHeight}px`;
-    
+
     menu.innerHTML = `
         <div class="sticky top-0 bg-white dark:bg-zinc-900 p-4 border-b border-gray-200 dark:border-white/10 z-10">
             <div class="flex items-center justify-between">
@@ -317,7 +320,7 @@ function mostrarMenuSeleccion(tipo, deportistaId, nombreDeportista, opciones, ti
             `).join('')}
         </div>
     `;
-    
+
     document.body.appendChild(overlay);
     document.body.appendChild(menu);
     menu.style.opacity = '0';
@@ -351,7 +354,7 @@ function cerrarMenuSeleccion() {
 async function seleccionarOpcion(tipo, deportistaId, valor) {
     const deportista = deportistas.find(d => d.id === deportistaId);
     if (!deportista) return;
-    
+
     let titulo, valorActual, nuevoNombre, campo;
     if (tipo === 'nivel') {
         titulo = 'Cambiar nivel'; valorActual = getNivelNombre(deportista.nivel_actual);
@@ -360,11 +363,11 @@ async function seleccionarOpcion(tipo, deportistaId, valor) {
         titulo = 'Cambiar equipo'; valorActual = getEquipoNombre(deportista.equipo_competitivo);
         nuevoNombre = getEquipoNombre(valor); campo = 'equipo_competitivo';
     }
-    
+
     if (!confirm(`¿${titulo} de ${deportista.nombre}?\n\nDe: ${valorActual}\nA: ${nuevoNombre}`)) {
         cerrarMenuSeleccion(); return;
     }
-    
+
     try {
         setLoading(true);
         await EntrenadorAPI.updateDeportistaCampo(deportistaId, campo, valor);
@@ -387,20 +390,20 @@ async function seleccionarOpcion(tipo, deportistaId, valor) {
 function verDetallesCompletos(deportistaId) {
     deportistaSeleccionado = deportistas.find(d => d.id === deportistaId);
     if (!deportistaSeleccionado) { mostrarError('Deportista no encontrado'); return; }
-    
+
     if (deportistaSeleccionado.estado === 'pendiente_de_pago') {
         mostrarMensaje('⚠️ Este deportista tiene un pago pendiente. Contacta con administración.', 'warning');
     }
-    
+
     const imc = calcularIMC(deportistaSeleccionado.peso, deportistaSeleccionado.altura);
     const edad = calcularEdad(deportistaSeleccionado.fecha_nacimiento);
     const inicialNombre = deportistaSeleccionado.nombre?.charAt(0)?.toUpperCase() || '?';
     const tieneCondicionMedica = deportistaSeleccionado.condicion_medica && deportistaSeleccionado.condicion_medica.trim() !== '';
-    
+
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4';
     modal.id = 'modalDetallesDeportista';
-    
+
     modal.innerHTML = `
         <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div class="p-6 border-b border-gray-200 dark:border-white/5 flex items-center justify-between">
@@ -413,10 +416,10 @@ function verDetallesCompletos(deportistaId) {
                 <div class="flex flex-col md:flex-row gap-6 mb-8">
                     <div class="flex-shrink-0">
                         <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-white dark:border-zinc-800 shadow-lg">
-                            ${deportistaSeleccionado.foto_perfil ? 
-                                `<img src="${escapeHTML(deportistaSeleccionado.foto_perfil)}" alt="${escapeHTML(deportistaSeleccionado.nombre)}" class="w-full h-full object-cover">` : 
-                                `<div class="w-full h-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-4xl font-bold text-blue-800 dark:text-blue-400">${inicialNombre}</div>`
-                            }
+                            ${deportistaSeleccionado.foto_perfil ?
+            `<img src="${escapeHTML(deportistaSeleccionado.foto_perfil)}" alt="${escapeHTML(deportistaSeleccionado.nombre)}" class="w-full h-full object-cover">` :
+            `<div class="w-full h-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-4xl font-bold text-blue-800 dark:text-blue-400">${inicialNombre}</div>`
+        }
                         </div>
                     </div>
                     
@@ -566,7 +569,7 @@ function verDetallesCompletos(deportistaId) {
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
 }
 
@@ -577,20 +580,20 @@ function verDetallesCompletos(deportistaId) {
 function editarDeportistaCompleto(deportistaId) {
     deportistaSeleccionado = deportistas.find(d => d.id === deportistaId);
     if (!deportistaSeleccionado) { mostrarError('Deportista no encontrado'); return; }
-    
+
     if (deportistaSeleccionado.estado === 'pendiente_de_pago') {
         mostrarMensaje('❌ No se puede editar. Contacta con administración.', 'error');
         return;
     }
-    
+
     cerrarModal();
-    
+
     const inicialNombre = deportistaSeleccionado.nombre?.charAt(0)?.toUpperCase() || '?';
-    
+
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4';
     modal.id = 'modalEditarDeportista';
-    
+
     modal.innerHTML = `
         <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="p-6 border-b border-gray-200 dark:border-white/5 flex items-center justify-between">
@@ -603,10 +606,10 @@ function editarDeportistaCompleto(deportistaId) {
                 <div class="mb-6 flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
                     <div class="flex-shrink-0">
                         <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-white dark:border-zinc-800 shadow-lg">
-                            ${deportistaSeleccionado.foto_perfil ? 
-                                `<img src="${escapeHTML(deportistaSeleccionado.foto_perfil)}" alt="${escapeHTML(deportistaSeleccionado.nombre)}" class="w-full h-full object-cover">` : 
-                                `<div class="w-full h-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-2xl font-bold text-blue-800 dark:text-blue-400">${inicialNombre}</div>`
-                            }
+                            ${deportistaSeleccionado.foto_perfil ?
+            `<img src="${escapeHTML(deportistaSeleccionado.foto_perfil)}" alt="${escapeHTML(deportistaSeleccionado.nombre)}" class="w-full h-full object-cover">` :
+            `<div class="w-full h-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-2xl font-bold text-blue-800 dark:text-blue-400">${inicialNombre}</div>`
+        }
                         </div>
                     </div>
                     <div class="flex-1">
@@ -686,10 +689,10 @@ function editarDeportistaCompleto(deportistaId) {
             </form>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
-    
-    document.getElementById('formEditarDeportista').addEventListener('submit', async function(e) {
+
+    document.getElementById('formEditarDeportista').addEventListener('submit', async function (e) {
         e.preventDefault();
         await guardarCambiosDeportista();
     });
@@ -701,21 +704,21 @@ function editarDeportistaCompleto(deportistaId) {
 
 async function guardarCambiosDeportista() {
     if (!deportistaSeleccionado) return;
-    
+
     try {
         setLoading(true);
-        
+
         const pesoInput = document.getElementById('editPeso');
         const alturaInput = document.getElementById('editAltura');
         const tallaInput = document.getElementById('editTalla');
-        
+
         if (!pesoInput || !alturaInput || !tallaInput) {
             mostrarError('Error: No se encontraron los campos de edición');
             setLoading(false); return;
         }
-        
+
         const cambios = {};
-        
+
         if (pesoInput.value !== '') {
             const pesoNum = parseFloat(pesoInput.value);
             if (isNaN(pesoNum) || pesoNum <= 0 || pesoNum > 300) {
@@ -724,7 +727,7 @@ async function guardarCambiosDeportista() {
             }
             cambios.peso = pesoNum;
         }
-        
+
         if (alturaInput.value !== '') {
             const alturaNum = parseFloat(alturaInput.value);
             if (isNaN(alturaNum) || alturaNum <= 0 || alturaNum > 3) {
@@ -733,23 +736,23 @@ async function guardarCambiosDeportista() {
             }
             cambios.altura = alturaNum;
         }
-        
+
         if (tallaInput.value !== '') cambios.talla = tallaInput.value;
-        
+
         if (Object.keys(cambios).length === 0) {
             mostrarError('No hay cambios para guardar');
             setLoading(false); return;
         }
-        
+
         await EntrenadorAPI.updateDeportista(deportistaSeleccionado.id, cambios);
-        
+
         const index = deportistas.findIndex(d => d.id === deportistaSeleccionado.id);
         if (index !== -1) Object.assign(deportistas[index], cambios);
-        
+
         mostrarDeportistas();
         cerrarModal();
         mostrarMensajeGuardado(deportistaSeleccionado.nombre);
-        
+
     } catch (error) {
         console.error('Error:', error);
         mostrarError('Error al guardar los cambios: ' + error.message);
