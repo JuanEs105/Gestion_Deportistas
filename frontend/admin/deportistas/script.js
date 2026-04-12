@@ -139,7 +139,9 @@ function procesarDatosDeportistas(data) {
         parentesco: d.contacto_emergencia_parentesco || null,
         notificacionMostrada: false,
         usuario_asociado: d.user || null,
-        activo: d.activo || d.User?.activo || true
+        activo: d.activo || d.User?.activo || true,
+        numero_documento: d.numero_documento || null,   // ✅ AGREGAR
+        tipo_documento: d.tipo_documento || null,
     }));
 
     deportistas.sort((a, b) => a.nombre.localeCompare(b.nombre));
@@ -832,6 +834,16 @@ function editarDeportistaCompleto(deportistaId) {
                                 <p class="font-medium">${escapeHTML(deportistaSeleccionado.telefono || 'No registrado')}</p>
                             </div>
                             <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Número de Identificación</p>
+                                <div class="flex items-center gap-2">
+                                    <input type="text" id="editIdentificacion" 
+                                        value="${escapeHTML(deportistaSeleccionado.numero_documento || '')}"
+                                        class="flex-1 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                                        placeholder="Ej: 1052123456">
+                                    <span class="text-xs text-orange-500 font-medium">Editable</span>
+                                </div>
+                            </div>
+                            <div>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">F. Ingreso</p>
                                 <p class="font-medium">${deportistaSeleccionado.fecha_ingreso ? new Date(deportistaSeleccionado.fecha_ingreso).toLocaleDateString('es-ES') : 'No registrada'}</p>
                             </div>
@@ -879,6 +891,7 @@ async function guardarCambiosDeportistaAdmin() {
             nivel_actual: document.getElementById('editNivel').value,
             estado: document.getElementById('editEstado').value,
             equipo_competitivo: document.getElementById('editEquipo').value,
+            numero_identificacion: document.getElementById('editIdentificacion')?.value?.trim() || null,
         };
 
         console.log('💾 Guardando cambios completos:', datosActualizados);

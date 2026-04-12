@@ -8,7 +8,7 @@ class AdminController {
   // ==========================================
   // ESTADÍSTICAS GENERALES
   // ==========================================
-  
+
   static async getStats(req, res) {
     try {
       console.log('📊 getStats - Calculando estadísticas...');
@@ -1088,12 +1088,14 @@ class AdminController {
           'equipo_competitivo',
           'peso',
           'altura',
-          'talla_camiseta', // ⬅️ CAMBIAR 'talla' por 'talla_camiseta'
+          'talla_camiseta',
+          'foto_perfil',         // ✅ NUEVO - para ver fotos
+          'condicion_medica',    // ✅ NUEVO
           'fecha_nacimiento',
-          'direccion', // ⬅️ Agregar si necesitas
-          'eps', // ⬅️ Agregar si necesitas
-          'nivel_sugerido', // ⬅️ Agregar si necesitas
-          'nivel_deportivo', // ⬅️ Agregar si necesitas
+          'direccion',
+          'eps',
+          'nivel_sugerido',
+          'nivel_deportivo',
           'contacto_emergencia_nombre',
           'contacto_emergencia_telefono',
           'contacto_emergencia_parentesco',
@@ -1109,6 +1111,8 @@ class AdminController {
             'email',
             'telefono',
             'activo',
+            'numero_documento',    // ✅ NUEVO
+            'tipo_documento',
             'acepta_terminos',
             'created_at',
             'updated_at'
@@ -1131,18 +1135,22 @@ class AdminController {
           email: dep.user?.email || 'Sin email',
           telefono: dep.user?.telefono || null,
           activo: dep.user?.activo || false,
+          numero_documento: dep.user?.numero_documento || null,  // ✅ NUEVO
+          tipo_documento: dep.user?.tipo_documento || null,       // ✅ NUEVO
           acepta_terminos: dep.user?.acepta_terminos || false,
           nivel_actual: dep.nivel_actual || 'pendiente',
           estado: dep.estado || 'activo',
           equipo_competitivo: dep.equipo_competitivo || 'sin_equipo',
           peso: dep.peso || null,
           altura: dep.altura || null,
-          talla_camiseta: dep.talla_camiseta || null, // ⬅️ Usar 'talla_camiseta'
-          fecha_nacimiento: dep.fecha_nacimiento || null,
-          direccion: dep.direccion || null, // ⬅️ Agregar si necesitas
-          eps: dep.eps || null, // ⬅️ Agregar si necesitas
-          nivel_sugerido: dep.nivel_sugerido || null, // ⬅️ Agregar si necesitas
-          nivel_deportivo: dep.nivel_deportivo || null, // ⬅️ Agregar si necesitas
+          talla_camiseta: dep.talla_camiseta || null,   // ← ya existía
+          foto_perfil: dep.foto_perfil || null,          // ✅ AGREGA AQUÍ
+          condicion_medica: dep.condicion_medica || null, // ✅ AGREGA AQUÍ
+          fecha_nacimiento: dep.fecha_nacimiento || null, // ← ya existía
+          direccion: dep.direccion || null,
+          eps: dep.eps || null,
+          nivel_sugerido: dep.nivel_sugerido || null,
+          nivel_deportivo: dep.nivel_deportivo || null,
           contacto_emergencia_nombre: dep.contacto_emergencia_nombre || null,
           contacto_emergencia_telefono: dep.contacto_emergencia_telefono || null,
           contacto_emergencia_parentesco: dep.contacto_emergencia_parentesco || null,
@@ -1741,130 +1749,131 @@ class AdminController {
   // ==========================================
   static async updateDeportista(req, res) {
     try {
-        const { id } = req.params;
-        const datos = req.body;
-        
-        console.log(`✏️ Actualizando deportista ${id}:`, datos);
-        
-        // 🔥 DEBUG EXTENDIDO - Verificar todos los datos recibidos
-        console.log('🔍 DEBUG: Datos recibidos del frontend:');
-        console.log('- Peso:', datos.peso);
-        console.log('- Altura:', datos.altura);
-        console.log('- Talla Camiseta:', datos.talla_camiseta);
-        console.log('- Talla (alternativa):', datos.talla);
-        console.log('- Nivel:', datos.nivel_actual);
-        console.log('- Estado:', datos.estado);
-        console.log('- Equipo:', datos.equipo_competitivo);
-        
-        // Buscar deportista
-        const deportista = await Deportista.findByPk(id);
-        
-        if (!deportista) {
-            return res.status(404).json({
-                success: false,
-                error: 'Deportista no encontrado'
-            });
-        }
-        
-        // 🔥 CORRECCIÓN: Agregar TODOS los campos posibles
-        const camposPermitidos = [
-            'peso', 'altura', 'talla_camiseta', 'talla',
-            'nivel_actual', 'estado', 'equipo_competitivo',
-            'fecha_nacimiento', 'eps', 'direccion',
-            'contacto_emergencia_nombre', 'contacto_emergencia_telefono', 
-            'contacto_emergencia_parentesco'
-        ];
-        
-        const updates = {};
-        
-        // Procesar cada campo
-        Object.keys(datos).forEach(key => {
-            // Mapear 'talla' a 'talla_camiseta'
-            if (key === 'talla') {
-                updates['talla_camiseta'] = datos[key];
-                console.log(`🔄 Mapeando 'talla' → 'talla_camiseta': ${datos[key]}`);
-            }
-            // Agregar otros campos permitidos
-            else if (camposPermitidos.includes(key)) {
-                updates[key] = datos[key];
-                console.log(`✅ Agregando campo '${key}': ${datos[key]}`);
-            }
-            else {
-                console.log(`⚠️  Campo '${key}' no permitido o ignorado`);
-            }
+      const { id } = req.params;
+      const datos = req.body;
+
+      console.log(`✏️ Actualizando deportista ${id}:`, datos);
+
+      // 🔥 DEBUG EXTENDIDO - Verificar todos los datos recibidos
+      console.log('🔍 DEBUG: Datos recibidos del frontend:');
+      console.log('- Peso:', datos.peso);
+      console.log('- Altura:', datos.altura);
+      console.log('- Talla Camiseta:', datos.talla_camiseta);
+      console.log('- Talla (alternativa):', datos.talla);
+      console.log('- Nivel:', datos.nivel_actual);
+      console.log('- Estado:', datos.estado);
+      console.log('- Equipo:', datos.equipo_competitivo);
+
+      // Buscar deportista
+      const deportista = await Deportista.findByPk(id);
+
+      if (!deportista) {
+        return res.status(404).json({
+          success: false,
+          error: 'Deportista no encontrado'
         });
-        
-        console.log('📝 Campos que se actualizarán:', updates);
-        
-        if (Object.keys(updates).length === 0) {
-            return res.status(400).json({
-                success: false,
-                error: 'No se proporcionaron campos válidos para actualizar'
-            });
+      }
+
+      // 🔥 CORRECCIÓN: Agregar TODOS los campos posibles
+      const camposPermitidos = [
+        'peso', 'altura', 'talla_camiseta', 'talla',
+        'nivel_actual', 'estado', 'equipo_competitivo',
+        'fecha_nacimiento', 'eps', 'direccion',
+        'contacto_emergencia_nombre', 'contacto_emergencia_telefono',
+        'contacto_emergencia_parentesco'
+      ];
+
+      const updates = {};
+
+      // Procesar cada campo
+      Object.keys(datos).forEach(key => {
+        // Mapear 'talla' a 'talla_camiseta'
+        if (key === 'talla') {
+          updates['talla_camiseta'] = datos[key];
+          console.log(`🔄 Mapeando 'talla' → 'talla_camiseta': ${datos[key]}`);
         }
-        
-        // 🔥 DEBUG: Ver estado actual del deportista
-        console.log('📊 Estado actual del deportista:');
-        console.log('- Peso actual:', deportista.peso);
-        console.log('- Altura actual:', deportista.altura);
-        console.log('- Talla actual:', deportista.talla_camiseta);
-        
-        // Actualizar
-        await deportista.update(updates);
-        console.log('✅ Deportista actualizado en BD:', updates);
-        
-        // Si se actualiza el usuario (nombre, email, teléfono)
-        if (datos.nombre || datos.email || datos.telefono) {
-            const userUpdates = {};
-            if (datos.nombre) userUpdates.nombre = datos.nombre;
-            if (datos.email) userUpdates.email = datos.email;
-            if (datos.telefono !== undefined) userUpdates.telefono = datos.telefono;
-            
-            if (Object.keys(userUpdates).length > 0) {
-                await User.update(userUpdates, {
-                    where: { id: deportista.user_id }
-                });
-                console.log('✅ Usuario actualizado:', userUpdates);
-            }
+        // Agregar otros campos permitidos
+        else if (camposPermitidos.includes(key)) {
+          updates[key] = datos[key];
+          console.log(`✅ Agregando campo '${key}': ${datos[key]}`);
         }
-        
-        // 🔥 DEBUG: Recargar para verificar cambios
-        const deportistaActualizado = await Deportista.findByPk(id, {
-            attributes: ['id', 'peso', 'altura', 'talla_camiseta', 'nivel_actual', 'estado', 'equipo_competitivo']
+        else {
+          console.log(`⚠️  Campo '${key}' no permitido o ignorado`);
+        }
+      });
+
+      console.log('📝 Campos que se actualizarán:', updates);
+
+      if (Object.keys(updates).length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'No se proporcionaron campos válidos para actualizar'
         });
-        
-        console.log('🔍 DEPORTISTA ACTUALIZADO EN BD:');
-        console.log('- Nuevo peso:', deportistaActualizado.peso);
-        console.log('- Nueva altura:', deportistaActualizado.altura);
-        console.log('- Nueva talla camiseta:', deportistaActualizado.talla_camiseta);
-        console.log('- Nuevo nivel:', deportistaActualizado.nivel_actual);
-        console.log('- Nuevo estado:', deportistaActualizado.estado);
-        console.log('- Nuevo equipo:', deportistaActualizado.equipo_competitivo);
-        
-        res.json({
-            success: true,
-            message: 'Deportista actualizado exitosamente',
-            deportista: {
-                id: deportista.id,
-                peso: deportistaActualizado.peso,
-                altura: deportistaActualizado.altura,
-                talla_camiseta: deportistaActualizado.talla_camiseta,
-                nivel_actual: deportistaActualizado.nivel_actual,
-                estado: deportistaActualizado.estado,
-                equipo_competitivo: deportistaActualizado.equipo_competitivo
-            }
-        });
-        
+      }
+
+      // 🔥 DEBUG: Ver estado actual del deportista
+      console.log('📊 Estado actual del deportista:');
+      console.log('- Peso actual:', deportista.peso);
+      console.log('- Altura actual:', deportista.altura);
+      console.log('- Talla actual:', deportista.talla_camiseta);
+
+      // Actualizar
+      await deportista.update(updates);
+      console.log('✅ Deportista actualizado en BD:', updates);
+
+      // Si se actualiza el usuario (nombre, email, teléfono)
+      if (datos.nombre || datos.email || datos.telefono || datos.numero_documento !== undefined) {
+        const userUpdates = {};
+        if (datos.nombre) userUpdates.nombre = datos.nombre;
+        if (datos.email) userUpdates.email = datos.email;
+        if (datos.telefono !== undefined) userUpdates.telefono = datos.telefono;
+        if (datos.numero_documento !== undefined) userUpdates.numero_documento = datos.numero_documento;
+
+        if (Object.keys(userUpdates).length > 0) {
+          await User.update(userUpdates, {
+            where: { id: deportista.user_id }
+          });
+          console.log('✅ Usuario actualizado:', userUpdates);
+        }
+      }
+
+      // 🔥 DEBUG: Recargar para verificar cambios
+      const deportistaActualizado = await Deportista.findByPk(id, {
+        attributes: ['id', 'peso', 'altura', 'talla_camiseta', 'nivel_actual', 'estado', 'equipo_competitivo']
+      });
+
+      console.log('🔍 DEPORTISTA ACTUALIZADO EN BD:');
+      console.log('- Nuevo peso:', deportistaActualizado.peso);
+      console.log('- Nueva altura:', deportistaActualizado.altura);
+      console.log('- Nueva talla camiseta:', deportistaActualizado.talla_camiseta);
+      console.log('- Nuevo nivel:', deportistaActualizado.nivel_actual);
+      console.log('- Nuevo estado:', deportistaActualizado.estado);
+      console.log('- Nuevo equipo:', deportistaActualizado.equipo_competitivo);
+
+      res.json({
+        success: true,
+        message: 'Deportista actualizado exitosamente',
+        deportista: {
+          id: deportista.id,
+          peso: deportistaActualizado.peso,
+          altura: deportistaActualizado.altura,
+          talla_camiseta: deportistaActualizado.talla_camiseta,
+          nivel_actual: deportistaActualizado.nivel_actual,
+          estado: deportistaActualizado.estado,
+          equipo_competitivo: deportistaActualizado.equipo_competitivo
+        }
+      });
+
     } catch (error) {
-        console.error('❌ Error actualizando deportista:', error);
-        console.error('   Error stack:', error.stack);
-        res.status(500).json({
-            success: false,
-            error: 'Error en el servidor',
-            details: error.message
-        });
+      console.error('❌ Error actualizando deportista:', error);
+      console.error('   Error stack:', error.stack);
+      res.status(500).json({
+        success: false,
+        error: 'Error en el servidor',
+        details: error.message
+      });
     }
-}
+  }
 
   // ==========================================
   // ✅ MÉTODO NUEVO: Actualizar campo específico (nivel, estado, equipo)
@@ -2083,7 +2092,7 @@ class AdminController {
   }
 
 
-  
+
   static async eliminarDeportista(req, res) {
     try {
       const { id } = req.params;
@@ -2103,136 +2112,136 @@ class AdminController {
 
   static async eliminarDeportistaCompleto(req, res) {
     try {
-        const { id } = req.params;
-        
-        console.log(`🗑️ === ELIMINACIÓN COMPLETA DE DEPORTISTA ${id} ===`);
-        
-        // 🔍 1. Buscar deportista
-        const deportista = await Deportista.findByPk(id, {
-            include: [{
-                model: User,
-                as: 'user',
-                attributes: ['id', 'nombre', 'email']
-            }]
+      const { id } = req.params;
+
+      console.log(`🗑️ === ELIMINACIÓN COMPLETA DE DEPORTISTA ${id} ===`);
+
+      // 🔍 1. Buscar deportista
+      const deportista = await Deportista.findByPk(id, {
+        include: [{
+          model: User,
+          as: 'user',
+          attributes: ['id', 'nombre', 'email']
+        }]
+      });
+
+      if (!deportista) {
+        console.log(`❌ Deportista no encontrado con ID: ${id}`);
+        return res.status(404).json({
+          success: false,
+          message: 'Deportista no encontrado'
         });
-        
-        if (!deportista) {
-            console.log(`❌ Deportista no encontrado con ID: ${id}`);
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Deportista no encontrado' 
-            });
+      }
+
+      console.log(`✅ Deportista encontrado:`, {
+        id: deportista.id,
+        nombre: deportista.user?.nombre,
+        email: deportista.user?.email,
+        user_id: deportista.user_id
+      });
+
+      const userId = deportista.user_id;
+      const nombreDeportista = deportista.user?.nombre || 'Desconocido';
+
+      // 📊 2. Contar registros relacionados
+      const evaluacionesCount = await Evaluacion.count({
+        where: { deportista_id: id }
+      });
+
+      // 🔥 CORREGIR: HistorialNivel debe estar importado
+      const historialCount = await HistorialNivel.count({
+        where: { deportista_id: id }
+      });
+
+      console.log(`📊 Registros relacionados encontrados:`, {
+        evaluaciones: evaluacionesCount,
+        historial_nivel: historialCount
+      });
+
+      // 🔥 3. ELIMINAR EN TRANSACCIÓN
+      const transaction = await sequelize.transaction();
+
+      try {
+        // a) Eliminar evaluaciones
+        if (evaluacionesCount > 0) {
+          console.log(`🗑️ Eliminando ${evaluacionesCount} evaluaciones...`);
+          await Evaluacion.destroy({
+            where: { deportista_id: id },
+            transaction
+          });
+          console.log(`✅ Evaluaciones eliminadas`);
         }
-        
-        console.log(`✅ Deportista encontrado:`, {
-            id: deportista.id,
-            nombre: deportista.user?.nombre,
-            email: deportista.user?.email,
-            user_id: deportista.user_id
-        });
-        
-        const userId = deportista.user_id;
-        const nombreDeportista = deportista.user?.nombre || 'Desconocido';
-        
-        // 📊 2. Contar registros relacionados
-        const evaluacionesCount = await Evaluacion.count({ 
-            where: { deportista_id: id } 
-        });
-        
-        // 🔥 CORREGIR: HistorialNivel debe estar importado
-        const historialCount = await HistorialNivel.count({
-            where: { deportista_id: id }
-        });
-        
-        console.log(`📊 Registros relacionados encontrados:`, {
-            evaluaciones: evaluacionesCount,
-            historial_nivel: historialCount
-        });
-        
-        // 🔥 3. ELIMINAR EN TRANSACCIÓN
-        const transaction = await sequelize.transaction();
-        
-        try {
-            // a) Eliminar evaluaciones
-            if (evaluacionesCount > 0) {
-                console.log(`🗑️ Eliminando ${evaluacionesCount} evaluaciones...`);
-                await Evaluacion.destroy({
-                    where: { deportista_id: id },
-                    transaction
-                });
-                console.log(`✅ Evaluaciones eliminadas`);
-            }
-            
-            // b) Eliminar historial de nivel
-            if (historialCount > 0) {
-                console.log(`🗑️ Eliminando ${historialCount} registros de historial...`);
-                await HistorialNivel.destroy({
-                    where: { deportista_id: id },
-                    transaction
-                });
-                console.log(`✅ Historial eliminado`);
-            }
-            
-            // c) Eliminar el deportista
-            console.log(`🗑️ Eliminando registro de deportista...`);
-            await deportista.destroy({ transaction });
-            console.log(`✅ Deportista eliminado de la tabla deportistas`);
-            
-            // d) Eliminar el usuario asociado
-            console.log(`🗑️ Eliminando usuario ${userId}...`);
-            await User.destroy({
-                where: { id: userId },
-                transaction
-            });
-            console.log(`✅ Usuario eliminado`);
-            
-            // ✅ Confirmar transacción
-            await transaction.commit();
-            
-            console.log(`✅✅✅ ELIMINACIÓN COMPLETADA: ${nombreDeportista}`);
-            
-            res.json({ 
-                success: true, 
-                message: `Deportista "${nombreDeportista}" eliminado exitosamente`,
-                detalles: {
-                    id_deportista: id,
-                    id_usuario: userId,
-                    nombre: nombreDeportista,
-                    evaluaciones_eliminadas: evaluacionesCount,
-                    historial_eliminado: historialCount
-                }
-            });
-            
-        } catch (transactionError) {
-            // ❌ Revertir todo
-            await transaction.rollback();
-            console.error('❌❌❌ ERROR EN TRANSACCIÓN:', transactionError);
-            throw transactionError;
+
+        // b) Eliminar historial de nivel
+        if (historialCount > 0) {
+          console.log(`🗑️ Eliminando ${historialCount} registros de historial...`);
+          await HistorialNivel.destroy({
+            where: { deportista_id: id },
+            transaction
+          });
+          console.log(`✅ Historial eliminado`);
         }
-        
+
+        // c) Eliminar el deportista
+        console.log(`🗑️ Eliminando registro de deportista...`);
+        await deportista.destroy({ transaction });
+        console.log(`✅ Deportista eliminado de la tabla deportistas`);
+
+        // d) Eliminar el usuario asociado
+        console.log(`🗑️ Eliminando usuario ${userId}...`);
+        await User.destroy({
+          where: { id: userId },
+          transaction
+        });
+        console.log(`✅ Usuario eliminado`);
+
+        // ✅ Confirmar transacción
+        await transaction.commit();
+
+        console.log(`✅✅✅ ELIMINACIÓN COMPLETADA: ${nombreDeportista}`);
+
+        res.json({
+          success: true,
+          message: `Deportista "${nombreDeportista}" eliminado exitosamente`,
+          detalles: {
+            id_deportista: id,
+            id_usuario: userId,
+            nombre: nombreDeportista,
+            evaluaciones_eliminadas: evaluacionesCount,
+            historial_eliminado: historialCount
+          }
+        });
+
+      } catch (transactionError) {
+        // ❌ Revertir todo
+        await transaction.rollback();
+        console.error('❌❌❌ ERROR EN TRANSACCIÓN:', transactionError);
+        throw transactionError;
+      }
+
     } catch (error) {
-        console.error('❌❌❌ ERROR ELIMINANDO DEPORTISTA:', error);
-        
-        let errorMessage = 'Error al eliminar deportista';
-        let statusCode = 500;
-        
-        if (error.name === 'SequelizeForeignKeyConstraintError') {
-            errorMessage = 'No se puede eliminar el deportista porque tiene registros relacionados. Contacta al administrador de la base de datos.';
-            statusCode = 409;
-        }
-        
-        res.status(statusCode).json({ 
-            success: false, 
-            message: errorMessage,
-            error: error.message,
-            detalles: process.env.NODE_ENV === 'development' ? {
-                tipo: error.name,
-                constraint: error.parent?.constraint,
-                tabla: error.parent?.table
-            } : undefined
-        });
+      console.error('❌❌❌ ERROR ELIMINANDO DEPORTISTA:', error);
+
+      let errorMessage = 'Error al eliminar deportista';
+      let statusCode = 500;
+
+      if (error.name === 'SequelizeForeignKeyConstraintError') {
+        errorMessage = 'No se puede eliminar el deportista porque tiene registros relacionados. Contacta al administrador de la base de datos.';
+        statusCode = 409;
+      }
+
+      res.status(statusCode).json({
+        success: false,
+        message: errorMessage,
+        error: error.message,
+        detalles: process.env.NODE_ENV === 'development' ? {
+          tipo: error.name,
+          constraint: error.parent?.constraint,
+          tabla: error.parent?.table
+        } : undefined
+      });
     }
-}
+  }
 
   static async toggleDeportistaStatus(req, res) {
     try {

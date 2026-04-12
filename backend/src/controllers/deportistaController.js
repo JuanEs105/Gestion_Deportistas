@@ -48,9 +48,10 @@ class DeportistaController {
         include: [{
           model: User,
           as: 'user',
-          attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
+          attributes: ['id', 'nombre', 'email', 'telefono', 'activo', 'numero_documento', 'tipo_documento']
         }]
       });
+
 
       if (!deportista) {
         return res.status(404).json({
@@ -77,7 +78,7 @@ class DeportistaController {
         include: [{
           model: User,
           as: 'user',
-          attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
+          attributes: ['id', 'nombre', 'email', 'telefono', 'activo', 'numero_documento', 'tipo_documento']  // ✅ agrega los dos campos aquí
         }],
         order: [['created_at', 'DESC']]
       });
@@ -95,6 +96,8 @@ class DeportistaController {
           email: user.email || 'Sin email',
           telefono: user.telefono || null,
           activo: user.activo ?? true,
+          numero_documento: user.numero_documento || null,   // ✅ NUEVO
+          tipo_documento: user.tipo_documento || null,
           nivel_actual: deportistaObj.nivel_actual,
           estado: deportistaObj.estado,
           altura: deportistaObj.altura,
@@ -459,7 +462,7 @@ class DeportistaController {
 
       const deportistaActualizado = await Deportista.findOne({
         where: { user_id: userId },
-        include: [{ model: User, as: 'user', attributes: ['id', 'nombre', 'email', 'telefono', 'activo'] }]
+        include: [{ model: User, as: 'user', attributes: ['id', 'nombre', 'email', 'telefono', 'activo', 'numero_documento', 'tipo_documento'] }]
       });
 
       return res.json({

@@ -13,9 +13,9 @@ let selectedPhoto = null;
 // ===================================
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Inicializando Perfil Deportista');
-    
+
     if (!API.checkAuth()) return;
-    
+
     await cargarPerfil();
     configurarEventListeners();
     cargarTema();
@@ -27,9 +27,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function cargarPerfil() {
     try {
         mostrarCargando(true);
-        
+
         const perfil = await API.getMe();
-        
+
         console.log('🔍 DEBUG - Datos recibidos del perfil:');
         console.log('- Nombre completo:', perfil?.nombre || perfil?.user?.nombre);
         console.log('- Email:', perfil?.user?.email);
@@ -40,22 +40,22 @@ async function cargarPerfil() {
         console.log('- Contacto teléfono:', perfil?.contacto_emergencia_telefono);
         console.log('- Contacto parentesco:', perfil?.contacto_emergencia_parentesco);
         console.log('- Condición médica:', perfil?.condicion_medica);   // ✅ NUEVO
-        
+
         if (!perfil) throw new Error('No se pudo cargar tu perfil');
-        
+
         deportistaData = perfil;
         console.log('✅ Perfil cargado:', perfil);
-        
+
         actualizarSidebar();
         actualizarInfoRapida();
         actualizarInformacionPersonal();
         actualizarContactoEmergencia();
         actualizarInfoDeportiva();
         actualizarCondicionMedica();   // ✅ NUEVO
-        
+
         mostrarCargando(false);
         mostrarContenido(true);
-        
+
     } catch (error) {
         console.error('❌ Error cargando perfil:', error);
         API.showNotification('Error al cargar tu perfil', 'error');
@@ -69,13 +69,13 @@ async function cargarPerfil() {
 function actualizarSidebar() {
     const user = deportistaData.user || {};
     const nombre = user.nombre || deportistaData.nombre || 'Deportista';
-    
+
     const sidebarName = document.getElementById('sidebarName');
     const sidebarInitial = document.getElementById('sidebarInitial');
-    
+
     if (sidebarName) sidebarName.textContent = nombre;
     if (sidebarInitial) sidebarInitial.textContent = nombre.charAt(0).toUpperCase();
-    
+
     if (deportistaData.foto_perfil) {
         const sidebarAvatar = document.getElementById('sidebarAvatarContainer');
         if (sidebarAvatar) {
@@ -90,7 +90,7 @@ function actualizarInfoRapida() {
     const quickNivel = document.getElementById('quickNivel');
     const quickEquipo = document.getElementById('quickEquipo');
     const quickEstado = document.getElementById('quickEstado');
-    
+
     if (quickNivel) quickNivel.textContent = API.formatNivel(deportistaData.nivel_actual);
     if (quickEquipo) quickEquipo.textContent = API.formatEquipo(deportistaData.equipo_competitivo);
     if (quickEstado) quickEstado.textContent = API.formatEstado(deportistaData.estado);
@@ -101,20 +101,25 @@ function actualizarInformacionPersonal() {
     const nombre = user.nombre || deportistaData.nombre || '--';
     const email = user.email || '--';
     const telefono = user.telefono || deportistaData.telefono || 'No especificado';
-    const fechaNac = deportistaData.fecha_nacimiento ? 
-        new Date(deportistaData.fecha_nacimiento).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) : 
+    const fechaNac = deportistaData.fecha_nacimiento ?
+        new Date(deportistaData.fecha_nacimiento).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) :
         'No especificada';
-    
+
     document.getElementById('displayNombre').textContent = nombre;
     document.getElementById('displayEmail').textContent = email;
     document.getElementById('displayTelefono').textContent = telefono;
     document.getElementById('displayDireccion').textContent = deportistaData.direccion || 'No especificada';
     document.getElementById('displayFechaNac').textContent = fechaNac;
     document.getElementById('displayEPS').textContent = deportistaData.eps || 'No especificada';
-    
+    const identificacion = deportistaData.numero_documento
+    || deportistaData.user?.numero_documento
+    || null;
+    const displayId = document.getElementById('displayIdentificacion');
+    if (displayId) displayId.textContent = identificacion || 'No registrado';
+
     const profilePhoto = document.getElementById('profilePhoto');
     if (profilePhoto) profilePhoto.src = deportistaData.foto_perfil || 'https://via.placeholder.com/200';
-    
+
     document.getElementById('editTelefono').value = telefono !== 'No especificado' ? telefono : '';
     document.getElementById('editDireccion').value = deportistaData.direccion || '';
     document.getElementById('editEPS').value = deportistaData.eps || '';
@@ -125,11 +130,11 @@ function actualizarContactoEmergencia() {
     const nombre = deportistaData.contacto_emergencia_nombre || 'No especificado';
     const telefono = deportistaData.contacto_emergencia_telefono || 'No especificado';
     const parentesco = deportistaData.contacto_emergencia_parentesco || 'No especificado';
-    
+
     document.getElementById('displayEmergenciaNombre').textContent = nombre;
     document.getElementById('displayEmergenciaTel').textContent = telefono;
     document.getElementById('displayEmergenciaParentesco').textContent = parentesco;
-    
+
     document.getElementById('editEmergenciaNombre').value = nombre !== 'No especificado' ? nombre : '';
     document.getElementById('editEmergenciaTel').value = telefono !== 'No especificado' ? telefono : '';
     document.getElementById('editEmergenciaParentesco').value = parentesco !== 'No especificado' ? parentesco : '';
@@ -139,7 +144,7 @@ function actualizarInfoDeportiva() {
     const nivelEl = document.getElementById('infoNivel');
     const equipoEl = document.getElementById('infoEquipo');
     const estadoEl = document.getElementById('infoEstado');
-    
+
     if (nivelEl) {
         const nivel = deportistaData.nivel_actual || 'pendiente';
         nivelEl.textContent = API.formatNivel(nivel);
@@ -218,17 +223,17 @@ function configurarEventListeners() {
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
         if (confirm('¿Deseas cerrar sesión?')) API.logout();
     });
-    
+
     document.getElementById('toggleTheme')?.addEventListener('click', toggleTheme);
-    
+
     document.getElementById('editInfoBtn')?.addEventListener('click', mostrarEdicionInfo);
     document.getElementById('cancelInfoBtn')?.addEventListener('click', cancelarEdicionInfo);
     document.getElementById('infoEditMode')?.addEventListener('submit', guardarInformacionPersonal);
-    
+
     document.getElementById('editEmergenciaBtn')?.addEventListener('click', mostrarEdicionEmergencia);
     document.getElementById('cancelEmergenciaBtn')?.addEventListener('click', cancelarEdicionEmergencia);
     document.getElementById('emergenciaEditMode')?.addEventListener('submit', guardarContactoEmergencia);
-    
+
     document.getElementById('changePhotoBtn')?.addEventListener('click', () => {
         document.getElementById('photoInput').click();
     });
@@ -237,12 +242,12 @@ function configurarEventListeners() {
     });
     document.getElementById('photoInput')?.addEventListener('change', seleccionarFoto);
     document.getElementById('uploadPhotoBtn')?.addEventListener('click', subirFoto);
-    
+
     document.getElementById('cambiarPasswordBtn')?.addEventListener('click', abrirModalPassword);
     document.getElementById('closePasswordModal')?.addEventListener('click', cerrarModalPassword);
     document.getElementById('cancelPasswordBtn')?.addEventListener('click', cerrarModalPassword);
     document.getElementById('formCambiarPassword')?.addEventListener('submit', cambiarPassword);
-    
+
     document.querySelectorAll('.toggle-password').forEach(btn => {
         btn.addEventListener('click', togglePasswordVisibility);
     });
@@ -264,7 +269,7 @@ function cancelarEdicionInfo() {
 
 async function guardarInformacionPersonal(e) {
     e.preventDefault();
-    
+
     try {
         const datos = {
             telefono: document.getElementById('editTelefono').value,
@@ -272,21 +277,21 @@ async function guardarInformacionPersonal(e) {
             eps: document.getElementById('editEPS').value,
             talla_camiseta: document.getElementById('editTalla').value
         };
-        
+
         const response = await API.updatePerfil(datos);
-        
+
         if (response.deportista) {
             deportistaData = { ...deportistaData, ...response.deportista };
         } else {
             deportistaData = { ...deportistaData, ...datos };
         }
-        
+
         actualizarInformacionPersonal();
         actualizarSidebar();
         cancelarEdicionInfo();
-        
+
         API.showNotification('✅ Información actualizada correctamente', 'success');
-        
+
     } catch (error) {
         console.error('❌ Error guardando información:', error);
     }
@@ -308,27 +313,27 @@ function cancelarEdicionEmergencia() {
 
 async function guardarContactoEmergencia(e) {
     e.preventDefault();
-    
+
     try {
         const datos = {
             contacto_emergencia_nombre: document.getElementById('editEmergenciaNombre').value,
             contacto_emergencia_telefono: document.getElementById('editEmergenciaTel').value,
             contacto_emergencia_parentesco: document.getElementById('editEmergenciaParentesco').value
         };
-        
+
         const response = await API.updateContactoEmergencia(datos);
-        
+
         if (response.deportista) {
             deportistaData = { ...deportistaData, ...response.deportista };
         } else {
             deportistaData = { ...deportistaData, ...datos };
         }
-        
+
         actualizarContactoEmergencia();
         cancelarEdicionEmergencia();
-        
+
         API.showNotification('✅ Contacto de emergencia actualizado', 'success');
-        
+
     } catch (error) {
         console.error('❌ Error guardando contacto de emergencia:', error);
     }
@@ -340,17 +345,17 @@ async function guardarContactoEmergencia(e) {
 function seleccionarFoto(e) {
     const file = e.target.files[0];
     if (!file) return;
-    
+
     if (!file.type.startsWith('image/')) {
         API.showNotification('Por favor selecciona una imagen válida', 'error');
         return;
     }
-    
+
     if (file.size > 5 * 1024 * 1024) {
         API.showNotification('La imagen no debe superar los 5MB', 'error');
         return;
     }
-    
+
     const reader = new FileReader();
     reader.onload = (event) => {
         document.getElementById('profilePhoto').src = event.target.result;
@@ -365,53 +370,53 @@ async function subirFoto() {
         API.showNotification('No hay foto seleccionada', 'warning');
         return;
     }
-    
+
     try {
         const uploadBtn = document.getElementById('uploadPhotoBtn');
         const originalText = uploadBtn.innerHTML;
-        
+
         uploadBtn.disabled = true;
         uploadBtn.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div> Subiendo...';
-        
+
         const formData = new FormData();
         formData.append('foto_perfil', selectedPhoto);
-        
+
         const headers = {};
         if (API.token) headers['Authorization'] = `Bearer ${API.token}`;
-        
+
         const response = await fetch(`${API.baseURL}/deportistas/me/photo`, {
             method: 'POST',
             headers: headers,
             body: formData
         });
-        
+
         const result = await response.json();
-        
+
         if (!response.ok) throw new Error(result.error || 'Error subiendo foto');
-        
+
         deportistaData.foto_perfil = result.foto_perfil_url || result.deportista?.foto_perfil;
-        
+
         actualizarInformacionPersonal();
         actualizarSidebar();
-        
+
         API.showNotification('✅ Foto actualizada exitosamente', 'success');
-        
+
         selectedPhoto = null;
         uploadBtn.classList.add('hidden');
         uploadBtn.disabled = false;
         uploadBtn.innerHTML = originalText;
         document.getElementById('photoInput').value = '';
-        
+
     } catch (error) {
         console.error('❌ Error subiendo foto:', error);
         document.getElementById('profilePhoto').src = deportistaData.foto_perfil || 'https://via.placeholder.com/200';
         selectedPhoto = null;
         document.getElementById('photoInput').value = '';
-        
+
         const uploadBtn = document.getElementById('uploadPhotoBtn');
         uploadBtn.disabled = false;
         uploadBtn.innerHTML = '<span class="material-symbols-outlined">upload</span> Subir Foto';
-        
+
         API.showNotification(error.message || 'Error subiendo la foto', 'error');
     }
 }
@@ -433,21 +438,21 @@ function cerrarModalPassword() {
 
 async function cambiarPassword(e) {
     e.preventDefault();
-    
+
     const passwordActual = document.getElementById('passwordActual').value;
     const passwordNueva = document.getElementById('passwordNueva').value;
     const passwordConfirmar = document.getElementById('passwordConfirmar').value;
-    
+
     if (passwordNueva !== passwordConfirmar) {
         API.showNotification('Las contraseñas no coinciden', 'error');
         return;
     }
-    
+
     if (passwordNueva.length < 6) {
         API.showNotification('La contraseña debe tener al menos 6 caracteres', 'error');
         return;
     }
-    
+
     try {
         await API.cambiarPassword(passwordActual, passwordNueva);
         API.showNotification('✅ Contraseña cambiada exitosamente', 'success');
@@ -462,7 +467,7 @@ function togglePasswordVisibility(e) {
     const targetId = button.dataset.target;
     const input = document.getElementById(targetId);
     const icon = button.querySelector('.material-symbols-outlined');
-    
+
     if (input.type === 'password') {
         input.type = 'text';
         icon.textContent = 'visibility_off';
