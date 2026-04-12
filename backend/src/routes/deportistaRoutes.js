@@ -40,14 +40,15 @@ const extractPublicId = (cloudinaryUrl) => {
 router.get('/me', async (req, res) => {
   try {
     console.log('👤 GET /api/deportistas/me - Usuario:', req.user?.email);
-    
+
     const deportista = await Deportista.findOne({
       where: { user_id: req.user.id },
       include: [{
         model: User,
         as: 'user',
-        attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
-      }]
+        attributes: ['id', 'nombre', 'email', 'telefono', 'activo', 'numero_documento', 'tipo_documento']
+      }],
+      order: [['created_at', 'DESC']]
     });
 
     if (!deportista) {
@@ -59,7 +60,7 @@ router.get('/me', async (req, res) => {
 
     // Formatear respuesta con todos los campos que el frontend necesita
     const deportistaData = deportista.toJSON();
-    
+
     const respuesta = {
       id: deportistaData.id,
       user_id: deportistaData.user_id,
@@ -87,9 +88,9 @@ router.get('/me', async (req, res) => {
         activo: deportistaData.user?.activo
       }
     };
-    
+
     console.log('📤 Enviando respuesta perfil deportista');
-    
+
     res.json({
       success: true,
       deportista: respuesta
@@ -97,9 +98,9 @@ router.get('/me', async (req, res) => {
 
   } catch (error) {
     console.error('❌ Error obteniendo perfil deportista:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      error: 'Error en el servidor' 
+      error: 'Error en el servidor'
     });
   }
 });
@@ -108,12 +109,12 @@ router.get('/me', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     console.log('📥 GET /api/deportistas - Usuario:', req.user?.email);
-    
+
     const deportistas = await Deportista.findAll({
       include: [{
         model: User,
         as: 'user',
-        attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
+        attributes: ['id', 'nombre', 'email', 'telefono', 'activo', 'numero_documento', 'tipo_documento']
       }],
       order: [['created_at', 'DESC']]
     });
@@ -124,7 +125,7 @@ router.get('/', async (req, res) => {
     const deportistasFormateados = deportistas.map(d => {
       const deportistaObj = d.toJSON();
       const user = deportistaObj.user || {};
-      
+
       return {
         id: deportistaObj.id,
         user_id: deportistaObj.user_id,
@@ -133,6 +134,8 @@ router.get('/', async (req, res) => {
         telefono: user.telefono || null,
         documento_identidad: user.documento_identidad || null,
         activo: user.activo ?? true,
+        numero_documento: user.numero_documento || null,
+        tipo_documento: user.tipo_documento || null,
         nivel_actual: deportistaObj.nivel_actual || 'pendiente',
         estado: deportistaObj.estado || 'pendiente',
         altura: deportistaObj.altura,
@@ -175,9 +178,9 @@ router.put('/me', async (req, res) => {
   try {
     console.log('📝 PUT /api/deportistas/me - Usuario:', req.user?.email);
     console.log('📦 Datos recibidos:', req.body);
-    
+
     const userId = req.user.id;
-    
+
     // Buscar deportista por user_id
     const deportista = await Deportista.findOne({
       where: { user_id: userId },
@@ -186,14 +189,14 @@ router.put('/me', async (req, res) => {
         as: 'user'
       }]
     });
-    
+
     if (!deportista) {
       return res.status(404).json({
         success: false,
         error: 'Perfil no encontrado'
       });
     }
-    
+
     const {
       telefono,
       direccion,
@@ -204,14 +207,14 @@ router.put('/me', async (req, res) => {
       contacto_emergencia_parentesco
       // condicion_medica ignorada intencionalmente — solo admin puede modificarla
     } = req.body;
-    
+
     console.log('📋 Campos a actualizar:');
     console.log('- Teléfono:', telefono);
     console.log('- Dirección:', direccion);
     console.log('- EPS:', eps);
     console.log('- Talla camiseta:', talla_camiseta);
     console.log('- Contacto emergencia:', contacto_emergencia_nombre);
-    
+
     // ✅ ACTUALIZAR CAMPOS DEL DEPORTISTA
     if (direccion !== undefined) deportista.direccion = direccion;
     if (eps !== undefined) deportista.eps = eps;
@@ -219,18 +222,18 @@ router.put('/me', async (req, res) => {
     if (contacto_emergencia_nombre !== undefined) deportista.contacto_emergencia_nombre = contacto_emergencia_nombre;
     if (contacto_emergencia_telefono !== undefined) deportista.contacto_emergencia_telefono = contacto_emergencia_telefono;
     if (contacto_emergencia_parentesco !== undefined) deportista.contacto_emergencia_parentesco = contacto_emergencia_parentesco;
-    
+
     // ✅ ACTUALIZAR TELÉFONO DEL USUARIO
     if (telefono !== undefined && deportista.user) {
       deportista.user.telefono = telefono;
       await deportista.user.save();
     }
-    
+
     // Guardar cambios del deportista
     await deportista.save();
-    
+
     console.log('✅ Perfil actualizado exitosamente');
-    
+
     // Obtener datos actualizados
     const deportistaActualizado = await Deportista.findOne({
       where: { user_id: userId },
@@ -240,13 +243,13 @@ router.put('/me', async (req, res) => {
         attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
       }]
     });
-    
+
     res.json({
       success: true,
       message: 'Perfil actualizado exitosamente',
       deportista: deportistaActualizado
     });
-    
+
   } catch (error) {
     console.error('❌ Error actualizando perfil:', error);
     res.status(500).json({
@@ -261,39 +264,39 @@ router.put('/me', async (req, res) => {
 router.put('/me/emergency-contact', async (req, res) => {
   try {
     console.log('🔄 PUT /api/deportistas/me/emergency-contact - Usuario:', req.user?.email);
-    
+
     const userId = req.user.id;
-    const { 
-      contacto_emergencia_nombre, 
-      contacto_emergencia_telefono, 
-      contacto_emergencia_parentesco 
+    const {
+      contacto_emergencia_nombre,
+      contacto_emergencia_telefono,
+      contacto_emergencia_parentesco
     } = req.body;
-    
+
     const deportista = await Deportista.findOne({
       where: { user_id: userId }
     });
-    
+
     if (!deportista) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        error: 'Perfil no encontrado' 
+        error: 'Perfil no encontrado'
       });
     }
-    
+
     await deportista.update({
       contacto_emergencia_nombre,
       contacto_emergencia_telefono,
       contacto_emergencia_parentesco
     });
-    
+
     console.log('✅ Contacto de emergencia actualizado');
-    
+
     res.json({
       success: true,
       message: 'Contacto de emergencia actualizado',
       deportista
     });
-    
+
   } catch (error) {
     console.error('❌ Error actualizando contacto:', error);
     res.status(500).json({
@@ -308,10 +311,10 @@ router.put('/me/password', async (req, res) => {
   try {
     console.log('🔐 PUT /api/deportistas/me/password - Usuario:', req.user?.email);
     console.log('📦 Datos recibidos:', req.body);
-    
+
     const userId = req.user.id;
     const { password_actual, password_nueva } = req.body;
-    
+
     // Validar campos requeridos
     if (!password_actual || !password_nueva) {
       return res.status(400).json({
@@ -319,21 +322,21 @@ router.put('/me/password', async (req, res) => {
         error: 'Contraseña actual y nueva son requeridas'
       });
     }
-    
+
     const user = await User.findByPk(userId);
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
         error: 'Usuario no encontrado'
       });
     }
-    
+
     console.log('🔍 Verificando contraseña actual...');
-    
+
     // Verificar contraseña actual
     const esValida = await bcrypt.compare(password_actual, user.password);
-    
+
     if (!esValida) {
       console.log('❌ Contraseña actual incorrecta');
       return res.status(400).json({
@@ -341,9 +344,9 @@ router.put('/me/password', async (req, res) => {
         error: 'Contraseña actual incorrecta'
       });
     }
-    
+
     console.log('✅ Contraseña actual válida');
-    
+
     // Verificar que la nueva contraseña sea diferente
     const mismaContraseña = await bcrypt.compare(password_nueva, user.password);
     if (mismaContraseña) {
@@ -352,7 +355,7 @@ router.put('/me/password', async (req, res) => {
         error: 'La nueva contraseña debe ser diferente a la actual'
       });
     }
-    
+
     // Validar longitud mínima
     if (password_nueva.length < 6) {
       return res.status(400).json({
@@ -360,28 +363,28 @@ router.put('/me/password', async (req, res) => {
         error: 'La nueva contraseña debe tener al menos 6 caracteres'
       });
     }
-    
+
     console.log('🔄 Actualizando contraseña...');
-    
+
     // Actualizar contraseña (el hook beforeUpdate hará el hash)
     user.password = password_nueva;
     await user.save();
-    
+
     console.log('✅ Contraseña cambiada exitosamente');
-    
+
     res.json({
       success: true,
       message: 'Contraseña cambiada exitosamente'
     });
-    
+
   } catch (error) {
     console.error('❌ Error cambiando contraseña:', error);
-    
+
     let errorMessage = 'Error cambiando contraseña';
     if (error.name === 'SequelizeValidationError') {
       errorMessage = 'Error de validación en los datos';
     }
-    
+
     res.status(500).json({
       success: false,
       error: errorMessage,
@@ -394,27 +397,27 @@ router.put('/me/password', async (req, res) => {
 router.post('/me/photo', uploadFoto.single('foto_perfil'), async (req, res) => {
   try {
     console.log('🖼️ POST /api/deportistas/me/photo - Usuario:', req.user?.email);
-    
+
     if (!req.file) {
       return res.status(400).json({
         success: false,
         error: 'No se subió ninguna foto'
       });
     }
-    
+
     const userId = req.user.id;
-    
+
     const deportista = await Deportista.findOne({
       where: { user_id: userId }
     });
-    
+
     if (!deportista) {
       return res.status(404).json({
         success: false,
         error: 'Perfil no encontrado'
       });
     }
-    
+
     // 1. ELIMINAR FOTO ANTERIOR de Cloudinary si existe
     if (deportista.foto_perfil) {
       const oldPublicId = extractPublicId(deportista.foto_perfil);
@@ -427,16 +430,16 @@ router.post('/me/photo', uploadFoto.single('foto_perfil'), async (req, res) => {
         }
       }
     }
-    
+
     // 2. Obtener nueva URL de Cloudinary (viene en req.file.path)
     const fotoUrl = req.file.path;
     console.log('📸 Nueva URL de Cloudinary:', fotoUrl);
-    
+
     // 3. Actualizar en base de datos
     await deportista.update({ foto_perfil: fotoUrl });
-    
+
     console.log('✅ Foto actualizada exitosamente');
-    
+
     res.json({
       success: true,
       message: 'Foto actualizada exitosamente',
@@ -447,10 +450,10 @@ router.post('/me/photo', uploadFoto.single('foto_perfil'), async (req, res) => {
         nombre: deportista.user?.nombre
       }
     });
-    
+
   } catch (error) {
     console.error('❌ Error subiendo foto:', error);
-    
+
     // Determinar tipo de error para mensaje más específico
     let errorMessage = 'Error subiendo foto';
     if (error.message.includes('File too large') || error.code === 'LIMIT_FILE_SIZE') {
@@ -458,7 +461,7 @@ router.post('/me/photo', uploadFoto.single('foto_perfil'), async (req, res) => {
     } else if (error.message.includes('image') || error.message.includes('file type')) {
       errorMessage = 'Solo se permiten imágenes (JPG, PNG, GIF, WEBP)';
     }
-    
+
     res.status(500).json({
       success: false,
       error: errorMessage,
@@ -476,32 +479,32 @@ router.post('/me/photo', uploadFoto.single('foto_perfil'), async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const deportista = await Deportista.findByPk(id, {
       include: [{
         model: User,
         as: 'user',
-        attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
+        attributes: ['id', 'nombre', 'email', 'telefono', 'activo', 'numero_documento', 'tipo_documento']
       }]
     });
 
     if (!deportista) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        error: 'Deportista no encontrado' 
+        error: 'Deportista no encontrado'
       });
     }
 
-    res.json({ 
-      success: true, 
-      deportista 
+    res.json({
+      success: true,
+      deportista
     });
 
   } catch (error) {
     console.error('❌ Error obteniendo deportista:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      error: 'Error en el servidor' 
+      error: 'Error en el servidor'
     });
   }
 });
@@ -516,7 +519,7 @@ router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     let {
-      nivel_actual, estado, equipo_competitivo, 
+      nivel_actual, estado, equipo_competitivo,
       peso, altura, condicion_medica             // ✅ condicion_medica agregada
     } = req.body;
 
@@ -531,9 +534,9 @@ router.put('/:id', async (req, res) => {
     });
 
     if (!deportista) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        error: 'Deportista no encontrado' 
+        error: 'Deportista no encontrado'
       });
     }
 
@@ -543,13 +546,13 @@ router.put('/:id', async (req, res) => {
         'sin_equipo',
         'baby_titans',        // ✅ AGREGADO
         'rocks_titans',
-        'lightning_titans', 
+        'lightning_titans',
         'storm_titans',
         'fire_titans',
         'electric_titans',
         'nova_titans'         // ✅ AGREGADO
       ];
-      
+
       if (!equiposValidos.includes(equipo_competitivo)) {
         return res.status(400).json({
           success: false,
@@ -563,14 +566,14 @@ router.put('/:id', async (req, res) => {
       const nivelesValidos = [
         'pendiente',
         '1_basico',
-        '1_medio', 
+        '1_medio',
         '1_avanzado',
         '2',
         '3',
         '4'
         // baby_titans eliminado de niveles — ahora es solo equipo competitivo
       ];
-      
+
       if (!nivelesValidos.includes(nivel_actual)) {
         return res.status(400).json({
           success: false,
@@ -584,12 +587,12 @@ router.put('/:id', async (req, res) => {
       // Normalizar: "Pendiente de pago" → "pendiente_de_pago"
       estado = estado.toLowerCase().trim().replace(/\s+/g, '_');
       console.log('🔄 Estado normalizado:', estado);
-      
+
       const estadosValidos = [
-        'activo', 'pendiente', 'pendiente_de_pago', 
+        'activo', 'pendiente', 'pendiente_de_pago',
         'inactivo', 'lesionado', 'descanso'
       ];
-      
+
       if (!estadosValidos.includes(estado)) {
         console.log('❌ Estado inválido recibido:', estado);
         return res.status(400).json({
@@ -635,7 +638,7 @@ router.put('/:id', async (req, res) => {
   } catch (error) {
     console.error('❌ Error actualizando deportista:', error);
     console.error('📍 Stack trace:', error.stack);
-    
+
     res.status(500).json({
       success: false,
       error: 'Error actualizando deportista',
@@ -660,9 +663,9 @@ router.delete('/:id', isAdmin, async (req, res) => {
     });
 
     if (!deportista) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        error: 'Deportista no encontrado' 
+        error: 'Deportista no encontrado'
       });
     }
 
@@ -719,7 +722,7 @@ router.put('/:id/equipo', async (req, res) => {
       'sin_equipo',
       'baby_titans',        // ✅ AGREGADO
       'rocks_titans',
-      'lightning_titans', 
+      'lightning_titans',
       'storm_titans',
       'fire_titans',
       'electric_titans',
@@ -750,10 +753,10 @@ router.put('/:id/equipo', async (req, res) => {
 
   } catch (error) {
     console.error('❌ Error asignando equipo:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
       error: 'Error asignando equipo',
-      details: error.message 
+      details: error.message
     });
   }
 });
