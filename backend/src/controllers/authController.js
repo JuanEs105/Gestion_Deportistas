@@ -294,11 +294,18 @@ class AuthController {
       });
 
       console.log('✅ Usuario creado ID:', user.id);
+      let fechaNacimientoNormalizada = null;
+      if (fecha_nacimiento) {
+        // Tomar solo la parte YYYY-MM-DD sin importar si viene con hora
+        const soloFecha = fecha_nacimiento.split('T')[0];
+        // Reconstruir al mediodía UTC para que PostgreSQL no la mueva
+        fechaNacimientoNormalizada = new Date(soloFecha + 'T12:00:00.000Z');
+      }
 
       // Crear deportista
       const deportista = await Deportista.create({
         user_id: user.id,
-        fecha_nacimiento: fecha_nacimiento || null,
+        fecha_nacimiento: fechaNacimientoNormalizada,
         ciudad_nacimiento: ciudad_nacimiento || ciudad || null,
         direccion: direccion || null,
         eps: eps || null,

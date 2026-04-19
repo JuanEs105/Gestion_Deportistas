@@ -264,28 +264,42 @@
                         </div>
                     </div>
 
-                    <!-- Vista Modo Edición (oculta por defecto) -->
-                    <form id="infoEditMode" class="hidden">
+                   <!-- Vista Modo Edición - VERSIÓN COMPLETA CON TODOS LOS CAMPOS -->
+                    <form id="infoEditMode" class="hidden bg-white dark:bg-zinc-900 p-6 shadow-sm">
+                        <div class="mb-4 pb-4 border-b-2 border-primary flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">edit</span>
+                            <h3 class="font-display text-xl font-bold uppercase">EDITAR INFORMACIÓN</h3>
+                        </div>
+
                         <div class="grid md:grid-cols-2 gap-4 mb-4">
+
+                            <!-- Teléfono -->
                             <div>
                                 <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Teléfono</label>
                                 <input type="tel" id="editTelefono"
+                                    placeholder="Ej: 3114443158"
                                     class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
                             </div>
+
+                            <!-- Dirección -->
                             <div>
-                                <label
-                                    class="text-xs font-bold uppercase tracking-wider text-gray-500">Dirección</label>
+                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Dirección</label>
                                 <input type="text" id="editDireccion"
+                                    placeholder="Ej: Calle 10 #5-23, Barrio Centro"
                                     class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
                             </div>
+
+                            <!-- EPS -->
                             <div>
                                 <label class="text-xs font-bold uppercase tracking-wider text-gray-500">EPS</label>
                                 <input type="text" id="editEPS"
+                                    placeholder="Ej: Sanitas, Nueva EPS..."
                                     class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
                             </div>
+
+                            <!-- Talla de Camiseta -->
                             <div>
-                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Talla de
-                                    Camiseta</label>
+                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Talla de Camiseta</label>
                                 <select id="editTalla"
                                     class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
                                     <option value="">Seleccionar...</option>
@@ -299,7 +313,57 @@
                                     <option value="XL">XL</option>
                                 </select>
                             </div>
+
+                            <!-- Tipo de Documento -->
+                            <div>
+                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Tipo de Documento</label>
+                                <select id="editTipoDocumento"
+                                    class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="registro_civil">Registro Civil</option>
+                                    <option value="tarjeta_identidad">Tarjeta de Identidad</option>
+                                    <option value="cedula_ciudadania">Cédula de Ciudadanía</option>
+                                    <option value="cedula_extranjeria">Cédula de Extranjería</option>
+                                    <option value="CC">CC</option>
+                                    <option value="TI">TI</option>
+                                    <option value="CE">CE</option>
+                                    <option value="PAS">Pasaporte</option>
+                                </select>
+                            </div>
+
+                            <!-- Número de Documento -->
+                            <div>
+                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Número de Documento</label>
+                                <input type="text" id="editNumeroDocumento"
+                                    placeholder="Ej: 1092956466"
+                                    class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                            </div>
+
+                            <!-- Ciudad -->
+                            <div>
+                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Ciudad de Residencia</label>
+                                <input type="text" id="editCiudad"
+                                    placeholder="Ej: Duitama"
+                                    class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                            </div>
+
+                            <!-- Fecha de Nacimiento -->
+                            <div>
+                                <label class="text-xs font-bold uppercase tracking-wider text-gray-500">Fecha de Nacimiento</label>
+                                <input type="date" id="editFechaNacimiento"
+                                    class="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-white/20 rounded bg-white dark:bg-black/20 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                            </div>
+
                         </div>
+
+                        <!-- Aviso de seguridad -->
+                        <div class="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                            <p class="text-xs text-blue-700 dark:text-blue-400 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">info</span>
+                                El nombre, apellidos, email y condición médica solo pueden ser modificados por administración.
+                            </p>
+                        </div>
+
                         <div class="flex justify-end gap-3">
                             <button type="button"
                                 class="px-4 py-2 border border-gray-300 dark:border-white/20 rounded font-bold hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"

@@ -98,32 +98,89 @@ function actualizarInfoRapida() {
 
 function actualizarInformacionPersonal() {
     const user = deportistaData.user || {};
+
     const nombre = user.nombre || deportistaData.nombre || '--';
+    const apellidos = user.apellidos || deportistaData.apellidos || '';
+    const nombreCompleto = apellidos ? `${nombre} ${apellidos}` : nombre;
     const email = user.email || '--';
-    const telefono = user.telefono || deportistaData.telefono || 'No especificado';
-    const fechaNac = deportistaData.fecha_nacimiento ?
-        new Date(deportistaData.fecha_nacimiento).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) :
-        'No especificada';
+    const telefono = user.telefono || deportistaData.telefono || '';
 
-    document.getElementById('displayNombre').textContent = nombre;
-    document.getElementById('displayEmail').textContent = email;
-    document.getElementById('displayTelefono').textContent = telefono;
-    document.getElementById('displayDireccion').textContent = deportistaData.direccion || 'No especificada';
-    document.getElementById('displayFechaNac').textContent = fechaNac;
-    document.getElementById('displayEPS').textContent = deportistaData.eps || 'No especificada';
-    const identificacion = deportistaData.numero_documento
-    || deportistaData.user?.numero_documento
-    || null;
+    // ✅ FIX FECHA: T12:00:00 evita desfase de zona horaria Colombia (UTC-5)
+    let fechaNac = 'No especificada';
+    if (deportistaData.fecha_nacimiento) {
+        const soloFecha = deportistaData.fecha_nacimiento.split('T')[0];
+        fechaNac = new Date(soloFecha + 'T12:00:00')
+            .toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+    }
+
+    // ✅ Documento — puede estar en user o directamente en deportistaData
+    const tipoDoc = user.tipo_documento || deportistaData.tipo_documento || null;
+    const numeroDoc = user.numero_documento || deportistaData.numero_documento || null;
+
+    // ✅ Ciudad
+    const ciudad = user.ciudad || deportistaData.ciudad || null;
+
+    // — MODO LECTURA —
+    const set = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val || 'No especificado';
+    };
+
+    set('displayNombre', nombreCompleto);
+    set('displayEmail', email);
+    set('displayTelefono', telefono || 'No especificado');
+    set('displayDireccion', deportistaData.direccion);
+    set('displayFechaNac', fechaNac);
+    set('displayEPS', deportistaData.eps);
+    set('displayCiudad', ciudad);
+    set('displayTalla', deportistaData.talla_camiseta);
+
     const displayId = document.getElementById('displayIdentificacion');
-    if (displayId) displayId.textContent = identificacion || 'No registrado';
+    if (displayId) {
+        if (numeroDoc) {
+            // Mostrar label legible del tipo de documento
+            const tipoLabels = {
+                'registro_civil': 'Registro Civil',
+                'tarjeta_identidad': 'Tarjeta de Identidad',
+                'cedula_ciudadania': 'Cédula de Ciudadanía',
+                'cedula_extranjeria': 'Cédula de Extranjería',
+                'CC': 'Cédula de Ciudadanía',
+                'TI': 'Tarjeta de Identidad',
+                'CE': 'Cédula de Extranjería',
+                'PAS': 'Pasaporte',
+            };
+            const tipoLabel = tipoLabels[tipoDoc] || tipoDoc || '';
+            displayId.textContent = tipoLabel ? `${tipoLabel}: ${numeroDoc}` : numeroDoc;
+        } else {
+            displayId.textContent = 'No registrado';
+        }
+    }
 
+    // Foto
     const profilePhoto = document.getElementById('profilePhoto');
-    if (profilePhoto) profilePhoto.src = deportistaData.foto_perfil || 'https://via.placeholder.com/200';
+    if (profilePhoto) {
+        profilePhoto.src = deportistaData.foto_perfil || 'https://via.placeholder.com/200';
+    }
 
-    document.getElementById('editTelefono').value = telefono !== 'No especificado' ? telefono : '';
-    document.getElementById('editDireccion').value = deportistaData.direccion || '';
-    document.getElementById('editEPS').value = deportistaData.eps || '';
-    document.getElementById('editTalla').value = deportistaData.talla_camiseta || '';
+    // — MODO EDICIÓN: prellenar inputs —
+    const setInput = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val || '';
+    };
+
+    setInput('editTelefono', telefono);
+    setInput('editDireccion', deportistaData.direccion);
+    setInput('editEPS', deportistaData.eps);
+    setInput('editTalla', deportistaData.talla_camiseta);
+    setInput('editTipoDocumento', tipoDoc);
+    setInput('editNumeroDocumento', numeroDoc);
+    setInput('editCiudad', ciudad);
+
+    // ✅ Fecha en formato YYYY-MM-DD para el input type="date"
+    const editFecha = document.getElementById('editFechaNacimiento');
+    if (editFecha && deportistaData.fecha_nacimiento) {
+        editFecha.value = deportistaData.fecha_nacimiento.split('T')[0];
+    }
 }
 
 function actualizarContactoEmergencia() {
@@ -271,19 +328,51 @@ async function guardarInformacionPersonal(e) {
     e.preventDefault();
 
     try {
+        // ✅ Recoger TODOS los campos editables
+        const fechaInput = document.getElementById('editFechaNacimiento')?.value;
+
+        // FIX fecha: enviar al mediodía UTC para evitar desfase
+        let fechaNormalizada = undefined;
+        if (fechaInput) {
+            fechaNormalizada = fechaInput + 'T12:00:00.000Z';
+        }
+
         const datos = {
-            telefono: document.getElementById('editTelefono').value,
-            direccion: document.getElementById('editDireccion').value,
-            eps: document.getElementById('editEPS').value,
-            talla_camiseta: document.getElementById('editTalla').value
+            telefono:          document.getElementById('editTelefono')?.value.trim() || undefined,
+            direccion:         document.getElementById('editDireccion')?.value.trim() || undefined,
+            eps:               document.getElementById('editEPS')?.value.trim() || undefined,
+            talla_camiseta:    document.getElementById('editTalla')?.value || undefined,
+            tipo_documento:    document.getElementById('editTipoDocumento')?.value || undefined,
+            numero_documento:  document.getElementById('editNumeroDocumento')?.value.trim() || undefined,
+            ciudad:            document.getElementById('editCiudad')?.value.trim() || undefined,
+            fecha_nacimiento:  fechaNormalizada,
         };
+
+        // Limpiar undefined para no sobreescribir con vacío
+        Object.keys(datos).forEach(k => {
+            if (datos[k] === undefined || datos[k] === '') delete datos[k];
+        });
+
+        console.log('📤 Enviando datos:', datos);
 
         const response = await API.updatePerfil(datos);
 
+        // Actualizar datos locales
         if (response.deportista) {
             deportistaData = { ...deportistaData, ...response.deportista };
+            if (response.deportista.user) {
+                deportistaData.user = { ...deportistaData.user, ...response.deportista.user };
+            }
         } else {
-            deportistaData = { ...deportistaData, ...datos };
+            // Actualizar manualmente los campos que cambiaron
+            if (datos.direccion)        deportistaData.direccion = datos.direccion;
+            if (datos.eps)              deportistaData.eps = datos.eps;
+            if (datos.talla_camiseta)   deportistaData.talla_camiseta = datos.talla_camiseta;
+            if (datos.fecha_nacimiento) deportistaData.fecha_nacimiento = datos.fecha_nacimiento;
+            if (datos.telefono)         deportistaData.user = { ...deportistaData.user, telefono: datos.telefono };
+            if (datos.tipo_documento)   deportistaData.user = { ...deportistaData.user, tipo_documento: datos.tipo_documento };
+            if (datos.numero_documento) deportistaData.user = { ...deportistaData.user, numero_documento: datos.numero_documento };
+            if (datos.ciudad)           deportistaData.user = { ...deportistaData.user, ciudad: datos.ciudad };
         }
 
         actualizarInformacionPersonal();
@@ -294,6 +383,7 @@ async function guardarInformacionPersonal(e) {
 
     } catch (error) {
         console.error('❌ Error guardando información:', error);
+        API.showNotification('Error al guardar los cambios', 'error');
     }
 }
 

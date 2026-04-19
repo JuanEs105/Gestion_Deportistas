@@ -46,7 +46,7 @@ router.get('/me', async (req, res) => {
       include: [{
         model: User,
         as: 'user',
-        attributes: ['id', 'nombre', 'email', 'telefono', 'activo', 'numero_documento', 'tipo_documento']
+        attributes: ['id', 'nombre', 'apellidos', 'email', 'telefono', 'activo','numero_documento', 'tipo_documento', 'ciudad']
       }],
       order: [['created_at', 'DESC']]
     });
@@ -61,33 +61,40 @@ router.get('/me', async (req, res) => {
     // Formatear respuesta con todos los campos que el frontend necesita
     const deportistaData = deportista.toJSON();
 
-    const respuesta = {
-      id: deportistaData.id,
-      user_id: deportistaData.user_id,
-      nombre: deportistaData.user?.nombre || 'Sin nombre',
-      telefono: deportistaData.user?.telefono || null,
-      direccion: deportistaData.direccion || null,
-      eps: deportistaData.eps || null,
-      talla_camiseta: deportistaData.talla_camiseta || null,
-      fecha_nacimiento: deportistaData.fecha_nacimiento,
-      altura: deportistaData.altura,
-      peso: deportistaData.peso,
-      nivel_actual: deportistaData.nivel_actual || 'pendiente',
-      estado: deportistaData.estado || 'pendiente',
-      equipo_competitivo: deportistaData.equipo_competitivo || 'sin_equipo',
-      foto_perfil: deportistaData.foto_perfil,
-      condicion_medica: deportistaData.condicion_medica || null,  // ✅ AGREGADO
-      contacto_emergencia_nombre: deportistaData.contacto_emergencia_nombre,
-      contacto_emergencia_telefono: deportistaData.contacto_emergencia_telefono,
-      contacto_emergencia_parentesco: deportistaData.contacto_emergencia_parentesco,
-      user: {
-        id: deportistaData.user?.id,
-        nombre: deportistaData.user?.nombre,
-        email: deportistaData.user?.email,
-        telefono: deportistaData.user?.telefono,
-        activo: deportistaData.user?.activo
-      }
-    };
+          const respuesta = {
+        id: deportistaData.id,
+        user_id: deportistaData.user_id,
+        nombre: deportistaData.user?.nombre || 'Sin nombre',
+        apellidos: deportistaData.user?.apellidos || null,          // ✅
+        tipo_documento: deportistaData.user?.tipo_documento || null, // ✅
+        numero_documento: deportistaData.user?.numero_documento || null, // ✅
+        telefono: deportistaData.user?.telefono || null,
+        direccion: deportistaData.direccion || null,
+        eps: deportistaData.eps || null,
+        talla_camiseta: deportistaData.talla_camiseta || null,
+        fecha_nacimiento: deportistaData.fecha_nacimiento,
+        altura: deportistaData.altura,
+        peso: deportistaData.peso,
+        nivel_actual: deportistaData.nivel_actual || 'pendiente',
+        estado: deportistaData.estado || 'pendiente',
+        equipo_competitivo: deportistaData.equipo_competitivo || 'sin_equipo',
+        foto_perfil: deportistaData.foto_perfil,
+        condicion_medica: deportistaData.condicion_medica || null,
+        contacto_emergencia_nombre: deportistaData.contacto_emergencia_nombre,
+        contacto_emergencia_telefono: deportistaData.contacto_emergencia_telefono,
+        contacto_emergencia_parentesco: deportistaData.contacto_emergencia_parentesco,
+        user: {
+          id: deportistaData.user?.id,
+          nombre: deportistaData.user?.nombre,
+          apellidos: deportistaData.user?.apellidos || null,          // ✅
+          email: deportistaData.user?.email,
+          telefono: deportistaData.user?.telefono,
+          activo: deportistaData.user?.activo,
+          tipo_documento: deportistaData.user?.tipo_documento || null, // ✅
+          numero_documento: deportistaData.user?.numero_documento || null, // ✅
+          ciudad: deportistaData.user?.ciudad || null,                 // ✅
+        }
+      };
 
     console.log('📤 Enviando respuesta perfil deportista');
 
@@ -173,7 +180,6 @@ router.get('/', async (req, res) => {
 // ====================
 
 // PUT /api/deportistas/me - Deportista actualiza SU PROPIO perfil
-// NOTA: condicion_medica NO se permite editar desde aquí — solo admin puede modificarla
 router.put('/me', async (req, res) => {
   try {
     console.log('📝 PUT /api/deportistas/me - Usuario:', req.user?.email);
@@ -181,20 +187,13 @@ router.put('/me', async (req, res) => {
 
     const userId = req.user.id;
 
-    // Buscar deportista por user_id
     const deportista = await Deportista.findOne({
       where: { user_id: userId },
-      include: [{
-        model: User,
-        as: 'user'
-      }]
+      include: [{ model: User, as: 'user' }]
     });
 
     if (!deportista) {
-      return res.status(404).json({
-        success: false,
-        error: 'Perfil no encontrado'
-      });
+      return res.status(404).json({ success: false, error: 'Perfil no encontrado' });
     }
 
     const {
@@ -204,47 +203,51 @@ router.put('/me', async (req, res) => {
       talla_camiseta,
       contacto_emergencia_nombre,
       contacto_emergencia_telefono,
-      contacto_emergencia_parentesco
-      // condicion_medica ignorada intencionalmente — solo admin puede modificarla
+      contacto_emergencia_parentesco,
+      // ✅ CAMPOS NUEVOS
+      tipo_documento,
+      numero_documento,
+      ciudad,
+      fecha_nacimiento,
     } = req.body;
 
-    console.log('📋 Campos a actualizar:');
-    console.log('- Teléfono:', telefono);
-    console.log('- Dirección:', direccion);
-    console.log('- EPS:', eps);
-    console.log('- Talla camiseta:', talla_camiseta);
-    console.log('- Contacto emergencia:', contacto_emergencia_nombre);
-
-    // ✅ ACTUALIZAR CAMPOS DEL DEPORTISTA
-    if (direccion !== undefined) deportista.direccion = direccion;
-    if (eps !== undefined) deportista.eps = eps;
-    if (talla_camiseta !== undefined) deportista.talla_camiseta = talla_camiseta;
-    if (contacto_emergencia_nombre !== undefined) deportista.contacto_emergencia_nombre = contacto_emergencia_nombre;
-    if (contacto_emergencia_telefono !== undefined) deportista.contacto_emergencia_telefono = contacto_emergencia_telefono;
+    // — Actualizar tabla deportistas —
+    if (direccion !== undefined)                      deportista.direccion = direccion;
+    if (eps !== undefined)                            deportista.eps = eps;
+    if (talla_camiseta !== undefined)                 deportista.talla_camiseta = talla_camiseta;
+    if (contacto_emergencia_nombre !== undefined)     deportista.contacto_emergencia_nombre = contacto_emergencia_nombre;
+    if (contacto_emergencia_telefono !== undefined)   deportista.contacto_emergencia_telefono = contacto_emergencia_telefono;
     if (contacto_emergencia_parentesco !== undefined) deportista.contacto_emergencia_parentesco = contacto_emergencia_parentesco;
 
-    // ✅ ACTUALIZAR TELÉFONO DEL USUARIO
-    if (telefono !== undefined && deportista.user) {
-      deportista.user.telefono = telefono;
+    // ✅ FIX FECHA: normalizar para evitar desfase de zona horaria
+    if (fecha_nacimiento) {
+      const soloFecha = fecha_nacimiento.split('T')[0];
+      deportista.fecha_nacimiento = new Date(soloFecha + 'T12:00:00.000Z');
+    }
+
+    // — Actualizar tabla users —
+    if (deportista.user) {
+      if (telefono)        deportista.user.telefono        = telefono;
+      if (tipo_documento)  deportista.user.tipo_documento  = tipo_documento;
+      if (numero_documento) deportista.user.numero_documento = numero_documento;
+      if (ciudad)          deportista.user.ciudad          = ciudad;
       await deportista.user.save();
     }
 
-    // Guardar cambios del deportista
     await deportista.save();
 
-    console.log('✅ Perfil actualizado exitosamente');
-
-    // Obtener datos actualizados
+    // Retornar datos actualizados con TODOS los campos del user
     const deportistaActualizado = await Deportista.findOne({
       where: { user_id: userId },
       include: [{
         model: User,
         as: 'user',
-        attributes: ['id', 'nombre', 'email', 'telefono', 'activo']
+        attributes: ['id', 'nombre', 'apellidos', 'email', 'telefono', 'activo',
+                     'numero_documento', 'tipo_documento', 'ciudad']
       }]
     });
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Perfil actualizado exitosamente',
       deportista: deportistaActualizado
@@ -252,7 +255,7 @@ router.put('/me', async (req, res) => {
 
   } catch (error) {
     console.error('❌ Error actualizando perfil:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Error actualizando tu perfil',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined

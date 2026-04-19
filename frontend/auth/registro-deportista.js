@@ -500,6 +500,11 @@ function setupFormSubmit() {
                 if (condicionMedica) {
                     formData.set('condicion_medica', condicionMedica);
                 }
+                const fechaRaw = document.getElementById('fecha_nacimiento').value; // "2014-04-22"
+                if (fechaRaw) {
+                    // Agregar T12:00:00Z para que no se mueva por zona horaria
+                    formData.set('fecha_nacimiento', fechaRaw + 'T12:00:00.000Z');
+                }
 
                 console.log('📤 Enviando a backend...');
 
