@@ -1776,12 +1776,14 @@ class AdminController {
 
       // 🔥 CORRECCIÓN: Agregar TODOS los campos posibles
       const camposPermitidos = [
-        'peso', 'altura', 'talla_camiseta', 'talla',
-        'nivel_actual', 'estado', 'equipo_competitivo',
-        'fecha_nacimiento', 'eps', 'direccion',
-        'contacto_emergencia_nombre', 'contacto_emergencia_telefono',
-        'contacto_emergencia_parentesco'
-      ];
+          'peso', 'altura', 'talla_camiseta', 'talla',
+          'nivel_actual', 'estado', 'equipo_competitivo',
+          'fecha_nacimiento', 'eps', 'direccion',
+          'contacto_emergencia_nombre', 'contacto_emergencia_telefono',
+          'contacto_emergencia_parentesco',
+          // ✅ NUEVOS
+          'ciudad_nacimiento',
+       ];
 
       const updates = {};
 
@@ -1822,20 +1824,24 @@ class AdminController {
       console.log('✅ Deportista actualizado en BD:', updates);
 
       // Si se actualiza el usuario (nombre, email, teléfono)
-      if (datos.nombre || datos.email || datos.telefono || datos.numero_documento !== undefined) {
-        const userUpdates = {};
-        if (datos.nombre) userUpdates.nombre = datos.nombre;
-        if (datos.email) userUpdates.email = datos.email;
-        if (datos.telefono !== undefined) userUpdates.telefono = datos.telefono;
-        if (datos.numero_documento !== undefined) userUpdates.numero_documento = datos.numero_documento;
+      if (datos.nombre || datos.apellidos || datos.email || datos.telefono ||
+          datos.numero_documento !== undefined || datos.tipo_documento !== undefined ||
+          datos.ciudad !== undefined) {
 
-        if (Object.keys(userUpdates).length > 0) {
-          await User.update(userUpdates, {
-            where: { id: deportista.user_id }
-          });
-          console.log('✅ Usuario actualizado:', userUpdates);
+          const userUpdates = {};
+          if (datos.nombre)                        userUpdates.nombre = datos.nombre;
+          if (datos.apellidos !== undefined)       userUpdates.apellidos = datos.apellidos;
+          if (datos.email)                         userUpdates.email = datos.email;
+          if (datos.telefono !== undefined)        userUpdates.telefono = datos.telefono;
+          if (datos.numero_documento !== undefined) userUpdates.numero_documento = datos.numero_documento;
+          if (datos.tipo_documento !== undefined)  userUpdates.tipo_documento = datos.tipo_documento;
+          if (datos.ciudad !== undefined)          userUpdates.ciudad = datos.ciudad;
+
+          if (Object.keys(userUpdates).length > 0) {
+              await User.update(userUpdates, { where: { id: deportista.user_id } });
+              console.log('✅ Usuario actualizado:', userUpdates);
+          }
         }
-      }
 
       // 🔥 DEBUG: Recargar para verificar cambios
       const deportistaActualizado = await Deportista.findByPk(id, {

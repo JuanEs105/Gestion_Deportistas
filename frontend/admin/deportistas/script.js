@@ -142,7 +142,10 @@ function procesarDatosDeportistas(data) {
         activo: d.activo || d.User?.activo || true,
         numero_documento: d.numero_documento || null,   // ✅ AGREGAR
         tipo_documento: d.tipo_documento || null,
+        apellidos: d.apellidos || d.usuario_asociado?.apellidos || null,  // ✅ AGREGAR
+        ciudad: d.ciudad || d.user?.ciudad || null,                        // ✅ AGREGAR
     }));
+    
 
     deportistas.sort((a, b) => a.nombre.localeCompare(b.nombre));
     console.log(`✅ ${deportistas.length} deportistas procesados`);
@@ -824,40 +827,109 @@ function editarDeportistaCompleto(deportistaId) {
                                 Esta información solo puede ser modificada por el deportista al momento del registro.
                             </p>
                         </div>
-                                            
-                    <!-- Solo lectura -->
-                    <div class="bg-gray-50 dark:bg-zinc-800 rounded-xl p-6">
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">ℹ️ Información del Deportista (Solo Lectura)</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Nombre</p>
-                                <p class="font-medium">${escapeHTML(deportistaSeleccionado.nombre)}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Email</p>
-                                <p class="font-medium">${escapeHTML(deportistaSeleccionado.email)}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Teléfono</p>
-                                <p class="font-medium">${escapeHTML(deportistaSeleccionado.telefono || 'No registrado')}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Número de Identificación</p>
-                                <div class="flex items-center gap-2">
-                                    <input type="text" id="editIdentificacion" 
-                                        value="${escapeHTML(deportistaSeleccionado.numero_documento || '')}"
-                                        class="flex-1 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-                                        placeholder="Ej: 1052123456">
-                                    <span class="text-xs text-orange-500 font-medium">Editable</span>
+                    <!-- ✅ INFORMACIÓN PERSONAL — AHORA EDITABLE -->
+                        <div class="bg-gray-50 dark:bg-zinc-800 rounded-xl p-6">
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">👤 Información Personal</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nombre</label>
+                                    <input type="text" id="editNombre" value="${escapeHTML(deportistaSeleccionado.nombre || '')}"
+                                        class="w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                        placeholder="Nombre del deportista">
                                 </div>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">F. Ingreso</p>
-                                <p class="font-medium">${deportistaSeleccionado.fecha_ingreso ? new Date(deportistaSeleccionado.fecha_ingreso).toLocaleDateString('es-ES') : 'No registrada'}</p>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Apellidos</label>
+                                    <input type="text" id="editApellidos" value="${escapeHTML(deportistaSeleccionado.apellidos || deportistaSeleccionado.usuario_asociado?.apellidos || '')}"
+                                        class="w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                        placeholder="Apellidos">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
+                                    <input type="email" id="editEmail" value="${escapeHTML(deportistaSeleccionado.email || '')}"
+                                        class="w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                        placeholder="correo@ejemplo.com">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Teléfono</label>
+                                    <input type="tel" id="editTelefono" value="${escapeHTML(deportistaSeleccionado.telefono || '')}"
+                                        class="w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                        placeholder="3114443158">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tipo de Documento</label>
+                                    <select id="editTipoDocumento"
+                                            class="w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all">
+                                        <option value="">Seleccionar...</option>
+                                        <option value="TI" ${deportistaSeleccionado.tipo_documento === 'TI' ? 'selected' : ''}>Tarjeta de Identidad (TI)</option>
+                                        <option value="CC" ${deportistaSeleccionado.tipo_documento === 'CC' ? 'selected' : ''}>Cédula de Ciudadanía (CC)</option>
+                                        <option value="CE" ${deportistaSeleccionado.tipo_documento === 'CE' ? 'selected' : ''}>Cédula de Extranjería (CE)</option>
+                                        <option value="RC" ${deportistaSeleccionado.tipo_documento === 'RC' ? 'selected' : ''}>Registro Civil (RC)</option>
+                                        <option value="PAS" ${deportistaSeleccionado.tipo_documento === 'PAS' ? 'selected' : ''}>Pasaporte (PAS)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Número de Documento</label>
+                                    <input type="text" id="editNumeroDocumento" value="${escapeHTML(deportistaSeleccionado.numero_documento || '')}"
+                                        class="w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                        placeholder="Ej: 1092956466">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ciudad</label>
+                                    <input type="text" id="editCiudad" value="${escapeHTML(deportistaSeleccionado.ciudad || '')}"
+                                        class="w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                        placeholder="Duitama">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fecha de Nacimiento</label>
+                                    <input type="date" id="editFechaNacimientoAdmin"
+                                        value="${deportistaSeleccionado.fecha_nacimiento ? deportistaSeleccionado.fecha_nacimiento.split('T')[0] : ''}"
+                                        class="w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Dirección</label>
+                                    <input type="text" id="editDireccionAdmin" value="${escapeHTML(deportistaSeleccionado.direccion || '')}"
+                                        class="w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                        placeholder="Calle 10 #5-23">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">EPS</label>
+                                    <input type="text" id="editEPSAdmin" value="${escapeHTML(deportistaSeleccionado.eps || '')}"
+                                        class="w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                        placeholder="Sanitas, Nueva EPS...">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Contacto Emergencia</label>
+                                    <input type="text" id="editContactoNombre" value="${escapeHTML(deportistaSeleccionado.contacto_emergencia_nombre || '')}"
+                                        class="w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                        placeholder="Nombre del acudiente">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tel. Emergencia</label>
+                                    <input type="tel" id="editContactoTelefono" value="${escapeHTML(deportistaSeleccionado.contacto_emergencia_telefono || '')}"
+                                        class="w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                                        placeholder="3114443158">
+                                </div>
+
+                                <div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">F. Ingreso</p>
+                                    <p class="font-medium px-4 py-3">${deportistaSeleccionado.fecha_ingreso ? new Date(deportistaSeleccionado.fecha_ingreso).toLocaleDateString('es-ES') : 'No registrada'}</p>
+                                </div>
+
                             </div>
                         </div>
                     </div>
-                </div>
                 
                 <div class="mt-8 pt-6 border-t border-gray-200 dark:border-white/5 flex justify-between gap-3">
                     <button type="button" onclick="cerrarModal()" 
@@ -892,15 +964,40 @@ async function guardarCambiosDeportistaAdmin() {
     try {
         setLoading(true);
 
+        const fechaInputAdmin = document.getElementById('editFechaNacimientoAdmin')?.value;
+            let fechaNormalizadaAdmin = undefined;
+            if (fechaInputAdmin) {
+             fechaNormalizadaAdmin = fechaInputAdmin + 'T12:00:00.000Z';
+            }
+
         const datosActualizados = {
-            peso: document.getElementById('editPeso').value ? parseFloat(document.getElementById('editPeso').value) : null,
-            altura: document.getElementById('editAltura').value ? parseFloat(document.getElementById('editAltura').value) : null,
-            talla_camiseta: document.getElementById('editTalla').value.trim() || null,
-            nivel_actual: document.getElementById('editNivel').value,
-            estado: document.getElementById('editEstado').value,
-            equipo_competitivo: document.getElementById('editEquipo').value,
-            numero_identificacion: document.getElementById('editIdentificacion')?.value?.trim() || null,
-        };
+                // Datos físicos
+                peso:            document.getElementById('editPeso').value ? parseFloat(document.getElementById('editPeso').value) : null,
+                altura:          document.getElementById('editAltura').value ? parseFloat(document.getElementById('editAltura').value) : null,
+                talla_camiseta:  document.getElementById('editTalla').value.trim() || null,
+                // Configuración
+                nivel_actual:    document.getElementById('editNivel').value,
+                estado:          document.getElementById('editEstado').value,
+                equipo_competitivo: document.getElementById('editEquipo').value,
+                // ✅ Información personal — ahora editables por admin
+                nombre:          document.getElementById('editNombre')?.value.trim() || undefined,
+                apellidos:       document.getElementById('editApellidos')?.value.trim() || undefined,
+                email:           document.getElementById('editEmail')?.value.trim() || undefined,
+                telefono:        document.getElementById('editTelefono')?.value.trim() || undefined,
+                tipo_documento:  document.getElementById('editTipoDocumento')?.value || undefined,
+                numero_documento: document.getElementById('editNumeroDocumento')?.value.trim() || undefined,
+                ciudad:          document.getElementById('editCiudad')?.value.trim() || undefined,
+                fecha_nacimiento: fechaNormalizadaAdmin,
+                direccion:       document.getElementById('editDireccionAdmin')?.value.trim() || undefined,
+                eps:             document.getElementById('editEPSAdmin')?.value.trim() || undefined,
+                contacto_emergencia_nombre:   document.getElementById('editContactoNombre')?.value.trim() || undefined,
+                contacto_emergencia_telefono: document.getElementById('editContactoTelefono')?.value.trim() || undefined,
+            };
+
+            // Limpiar undefined
+                Object.keys(datosActualizados).forEach(k => {
+                    if (datosActualizados[k] === undefined) delete datosActualizados[k];
+                });
 
         console.log('💾 Guardando cambios completos:', datosActualizados);
 
